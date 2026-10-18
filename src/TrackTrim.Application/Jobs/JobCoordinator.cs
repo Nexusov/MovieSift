@@ -14,7 +14,7 @@ public sealed class JobCoordinator(IMediaBackend backend, ISourceAccess sourceAc
     /// <summary>Runs one approved immutable plan and publishes only verified clean output.</summary>
     public async Task<JobResult> RunAsync(JobRequest request)
     {
-        if (!await gate.WaitAsync(0, request.CancellationToken))
+        if (!await gate.WaitAsync(0))
         {
             return new(request.Plan.Id, JobPhase.Failed, Failure: new(ErrorCode.Busy));
         }
@@ -24,6 +24,8 @@ public sealed class JobCoordinator(IMediaBackend backend, ISourceAccess sourceAc
 
         try
         {
+            request.CancellationToken.ThrowIfCancellationRequested();
+
             if (pendingWarning is not null)
             {
                 return result with { Phase = JobPhase.Failed, Failure = new(ErrorCode.Busy) };
@@ -91,12 +93,15 @@ public sealed class JobCoordinator(IMediaBackend backend, ISourceAccess sourceAc
         }
         finally
         {
-            gate.Release();
-        }
+            var shouldCleanup = output is not null && pendingWarning?.Output != output &&
+                result.Failure?.Code != ErrorCode.ProcessTerminationFailed;
 
-        if (output is not null && result.Failure?.Code != ErrorCode.ProcessTerminationFailed)
-        {
-            result = result with { CleanupIssues = await CleanupSafelyAsync(output) };
+            if (shouldCleanup)
+            {
+                result = result with { CleanupIssues = await CleanupSafelyAsync(output!) };
+            }
+
+            gate.Release();
         }
 
         return result;
@@ -149,12 +154,12 @@ public sealed class JobCoordinator(IMediaBackend backend, ISourceAccess sourceAc
         }
         finally
         {
-            gate.Release();
-        }
+            if (pendingWarning is null && result.Failure?.Code != ErrorCode.ProcessTerminationFailed)
+            {
+                result = result with { CleanupIssues = await CleanupSafelyAsync(pending.Output) };
+            }
 
-        if (result.Failure?.Code != ErrorCode.ProcessTerminationFailed)
-        {
-            result = result with { CleanupIssues = await CleanupSafelyAsync(pending.Output) };
+            gate.Release();
         }
 
         return result;
@@ -210,6 +215,7 @@ public sealed class JobCoordinator(IMediaBackend backend, ISourceAccess sourceAc
             Phase = JobPhase.Completed,
             PublishedPath = publication.Path,
             OutputLength = publication.Length,
+            CancellationRequested = request.CancellationToken.IsCancellationRequested,
             Failure = null
         };
     }
