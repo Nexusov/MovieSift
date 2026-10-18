@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text.Json.Nodes;
+using Microsoft.Win32.SafeHandles;
 using TrackTrim.Application.Ports;
 using TrackTrim.Core.Media;
 using TrackTrim.Core.Planning;
@@ -14,6 +15,11 @@ namespace TrackTrim.Application.Tests;
 /// <summary>Checks real local publication, alias detection and bounded portable records.</summary>
 public sealed class PortableFileTests : IDisposable
 {
+    private const uint FifoOwnerReadWritePermissions = 0x180;
+    private const int LinuxReadWrite = 2;
+    private const int LinuxNonBlocking = 0x800;
+    private const int LinuxCloseOnExec = 0x80000;
+    private static readonly TimeSpan FifoReadTimeout = TimeSpan.FromSeconds(5);
     private readonly string root = Path.Combine(Path.GetTempPath(), $"TrackTrim tests Кириллица {Guid.NewGuid():N}");
     public static bool IsLinux => OperatingSystem.IsLinux();
 
@@ -57,6 +63,87 @@ public sealed class PortableFileTests : IDisposable
         var access = new FileSourceAccess();
         var failure = await Assert.ThrowsAsync<OperationFailureException>(() => access.ReadRevisionAsync(new(fifo)));
         Assert.Equal(Core.Failures.ErrorCode.InvalidSource, failure.Failure.Code);
+    }
+
+    /// <summary>Rejects FIFO ownership evidence without blocking discovery or authorizing deletion.</summary>
+    [Theory(SkipUnless = nameof(IsLinux), Skip = "The ownership FIFO regressions require Linux.")]
+    [InlineData("record")]
+    [InlineData("marker")]
+    public async Task LinuxFifoOwnershipEvidenceCannotBlockOrAuthorizeCleanup(string evidenceKind)
+    {
+        var request = await CreateOutputAsync();
+        var recordPath = Path.Combine(root, "data", "ownership", $"{request.Output.JobId:N}.json");
+        var markerPath = Path.Combine(request.Output.DirectoryPath, "owner.json");
+        var fifoPath = evidenceKind == "record" ? recordPath : markerPath;
+        var retainedEvidencePath = evidenceKind == "record" ? markerPath : recordPath;
+        var cancellationToken = TestContext.Current.CancellationToken;
+        var retainedEvidence = await File.ReadAllTextAsync(retainedEvidencePath, cancellationToken);
+        await File.WriteAllTextAsync(request.Output.CandidatePath, "candidate evidence", cancellationToken);
+        File.Delete(fifoPath);
+        Assert.Equal(0, MakeFifo(fifoPath, FifoOwnerReadWritePermissions));
+        var discovery = Task.Run(() => request.Store.FindInterruptedAsync(cancellationToken), CancellationToken.None);
+
+        try
+        {
+            var entry = Assert.Single(await discovery.WaitAsync(FifoReadTimeout, cancellationToken));
+            Assert.Equal("InvalidRecord", entry.Stage);
+            Assert.False(entry.CanClean);
+            Assert.Null(entry.Output);
+            Assert.Equal(recordPath, entry.Issue);
+        }
+        finally
+        {
+            if (!discovery.IsCompleted)
+            {
+                await ReleaseBlockedFifoReadAsync(new(fifoPath, discovery));
+            }
+        }
+
+        var cleanup = Task.Run(() => request.Store.CleanupAsync(new(request.Output)), CancellationToken.None);
+
+        try
+        {
+            Assert.Single(await cleanup.WaitAsync(FifoReadTimeout, cancellationToken));
+        }
+        finally
+        {
+            if (!cleanup.IsCompleted)
+            {
+                await ReleaseBlockedFifoReadAsync(new(fifoPath, cleanup));
+            }
+        }
+
+        Assert.True(File.Exists(fifoPath));
+        Assert.Equal(retainedEvidence, await File.ReadAllTextAsync(retainedEvidencePath, cancellationToken));
+        Assert.Equal("candidate evidence", await File.ReadAllTextAsync(request.Output.CandidatePath, cancellationToken));
+        Assert.Equal("original", await File.ReadAllTextAsync(Path.Combine(root, "source.mkv"), cancellationToken));
+    }
+
+    /// <summary>Uses English for non-regular settings without blocking startup or deleting the FIFO.</summary>
+    [Fact(SkipUnless = nameof(IsLinux), Skip = "The settings FIFO regression requires Linux.")]
+    public async Task LinuxFifoSettingsFallBackWithoutBlockingStartup()
+    {
+        var dataDirectory = Path.Combine(root, "data");
+        Directory.CreateDirectory(dataDirectory);
+        var fifoPath = Path.Combine(dataDirectory, "settings.json");
+        Assert.Equal(0, MakeFifo(fifoPath, FifoOwnerReadWritePermissions));
+        var cancellationToken = TestContext.Current.CancellationToken;
+        var store = new PortableSettingsStore(dataDirectory);
+        var loading = Task.Run(() => store.LoadLanguageAsync(cancellationToken), CancellationToken.None);
+
+        try
+        {
+            Assert.Equal("en", await loading.WaitAsync(FifoReadTimeout, cancellationToken));
+        }
+        finally
+        {
+            if (!loading.IsCompleted)
+            {
+                await ReleaseBlockedFifoReadAsync(new(fifoPath, loading));
+            }
+        }
+
+        Assert.True(File.Exists(fifoPath));
     }
 
     /// <summary>Enforces a collision appearing after reservation at the actual move operation.</summary>
@@ -325,6 +412,18 @@ public sealed class PortableFileTests : IDisposable
         return record.ToJsonString();
     }
 
+    /// <summary>Releases a regressed blocking open and observes its worker before removing the test directory.</summary>
+    private static async Task ReleaseBlockedFifoReadAsync(BlockedFifoRead request)
+    {
+        // The test-only O_RDWR descriptor also works when the queued reader has not entered open() yet.
+        var descriptor = OpenFifo(request.Path, LinuxReadWrite | LinuxNonBlocking | LinuxCloseOnExec);
+        Assert.True(descriptor >= 0, $"Could not release the blocked record reader (OS error {Marshal.GetLastPInvokeError()}).");
+        using var releaseHandle = new SafeFileHandle((IntPtr)descriptor, ownsHandle: true);
+        var failure = await Record.ExceptionAsync(() => request.Worker.WaitAsync(FifoReadTimeout, CancellationToken.None));
+        Assert.IsNotType<TimeoutException>(failure);
+        Assert.True(request.Worker.IsCompleted, "The record reader must be observed before test teardown.");
+    }
+
     /// <summary>Removes only this test's unique temporary directory.</summary>
     public void Dispose() => Directory.Delete(root, recursive: true);
 
@@ -338,6 +437,10 @@ public sealed class PortableFileTests : IDisposable
     [DllImport("libc", EntryPoint = "mkfifo", SetLastError = true)]
     private static extern int MakeFifo([MarshalAs(UnmanagedType.LPUTF8Str)] string path, uint mode);
 
+    [DllImport("libc", EntryPoint = "open", SetLastError = true)]
+    private static extern int OpenFifo([MarshalAs(UnmanagedType.LPUTF8Str)] string path, int flags);
+
     private sealed record OutputFixture(OwnedOutputStore Store, OwnedOutput Output);
     private sealed record RecordCorruption(string OriginalJson, string MemberPath, string? ReplacementJson);
+    private sealed record BlockedFifoRead(string Path, Task Worker);
 }

@@ -10,11 +10,10 @@ internal static class BoundedJson
     private const int MaximumRecordBytes = 65_536;
     private static readonly JsonSerializerOptions Options = new() { MaxDepth = 16, WriteIndented = true };
 
-    /// <summary>Rejects oversized or redirected records before deserialization.</summary>
+    /// <summary>Requires a regular file and rejects oversized or redirected records before deserialization.</summary>
     internal static async Task<T?> ReadAsync<T>(string path)
     {
-        Files.PathSafety.RejectReparsePoints(path);
-        await using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+        await using var stream = Files.FileSourceAccess.OpenRegularReadStream(path);
 
         if (stream.Length > MaximumRecordBytes)
         {
