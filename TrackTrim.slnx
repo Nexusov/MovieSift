@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/TrackTrim.Application/TrackTrim.Application.csproj" />
+    <Project Path="src/TrackTrim.Core/TrackTrim.Core.csproj" />
+    <Project Path="src/TrackTrim.Desktop/TrackTrim.Desktop.csproj" />
+    <Project Path="src/TrackTrim.Infrastructure/TrackTrim.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/TrackTrim.Application.Tests/TrackTrim.Application.Tests.csproj" />
+    <Project Path="tests/TrackTrim.Core.Tests/TrackTrim.Core.Tests.csproj" />
+    <Project Path="tests/TrackTrim.Desktop.Tests/TrackTrim.Desktop.Tests.csproj" />
+    <Project Path="tests/TrackTrim.Infrastructure.Tests/TrackTrim.Infrastructure.Tests.csproj" />
+    <Project Path="tests/TrackTrim.ProcessTestWorker/TrackTrim.ProcessTestWorker.csproj" />
+  </Folder>
+</Solution>

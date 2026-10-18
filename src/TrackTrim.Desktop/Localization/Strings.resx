@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <data name="AppSubtitle" xml:space="preserve"><value>Keep the tracks you need. Preserve the original.</value></data>
+  <data name="Language" xml:space="preserve"><value>Language / Язык</value></data>
+  <data name="OpenFile" xml:space="preserve"><value>Open MKV…</value></data>
+  <data name="ChooseOutput" xml:space="preserve"><value>Choose output folder…</value></data>
+  <data name="Source" xml:space="preserve"><value>Source file</value></data>
+  <data name="Output" xml:space="preserve"><value>Output file</value></data>
+  <data name="NoSource" xml:space="preserve"><value>Select one local MKV to inspect its real tracks.</value></data>
+  <data name="NoOutput" xml:space="preserve"><value>Choose a separate output folder.</value></data>
+  <data name="Tracks" xml:space="preserve"><value>Tracks</value></data>
+  <data name="Keep" xml:space="preserve"><value>Keep</value></data>
+  <data name="TrackId" xml:space="preserve"><value>Tool ID</value></data>
+  <data name="Type" xml:space="preserve"><value>Type</value></data>
+  <data name="Codec" xml:space="preserve"><value>Codec</value></data>
+  <data name="LanguageMetadata" xml:space="preserve"><value>Language tag</value></data>
+  <data name="Title" xml:space="preserve"><value>Title</value></data>
+  <data name="Channels" xml:space="preserve"><value>Channels</value></data>
+  <data name="Flags" xml:space="preserve"><value>Effective flags</value></data>
+  <data name="Unknown" xml:space="preserve"><value>Unknown</value></data>
+  <data name="Untitled" xml:space="preserve"><value>Untitled</value></data>
+  <data name="Video" xml:space="preserve"><value>Video</value></data>
+  <data name="Audio" xml:space="preserve"><value>Audio</value></data>
+  <data name="Subtitles" xml:space="preserve"><value>Subtitles</value></data>
+  <data name="Other" xml:space="preserve"><value>Other</value></data>
+  <data name="AlwaysKept" xml:space="preserve"><value>Always kept</value></data>
+  <data name="Default" xml:space="preserve"><value>default</value></data>
+  <data name="Forced" xml:space="preserve"><value>forced</value></data>
+  <data name="Enabled" xml:space="preserve"><value>enabled</value></data>
+  <data name="ReviewPlan" xml:space="preserve"><value>Review output plan</value></data>
+  <data name="Run" xml:space="preserve"><value>Create new MKV</value></data>
+  <data name="Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Plan" xml:space="preserve"><value>Approved plan review</value></data>
+  <data name="PlanInstructions" xml:space="preserve"><value>Review the selected tracks and output path, then create the new MKV. Changing a selection or destination invalidates this review.</value></data>
+  <data name="ConfirmSilent" xml:space="preserve"><value>I confirm removal of every audio track (silent output).</value></data>
+  <data name="OriginalNotice" xml:space="preserve"><value>The original is preserved and still occupies disk space. Only a new file is created.</value></data>
+  <data name="VerificationNotice" xml:space="preserve"><value>Every output receives structural and metadata verification. This does not prove every encoded packet is intact.</value></data>
+  <data name="Idle" xml:space="preserve"><value>Ready</value></data>
+  <data name="Inspecting" xml:space="preserve"><value>Inspecting the source…</value></data>
+  <data name="InspectionReady" xml:space="preserve"><value>Tracks loaded. Select audio and subtitles to keep.</value></data>
+  <data name="PlanReady" xml:space="preserve"><value>Plan is ready for execution.</value></data>
+  <data name="PlanInvalidated" xml:space="preserve"><value>The plan changed. Review it again before processing.</value></data>
+  <data name="NoChange" xml:space="preserve"><value>No tracks removed. A new file is unnecessary; no tool was run.</value></data>
+  <data name="Checking" xml:space="preserve"><value>Checking source and destination…</value></data>
+  <data name="Remuxing" xml:space="preserve"><value>Copying retained streams…</value></data>
+  <data name="Verifying" xml:space="preserve"><value>Verifying the candidate…</value></data>
+  <data name="Publishing" xml:space="preserve"><value>Publishing the new file…</value></data>
+  <data name="Published" xml:space="preserve"><value>New file created: {0}</value></data>
+  <data name="Cancelled" xml:space="preserve"><value>Operation cancelled. The original is preserved.</value></data>
+  <data name="Failed" xml:space="preserve"><value>Operation failed.</value></data>
+  <data name="WarningReview" xml:space="preserve"><value>The tool reported warnings. Verified output is awaiting your review.</value></data>
+  <data name="PublishWarnings" xml:space="preserve"><value>Publish with warnings</value></data>
+  <data name="Discard" xml:space="preserve"><value>Discard output</value></data>
+  <data name="Discarded" xml:space="preserve"><value>The temporary output was discarded.</value></data>
+  <data name="Diagnostics" xml:space="preserve"><value>Tool diagnostics (original language)</value></data>
+  <data name="Error" xml:space="preserve"><value>Error: {0}</value></data>
+  <data name="Details" xml:space="preserve"><value>Details</value></data>
+  <data name="PersistenceFailure" xml:space="preserve"><value>Portable data is unavailable. In non-persistent mode, settings cannot be saved and media writes are disabled. Move the application to a writable folder to enable processing.</value></data>
+  <data name="ChooseData" xml:space="preserve"><value>Choose writable data folder…</value></data>
+  <data name="Interrupted" xml:space="preserve"><value>Interrupted temporary work requires review. Nothing will be published automatically.</value></data>
+  <data name="CleanInterrupted" xml:space="preserve"><value>Clean owned temporary files</value></data>
+  <data name="CleanupIssue" xml:space="preserve"><value>Temporary cleanup needs attention: {0}</value></data>
+  <data name="CloseDuringWork" xml:space="preserve"><value>Stopping the active operation safely before closing…</value></data>
+  <data name="TracksSummary" xml:space="preserve"><value>Keep {0} tracks; remove {1}.</value></data>
+  <data name="SizeDifference" xml:space="preserve"><value>New file is {0:N0} bytes smaller. The original remains on disk.</value></data>
+  <data name="Backend" xml:space="preserve"><value>Media backend</value></data>
+  <data name="DevelopmentTools" xml:space="preserve"><value>Development tool override</value></data>
+  <data name="FileDialogTitle" xml:space="preserve"><value>Select an MKV file</value></data>
+  <data name="OutputDialogTitle" xml:space="preserve"><value>Choose a folder for the new file</value></data>
+  <data name="DataDialogTitle" xml:space="preserve"><value>Choose a writable portable data folder</value></data>
+  <data name="SelectionWarning" xml:space="preserve"><value>Removing a default audio track does not assign a new default. Player choices may differ.</value></data>
+  <data name="LanguageTagNotice" xml:space="preserve"><value>Language tags are metadata and do not prove which language is spoken.</value></data>
+  <data name="NoAudioConfirmation" xml:space="preserve"><value>Confirm the silent-output decision before reviewing this plan.</value></data>
+  <data name="Unsupported" xml:space="preserve"><value>The source contains a detected unsupported feature: {0}</value></data>
+  <data name="DestinationRequired" xml:space="preserve"><value>Choose an output folder before reviewing the plan.</value></data>
+  <data name="SourceRequired" xml:space="preserve"><value>Open an MKV file first.</value></data>
+  <data name="CleanupHeading" xml:space="preserve"><value>Temporary cleanup needs attention.</value></data>
+  <data name="ErrorInvalidSource" xml:space="preserve"><value>Select a supported local regular MKV file.</value></data>
+  <data name="ErrorUnsupportedContainer" xml:space="preserve"><value>The detected container is not supported in this phase.</value></data>
+  <data name="ErrorUnsupportedFeature" xml:space="preserve"><value>A detected media feature cannot be preserved safely.</value></data>
+  <data name="ErrorToolUnavailable" xml:space="preserve"><value>The bundled media tools are missing or cannot run. Re-extract the complete portable archive.</value></data>
+  <data name="ErrorToolVersionMismatch" xml:space="preserve"><value>The media tool versions do not match the pinned supported distribution.</value></data>
+  <data name="ErrorInvalidToolOutput" xml:space="preserve"><value>The media tool returned malformed, incomplete, or excessive structured data.</value></data>
+  <data name="ErrorToolFailed" xml:space="preserve"><value>The media tool failed. Review its original diagnostics below.</value></data>
+  <data name="ErrorSourceChanged" xml:space="preserve"><value>The source changed after inspection. Open and review it again.</value></data>
+  <data name="ErrorInvalidSelection" xml:space="preserve"><value>The selection is invalid. Every video track must be kept.</value></data>
+  <data name="ErrorZeroAudioConfirmationRequired" xml:space="preserve"><value>Confirm creation of a silent output before reviewing the plan.</value></data>
+  <data name="ErrorInvalidDestination" xml:space="preserve"><value>Choose a valid separate output path in a writable folder.</value></data>
+  <data name="ErrorDestinationExists" xml:space="preserve"><value>The destination already exists. Choose another output filename.</value></data>
+  <data name="ErrorInsufficientSpace" xml:space="preserve"><value>There may be insufficient space for a complete new output alongside the original.</value></data>
+  <data name="ErrorPersistenceUnavailable" xml:space="preserve"><value>Portable ownership records cannot be stored safely. Media writes are disabled.</value></data>
+  <data name="ErrorVerificationFailed" xml:space="preserve"><value>The required verification failed. This candidate cannot be published.</value></data>
+  <data name="ErrorPublicationFailed" xml:space="preserve"><value>The verified candidate could not be published. The original is preserved.</value></data>
+  <data name="ErrorPublicationUncertain" xml:space="preserve"><value>Publication could not be confirmed. Inspect the destination; do not assume success.</value></data>
+  <data name="ErrorOwnershipInvalid" xml:space="preserve"><value>Temporary file ownership could not be verified. Automatic deletion is refused.</value></data>
+  <data name="ErrorProcessTerminationFailed" xml:space="preserve"><value>Worker termination could not be confirmed. The candidate is retained for safety.</value></data>
+  <data name="ErrorBusy" xml:space="preserve"><value>Another operation is still active.</value></data>
+  <data name="ErrorStalePlan" xml:space="preserve"><value>The approved plan is stale. Inspect and review the source again.</value></data>
+  <data name="ErrorCancelled" xml:space="preserve"><value>The operation was cancelled.</value></data>
+  <data name="ErrorIoFailure" xml:space="preserve"><value>A local file operation failed. Review the details below.</value></data>
+  <data name="Remove" xml:space="preserve"><value>Remove</value></data>
+  <data name="InterruptedCleanable" xml:space="preserve"><value>Ownership validated; the empty temporary directory can be cleaned.</value></data>
+  <data name="InterruptedUnresolved" xml:space="preserve"><value>Automatic cleanup is unavailable. Review ownership and worker state before manual cleanup. Start a fresh operation from the source; this candidate cannot be published after restart.</value></data>
+  <data name="CloseUnconfirmedNotice" xml:space="preserve"><value>The worker's termination is unconfirmed. Keep this window open to review diagnostics, or explicitly close the application while retaining its temporary files.</value></data>
+  <data name="CloseDespiteUncertainty" xml:space="preserve"><value>Close application; retain temporary files</value></data>
+  <data name="Finishing" xml:space="preserve"><value>Completing the operation…</value></data>
+  <data name="DiscardCleanupIncomplete" xml:space="preserve"><value>Discard was requested, but temporary cleanup is incomplete. Review the cleanup details.</value></data>
+  <data name="PublishedWithWarnings" xml:space="preserve"><value>New file published with warnings after explicit approval: {0}</value></data>
+  <data name="SizeIncrease" xml:space="preserve"><value>New file is {0:N0} bytes larger. The original remains on disk.</value></data>
+  <data name="Yes" xml:space="preserve"><value>yes</value></data>
+  <data name="No" xml:space="preserve"><value>no</value></data>
+  <data name="MediaFeatures" xml:space="preserve"><value>Attachments: {0}. Chapters: {1}. User tags: {2}.</value></data>
+  <data name="PreservationSummary" xml:space="preserve"><value>Keep every video track and supported attachment, ordinary chapters and supported user tags. Retained stream order and effective flags are preserved.</value></data>
+  <data name="InterruptedPaths" xml:space="preserve"><value>Temporary candidate: {0}&#10;Planned output (publication unconfirmed): {1}</value></data>
+</root>
