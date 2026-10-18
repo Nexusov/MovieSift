@@ -14,6 +14,7 @@ cp -- "$fixture_path" "$check_directory/input Кириллица/--source with s
 docker build --platform linux/amd64 --file "$script_directory/portable-smoke.Dockerfile" --tag tracktrim-portable-smoke "$script_directory"
 docker run --rm --platform linux/amd64 --network none --read-only \
     --user "$(id -u):$(id -g)" --cap-drop ALL --security-opt no-new-privileges \
+    --env LANG=C --env LC_ALL=C --env LC_CTYPE=C \
     --tmpfs /tmp:rw,nosuid,nodev,noexec \
     --mount "type=bind,source=$check_directory,target=/check" \
     tracktrim-portable-smoke | tee "$check_directory/evidence/container-workflow.txt"

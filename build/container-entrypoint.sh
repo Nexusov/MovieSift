@@ -23,6 +23,7 @@ mkdir -p "$evidence"
 cp /usr/local/share/tracktrim-smoke/environment.txt "$evidence/container-environment.txt"
 {
     printf 'Runtime user: %s:%s\n' "$(id -u)" "$(id -g)"
+    printf 'Parent LANG: %s\nParent LC_ALL: %s\nParent LC_CTYPE: %s\n' "${LANG-<unset>}" "${LC_ALL-<unset>}" "${LC_CTYPE-<unset>}"
     printf '%s\n' 'Installed SDK/runtime/media commands: absent' 'Container network: disabled by docker run --network none'
     printf 'Original source SHA256: %s\n' "$original_hash"
 } >> "$evidence/container-environment.txt"

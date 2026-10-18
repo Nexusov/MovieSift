@@ -396,10 +396,21 @@ public sealed class MkvBackend(MkvBackendOptions options) : IMediaBackend
     {
         try
         {
-            var processRequest = options.Tools.NativeLibraryDirectory is { } nativeLibraryDirectory
-                ? request with { Environment = new Dictionary<string, string> { ["LD_LIBRARY_PATH"] = nativeLibraryDirectory } }
-                : request;
-            return await processRunner.RunAsync(processRequest).ConfigureAwait(false);
+            var environment = new Dictionary<string, string>(request.Environment ?? new Dictionary<string, string>());
+
+            if (options.Tools.NativeLibraryDirectory is { } nativeLibraryDirectory)
+            {
+                environment["LD_LIBRARY_PATH"] = nativeLibraryDirectory;
+            }
+
+            if (OperatingSystem.IsLinux())
+            {
+                // MKVToolNix derives Unix argv encoding from LC_ALL/LANG; C.UTF-8 preserves Unicode paths on a minimal C-locale host.
+                environment["LC_ALL"] = "C.UTF-8";
+                environment["LANG"] = "C.UTF-8";
+            }
+
+            return await processRunner.RunAsync(request with { Environment = environment }).ConfigureAwait(false);
         }
         catch (ProcessTerminationException exception)
         {
