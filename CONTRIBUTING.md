@@ -1,6 +1,6 @@
 # Contributing
 
-Use the stable SDK pinned by `global.json`, PowerShell 7, Git, and an editor with C#/XAML support. Use the same central package versions as the application and restore committed lockfiles. Updating a dependency is a deliberate, independently reviewable change; regenerate the affected locks and rerun verification.
+Use the stable SDK pinned by `global.json`, PowerShell 7, Python 3.9+ with standard-library `tarfile`/XZ support, Git, and an editor with C#/XAML support. Local verification used Python 3.13.0 and PowerShell 7.6.5. Python is required only for explicit source-notice extraction and fixture generation; no Python runtime is bundled or required by the application. Use the same central package versions as the application and restore committed lockfiles. Updating a dependency is a deliberate, independently reviewable change; regenerate the affected locks and rerun verification.
 
 ## Local checks
 
@@ -47,7 +47,7 @@ Run the Linux equivalents on Linux. Packaging verifies the shipped runtime versi
 
 The relocation test clears development runtime/tool variables, changes the working directory, exercises spaces/Cyrillic/metacharacters, and verifies that the source hash remains unchanged. It cannot prove the host lacks an installed SDK; clean target-system acceptance remains a separate check. Native file pickers, keyboard focus, scaling, shutdown during work, and both-language layouts require a real desktop session.
 
-On a Linux developer/CI host with Docker, run `bash ./build/verify-clean-linux.sh ./artifacts/TrackTrim-linux-x64.tar.gz ./artifacts/fixtures/ordinary.mkv`. The image uses the pinned official Ubuntu 24.04 amd64 digest in `build/portable-smoke.Dockerfile`, installs only native OS libraries during image construction, then runs the packaged CLI without root or networking. It asserts that `dotnet`, MKVToolNix, and FFmpeg commands are not installed separately. The exact distro/package list and workflow log are retained under `artifacts/clean Linux Кириллица.*/evidence`. Docker is a development/CI dependency only; the distributed application does not use containers.
+On a Linux developer/CI host with Docker, run `bash ./build/verify-clean-linux.sh ./artifacts/TrackTrim-linux-x64.tar.gz ./artifacts/fixtures/ordinary.mkv`. The image uses the pinned official Ubuntu 24.04 amd64 digest in `build/portable-smoke.Dockerfile`, installs only native OS libraries during image construction, then runs the packaged CLI without root or networking. It asserts that `dotnet`, MKVToolNix, and FFmpeg commands are not installed separately. The ASCII parent locale (`LANG=C`, `LC_ALL=C`, `LC_CTYPE=C`) deliberately tests that the native worker boundary handles Unicode independently of the inherited locale. The exact distro/package list, user/locale, and workflow log are retained under `artifacts/clean Linux Кириллица.*/evidence`. Docker is a development/CI dependency only; the distributed application does not use containers.
 
 ## Changes and licensing
 

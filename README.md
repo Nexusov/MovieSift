@@ -16,6 +16,8 @@ The application uses C#/.NET 10, Avalonia 12 with Fluent controls, CommunityTool
 
 Do not use the application as a universal preservation tool. The [supported MKV matrix](docs/SUPPORTED_FORMATS.md) defines the inspected, verified, and rejected cases. MP4, batch input, folders, presets, playback, source replacement, and recovery/resume of a batch queue are outside this implementation.
 
+Known preservation gap: Matroska segment families (`SegmentFamily`) are outside the supported subset. The current probe cannot reliably detect them, and a real remux dropped that relationship. This build must not be used for family-linked files.
+
 These are headless renders of the compiled Fluent view after real MKV inspection, in English and Russian. Native desktop acceptance remains pending.
 
 ![English TrackTrim inspector with real video, two audio tracks, and subtitles](docs/images/tracktrim-en.png)
@@ -24,7 +26,7 @@ These are headless renders of the compiled Fluent view after real MKV inspection
 
 ## Build and run
 
-Install the exact stable SDK in `global.json` and PowerShell 7 for the build scripts. No media tools are downloaded by the running application. Acquisition is an explicit developer/build operation:
+Install the exact stable SDK in `global.json`, PowerShell 7, and Python 3 for the build scripts (Python 3.9+ with standard-library `tarfile`/XZ support; the local verification used Python 3.13.0). Python extracts pinned source notices and generates original fixtures; it is not an application runtime dependency. No media tools are downloaded by the running application. Acquisition is an explicit developer/build operation:
 
 ```powershell
 pwsh ./build/acquire-tools.ps1 -RuntimeIdentifier win-x64 -Destination ./tools
@@ -64,7 +66,7 @@ pwsh ./build/verify-package.ps1 -ArchivePath ./artifacts/TrackTrim-win-x64.zip -
 
 This runs the actual packaged entry point from an unrelated working directory, tests a path containing spaces/Cyrillic/metacharacters, performs the real application workflow, and hashes the source before/after. It does not establish native dialogs, scaling, or clean-machine desktop acceptance.
 
-Linux CI also defines a CLI check in a pinned Ubuntu 24.04 container with native OS libraries, no installed SDK/runtime/media commands, no network, and a non-root runtime user. Run it with `bash ./build/verify-clean-linux.sh ./artifacts/TrackTrim-linux-x64.tar.gz ./artifacts/fixtures/ordinary.mkv`. It records the exact base image and installed package versions. See `PLAN.md` for actual execution; a container CLI check is separate from Ubuntu Desktop acceptance.
+Linux CI also verifies the actual workflow in a pinned Ubuntu 24.04 container with native OS libraries, no installed SDK/runtime/media commands, no network, and a non-root runtime user. Run it with `bash ./build/verify-clean-linux.sh ./artifacts/TrackTrim-linux-x64.tar.gz ./artifacts/fixtures/ordinary.mkv`. The successful check records the exact base image, installed package versions, user, and ASCII parent locale (`C`); the native worker boundary handles Cyrillic paths independently. See [PLAN](docs/PLAN.md) for executed evidence; a container CLI check is separate from Ubuntu Desktop acceptance.
 
 Settings, bounded logs, and temporary-output ownership records are stored in `data` relative to the executable. An unwritable data directory is an error for media writes; the application must not silently redirect to a user profile. Startup recovery offers validated owned-temporary cleanup, never automatic publication or byte resume.
 
