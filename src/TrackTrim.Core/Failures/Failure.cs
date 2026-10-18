@@ -31,6 +31,7 @@ public enum ErrorReason
 {
     None,
     LinkedSegments,
+    SegmentStructure,
     TrackType,
     HdrMetadata,
     ChapterReferences,

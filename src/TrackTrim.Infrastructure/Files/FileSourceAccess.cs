@@ -19,6 +19,7 @@ public sealed class FileSourceAccess : ISourceAccess
     private const int LinuxNonBlocking = 0x800;
     private const int LinuxNoFollow = 0x20000;
     private const int LinuxCloseOnExec = 0x80000;
+    private const int ReadBufferBytes = 4096;
 
     /// <summary>Captures an existing local regular file's identity, size and modification time.</summary>
     public Task<SourceRevision> ReadRevisionAsync(SourceRequest request)
@@ -85,6 +86,25 @@ public sealed class FileSourceAccess : ISourceAccess
         }
 
         return new SafeFileHandle((IntPtr)descriptor, ownsHandle: true);
+    }
+
+    /// <summary>Provides a read-only regular-file stream without blocking on a substituted Linux FIFO.</summary>
+    internal static FileStream OpenRegularReadStream(string path)
+    {
+        PathSafety.RejectReparsePoints(path);
+        var handle = OpenReadHandle(path);
+
+        try
+        {
+            _ = OperatingSystem.IsWindows()
+                ? ReadWindowsRevision(new(path, handle)) : ReadLinuxRevision(new(path, handle));
+            return new FileStream(handle, FileAccess.Read, ReadBufferBytes, isAsync: false);
+        }
+        catch
+        {
+            handle.Dispose();
+            throw;
+        }
     }
 
     /// <summary>Rechecks path safety and advisory capacity for only the additional allocation requested at this stage.</summary>

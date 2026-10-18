@@ -200,7 +200,9 @@ public sealed class MkvBackend(MkvBackendOptions options) : IMediaBackend
                 $"Identification failed or exceeded its output bound. {CombineDiagnostics(result)}"));
         }
 
-        return MkvIdentification.Parse(new MkvIdentification.IdentificationRequest(result.StandardOutput, request.Source));
+        var inspection = MkvIdentification.Parse(new MkvIdentification.IdentificationRequest(result.StandardOutput, request.Source));
+        await MkvSegmentInfoReader.ValidateAsync(new(request.Source.FullPath, request.CancellationToken)).ConfigureAwait(false);
+        return inspection;
     }
 
     /// <summary>Extracts complete XML into application-owned names and validates unsupported structures.</summary>
