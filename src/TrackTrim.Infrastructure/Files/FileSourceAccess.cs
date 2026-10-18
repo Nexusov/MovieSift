@@ -87,13 +87,13 @@ public sealed class FileSourceAccess : ISourceAccess
         return new SafeFileHandle((IntPtr)descriptor, ownsHandle: true);
     }
 
-    /// <summary>Rejects aliasing, occupied destinations and unsupported path policies before a write.</summary>
+    /// <summary>Rechecks path safety and advisory capacity for only the additional allocation requested at this stage.</summary>
     public async Task ValidateDestinationAsync(ValidateDestinationRequest request)
     {
         request.CancellationToken.ThrowIfCancellationRequested();
         var path = Path.GetFullPath(request.DestinationPath);
         var parent = Path.GetDirectoryName(path);
-        var invalidDestination = !Path.IsPathFullyQualified(request.DestinationPath) ||
+        var invalidDestination = request.AdditionalAllocationBytes < 0 || !Path.IsPathFullyQualified(request.DestinationPath) ||
             !string.Equals(Path.GetExtension(path), ".mkv", StringComparison.OrdinalIgnoreCase) ||
             path.StartsWith(@"\\", StringComparison.Ordinal) || parent is null;
 
@@ -129,9 +129,9 @@ public sealed class FileSourceAccess : ISourceAccess
             throw new OperationFailureException(new(ErrorCode.InvalidDestination, "Network destinations are not supported.", ErrorReason.NetworkPath));
         }
 
-        if (drive.AvailableFreeSpace < request.Source.Length)
+        if (drive.AvailableFreeSpace < request.AdditionalAllocationBytes)
         {
-            throw new OperationFailureException(new(ErrorCode.InsufficientSpace, "A complete new file must coexist with the original."));
+            throw new OperationFailureException(new(ErrorCode.InsufficientSpace, "The additional output allocation exceeds the currently available space."));
         }
     }
 

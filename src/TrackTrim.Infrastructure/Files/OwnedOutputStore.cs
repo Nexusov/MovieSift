@@ -14,8 +14,11 @@ public sealed class OwnedOutputStore(string dataDirectory) : IOutputStore
 {
     private const int RecordVersion = 1;
     private const int OwnershipTokenBytes = 32;
+    private const int OwnershipTokenCharacters = OwnershipTokenBytes * 2;
     private const string CandidateName = "candidate.mkv";
     private const string MarkerName = "owner.json";
+    private const string ReservedStage = "Reserved";
+    private const string PublishingStage = "Publishing";
     private readonly string recordDirectory = Path.Combine(Path.GetFullPath(dataDirectory), "ownership");
 
     /// <summary>Records ownership before any media tool can write the candidate.</summary>
@@ -48,7 +51,7 @@ public sealed class OwnedOutputStore(string dataDirectory) : IOutputStore
                 markerStream.Flush(flushToDisk: true);
             }
 
-            await WriteRecordAsync(new(output, "Reserved"));
+            await WriteRecordAsync(new(output, ReservedStage));
             return output;
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
@@ -60,41 +63,14 @@ public sealed class OwnedOutputStore(string dataDirectory) : IOutputStore
     /// <summary>Checks the fixed layout, matching marker and persisted ownership record.</summary>
     public async Task ValidateOwnershipAsync(OutputRequest request)
     {
-        request.CancellationToken.ThrowIfCancellationRequested();
-        var output = request.Output;
-        var parent = Path.GetDirectoryName(output.DestinationPath);
-        var expectedDirectory = parent is null ? "" : Path.Combine(parent, $".tracktrim-{output.JobId:N}");
-        var expectedCandidate = Path.Combine(output.DirectoryPath, CandidateName);
-        var invalidLayout = output.DirectoryPath != expectedDirectory || output.CandidatePath != expectedCandidate ||
-            output.OwnershipToken.Length != OwnershipTokenBytes * 2;
-
-        if (invalidLayout)
-        {
-            throw new OperationFailureException(new(ErrorCode.OwnershipInvalid, "The temporary layout does not match its record."));
-        }
-
-        PathSafety.RejectReparsePoints(output.DirectoryPath);
-        var marker = await BoundedJson.ReadAsync<OwnerMarker>(Path.Combine(output.DirectoryPath, MarkerName));
-        var record = await BoundedJson.ReadAsync<OwnershipRecord>(RecordPath(output.JobId));
-        var invalidOwnership = marker != new OwnerMarker(output.JobId, output.OwnershipToken) ||
-            record?.Version != RecordVersion || record.Output != output;
-
-        if (invalidOwnership)
-        {
-            throw new OperationFailureException(new(ErrorCode.OwnershipInvalid, "The ownership token does not match."));
-        }
-
-        if (File.Exists(output.CandidatePath))
-        {
-            PathSafety.RejectReparsePoints(output.CandidatePath);
-        }
+        await ReadOwnedRecordAsync(request);
     }
 
     /// <summary>Flushes an interruption record before entering the publication operation.</summary>
     public async Task MarkPublishingAsync(OutputRequest request)
     {
         await ValidateOwnershipAsync(request);
-        await WriteRecordAsync(new(request.Output, "Publishing"));
+        await WriteRecordAsync(new(request.Output, PublishingStage));
     }
 
     /// <summary>Uses the platform move's no-overwrite operation on the destination filesystem.</summary>
@@ -125,10 +101,9 @@ public sealed class OwnedOutputStore(string dataDirectory) : IOutputStore
     {
         try
         {
-            await ValidateOwnershipAsync(request);
-            var record = await BoundedJson.ReadAsync<OwnershipRecord>(RecordPath(request.Output.JobId));
+            var record = await ReadOwnedRecordAsync(request);
             using var currentProcess = Process.GetCurrentProcess();
-            var ownsCurrentProcess = record!.OwnerProcessId == currentProcess.Id &&
+            var ownsCurrentProcess = record.OwnerProcessId == currentProcess.Id &&
                 record.OwnerStartedUtcTicks == currentProcess.StartTime.ToUniversalTime().Ticks;
             var unsafeInterruptedCleanup = !ownsCurrentProcess &&
                 (IsOriginalProcessAlive(record) || File.Exists(request.Output.CandidatePath));
@@ -163,7 +138,7 @@ public sealed class OwnedOutputStore(string dataDirectory) : IOutputStore
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or OperationFailureException or JsonException)
         {
-            return [new(request.Output.DirectoryPath, exception.Message)];
+            return [new(request.Output?.DirectoryPath ?? recordDirectory, exception.Message)];
         }
     }
 
@@ -184,15 +159,8 @@ public sealed class OwnedOutputStore(string dataDirectory) : IOutputStore
 
             try
             {
-                var record = await BoundedJson.ReadAsync<OwnershipRecord>(path);
-
-                if (record is null || record.Version != RecordVersion || path != RecordPath(record.Output.JobId))
-                {
-                    results.Add(new(null, "InvalidRecord", false, path));
-                    continue;
-                }
-
-                await ValidateOwnershipAsync(new(record.Output, cancellationToken));
+                var record = await ReadRecordAsync(path);
+                await ValidateEvidenceAsync(record);
                 var canClean = !IsOriginalProcessAlive(record) && !File.Exists(record.Output.CandidatePath);
                 results.Add(new(record.Output, record.Stage, canClean));
             }
@@ -207,7 +175,7 @@ public sealed class OwnedOutputStore(string dataDirectory) : IOutputStore
     }
 
     /// <summary>Requires both process identity and start time before treating an old owner as active.</summary>
-    private static bool IsOriginalProcessAlive(OwnershipRecord record)
+    private static bool IsOriginalProcessAlive(ValidatedOwnershipRecord record)
     {
         try
         {
@@ -223,6 +191,154 @@ public sealed class OwnedOutputStore(string dataDirectory) : IOutputStore
             return true;
         }
     }
+
+    /// <summary>Converts a caller's output and matching journal into fully checked ownership evidence.</summary>
+    private async Task<ValidatedOwnershipRecord> ReadOwnedRecordAsync(OutputRequest request)
+    {
+        request.CancellationToken.ThrowIfCancellationRequested();
+        var output = ValidateOutput(request.Output);
+        var record = await ReadRecordAsync(RecordPath(output.JobId));
+
+        if (record.Output != output)
+        {
+            throw InvalidOwnership("The output does not match its persisted ownership record.");
+        }
+
+        await ValidateEvidenceAsync(record);
+        return record;
+    }
+
+    /// <summary>Rejects missing fields and unsupported versions before using persisted paths or owner IDs.</summary>
+    private async Task<ValidatedOwnershipRecord> ReadRecordAsync(string path)
+    {
+        var record = await ReadOwnershipJsonAsync<OwnershipRecord>(path);
+
+        if (record is null)
+        {
+            throw InvalidOwnership("The ownership record is empty.");
+        }
+
+        var validOwnerIdentity = record.OwnerProcessId > 0 && record.OwnerStartedUtcTicks > 0 &&
+            record.OwnerStartedUtcTicks <= DateTime.MaxValue.Ticks;
+        var validHeader = record.Version == RecordVersion && validOwnerIdentity;
+
+        if (!validHeader)
+        {
+            throw InvalidOwnership("The ownership record has an unsupported version or an invalid process identity.");
+        }
+
+        var stage = record.Stage switch
+        {
+            ReservedStage => ReservedStage,
+            PublishingStage => PublishingStage,
+            _ => throw InvalidOwnership("The ownership record has an invalid stage.")
+        };
+        var output = ValidateOutput(record.Output);
+
+        if (path != RecordPath(output.JobId))
+        {
+            throw InvalidOwnership("The ownership record filename does not match its operation identifier.");
+        }
+
+        return new(output, stage, record.OwnerProcessId, record.OwnerStartedUtcTicks);
+    }
+
+    /// <summary>Requires a complete operation identity and an exact canonical adjacent candidate layout.</summary>
+    private static OwnedOutput ValidateOutput(OwnedOutput? output)
+    {
+        if (output is null)
+        {
+            throw InvalidOwnership("The ownership record has no output description.");
+        }
+
+        var validIdentity = output.JobId != Guid.Empty && IsOwnershipToken(output.OwnershipToken);
+        var validPaths = IsCanonicalAbsolutePath(output.DirectoryPath) && IsCanonicalAbsolutePath(output.CandidatePath) &&
+            IsCanonicalAbsolutePath(output.DestinationPath);
+
+        if (!validIdentity || !validPaths)
+        {
+            throw InvalidOwnership("The ownership record has an invalid operation identifier, token or path.");
+        }
+
+        var parent = Path.GetDirectoryName(output.DestinationPath);
+
+        if (parent is null)
+        {
+            throw InvalidOwnership("The output destination has no parent directory.");
+        }
+
+        var expectedDirectory = Path.Combine(parent, $".tracktrim-{output.JobId:N}");
+        var expectedCandidate = Path.Combine(expectedDirectory, CandidateName);
+        var validLayout = output.DirectoryPath == expectedDirectory && output.CandidatePath == expectedCandidate &&
+            string.Equals(Path.GetExtension(output.DestinationPath), ".mkv", StringComparison.OrdinalIgnoreCase);
+
+        if (!validLayout)
+        {
+            throw InvalidOwnership("The temporary layout does not match its record.");
+        }
+
+        return output;
+    }
+
+    /// <summary>Checks canonical local path syntax without probing an untrusted filesystem location.</summary>
+    private static bool IsCanonicalAbsolutePath(string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return false;
+        }
+
+        try
+        {
+            var validSyntax = !path.StartsWith(@"\\", StringComparison.Ordinal) &&
+                path.IndexOfAny(Path.GetInvalidPathChars()) < 0 && Path.IsPathFullyQualified(path);
+            return validSyntax && Path.GetFullPath(path) == path;
+        }
+        catch (Exception exception) when (exception is ArgumentException or NotSupportedException or PathTooLongException)
+        {
+            return false;
+        }
+    }
+
+    /// <summary>Requires the complete random token rather than accepting any string with the right length.</summary>
+    private static bool IsOwnershipToken(string? token) =>
+        token is { Length: OwnershipTokenCharacters } && token.All(Uri.IsHexDigit);
+
+    /// <summary>Checks the exact marker and path redirection only after the journal structure is valid.</summary>
+    private static async Task ValidateEvidenceAsync(ValidatedOwnershipRecord record)
+    {
+        var output = record.Output;
+        PathSafety.RejectReparsePoints(output.DirectoryPath);
+        var marker = await ReadOwnershipJsonAsync<OwnerMarker>(Path.Combine(output.DirectoryPath, MarkerName));
+        var validMarker = marker is not null && marker.JobId == output.JobId &&
+            IsOwnershipToken(marker.OwnershipToken) && marker.OwnershipToken == output.OwnershipToken;
+
+        if (!validMarker)
+        {
+            throw InvalidOwnership("The ownership marker does not match the complete operation identity and token.");
+        }
+
+        if (File.Exists(output.CandidatePath))
+        {
+            PathSafety.RejectReparsePoints(output.CandidatePath);
+        }
+    }
+
+    /// <summary>Turns malformed ownership JSON into a typed failure without deleting the original record.</summary>
+    private static async Task<T?> ReadOwnershipJsonAsync<T>(string path)
+    {
+        try
+        {
+            return await BoundedJson.ReadAsync<T>(path);
+        }
+        catch (JsonException exception)
+        {
+            throw InvalidOwnership(exception.Message);
+        }
+    }
+
+    /// <summary>Creates the stable failure used whenever ownership evidence is insufficient.</summary>
+    private static OperationFailureException InvalidOwnership(string detail) => new(new(ErrorCode.OwnershipInvalid, detail));
 
     /// <summary>Writes the current owner identity and stage to a bounded local record.</summary>
     private Task WriteRecordAsync(RecordWriteRequest request)

@@ -24,6 +24,7 @@ internal sealed class JobTestHarness : IMediaBackend, ISourceAccess, IOutputStor
     public int CleanupCalls { get; private set; }
     public int ReserveCalls { get; private set; }
     public int RevisionCalls { get; private set; }
+    public long AvailableFreeSpace { get; set; } = long.MaxValue;
     public int ExitCode { get; set; }
     public bool VerificationPasses { get; set; } = true;
     public bool FailCleanup { get; set; }
@@ -81,8 +82,16 @@ internal sealed class JobTestHarness : IMediaBackend, ISourceAccess, IOutputStor
         return Task.FromResult(SourceChanges ? Inspection.Source with { Length = 101 } : Inspection.Source);
     }
 
-    /// <summary>Leaves destination races to the simulated final publication operation.</summary>
-    public Task ValidateDestinationAsync(ValidateDestinationRequest request) => Task.CompletedTask;
+    /// <summary>Models changing capacity without allocating large files; publication races remain separate.</summary>
+    public Task ValidateDestinationAsync(ValidateDestinationRequest request)
+    {
+        if (AvailableFreeSpace < request.AdditionalAllocationBytes)
+        {
+            throw new OperationFailureException(new(ErrorCode.InsufficientSpace));
+        }
+
+        return Task.CompletedTask;
+    }
 
     /// <summary>Creates an application-owned candidate record without filesystem effects.</summary>
     public Task<OwnedOutput> ReserveAsync(ReserveOutputRequest request)

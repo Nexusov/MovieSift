@@ -8,6 +8,43 @@ namespace TrackTrim.Application.Tests;
 /// <summary>Verifies publication, warnings, cancellation and cleanup as separate evidence.</summary>
 public sealed class JobCoordinatorTests
 {
+    /// <summary>Rejects an insufficient initial estimate before reserving or starting a media worker.</summary>
+    [Fact]
+    public async Task InitialCapacityShortageDoesNotStartRemux()
+    {
+        var harness = new JobTestHarness { AvailableFreeSpace = 99 };
+        var result = await harness.Coordinator.RunAsync(new(harness.CreatePlan()));
+        Assert.Equal(ErrorCode.InsufficientSpace, result.Failure?.Code);
+        Assert.Equal(0, harness.ReserveCalls);
+        Assert.Equal(0, harness.RemuxCalls);
+    }
+
+    /// <summary>Does not reserve a second source-sized allocation after an owned candidate already exists.</summary>
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    public async Task CompletedCandidatePublishesWhenRemainingCapacityIsBelowSourceSize(int exitCode)
+    {
+        const long initialFreeSpace = 125;
+        const long remainingFreeSpace = 45;
+        var harness = new JobTestHarness { ExitCode = exitCode, AvailableFreeSpace = initialFreeSpace };
+        harness.OnRemux = () => harness.AvailableFreeSpace = remainingFreeSpace;
+        var coordinator = harness.Coordinator;
+        var result = await coordinator.RunAsync(new(harness.CreatePlan()));
+
+        if (exitCode == 1)
+        {
+            Assert.Equal(JobPhase.AwaitingWarningReview, result.Phase);
+            result = await coordinator.PublishWarningsAsync(new(result.JobId));
+        }
+
+        Assert.Equal(JobPhase.Completed, result.Phase);
+        Assert.Null(result.Failure);
+        Assert.Equal("output.mkv", result.PublishedPath);
+        Assert.Equal(1, harness.RemuxCalls);
+        Assert.Equal(1, harness.PublishCalls);
+    }
+
     /// <summary>Publishes only after structural verification completes.</summary>
     [Fact]
     public async Task CleanVerifiedOutputIsPublished()

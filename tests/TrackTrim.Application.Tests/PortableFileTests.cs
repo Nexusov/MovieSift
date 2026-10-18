@@ -42,7 +42,7 @@ public sealed class PortableFileTests : IDisposable
         var original = await access.ReadRevisionAsync(new(source));
         var linked = await access.ReadRevisionAsync(new(alias));
         Assert.Equal(original.FileIdentity, linked.FileIdentity);
-        var failure = await Assert.ThrowsAsync<OperationFailureException>(() => access.ValidateDestinationAsync(new(original, alias)));
+        var failure = await Assert.ThrowsAsync<OperationFailureException>(() => access.ValidateDestinationAsync(new(original, alias, original.Length)));
         Assert.Equal(Core.Failures.ErrorCode.InvalidDestination, failure.Failure.Code);
         Assert.Equal("original", await File.ReadAllTextAsync(source, TestContext.Current.CancellationToken));
     }
@@ -115,17 +115,154 @@ public sealed class PortableFileTests : IDisposable
         Assert.True(File.Exists(request.Output.CandidatePath));
     }
 
-    /// <summary>Reports corrupt ownership records without authorizing any deletion.</summary>
-    [Fact]
-    public async Task CorruptRecordRemainsVisibleAndCannotAuthorizeCleanup()
+    /// <summary>Rejects malformed and incomplete ownership records without deleting any evidence.</summary>
+    [Theory]
+    [InlineData("$", "{bad json")]
+    [InlineData("$", "null")]
+    [InlineData("Version", null)]
+    [InlineData("Version", "2")]
+    [InlineData("Output", null)]
+    [InlineData("Output", "null")]
+    [InlineData("Output.JobId", null)]
+    [InlineData("Output.JobId", "\"00000000-0000-0000-0000-000000000000\"")]
+    [InlineData("Output.DirectoryPath", null)]
+    [InlineData("Output.DirectoryPath", "null")]
+    [InlineData("Output.DirectoryPath", "\"relative-directory\"")]
+    [InlineData("Output.DirectoryPath", "\"\\u0000\"")]
+    [InlineData("Output.CandidatePath", null)]
+    [InlineData("Output.CandidatePath", "null")]
+    [InlineData("Output.CandidatePath", "\"relative-candidate.mkv\"")]
+    [InlineData("Output.DestinationPath", null)]
+    [InlineData("Output.DestinationPath", "null")]
+    [InlineData("Output.DestinationPath", "\"relative-destination.mkv\"")]
+    [InlineData("Output.OwnershipToken", null)]
+    [InlineData("Output.OwnershipToken", "null")]
+    [InlineData("Output.OwnershipToken", "\"invalid\"")]
+    [InlineData("Stage", null)]
+    [InlineData("Stage", "null")]
+    [InlineData("Stage", "\"Unknown\"")]
+    [InlineData("OwnerProcessId", null)]
+    [InlineData("OwnerProcessId", "0")]
+    [InlineData("OwnerProcessId", "-1")]
+    [InlineData("OwnerStartedUtcTicks", null)]
+    [InlineData("OwnerStartedUtcTicks", "0")]
+    [InlineData("OwnerStartedUtcTicks", "-1")]
+    [InlineData("OwnerStartedUtcTicks", "3155378976000000000")]
+    public async Task CorruptRecordRemainsVisibleAndCannotAuthorizeCleanup(string memberPath, string? replacementJson)
     {
         var request = await CreateOutputAsync();
         var recordPath = Path.Combine(root, "data", "ownership", $"{request.Output.JobId:N}.json");
-        await File.WriteAllTextAsync(recordPath, "{bad json", TestContext.Current.CancellationToken);
+        var markerPath = Path.Combine(request.Output.DirectoryPath, "owner.json");
+        var originalMarker = await File.ReadAllTextAsync(markerPath, TestContext.Current.CancellationToken);
+        var originalRecord = await File.ReadAllTextAsync(recordPath, TestContext.Current.CancellationToken);
+        var corruptedRecord = CorruptRecordJson(new(originalRecord, memberPath, replacementJson));
+        await File.WriteAllTextAsync(recordPath, corruptedRecord, TestContext.Current.CancellationToken);
+        await File.WriteAllTextAsync(request.Output.CandidatePath, "candidate evidence", TestContext.Current.CancellationToken);
         var entry = Assert.Single(await request.Store.FindInterruptedAsync(TestContext.Current.CancellationToken));
+        var cleanupIssues = await request.Store.CleanupAsync(new(request.Output));
+
+        Assert.Equal("InvalidRecord", entry.Stage);
         Assert.False(entry.CanClean);
         Assert.Null(entry.Output);
-        Assert.True(File.Exists(recordPath));
+        Assert.Equal(recordPath, entry.Issue);
+        Assert.Single(cleanupIssues);
+        Assert.Equal(corruptedRecord, await File.ReadAllTextAsync(recordPath, TestContext.Current.CancellationToken));
+        Assert.Equal(originalMarker, await File.ReadAllTextAsync(markerPath, TestContext.Current.CancellationToken));
+        Assert.Equal("candidate evidence", await File.ReadAllTextAsync(request.Output.CandidatePath, TestContext.Current.CancellationToken));
+        Assert.Equal("original", await File.ReadAllTextAsync(Path.Combine(root, "source.mkv"), TestContext.Current.CancellationToken));
+    }
+
+    /// <summary>Does not remove an empty reservation when its process identity is incomplete.</summary>
+    [Theory]
+    [InlineData("OwnerProcessId")]
+    [InlineData("OwnerStartedUtcTicks")]
+    public async Task MissingOwnerIdentityCannotAuthorizeEmptyDirectoryCleanup(string memberPath)
+    {
+        var request = await CreateOutputAsync();
+        var recordPath = Path.Combine(root, "data", "ownership", $"{request.Output.JobId:N}.json");
+        var originalRecord = await File.ReadAllTextAsync(recordPath, TestContext.Current.CancellationToken);
+        var corruptedRecord = CorruptRecordJson(new(originalRecord, memberPath, null));
+        await File.WriteAllTextAsync(recordPath, corruptedRecord, TestContext.Current.CancellationToken);
+        var entry = Assert.Single(await request.Store.FindInterruptedAsync(TestContext.Current.CancellationToken));
+        var cleanupIssues = await request.Store.CleanupAsync(new(request.Output));
+
+        Assert.Equal("InvalidRecord", entry.Stage);
+        Assert.False(entry.CanClean);
+        Assert.Single(cleanupIssues);
+        Assert.Equal(corruptedRecord, await File.ReadAllTextAsync(recordPath, TestContext.Current.CancellationToken));
+        Assert.True(File.Exists(Path.Combine(request.Output.DirectoryPath, "owner.json")));
+    }
+
+    /// <summary>Rejects record filenames that disagree with their embedded operation identifier.</summary>
+    [Fact]
+    public async Task RenamedOwnershipRecordCannotAuthorizeCleanup()
+    {
+        var request = await CreateOutputAsync();
+        var originalPath = Path.Combine(root, "data", "ownership", $"{request.Output.JobId:N}.json");
+        var renamedPath = Path.Combine(root, "data", "ownership", $"{Guid.NewGuid():N}.json");
+        var originalRecord = await File.ReadAllTextAsync(originalPath, TestContext.Current.CancellationToken);
+        File.Move(originalPath, renamedPath);
+        var entry = Assert.Single(await request.Store.FindInterruptedAsync(TestContext.Current.CancellationToken));
+
+        Assert.Equal("InvalidRecord", entry.Stage);
+        Assert.False(entry.CanClean);
+        Assert.Null(entry.Output);
+        Assert.Equal(renamedPath, entry.Issue);
+        Assert.Single(await request.Store.CleanupAsync(new(request.Output)));
+        Assert.Equal(originalRecord, await File.ReadAllTextAsync(renamedPath, TestContext.Current.CancellationToken));
+        Assert.True(File.Exists(Path.Combine(request.Output.DirectoryPath, "owner.json")));
+    }
+
+    /// <summary>Preserves both files when a marker is malformed or lacks its matching identity.</summary>
+    [Theory]
+    [InlineData("$", "{bad json")]
+    [InlineData("$", "null")]
+    [InlineData("JobId", null)]
+    [InlineData("OwnershipToken", null)]
+    [InlineData("OwnershipToken", "null")]
+    public async Task InvalidMarkerCannotAuthorizeCleanup(string memberPath, string? replacementJson)
+    {
+        var request = await CreateOutputAsync();
+        var recordPath = Path.Combine(root, "data", "ownership", $"{request.Output.JobId:N}.json");
+        var markerPath = Path.Combine(request.Output.DirectoryPath, "owner.json");
+        var originalRecord = await File.ReadAllTextAsync(recordPath, TestContext.Current.CancellationToken);
+        var originalMarker = await File.ReadAllTextAsync(markerPath, TestContext.Current.CancellationToken);
+        var corruptedMarker = CorruptRecordJson(new(originalMarker, memberPath, replacementJson));
+        await File.WriteAllTextAsync(markerPath, corruptedMarker, TestContext.Current.CancellationToken);
+        var entry = Assert.Single(await request.Store.FindInterruptedAsync(TestContext.Current.CancellationToken));
+
+        Assert.Equal("InvalidRecord", entry.Stage);
+        Assert.False(entry.CanClean);
+        Assert.Null(entry.Output);
+        Assert.Equal(recordPath, entry.Issue);
+        Assert.Single(await request.Store.CleanupAsync(new(request.Output)));
+        Assert.Equal(originalRecord, await File.ReadAllTextAsync(recordPath, TestContext.Current.CancellationToken));
+        Assert.Equal(corruptedMarker, await File.ReadAllTextAsync(markerPath, TestContext.Current.CancellationToken));
+    }
+
+    /// <summary>Requires a real hexadecimal ownership token even when both persisted files agree.</summary>
+    [Fact]
+    public async Task MatchingMalformedTokenCannotAuthorizeCleanup()
+    {
+        var request = await CreateOutputAsync();
+        const int TokenCharacters = 64;
+        var malformedOutput = request.Output with { OwnershipToken = new string('Z', TokenCharacters) };
+        var replacementJson = $"\"{malformedOutput.OwnershipToken}\"";
+        var recordPath = Path.Combine(root, "data", "ownership", $"{request.Output.JobId:N}.json");
+        var markerPath = Path.Combine(request.Output.DirectoryPath, "owner.json");
+        var originalRecord = await File.ReadAllTextAsync(recordPath, TestContext.Current.CancellationToken);
+        var originalMarker = await File.ReadAllTextAsync(markerPath, TestContext.Current.CancellationToken);
+        var corruptedRecord = CorruptRecordJson(new(originalRecord, "Output.OwnershipToken", replacementJson));
+        var corruptedMarker = CorruptRecordJson(new(originalMarker, "OwnershipToken", replacementJson));
+        await File.WriteAllTextAsync(recordPath, corruptedRecord, TestContext.Current.CancellationToken);
+        await File.WriteAllTextAsync(markerPath, corruptedMarker, TestContext.Current.CancellationToken);
+        var entry = Assert.Single(await request.Store.FindInterruptedAsync(TestContext.Current.CancellationToken));
+
+        Assert.Equal("InvalidRecord", entry.Stage);
+        Assert.False(entry.CanClean);
+        Assert.Single(await request.Store.CleanupAsync(new(malformedOutput)));
+        Assert.Equal(corruptedRecord, await File.ReadAllTextAsync(recordPath, TestContext.Current.CancellationToken));
+        Assert.Equal(corruptedMarker, await File.ReadAllTextAsync(markerPath, TestContext.Current.CancellationToken));
     }
 
     /// <summary>Uses English on first launch under Russian culture and persists an explicit switch.</summary>
@@ -166,6 +303,28 @@ public sealed class PortableFileTests : IDisposable
         return new(store, await store.ReserveAsync(new(plan)));
     }
 
+    /// <summary>Changes one persisted field while preserving an otherwise authentic reservation.</summary>
+    private static string CorruptRecordJson(RecordCorruption request)
+    {
+        if (request.MemberPath == "$")
+        {
+            return request.ReplacementJson!;
+        }
+
+        var record = JsonNode.Parse(request.OriginalJson)!.AsObject();
+        var members = request.MemberPath.Split('.');
+        var parent = members.Length == 1 ? record : record["Output"]!.AsObject();
+
+        if (request.ReplacementJson is null)
+        {
+            parent.Remove(members[^1]);
+            return record.ToJsonString();
+        }
+
+        parent[members[^1]] = JsonNode.Parse(request.ReplacementJson);
+        return record.ToJsonString();
+    }
+
     /// <summary>Removes only this test's unique temporary directory.</summary>
     public void Dispose() => Directory.Delete(root, recursive: true);
 
@@ -180,4 +339,5 @@ public sealed class PortableFileTests : IDisposable
     private static extern int MakeFifo([MarshalAs(UnmanagedType.LPUTF8Str)] string path, uint mode);
 
     private sealed record OutputFixture(OwnedOutputStore Store, OwnedOutput Output);
+    private sealed record RecordCorruption(string OriginalJson, string MemberPath, string? ReplacementJson);
 }
