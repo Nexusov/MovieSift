@@ -22,7 +22,7 @@ public sealed record MediaTrack(
     bool IsEnabled,
     ImmutableDictionary<string, string> Properties);
 
-public sealed record Attachment(int Id, ulong Uid, string Name, string ContentType, long Size);
+public sealed record Attachment(int Id, ulong Uid, string Name, string ContentType, long Size, string Description = "");
 
 public sealed record MediaInspection(
     SourceRevision Source,

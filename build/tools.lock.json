@@ -1,0 +1,20 @@
+{
+  "version": "102.0",
+  "identificationFormatVersion": 20,
+  "license": "GPL v2 according to upstream README; included components have separate licenses",
+  "source": {
+    "url": "https://mkvtoolnix.download/sources/mkvtoolnix-102.0.tar.xz",
+    "sha256": "9f0a810f17c7df8adb9064a3a41d5784399be412d19704cf080745ad7d45da30",
+    "checksumUrl": "https://mkvtoolnix.download/sources/mkvtoolnix-102.0.tar.xz.sha256"
+  },
+  "win-x64": {
+    "url": "https://mkvtoolnix.download/windows/releases/102.0/mkvtoolnix-64-bit-102.0.zip",
+    "sha256": "c02e918900f6d945d9307b426237e456378b79a200589ac6928de39064409a44",
+    "checksumUrl": "https://mkvtoolnix.download/windows/releases/102.0/sha256sums.txt"
+  },
+  "linux-x64": {
+    "url": "https://mkvtoolnix.download/appimage/MKVToolNix_GUI-102.0-x86_64.AppImage",
+    "sha256": "c66345b30d6d5fd640ea982ab5e202a99b9f541a20e42aa19edd90f3ddd5dc9b",
+    "checksumNote": "SHA-256 pinned from the upstream HTTPS artifact fetched on 2026-10-18; no separately published SHA-256 file was found for this AppImage."
+  }
+}

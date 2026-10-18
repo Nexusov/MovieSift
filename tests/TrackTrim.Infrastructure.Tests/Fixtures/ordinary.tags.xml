@@ -1,0 +1,32 @@
+﻿<?xml version="1.0"?>
+<!-- <!DOCTYPE Tags SYSTEM "matroskatags.dtd"> -->
+<Tags>
+  <Tag>
+    <Targets />
+    <Simple>
+      <Name>COMMENT</Name>
+      <String>Original global fixture tag</String>
+      <TagLanguageIETF>und</TagLanguageIETF>
+    </Simple>
+  </Tag>
+  <Tag>
+    <Targets>
+      <TrackUID>13675876335307270593</TrackUID>
+    </Targets>
+    <Simple>
+      <Name>COMMENT</Name>
+      <String>Low tone</String>
+      <TagLanguageIETF>und</TagLanguageIETF>
+    </Simple>
+  </Tag>
+  <Tag>
+    <Targets>
+      <TrackUID>15985661122095681775</TrackUID>
+    </Targets>
+    <Simple>
+      <Name>COMMENT</Name>
+      <String>High tone</String>
+      <TagLanguageIETF>und</TagLanguageIETF>
+    </Simple>
+  </Tag>
+</Tags>
