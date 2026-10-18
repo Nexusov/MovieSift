@@ -10,6 +10,7 @@ namespace TrackTrim.Infrastructure.Tests;
 public sealed class OwnedProcessRunnerTests
 {
     private const int OutputBoundCharacters = 1024;
+    private const int ProcessStateOffset = 2;
     private static readonly TimeSpan TestTimeout = TimeSpan.FromSeconds(30);
 
     /// <summary>Proves bounded retention while both real OS pipes exceed ordinary buffer capacity.</summary>
@@ -58,13 +59,16 @@ public sealed class OwnedProcessRunnerTests
         var execution = new OwnedProcessRunner().RunAsync(request);
         var parentIdentifier = await parentReady.Task.WaitAsync(TestTimeout, TestContext.Current.CancellationToken);
         var childIdentifier = expectsChild ? await childReady.Task.WaitAsync(TestTimeout, TestContext.Current.CancellationToken) : (int?)null;
+        using var parent = ObserveActiveProcess(parentIdentifier);
+        using var child = childIdentifier is { } identifier ? ObserveActiveProcess(identifier) : null;
         await cancellationSource.CancelAsync();
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() => execution.WaitAsync(TestTimeout, TestContext.Current.CancellationToken));
-        Assert.True(HasExited(parentIdentifier));
+        await AssertExitedAsync(parent);
 
-        if (childIdentifier is { } identifier)
+        if (child is not null)
         {
-            Assert.True(HasExited(identifier));
+            AssertNoActiveLinuxProcess(child);
+            await AssertExitedAsync(child);
         }
     }
 
@@ -121,17 +125,63 @@ public sealed class OwnedProcessRunnerTests
             TestTimeout, options.LineCallback, options.CancellationToken);
     }
 
-    /// <summary>Checks actual process liveness after runner cancellation has completed.</summary>
-    private static bool HasExited(int identifier)
+    /// <summary>Retains the actual live process instance before cancellation rather than looking up a later PID.</summary>
+    private static Process ObserveActiveProcess(int identifier)
+    {
+        var process = Process.GetProcessById(identifier);
+        _ = process.SafeHandle;
+        Assert.False(process.HasExited, "The controlled worker must be observed alive before cancellation.");
+        return process;
+    }
+
+    /// <summary>Rejects a genuinely active Linux descendant before waiting for non-child process-table reaping.</summary>
+    private static void AssertNoActiveLinuxProcess(Process process)
+    {
+
+        if (!OperatingSystem.IsLinux() || process.HasExited)
+        {
+            return;
+        }
+
+        var state = LinuxProcessState(process);
+        Assert.True(state is "Z" or "X" or "exited",
+            $"The runner returned while its observed descendant {process.Id} remained active (Linux state {state}).");
+    }
+
+    /// <summary>Awaits termination of the same retained process with a bound instead of racing an immediate PID lookup.</summary>
+    private static async Task AssertExitedAsync(Process process)
     {
         try
         {
-            using var process = Process.GetProcessById(identifier);
-            return process.HasExited;
+            await process.WaitForExitAsync(TestContext.Current.CancellationToken)
+                .WaitAsync(TestTimeout, TestContext.Current.CancellationToken);
         }
-        catch (ArgumentException)
+        catch (TimeoutException)
         {
-            return true;
+            Assert.Fail($"The retained worker {process.Id} did not report exit within {TestTimeout}; Linux state: {LinuxProcessState(process)}.");
+        }
+
+        Assert.True(process.HasExited);
+    }
+
+    /// <summary>Records Linux's actual process-table state without interpreting a zombie as an active writer.</summary>
+    private static string LinuxProcessState(Process process)
+    {
+
+        if (!OperatingSystem.IsLinux())
+        {
+            return "not Linux";
+        }
+
+        try
+        {
+            var status = File.ReadAllText($"/proc/{process.Id.ToString(CultureInfo.InvariantCulture)}/stat");
+            var commandEnd = status.LastIndexOf(')');
+            return status[(commandEnd + ProcessStateOffset)..].Split(' ')[0];
+        }
+        catch (Exception exception) when (exception is FileNotFoundException or DirectoryNotFoundException)
+        {
+            return "exited";
         }
     }
 

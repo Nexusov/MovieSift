@@ -135,7 +135,8 @@ internal sealed class OwnedProcessRunner
             using var terminationSource = new CancellationTokenSource(TerminationTimeout);
             await process.WaitForExitAsync(terminationSource.Token).ConfigureAwait(false);
         }
-        catch (Exception exception) when (exception is InvalidOperationException or System.ComponentModel.Win32Exception or OperationCanceledException)
+        catch (Exception exception) when (exception is InvalidOperationException or System.ComponentModel.Win32Exception
+            or OperationCanceledException or AggregateException)
         {
             throw new ProcessTerminationException("The media worker may still be writing its candidate.", exception);
         }
