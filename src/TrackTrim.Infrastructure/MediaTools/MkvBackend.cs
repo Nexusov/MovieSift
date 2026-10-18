@@ -9,13 +9,15 @@ using TrackTrim.Infrastructure.Processes;
 namespace TrackTrim.Infrastructure.MediaTools;
 
 public sealed record MkvBackendOptions(ISourceAccess SourceAccess, MkvToolPaths Tools,
-    string? ScratchDirectory = null, Action<string>? Diagnostic = null);
+    string? ScratchDirectory = null, Action<string>? Diagnostic = null)
+{
+    internal Action<int>? RemuxProcessStarted { get; init; }
+}
 
 /// <summary>Implements the pinned Matroska workflow with real MKVToolNix workers and structural verification.</summary>
 public sealed class MkvBackend(MkvBackendOptions options) : IMediaBackend
 {
     private const int MaximumDiagnosticsCharacters = 32768;
-    private const double TimestampToleranceMilliseconds = 1;
     private static readonly TimeSpan InspectionTimeout = TimeSpan.FromMinutes(2);
     private static readonly HashSet<string> PermittedChangedTrackProperties = new(StringComparer.Ordinal)
     {
@@ -61,7 +63,8 @@ public sealed class MkvBackend(MkvBackendOptions options) : IMediaBackend
         await ValidateToolsAsync(request.CancellationToken).ConfigureAwait(false);
         var result = await RunAsync(new ProcessRequest(options.Tools.MkvMerge, MkvArguments.BuildRemux(request),
             MaximumDiagnosticsCharacters, null,
-            line => ReportProgress(new ProgressLine(line, request.Progress)), request.CancellationToken)).ConfigureAwait(false);
+            line => ReportProgress(new ProgressLine(line, request.Progress)), request.CancellationToken,
+            ProcessStarted: options.RemuxProcessStarted)).ConfigureAwait(false);
         return new ToolOutcome(result.ExitCode, CombineDiagnostics(result));
     }
 
@@ -128,9 +131,10 @@ public sealed class MkvBackend(MkvBackendOptions options) : IMediaBackend
             {
                 var sourceTrack = request.Plan.RetainedTracks[trackIndex];
                 var outputTrack = candidate.Tracks[trackIndex];
-                var timestampsMatch = await TimestampsMatchAsync(new TimestampComparison(
+                var timestampsMatch = await MkvTimestampComparison.EquivalentAsync(new TrackTimestampComparison(
                     TimestampPath(new TrackPath(sourceScratch, sourceTrack.Id)),
-                    TimestampPath(new TrackPath(outputScratch, outputTrack.Id)), request.CancellationToken)).ConfigureAwait(false);
+                    TimestampPath(new TrackPath(outputScratch, outputTrack.Id)), sourceTrack, outputTrack,
+                    request.CancellationToken)).ConfigureAwait(false);
 
                 if (!timestampsMatch)
                 {
@@ -290,7 +294,7 @@ public sealed class MkvBackend(MkvBackendOptions options) : IMediaBackend
             }
 
             var commonMetadataMatches = expected.Kind == actual.Kind && expected.Codec == actual.Codec
-                && expected.Language == actual.Language && expected.Title == actual.Title
+                && LanguageAliasPolicy.Equivalent(new LanguageComparison(expected.Language, actual.Language)) && expected.Title == actual.Title
                 && expected.Channels == actual.Channels && expected.IsDefault == actual.IsDefault
                 && expected.IsForced == actual.IsForced && expected.IsEnabled == actual.IsEnabled;
 
@@ -301,6 +305,12 @@ public sealed class MkvBackend(MkvBackendOptions options) : IMediaBackend
 
             var expectedProperties = expected.Properties.Where(property => !PermittedChangedTrackProperties.Contains(property.Key)).ToDictionary();
             var actualProperties = actual.Properties.Where(property => !PermittedChangedTrackProperties.Contains(property.Key)).ToDictionary();
+
+            if (AacDefaultDurationPolicy.PermitsAddition(new TrackSemanticComparison(expected, actual)))
+            {
+                actualProperties.Remove(AacDefaultDurationPolicy.PropertyName);
+            }
+
             var propertiesMatch = expectedProperties.Count == actualProperties.Count
                 && expectedProperties.All(property => actualProperties.TryGetValue(property.Key, out var value) && property.Value == value);
 
@@ -316,27 +326,8 @@ public sealed class MkvBackend(MkvBackendOptions options) : IMediaBackend
     /// <summary>Allows an IETF language addition only when it is equivalent to the original legacy field.</summary>
     private static bool LanguageIetfMatches(TrackLanguageComparison request)
     {
-
-        if (request.Expected.LanguageIetf is not null)
-        {
-            return request.Expected.LanguageIetf == request.Actual.LanguageIetf;
-        }
-
-        if (request.Actual.LanguageIetf is null || request.Actual.LanguageIetf == request.Expected.Language)
-        {
-            return true;
-        }
-
-        try
-        {
-            var culture = CultureInfo.GetCultureInfo(request.Actual.LanguageIetf);
-            return culture.ThreeLetterISOLanguageName == request.Expected.Language
-                && culture.TwoLetterISOLanguageName == request.Actual.LanguageIetf;
-        }
-        catch (CultureNotFoundException)
-        {
-            return false;
-        }
+        return LanguageAliasPolicy.MatchesIetf(new IetfLanguageComparison(request.Expected.Language,
+            request.Expected.LanguageIetf, request.Actual.LanguageIetf));
     }
 
     /// <summary>Checks attachment order, UIDs, names, types, and sizes; fixture tests check their payloads.</summary>
@@ -346,51 +337,6 @@ public sealed class MkvBackend(MkvBackendOptions options) : IMediaBackend
             pair.First.Uid == pair.Second.Uid && pair.First.Name == pair.Second.Name
             && pair.First.ContentType == pair.Second.ContentType && pair.First.Size == pair.Second.Size
             && pair.First.Description == pair.Second.Description);
-    }
-
-    /// <summary>Compares every retained-frame timestamp with a justified Matroska tick-rounding allowance.</summary>
-    private static async Task<bool> TimestampsMatchAsync(TimestampComparison request)
-    {
-        using var expectedReader = File.OpenText(request.ExpectedPath);
-        using var actualReader = File.OpenText(request.ActualPath);
-
-        while (true)
-        {
-            var expected = await expectedReader.ReadLineAsync(request.CancellationToken).ConfigureAwait(false);
-            var actual = await actualReader.ReadLineAsync(request.CancellationToken).ConfigureAwait(false);
-
-            if (expected is null || actual is null)
-            {
-                return expected is null && actual is null;
-            }
-
-            if (expected.StartsWith('#') || actual.StartsWith('#'))
-            {
-
-                if (expected != actual)
-                {
-                    return false;
-                }
-
-                continue;
-            }
-
-            var validValues = double.TryParse(expected, NumberStyles.Float, CultureInfo.InvariantCulture, out var expectedValue)
-                && double.TryParse(actual, NumberStyles.Float, CultureInfo.InvariantCulture, out _);
-
-            if (!validValues)
-            {
-                return false;
-            }
-
-            var actualValue = double.Parse(actual, CultureInfo.InvariantCulture);
-
-            if (!double.IsFinite(expectedValue) || !double.IsFinite(actualValue)
-                || Math.Abs(expectedValue - actualValue) > TimestampToleranceMilliseconds)
-            {
-                return false;
-            }
-        }
     }
 
     /// <summary>Translates process ownership failures into stable application outcomes.</summary>
@@ -503,7 +449,6 @@ public sealed class MkvBackend(MkvBackendOptions options) : IMediaBackend
     private sealed record MetadataExtraction(MediaInspection Inspection, string Directory, CancellationToken CancellationToken);
     private sealed record ExtractedMetadata(XDocument? Chapters, XDocument? Tags);
     private sealed record TimestampExtraction(string SourcePath, IReadOnlyList<MediaTrack> Tracks, string Directory, CancellationToken CancellationToken);
-    private sealed record TimestampComparison(string ExpectedPath, string ActualPath, CancellationToken CancellationToken);
     private sealed record TrackComparison(IReadOnlyList<MediaTrack> Expected, IReadOnlyList<MediaTrack> Actual);
     private sealed record AttachmentComparison(IReadOnlyList<Attachment> Expected, IReadOnlyList<Attachment> Actual);
     private sealed record TrackLanguageComparison(MediaTrack Expected, MediaTrack Actual);

@@ -132,6 +132,18 @@ public sealed class MkvStructuredOutputTests
         Assert.False(MkvMetadataXml.Equivalent(new MkvMetadataXml.XmlComparison(expected, changed)));
     }
 
+    /// <summary>Accepts the exact ISO bibliographic-to-alpha-two addition produced for German and French.</summary>
+    [Theory]
+    [InlineData("ger", "de")]
+    [InlineData("fre", "fr")]
+    public void XmlAcceptsBibliographicLanguageIetfAddition(string legacy, string ietf)
+    {
+        var source = XDocument.Parse($"<Chapters><EditionEntry><ChapterAtom><ChapterDisplay><ChapterString>Original</ChapterString><ChapterLanguage>{legacy}</ChapterLanguage></ChapterDisplay></ChapterAtom></EditionEntry></Chapters>");
+        var candidate = new XDocument(source);
+        candidate.Descendants("ChapterDisplay").Single().Add(new XElement("ChapLanguageIETF", ietf));
+        Assert.True(MkvMetadataXml.Equivalent(new MkvMetadataXml.XmlComparison(source, candidate)));
+    }
+
     /// <summary>Rejects mixed and dangling references that need a separate post-removal semantics policy.</summary>
     [Fact]
     public void RejectsMixedAndDanglingTagTargets()

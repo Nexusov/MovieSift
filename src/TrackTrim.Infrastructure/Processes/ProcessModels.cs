@@ -7,7 +7,8 @@ internal sealed record ProcessRequest(
     TimeSpan? Timeout,
     Action<string>? StandardOutputLine,
     CancellationToken CancellationToken,
-    IReadOnlyDictionary<string, string>? Environment = null);
+    IReadOnlyDictionary<string, string>? Environment = null,
+    Action<int>? ProcessStarted = null);
 
 internal sealed record ProcessResult(
     int ExitCode,

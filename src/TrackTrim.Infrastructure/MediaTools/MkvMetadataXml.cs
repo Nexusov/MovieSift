@@ -183,13 +183,20 @@ internal static class MkvMetadataXml
                 continue;
             }
 
-            var ietfLanguage = parent.Element(ietfName);
-            var legacyLanguage = parent.Element(legacyName);
-
-            if (ietfLanguage is not null && legacyLanguage is not null && EquivalentLanguage(
-                new LanguageComparison(legacyLanguage.Value, ietfLanguage.Value)))
+            foreach (var ietfLanguage in parent.Elements(ietfName).ToArray())
             {
-                ietfLanguage.Remove();
+                var redundantPlainCode = parent.Elements(legacyName).Any(legacyLanguage =>
+                    LanguageAliasPolicy.EquivalentPlainCodes(new LanguageComparison(legacyLanguage.Value, ietfLanguage.Value)));
+
+                if (redundantPlainCode)
+                {
+                    ietfLanguage.Remove();
+                }
+            }
+
+            foreach (var language in parent.Elements(legacyName).Concat(parent.Elements(ietfName)))
+            {
+                language.Value = LanguageAliasPolicy.Canonicalize(language.Value);
             }
         }
 
@@ -219,27 +226,6 @@ internal static class MkvMetadataXml
         return canonical.ToString(SaveOptions.DisableFormatting);
     }
 
-    /// <summary>Accepts only the documented alpha-2/alpha-3 equivalent language addition.</summary>
-    private static bool EquivalentLanguage(LanguageComparison request)
-    {
-
-        if (request.Legacy == request.Ietf)
-        {
-            return true;
-        }
-
-        try
-        {
-            var culture = CultureInfo.GetCultureInfo(request.Ietf);
-            return culture.ThreeLetterISOLanguageName == request.Legacy
-                && culture.TwoLetterISOLanguageName == request.Ietf;
-        }
-        catch (CultureNotFoundException)
-        {
-            return false;
-        }
-    }
-
     /// <summary>Creates a stable structured-output error.</summary>
     private static OperationFailureException Invalid(string detail)
     {
@@ -255,5 +241,4 @@ internal static class MkvMetadataXml
     internal sealed record TagExpectation(XDocument Source, IReadOnlyDictionary<ulong, ulong> RetainedUidMapping);
     internal sealed record XmlComparison(XDocument Expected, XDocument Actual);
     internal sealed record TrackTargetValidation(XDocument Document, IReadOnlySet<ulong> KnownTrackUids);
-    private sealed record LanguageComparison(string Legacy, string Ietf);
 }

@@ -1,9 +1,11 @@
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Globalization;
 using System.Security.Cryptography;
 using TrackTrim.Application.Ports;
 using TrackTrim.Core.Media;
 using TrackTrim.Core.Planning;
+using TrackTrim.Infrastructure.Files;
 using TrackTrim.Infrastructure.MediaTools;
 using TrackTrim.Infrastructure.Processes;
 using Xunit;
@@ -84,7 +86,10 @@ public sealed class MkvBackendIntegrationTests
         Assert.True(verification.Passed, verification.Details);
         var output = await backend.InspectAsync(new InspectRequest(candidate));
         Assert.DoesNotContain(output.Tracks, track => track.Kind == TrackKind.Audio);
-        Assert.Single(output.Tracks.Where(track => track.Kind == TrackKind.Subtitles));
+        var sourceSubtitles = Assert.Single(inspection.Tracks.Where(track => track.Kind == TrackKind.Subtitles));
+        var outputSubtitles = Assert.Single(output.Tracks.Where(track => track.Kind == TrackKind.Subtitles));
+        await MediaPayloadEvidence.AssertIdenticalAsync(new PayloadComparison(sourcePath, sourceSubtitles.Id,
+            candidate, outputSubtitles.Id, workspace.Path, "retained-subtitles"));
         Assert.Equal(originalHash, await HashAsync(sourcePath));
     }
 
@@ -112,29 +117,58 @@ public sealed class MkvBackendIntegrationTests
         Assert.Equal(originalHash, await HashAsync(sourcePath));
     }
 
-    /// <summary>Cancels after actual machine progress and confirms the source bytes remain intact.</summary>
+    /// <summary>Cancels an observed live remux worker and checks that the same process handle exits before cleanup.</summary>
     [MediaFact]
     public async Task CancellationDuringRealWorkerOutputReapsWorkerAndPreservesOriginal()
     {
         using var workspace = new TestWorkspace();
-        var sourcePath = Path.Combine(MediaTestEnvironment.FixtureDirectory, "ordinary.mkv");
+        var sourcePath = Path.Combine(MediaTestEnvironment.FixtureDirectory, "cancellation.mkv");
         var originalHash = await HashAsync(sourcePath);
-        var backend = MediaTestEnvironment.CreateBackend(Path.Combine(workspace.Path, "scratch"));
+        Process? worker = null;
+        var toolPaths = MkvToolPaths.FromDirectory(MediaTestEnvironment.ToolDirectory) with { IsDevelopmentOverride = true };
+        var backend = new MkvBackend(new MkvBackendOptions(new FileSourceAccess(), toolPaths,
+            Path.Combine(workspace.Path, "scratch"))
+        {
+            RemuxProcessStarted = identifier =>
+            {
+                worker = Process.GetProcessById(identifier);
+                _ = worker.SafeHandle;
+                Assert.False(worker.HasExited, "The observed remux worker must still be alive when its handle is retained.");
+            },
+        });
         var inspection = await backend.InspectAsync(new InspectRequest(sourcePath));
         var candidate = Path.Combine(workspace.Path, "cancel-during-work.mkv");
         var retainedIds = inspection.Tracks.Where(track => track.Kind != TrackKind.Subtitles).Select(track => track.Id).ToArray();
         var plan = PlanBuilder.Build(new PlanRequest(inspection, retainedIds, candidate, false)).Plan!;
         using var cancellationSource = new CancellationTokenSource();
-        var progressObserved = false;
-        var progress = new SynchronousProgress(_ =>
+        var activeWorkerAtCancellation = false;
+        var progress = new SynchronousProgress(percentage =>
         {
-            progressObserved = true;
+            var workerIsActive = worker is not null && !worker.HasExited && percentage < 100;
+
+            if (!workerIsActive)
+            {
+                return;
+            }
+
+            activeWorkerAtCancellation = true;
             cancellationSource.Cancel();
         });
-        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => backend.RemuxAsync(
-            new RemuxRequest(plan, candidate, progress, cancellationSource.Token)));
-        Assert.True(progressObserved);
-        Assert.Equal(originalHash, await HashAsync(sourcePath));
+
+        try
+        {
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => backend.RemuxAsync(
+                new RemuxRequest(plan, candidate, progress, cancellationSource.Token)));
+            Assert.True(activeWorkerAtCancellation, "Buffered progress from an already-exited worker cannot satisfy this regression.");
+            Assert.NotNull(worker);
+            await worker.WaitForExitAsync(TestContext.Current.CancellationToken).WaitAsync(TimeSpan.FromSeconds(30), TestContext.Current.CancellationToken);
+            Assert.True(worker.HasExited, "The same retained worker handle must report exit after cancellation completes.");
+            Assert.Equal(originalHash, await HashAsync(sourcePath));
+        }
+        finally
+        {
+            worker?.Dispose();
+        }
     }
 
     /// <summary>Checks that cancellation before launch produces no candidate and leaves the source intact.</summary>

@@ -42,6 +42,17 @@ internal sealed class OwnedProcessRunner
 
         using var process = new Process { StartInfo = startInfo };
         process.Start();
+
+        try
+        {
+            request.ProcessStarted?.Invoke(process.Id);
+        }
+        catch
+        {
+            await TerminateAsync(process).ConfigureAwait(false);
+            throw;
+        }
+
         using var drainageSource = new CancellationTokenSource();
         var standardOutputTask = DrainAsync(new DrainRequest(
             process.StandardOutput, request.MaximumOutputCharacters, request.StandardOutputLine, drainageSource.Token));

@@ -77,6 +77,36 @@ public sealed class OwnedProcessRunnerTests
         Assert.Contains("not a real mkvmerge warning fixture", result.StandardError, StringComparison.Ordinal);
     }
 
+    /// <summary>Reaps an already-started worker when a process-lifecycle observer itself fails.</summary>
+    [Fact]
+    public async Task FailingStartObserverCannotLeaveItsWorkerRunning()
+    {
+        Process? observedWorker = null;
+        var request = WorkerRequest(new WorkerOptions(["wait"])) with
+        {
+            ProcessStarted = identifier =>
+            {
+                observedWorker = Process.GetProcessById(identifier);
+                _ = observedWorker.SafeHandle;
+                Assert.False(observedWorker.HasExited);
+                throw new InvalidOperationException("controlled lifecycle observer failure");
+            },
+        };
+
+        try
+        {
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => new OwnedProcessRunner().RunAsync(request));
+            Assert.Equal("controlled lifecycle observer failure", exception.Message);
+            Assert.NotNull(observedWorker);
+            await observedWorker.WaitForExitAsync(TestContext.Current.CancellationToken).WaitAsync(TestTimeout, TestContext.Current.CancellationToken);
+            Assert.True(observedWorker.HasExited);
+        }
+        finally
+        {
+            observedWorker?.Dispose();
+        }
+    }
+
     /// <summary>Builds a controlled helper invocation using the exact runtime hosting the test suite.</summary>
     private static ProcessRequest WorkerRequest(WorkerOptions options)
     {

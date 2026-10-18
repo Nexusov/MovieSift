@@ -13,6 +13,7 @@ import sys
 import wave
 
 FRAME_COUNT = 20
+CANCELLATION_FRAME_COUNT = 60000
 FRAME_RATE = 10
 SAMPLE_RATE = 48000
 DURATION_SECONDS = 2
@@ -25,12 +26,12 @@ VP8_BLUE = "8AEAnQEqEAAQAADAEiWgAnS6AfgABEwAAP7+ZqH/+tHP10T/Wjn/rRz/5SqLVNuKAAA=
 
 def write_video(request):
     """Write a valid IVF stream containing independently decodable VP8 keyframes."""
-    path, encoded_frame = request
+    path, encoded_frame, frame_count = request
     payload = base64.b64decode(encoded_frame)
-    header = struct.pack("<4sHH4sHHIIII", b"DKIF", 0, 32, b"VP80", 16, 16, FRAME_RATE, 1, FRAME_COUNT, 0)
+    header = struct.pack("<4sHH4sHHIIII", b"DKIF", 0, 32, b"VP80", 16, 16, FRAME_RATE, 1, frame_count, 0)
     with path.open("wb") as output:
         output.write(header)
-        for frame_index in range(FRAME_COUNT):
+        for frame_index in range(frame_count):
             output.write(struct.pack("<IQ", len(payload), frame_index))
             output.write(payload)
 
@@ -67,8 +68,8 @@ def main():
     version = run([str(executable), "--version"]).strip()
     if not version.startswith("mkvmerge v102.0 "):
         raise RuntimeError(f"Expected pinned MKVToolNix 102.0, received {version}")
-    write_video((destination / "red.ivf", VP8_RED))
-    write_video((destination / "blue.ivf", VP8_BLUE))
+    write_video((destination / "red.ivf", VP8_RED, FRAME_COUNT))
+    write_video((destination / "blue.ivf", VP8_BLUE, FRAME_COUNT))
     write_audio((destination / "low.wav", 440))
     write_audio((destination / "high.wav", 880))
     (destination / "captions.srt").write_text("1\n00:00:00,000 --> 00:00:01,700\nOriginal synthetic subtitle.\n", encoding="utf-8")
@@ -122,6 +123,11 @@ def main():
         preliminary.unlink()
         identification = run([str(executable), "-J", str(output)])
         (destination / f"{output.stem}.identification.json").write_text(identification, encoding="utf-8")
+    cancellation_video = destination / "cancellation.ivf"
+    write_video((cancellation_video, VP8_RED, CANCELLATION_FRAME_COUNT))
+    run([str(executable), "--deterministic", "TrackTrim-live-cancellation-v1", "--disable-track-statistics-tags",
+         "--output", str(destination / "cancellation.mkv"), str(cancellation_video),
+         str(destination / "low.wav"), str(destination / "high.wav"), str(destination / "captions.srt")])
     manifest = {"generator": "TrackTrim original synthetic fixture v1", "tool": version,
                 "files": {path.name: hashlib.sha256(path.read_bytes()).hexdigest()
                           for path in sorted(destination.glob("*.mkv"))}}
