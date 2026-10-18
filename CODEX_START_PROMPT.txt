@@ -1,0 +1,71 @@
+You are implementing an open-source Windows/Linux desktop application for removing unwanted embedded audio and subtitle tracks from local video files without re-encoding.
+
+Read PROJECT_BRIEF.md in the repository root in full before changing code. It is the reviewed product and engineering baseline, not a claim that anything is implemented. Inspect the workspace, Git state, repository instructions, and installed toolchain first. Preserve unrelated work and reuse the established project name. For an empty repository, use TrackTrim.
+
+SCOPE AND EXECUTION
+
+Implement Phase 0 and then Phase 1 only: a verified foundation and one complete, real MKV workflow. Follow the brief's small Phase 1 checkpoints and keep each increment buildable and reviewable. Continue through the authorized checkpoints without optional confirmation requests. Do not stop after generating planning documents or a mock UI if a working vertical slice is feasible. Do not implement batch processing, folders, rules/presets, MP4 production processing, playback, source replacement, or other later milestones in this task.
+
+TECHNOLOGY
+
+Use C#/.NET 10 LTS, stable Avalonia 12 with Fluent styling, CommunityToolkit.Mvvm, and MKVToolNix CLI processes. Verify compatible stable versions from official sources, pin the SDK in global.json, pin related package/tool versions, and use locked restore. Record the actual bundled runtime separately from the SDK version. No preview dependencies or silent framework substitutions.
+
+Use mkvmerge for MKV identification/remuxing and same-version mkvextract for the brief's required chapter/tag checks. FFmpeg/ffprobe belong to the later MP4 adapter or clearly identified development-only fixture/verification work. Do not implement an FFmpeg-based MKV fallback or bundle unused production tools.
+
+ARCHITECTURE AND READABILITY
+
+Use four small production projects: Core, Application, Infrastructure, and Desktop. Core contains pure media/selection/planning logic and depends only on the base class library. Application coordinates use cases and owns narrow I/O contracts. Infrastructure implements media-tool, process, filesystem, and persistence boundaries. Desktop owns Views, ViewModels, localization, and composition. Its Infrastructure reference is for Bootstrap only; ViewModels must not build CLI commands, access media files, or own worker processes.
+
+Use explicit constructor injection, compiled typed bindings, asynchronous commands, nullable reference types, immutable plans, and explicit outcomes for expected failures. Create interfaces only for meaningful boundaries. Create folders/projects when they contain useful code. Prefer cohesive readable classes and ordinary control flow. Avoid service locators, global mutable services, mediator/CQRS frameworks, generic repositories, speculative inheritance, a custom logging/translation framework, and interfaces for every class.
+
+Keep machine-readable error codes and parameters independent of localized text. Keep backend-specific DTOs and preservation rules inside their adapter. Do not prebuild a universal media abstraction or an MP4 implementation. Document significant tradeoffs briefly and only when they affect real behavior.
+
+MANDATORY LOCALIZATION
+
+Deliver English and Russian in Phase 1. First launch must use English even on a Russian OS. Provide an obvious English / Русский selector that updates the current application-owned UI without restarting, losing the loaded file or selections, or restarting/cancelling an active job. Persist en/ru in portable settings; missing/invalid values fall back to English.
+
+Use neutral English resources and Russian resources, preferably .resx with a small observable localization service. Translate application-owned labels, statuses, validation, and accessible names. Preserve raw tool diagnostics, filenames, and media metadata; native OS dialog language may remain OS-controlled. Keep protocol parsing, CLI values, settings serialization, and media plans culture-invariant. Test switching, persistence, fallback, English-first startup under Russian culture, and resource/format-argument parity.
+
+PHASE 1 BEHAVIOR
+
+Let the user select one real MKV, inspect actual tracks, choose audio/subtitle tracks to keep, review a concrete immutable output plan, select a separate output location, run a real remux, observe real progress, cancel, and inspect the actual result. Start with all audio/subtitles selected. Preserve every video track and required supported attachments. Removing all subtitles is valid; removing all existing audio requires explicit plan confirmation. A no-change plan must not launch redundant processing.
+
+Keep file-local track identity distinct from UI rows, Matroska UIDs, and ffprobe indexes. Preserve retained order and effective flags. Distinguish unknown metadata from documented format defaults. Do not infer spoken language from tags. Reject stale plans and prevent late inspection results from replacing newer UI state.
+
+Follow the brief's MKV preservation policy, including explicit retention/empty-selection arguments, track order, language normalization, generated statistics tags, and permitted UID changes. Verify supported chapter/tag content through appropriate XML inspection against expected post-removal metadata, including retained/removed-track targets; comparing only counts is insufficient. Do not claim that all container metadata is preserved or every packet verified when only a structural check was performed. Detected unsupported features require explicit errors; no transcoding, silent dropping, or backend fallback.
+
+SAFETY AND PROCESS OWNERSHIP
+
+Never modify, overwrite, or delete original media. Recheck source identity before processing and before publication. Use an owned temporary candidate next to the final destination on the same filesystem, record ownership, remux, drain process output, validate, then publish with a no-overwrite operation that enforces collisions at publication time. Do not rely on an earlier File.Exists check.
+
+One job owner controls the process, candidate, verification, warning review, publication, and cleanup. Keep lifecycle phase separate from tool outcome, verification result, publication/path, cancellation request, and cleanup issues. A cleanup failure must not replace the primary error or hide a successfully published output.
+
+Treat mkvmerge exit 1 as warnings: never auto-publish or mark clean success. A candidate that passes every required check may offer explicit Publish with warnings or Discard output. Approval publishes that candidate after rechecking relevant source/candidate/destination assumptions; it must not silently remux again. Failed/incomplete required verification cannot be overridden.
+
+Use absolute bundled-tool paths, ProcessStartInfo.ArgumentList, and UseShellExecute=false. Resolve paths from AppContext.BaseDirectory, not the working directory or arbitrary PATH executables. Continuously drain stdout/stderr asynchronously with bounded retained diagnostics; reject excessive/truncated JSON/XML explicitly. Use documented machine-oriented progress independent of UI language. No shell interpolation, UI-thread blocking, or unobserved work.
+
+Cancellation must stop and await/reap the owned process, account for owned descendants where relevant, and cover verification subprocesses. Cancelling a wait is insufficient. Do not delete a candidate while an unconfirmed surviving worker could still write it. Check pending cancellation before a short non-cancellable publication step; after successful publication, a late cancel request must not relabel the result as unpublished or delete it. Closing the window must safely finish shutdown or keep the app running with an explicit choice.
+
+Implement only the minimal versioned temporary-output ownership records and startup interrupted-work notice/validated cleanup required by Phase 1. Do not implement a persisted batch queue or resume framework. After restart, do not trust old verification flags, auto-publish, auto-retry, delete by glob, or kill a process from a stale recorded PID.
+
+PORTABLE PACKAGING
+
+Prove packaging early. Target separate self-contained win-x64 ZIP and linux-x64 tar.gz bundles containing the complete application/runtime, required MKVToolNix executables and dependency closure, notices, and provenance. No installer, administrator requirement, separately installed .NET, user-installed media tools, or first-launch downloads. An explicit development tool override is not portable-release acceptance.
+
+Use Windows 11 x64 on a supported release, initially 25H2, and Ubuntu 24.04 x64 Desktop with X11/XWayland as proposed acceptance environments. Record exact tested versions/editions and combined native requirements. Native Wayland, arbitrary Linux distributions, AOT, trimming, and single-file publishing are not initial guarantees. Resolve the real Linux tool-library/FUSE implications rather than copying one binary and assuming portability.
+
+Keep application-controlled settings/logs/ownership records in data beside the application. Handle an unwritable location explicitly as described in the brief. Verify relocated bundles, spaces/Cyrillic paths, a different working directory, and a target without a development SDK or installed media tools. If an OS is unavailable, implement its CI checks and explicitly leave runtime/desktop acceptance unverified. Cross-publishing or defining CI is not a runtime test.
+
+VERIFICATION AND DOCUMENTATION
+
+Add focused tests for the delivered scope: exact retention, preserved original hashes, no subtitles, confirmed zero audio, multiple video tracks, retained order/flags, identical-metadata but distinguishable audio tracks, chapters/tags/attachments, stale inspection/plans, source changes, cancellation, warning review, failed verification, existing and late-created destinations, cleanup failures, portable settings, and both UI languages.
+
+Use small real/generated MKV fixtures with generation scripts and provenance. Compare retained encoded content or codec-appropriate equivalents where suitable. Deterministic fake ports/helper processes are appropriate for rare failures and races, but cannot replace real mkvmerge integration. Test filenames legal on each platform. Do not report simulated warning tests as real warning-remux coverage.
+
+Run locked restore, formatting verification, build, and relevant tests. A designated media/package CI job must fail if required tools are unavailable rather than pass by skipping everything. Report skipped/unavailable/unrun checks honestly, without invented counts or results. Separate headless UI checks from real desktop smoke tests.
+
+Maintain concise English README.md, AGENTS.md, CONTRIBUTING.md, docs/ARCHITECTURE.md, docs/SUPPORTED_FORMATS.md, docs/PLAN.md, and THIRD_PARTY_NOTICES.md. Keep documentation factual and current, describing behavior, decisions, limitations, and actual commands rather than a conversation history. Preserve any existing license and record unresolved license/provenance obligations instead of claiming redistribution compliance without evidence.
+
+Keep dependencies, changes, and commits small and justified under repository policy. Preserve unrelated work. Do not push, publish, sign a release, or change repository settings.
+
+Proceed with reasonable non-destructive defaults. If blocked, complete independent work and report the exact blocker and acceptance gap; do not silently weaken the contract. Finish with a Russian report covering implemented behavior, changed files and artifacts, exact checks/results, unverified requirements, known risks, and the next bounded task. Stop before Phase 2.
