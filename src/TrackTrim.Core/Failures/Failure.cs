@@ -27,4 +27,19 @@ public enum ErrorCode
     IoFailure
 }
 
-public sealed record Failure(ErrorCode Code, string Detail = "");
+public enum ErrorReason
+{
+    None,
+    LinkedSegments,
+    TrackType,
+    HdrMetadata,
+    ChapterReferences,
+    OrderedChapters,
+    TagTargets,
+    DanglingTrackTags,
+    RedirectedPath,
+    NetworkPath,
+    RegularFileRequired
+}
+
+public sealed record Failure(ErrorCode Code, string Detail = "", ErrorReason Reason = ErrorReason.None);

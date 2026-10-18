@@ -25,6 +25,7 @@ public sealed partial class MainViewModel : ObservableObject
     private Task activeOperation = Task.CompletedTask;
     private string statusKey = "Idle";
     private long languageRevision;
+    private string toolDiagnostics = string.Empty;
 
     [ObservableProperty]
     private string sourcePath = string.Empty;
@@ -43,9 +44,6 @@ public sealed partial class MainViewModel : ObservableObject
 
     [ObservableProperty]
     private bool isProgressIndeterminate;
-
-    [ObservableProperty]
-    private string diagnostics = string.Empty;
 
     [ObservableProperty]
     private string cleanupDetails = string.Empty;
@@ -93,6 +91,8 @@ public sealed partial class MainViewModel : ObservableObject
     public string InterruptedDetails => DescribeInterrupted();
     public bool HasError => failure is not null && failure.Code != ErrorCode.Cancelled;
     public bool HasDiagnostics => !string.IsNullOrWhiteSpace(Diagnostics);
+    public string Diagnostics => DescribeDiagnostics();
+    public bool HasErrorDetail => !string.IsNullOrWhiteSpace(ErrorDetail);
     public bool HasCleanupIssue => !string.IsNullOrWhiteSpace(CleanupDetails);
     public bool HasSizeDifference => result?.OutputLength is not null && inspection is not null && result.PublishedPath is not null;
     public bool RemovesDefaultAudio => approvedPlan?.RemovesDefaultAudio == true;
@@ -102,7 +102,9 @@ public sealed partial class MainViewModel : ObservableObject
     public string MediaFeaturesText => DescribeMediaFeatures();
     public string StatusText => result?.PublishedPath is { } path && statusKey is "Published" or "PublishedWithWarnings" ? Localization.Format(new(statusKey, [path])) : Localization[statusKey];
     public string ErrorText => failure is null ? string.Empty : Localization[$"Error{failure.Code}"];
-    public string ErrorDetail => failure?.Detail ?? string.Empty;
+    public string ErrorDetail => failure is { Reason: not ErrorReason.None } reasonedFailure
+        ? Localization[$"ErrorReason{reasonedFailure.Reason}"]
+        : string.Empty;
     public string PlanDescription => approvedPlan is null ? string.Empty : Localization.Format(new("TracksSummary", [approvedPlan.RetainedTracks.Length,
         approvedPlan.Inspection.Tracks.Length - approvedPlan.RetainedTracks.Length]));
     public string PlanDestination => approvedPlan?.DestinationPath ?? string.Empty;
@@ -381,7 +383,7 @@ public sealed partial class MainViewModel : ObservableObject
         IsProgressIndeterminate = true;
         ProgressValue = 0;
         failure = null;
-        Diagnostics = string.Empty;
+        toolDiagnostics = string.Empty;
         CleanupDetails = string.Empty;
 
         try
@@ -419,7 +421,7 @@ public sealed partial class MainViewModel : ObservableObject
     {
         result = jobResult;
         failure = jobResult.Failure;
-        Diagnostics = jobResult.Tool?.Diagnostics ?? string.Empty;
+        toolDiagnostics = jobResult.Tool?.Diagnostics ?? string.Empty;
         var cleanupIssues = jobResult.CleanupIssues.IsDefault ? [] : jobResult.CleanupIssues;
         CleanupDetails = string.Join(Environment.NewLine, cleanupIssues.Select(issue => $"{issue.Path}: {issue.Detail}"));
         statusKey = GetResultStatusKey(jobResult);
@@ -484,6 +486,14 @@ public sealed partial class MainViewModel : ObservableObject
                 : entry.Issue ?? string.Empty;
             return $"{state}{Environment.NewLine}{paths}";
         }));
+    }
+
+    /// <summary>Keeps original tool, adapter and cleanup details in an explicitly technical presentation.</summary>
+    private string DescribeDiagnostics()
+    {
+        var details = new[] { toolDiagnostics, failure?.Detail ?? string.Empty, CleanupDetails };
+        var distinctDetails = details.Where(detail => !string.IsNullOrWhiteSpace(detail)).Distinct(StringComparer.Ordinal);
+        return string.Join(Environment.NewLine + Environment.NewLine, distinctDetails);
     }
 
     /// <summary>Reports measured growth or reduction without claiming that the original was removed.</summary>

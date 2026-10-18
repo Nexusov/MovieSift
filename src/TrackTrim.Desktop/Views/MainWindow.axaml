@@ -121,7 +121,7 @@
 
         <StackPanel Spacing="6" IsVisible="{Binding HasError}">
           <TextBlock x:Name="ErrorText" Text="{Binding ErrorText}" TextWrapping="Wrap" Foreground="Crimson" FontWeight="SemiBold" />
-          <TextBox Text="{Binding ErrorDetail}" TextWrapping="Wrap" IsReadOnly="True" />
+          <TextBlock x:Name="ErrorDetailText" Text="{Binding ErrorDetail}" TextWrapping="Wrap" IsVisible="{Binding HasErrorDetail}" />
         </StackPanel>
 
         <Border Padding="12" BorderBrush="Orange" BorderThickness="1" CornerRadius="4" IsVisible="{Binding RequiresCloseDecision}">
@@ -133,7 +133,6 @@
 
         <StackPanel Spacing="6" IsVisible="{Binding HasCleanupIssue}">
           <TextBlock Text="{Binding Localization[CleanupHeading]}" TextWrapping="Wrap" />
-          <TextBox Text="{Binding CleanupDetails}" TextWrapping="Wrap" IsReadOnly="True" />
         </StackPanel>
 
         <Expander Header="{Binding Localization[Diagnostics]}" IsVisible="{Binding HasDiagnostics}">

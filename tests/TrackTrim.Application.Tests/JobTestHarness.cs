@@ -34,6 +34,7 @@ internal sealed class JobTestHarness : IMediaBackend, ISourceAccess, IOutputStor
     public Action? OnRemux { get; set; }
     public Action? OnVerify { get; set; }
     public Action? OnPublish { get; set; }
+    public Action? OnCleanup { get; set; }
 
     public JobCoordinator Coordinator => new(this, this, this);
 
@@ -114,6 +115,7 @@ internal sealed class JobTestHarness : IMediaBackend, ISourceAccess, IOutputStor
     public Task<ImmutableArray<CleanupIssue>> CleanupAsync(OutputRequest request)
     {
         CleanupCalls++;
+        OnCleanup?.Invoke();
         ImmutableArray<CleanupIssue> issues = FailCleanup ? [new("owned", "simulated cleanup failure")] : [];
         return Task.FromResult(issues);
     }

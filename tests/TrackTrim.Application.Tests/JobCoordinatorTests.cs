@@ -150,6 +150,19 @@ public sealed class JobCoordinatorTests
         Assert.Single(result.CleanupIssues);
     }
 
+    /// <summary>Records cancellation arriving during cleanup without changing successful publication.</summary>
+    [Fact]
+    public async Task CancellationDuringCleanupRetainsPublishedOutcomeAndRequestEvidence()
+    {
+        using var cancellation = new CancellationTokenSource();
+        var harness = new JobTestHarness { OnCleanup = cancellation.Cancel };
+        var result = await harness.Coordinator.RunAsync(new(harness.CreatePlan(), CancellationToken: cancellation.Token));
+        Assert.Equal(JobPhase.Completed, result.Phase);
+        Assert.Equal("output.mkv", result.PublishedPath);
+        Assert.True(result.CancellationRequested);
+        Assert.Null(result.Failure);
+    }
+
     /// <summary>Stops before verification and publication when cancellation is observed.</summary>
     [Fact]
     public async Task CancellationDuringWorkerNeverPublishes()

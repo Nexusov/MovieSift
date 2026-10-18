@@ -104,7 +104,7 @@ public sealed class JobCoordinator(IMediaBackend backend, ISourceAccess sourceAc
             gate.Release();
         }
 
-        return result;
+        return result with { CancellationRequested = result.CancellationRequested || request.CancellationToken.IsCancellationRequested };
     }
 
     /// <summary>Revalidates and publishes the existing warning candidate without remuxing.</summary>
@@ -162,7 +162,7 @@ public sealed class JobCoordinator(IMediaBackend backend, ISourceAccess sourceAc
             gate.Release();
         }
 
-        return result;
+        return result with { CancellationRequested = result.CancellationRequested || request.CancellationToken.IsCancellationRequested };
     }
 
     /// <summary>Discards only this coordinator's owned warning candidate.</summary>

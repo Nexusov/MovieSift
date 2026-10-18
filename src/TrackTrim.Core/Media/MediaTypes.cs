@@ -3,6 +3,7 @@ using System.Collections.Immutable;
 namespace TrackTrim.Core.Media;
 
 public enum TrackKind { Video, Audio, Subtitles }
+public enum TrackDisposition { HearingImpaired, VisualImpaired, TextDescriptions, Original, Commentary }
 
 public sealed record SourceRevision(string FullPath, string FileIdentity, long Length, long LastWriteUtcTicks);
 
@@ -20,7 +21,8 @@ public sealed record MediaTrack(
     bool IsDefault,
     bool IsForced,
     bool IsEnabled,
-    ImmutableDictionary<string, string> Properties);
+    ImmutableDictionary<string, string> Properties,
+    ImmutableArray<TrackDisposition> Dispositions = default);
 
 public sealed record Attachment(int Id, ulong Uid, string Name, string ContentType, long Size, string Description = "");
 

@@ -17,7 +17,7 @@ internal static class PathSafety
 
             if (attributes.HasFlag(FileAttributes.ReparsePoint))
             {
-                throw new OperationFailureException(new(ErrorCode.InvalidDestination, "Symlink and junction paths are not supported."));
+                throw new OperationFailureException(new(ErrorCode.InvalidDestination, "Symlink and junction paths are not supported.", ErrorReason.RedirectedPath));
             }
 
             current = Path.GetDirectoryName(current);

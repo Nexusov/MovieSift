@@ -28,7 +28,7 @@ internal sealed class ViewModelFixture
             CreateTrack(new(3, TrackKind.Subtitles, "Subtitle")));
         Backend = new FakeMediaBackend(new(source, new("MKVToolNix", "102.0", 20), tracks, [], "Fixture", false, false));
         var sourceAccess = new FakeSourceAccess(source);
-        var outputs = new FakeOutputStore();
+        var outputs = Outputs;
         ViewModel = new(new(new InspectionService(Backend, sourceAccess), new JobCoordinator(Backend, sourceAccess, outputs),
             Settings, outputs, new FakeDialogs(SourcePath), new LocalizationService(), true, new LoggerConfiguration().CreateLogger()));
     }
@@ -36,6 +36,7 @@ internal sealed class ViewModelFixture
     public MainViewModel ViewModel { get; }
     public FakeMediaBackend Backend { get; }
     public FakeSettingsStore Settings { get; } = new();
+    public FakeOutputStore Outputs { get; } = new();
 
     /// <summary>Loads the deterministic source through the same commands used by the UI.</summary>
     public async Task LoadAsync()
@@ -100,9 +101,18 @@ internal sealed class FakeMediaBackend(MediaInspection inspection) : IMediaBacke
     public bool VerificationPassed { get; set; } = true;
     public bool TerminationFails { get; set; }
     public int RemuxCount { get; private set; }
+    public Exception? InspectionException { get; set; }
 
     /// <summary>Returns immutable representative metadata for presentation tests.</summary>
-    public Task<MediaInspection> InspectAsync(InspectRequest request) => Task.FromResult(inspection);
+    public Task<MediaInspection> InspectAsync(InspectRequest request)
+    {
+        if (InspectionException is { } exception)
+        {
+            return Task.FromException<MediaInspection>(exception);
+        }
+
+        return Task.FromResult(inspection);
+    }
 
     /// <summary>Exposes deterministic completion and cancellation rather than arbitrary sleeps.</summary>
     public async Task<ToolOutcome> RemuxAsync(RemuxRequest request)
@@ -131,6 +141,8 @@ internal sealed class FakeMediaBackend(MediaInspection inspection) : IMediaBacke
 /// <summary>Supplies outcome evidence without creating files in presentation tests.</summary>
 internal sealed class FakeOutputStore : IOutputStore
 {
+    public ImmutableArray<CleanupIssue> CleanupIssues { get; set; } = [];
+
     /// <summary>Creates an in-memory ownership record for the synthetic candidate.</summary>
     public Task<OwnedOutput> ReserveAsync(ReserveOutputRequest request)
     {
@@ -147,7 +159,7 @@ internal sealed class FakeOutputStore : IOutputStore
     public Task<PublishedOutput> PublishAsync(OutputRequest request) => Task.FromResult(new PublishedOutput(request.Output.DestinationPath, 700));
 
     /// <summary>Reports complete cleanup for presentation-only candidates.</summary>
-    public Task<ImmutableArray<CleanupIssue>> CleanupAsync(OutputRequest request) => Task.FromResult(ImmutableArray<CleanupIssue>.Empty);
+    public Task<ImmutableArray<CleanupIssue>> CleanupAsync(OutputRequest request) => Task.FromResult(CleanupIssues);
 
     /// <summary>Starts presentation tests with no prior ownership records.</summary>
     public Task<ImmutableArray<InterruptedOutput>> FindInterruptedAsync(CancellationToken cancellationToken = default) => Task.FromResult(ImmutableArray<InterruptedOutput>.Empty);

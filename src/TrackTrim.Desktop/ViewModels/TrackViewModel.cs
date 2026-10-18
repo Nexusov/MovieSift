@@ -68,9 +68,16 @@ public sealed class TrackViewModel : ObservableObject
             yield return Localization["Forced"];
         }
 
-        if (Track.IsEnabled)
+        yield return Localization[Track.IsEnabled ? "Enabled" : "Disabled"];
+
+        if (Track.Dispositions.IsDefaultOrEmpty)
         {
-            yield return Localization["Enabled"];
+            yield break;
+        }
+
+        foreach (var disposition in Track.Dispositions)
+        {
+            yield return Localization[$"Disposition{disposition}"];
         }
     }
 }

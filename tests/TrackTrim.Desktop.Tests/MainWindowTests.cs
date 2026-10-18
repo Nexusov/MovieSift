@@ -2,6 +2,8 @@ using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
+using TrackTrim.Application;
+using TrackTrim.Core.Failures;
 using TrackTrim.Desktop.Views;
 using Xunit;
 
@@ -10,6 +12,68 @@ namespace TrackTrim.Desktop.Tests;
 /// <summary>Tests compiled bindings, review invalidation and bilingual live-job presentation.</summary>
 public sealed class MainWindowTests
 {
+    /// <summary>Localizes authored failure reasons while preserving original adapter detail only as diagnostics.</summary>
+    [AvaloniaFact]
+    public async Task InspectionFailureReasonSwitchesLanguageWithoutTranslatingRawDiagnostics()
+    {
+        const string rawDetail = "Linked segment UID 0123456789 is unsupported.";
+        var fixture = new ViewModelFixture();
+        fixture.Backend.InspectionException = new OperationFailureException(new(ErrorCode.UnsupportedFeature, rawDetail, ErrorReason.LinkedSegments));
+        var viewModel = fixture.ViewModel;
+        await viewModel.ChangeLanguageCommand.ExecuteAsync("ru");
+        var window = new MainWindow { DataContext = viewModel };
+        window.Show();
+        await viewModel.OpenSourceCommand.ExecuteAsync(null);
+        Assert.True(viewModel.HasError);
+        Assert.Contains("Связанные сегменты Matroska не поддерживаются", viewModel.ErrorDetail);
+        Assert.Equal(viewModel.ErrorDetail, window.FindControl<TextBlock>("ErrorDetailText")!.Text);
+        Assert.DoesNotContain(rawDetail, viewModel.ErrorDetail);
+        Assert.Equal(rawDetail, viewModel.Diagnostics);
+        Assert.Equal("Техническая диагностика (исходный язык)", viewModel.Localization["Diagnostics"]);
+        await viewModel.ChangeLanguageCommand.ExecuteAsync("en");
+        Assert.Contains("Linked Matroska segments are unsupported", viewModel.ErrorDetail);
+        Assert.Equal(rawDetail, viewModel.Diagnostics);
+        window.Close();
+    }
+
+    /// <summary>Moves unexpected boundary exception text into diagnostics when no localized reason exists.</summary>
+    [AvaloniaFact]
+    public async Task UnexpectedInspectionExceptionDoesNotAppearAsUntranslatedErrorDetail()
+    {
+        const string rawDetail = "Synthetic inspection boundary exception.";
+        var fixture = new ViewModelFixture();
+        fixture.Backend.InspectionException = new InvalidOperationException(rawDetail);
+        var viewModel = fixture.ViewModel;
+        await viewModel.ChangeLanguageCommand.ExecuteAsync("ru");
+        await viewModel.OpenSourceCommand.ExecuteAsync(null);
+        Assert.True(viewModel.HasError);
+        Assert.False(viewModel.HasErrorDetail);
+        Assert.Empty(viewModel.ErrorDetail);
+        Assert.DoesNotContain(rawDetail, viewModel.ErrorText);
+        Assert.Equal(rawDetail, viewModel.Diagnostics);
+    }
+
+    /// <summary>Retains publication evidence while exposing cleanup detail only under technical diagnostics.</summary>
+    [AvaloniaFact]
+    public async Task PublishedOutputRetainsRawCleanupDiagnosticsWithLocalizedExplanation()
+    {
+        const string rawDetail = "Synthetic cleanup access denied.";
+        var fixture = new ViewModelFixture();
+        fixture.Outputs.CleanupIssues = [new("fixture-owned-path", rawDetail)];
+        await fixture.LoadAsync();
+        var viewModel = fixture.ViewModel;
+        await viewModel.ChangeLanguageCommand.ExecuteAsync("ru");
+        viewModel.Tracks[1].Keep = false;
+        viewModel.ReviewPlanCommand.Execute(null);
+        await viewModel.RunCommand.ExecuteAsync(null);
+        Assert.True(viewModel.HasCleanupIssue);
+        Assert.False(viewModel.HasError);
+        Assert.Contains(ViewModelFixture.OutputPath, viewModel.StatusText);
+        Assert.Contains("Временные файлы удалены не полностью", viewModel.Localization["CleanupHeading"]);
+        Assert.DoesNotContain(rawDetail, viewModel.Localization["CleanupHeading"]);
+        Assert.Contains(rawDetail, viewModel.Diagnostics);
+    }
+
     /// <summary>Shows no-change evidence without invoking a redundant remux from the UI.</summary>
     [AvaloniaFact]
     public async Task UnchangedSelectionProducesVisibleNoChangeWithoutRemux()
@@ -149,6 +213,9 @@ public sealed class MainWindowTests
         Assert.False(viewModel.HasWarningCandidate);
         await viewModel.ChangeLanguageCommand.ExecuteAsync("ru");
         Assert.Contains("проверка не пройдена", viewModel.ErrorText);
+        Assert.Empty(viewModel.ErrorDetail);
+        Assert.Contains("simulated tool warning", viewModel.Diagnostics);
+        Assert.Contains("simulated verification", viewModel.Diagnostics);
         Assert.False(viewModel.PublishWarningsCommand.CanExecute(null));
     }
 

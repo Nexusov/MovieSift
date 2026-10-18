@@ -12,6 +12,14 @@ internal static class MkvIdentification
     internal const int SupportedIdentificationFormat = 20;
     internal const int MaximumJsonCharacters = 8 * 1024 * 1024;
     private const int MaximumJsonDepth = 32;
+    private static readonly ImmutableArray<DispositionProperty> DispositionProperties =
+    [
+        new("flag_hearing_impaired", TrackDisposition.HearingImpaired),
+        new("flag_visual_impaired", TrackDisposition.VisualImpaired),
+        new("flag_text_descriptions", TrackDisposition.TextDescriptions),
+        new("flag_original", TrackDisposition.Original),
+        new("flag_commentary", TrackDisposition.Commentary)
+    ];
     private static readonly string[] UnsupportedContainerProperties =
         ["next_segment_uid", "previous_segment_uid", "segment_family"];
     private static readonly string[] UnsupportedTrackProperties =
@@ -60,7 +68,8 @@ internal static class MkvIdentification
 
                 if (containerProperties.TryGetProperty(propertyName, out _))
                 {
-                    throw Unsupported($"Linked segments ({propertyName}) are not supported.");
+                    throw Unsupported(new UnsupportedFeature(ErrorReason.LinkedSegments,
+                        $"Linked segments ({propertyName}) are not supported."));
                 }
             }
 
@@ -97,7 +106,8 @@ internal static class MkvIdentification
             "video" => TrackKind.Video,
             "audio" => TrackKind.Audio,
             "subtitles" => TrackKind.Subtitles,
-            _ => throw Unsupported("Uncommon track types are not supported in this MKV workflow."),
+            _ => throw Unsupported(new UnsupportedFeature(ErrorReason.TrackType,
+                "Uncommon track types are not supported in this MKV workflow.")),
         };
         var properties = track.GetProperty("properties");
 
@@ -109,7 +119,9 @@ internal static class MkvIdentification
 
             if (advancedProperty)
             {
-                throw Unsupported($"Advanced video metadata ({property.Name}) requires a separately verified workflow.");
+                var reason = property.Name == "multiplexed_tracks" ? ErrorReason.TrackType : ErrorReason.HdrMetadata;
+                throw Unsupported(new UnsupportedFeature(reason,
+                    $"Advanced media metadata ({property.Name}) requires a separately verified workflow."));
             }
         }
 
@@ -117,7 +129,8 @@ internal static class MkvIdentification
 
         if (transfer is "16" or "18")
         {
-            throw Unsupported("Detected PQ/HLG HDR transfer characteristics require a separately verified workflow.");
+            throw Unsupported(new UnsupportedFeature(ErrorReason.HdrMetadata,
+                "Detected PQ/HLG HDR transfer characteristics require a separately verified workflow."));
         }
 
         var rawProperties = properties.EnumerateObject().ToImmutableDictionary(
@@ -131,7 +144,14 @@ internal static class MkvIdentification
             OptionalString(new OptionalProperty(properties, "track_name")) ?? string.Empty, channels,
             EffectiveFlag(new FlagRequest(properties, "default_track", true)),
             EffectiveFlag(new FlagRequest(properties, "forced_track", false)),
-            EffectiveFlag(new FlagRequest(properties, "enabled_track", true)), rawProperties);
+            EffectiveFlag(new FlagRequest(properties, "enabled_track", true)), rawProperties, ReadDispositions(properties));
+    }
+
+    /// <summary>Maps inspected Matroska flags to backend-independent presentation values.</summary>
+    private static ImmutableArray<TrackDisposition> ReadDispositions(JsonElement properties)
+    {
+        return DispositionProperties.Where(property =>
+            EffectiveFlag(new(properties, property.Name, false))).Select(property => property.Disposition).ToImmutableArray();
     }
 
     /// <summary>Reads attachment metadata without ever turning its filename into a filesystem path.</summary>
@@ -164,9 +184,9 @@ internal static class MkvIdentification
     }
 
     /// <summary>Creates an actionable capability failure.</summary>
-    private static OperationFailureException Unsupported(string detail)
+    private static OperationFailureException Unsupported(UnsupportedFeature feature)
     {
-        return new OperationFailureException(new Failure(ErrorCode.UnsupportedFeature, detail));
+        return new OperationFailureException(new Failure(ErrorCode.UnsupportedFeature, feature.Detail, feature.Reason));
     }
 
     internal sealed record IdentificationRequest(string Json, SourceRevision Source);

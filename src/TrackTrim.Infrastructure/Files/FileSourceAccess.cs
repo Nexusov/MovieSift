@@ -32,14 +32,14 @@ public sealed class FileSourceAccess : ISourceAccess
 
             if (isInvalidPath)
             {
-                throw new OperationFailureException(new(ErrorCode.InvalidSource, "Choose a local regular file."));
+                throw new OperationFailureException(new(ErrorCode.InvalidSource, "Choose a local regular file.", ErrorReason.RegularFileRequired));
             }
 
             var drive = GetContainingDrive(path);
 
             if (drive.DriveType == DriveType.Network)
             {
-                throw new OperationFailureException(new(ErrorCode.InvalidSource, "Network sources are not supported."));
+                throw new OperationFailureException(new(ErrorCode.InvalidSource, "Network sources are not supported.", ErrorReason.NetworkPath));
             }
 
             PathSafety.RejectReparsePoints(path);
@@ -51,7 +51,7 @@ public sealed class FileSourceAccess : ISourceAccess
 
                 if (!isRegularFile)
                 {
-                    throw new OperationFailureException(new(ErrorCode.InvalidSource, "Choose a local regular file."));
+                    throw new OperationFailureException(new(ErrorCode.InvalidSource, "Choose a local regular file.", ErrorReason.RegularFileRequired));
                 }
             }
 
@@ -61,7 +61,7 @@ public sealed class FileSourceAccess : ISourceAccess
         }
         catch (OperationFailureException exception) when (exception.Failure.Code == ErrorCode.InvalidDestination)
         {
-            throw new OperationFailureException(new(ErrorCode.InvalidSource, exception.Failure.Detail));
+            throw new OperationFailureException(new(ErrorCode.InvalidSource, exception.Failure.Detail, exception.Failure.Reason));
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
         {
@@ -126,7 +126,7 @@ public sealed class FileSourceAccess : ISourceAccess
 
         if (drive.DriveType == DriveType.Network)
         {
-            throw new OperationFailureException(new(ErrorCode.InvalidDestination, "Network destinations are not supported."));
+            throw new OperationFailureException(new(ErrorCode.InvalidDestination, "Network destinations are not supported.", ErrorReason.NetworkPath));
         }
 
         if (drive.AvailableFreeSpace < request.Source.Length)

@@ -1,9 +1,12 @@
 using System.Collections;
+using System.Collections.Immutable;
 using System.Globalization;
 using System.Resources;
 using System.Text.RegularExpressions;
 using TrackTrim.Core.Failures;
+using TrackTrim.Core.Media;
 using TrackTrim.Desktop.Localization;
+using TrackTrim.Desktop.ViewModels;
 using Xunit;
 
 namespace TrackTrim.Desktop.Tests;
@@ -65,6 +68,32 @@ public sealed partial class LocalizationTests
         {
             Assert.Contains($"Error{errorCode}", english.Keys);
         }
+
+        foreach (var reason in Enum.GetValues<ErrorReason>().Where(reason => reason != ErrorReason.None))
+        {
+            Assert.Contains($"ErrorReason{reason}", english.Keys);
+        }
+
+        foreach (var disposition in Enum.GetValues<TrackDisposition>())
+        {
+            Assert.Contains($"Disposition{disposition}", english.Keys);
+        }
+    }
+
+    /// <summary>Shows inspected commentary and disabled state in the selected application language.</summary>
+    [Fact]
+    public void TrackDispositionsAreReadableInBothLanguages()
+    {
+        var localization = new LocalizationService();
+        var track = new MediaTrack(2, 123, TrackKind.Audio, "PCM", "eng", "en", "Commentary", 1,
+            false, false, false, ImmutableDictionary<string, string>.Empty, [TrackDisposition.Commentary]);
+        var viewModel = new TrackViewModel(new(track, localization, () => { }));
+        Assert.Contains("disabled", viewModel.FlagsText);
+        Assert.Contains("commentary", viewModel.FlagsText);
+        localization.SetLanguage("ru");
+        viewModel.RefreshLocalization();
+        Assert.Contains("отключена", viewModel.FlagsText);
+        Assert.Contains("комментарий", viewModel.FlagsText);
     }
 
     /// <summary>Reads resource keys independently of generated UI property names.</summary>

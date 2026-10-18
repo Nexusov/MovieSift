@@ -29,6 +29,12 @@
   <data name="Default" xml:space="preserve"><value>по умолчанию</value></data>
   <data name="Forced" xml:space="preserve"><value>принудительная</value></data>
   <data name="Enabled" xml:space="preserve"><value>включена</value></data>
+  <data name="Disabled" xml:space="preserve"><value>отключена</value></data>
+  <data name="DispositionHearingImpaired" xml:space="preserve"><value>для слабослышащих</value></data>
+  <data name="DispositionVisualImpaired" xml:space="preserve"><value>для слабовидящих</value></data>
+  <data name="DispositionTextDescriptions" xml:space="preserve"><value>текстовые описания</value></data>
+  <data name="DispositionOriginal" xml:space="preserve"><value>язык оригинала</value></data>
+  <data name="DispositionCommentary" xml:space="preserve"><value>комментарий</value></data>
   <data name="ReviewPlan" xml:space="preserve"><value>Проверить план</value></data>
   <data name="Run" xml:space="preserve"><value>Создать новый MKV</value></data>
   <data name="Cancel" xml:space="preserve"><value>Отменить</value></data>
@@ -54,7 +60,7 @@
   <data name="PublishWarnings" xml:space="preserve"><value>Сохранить с предупреждениями</value></data>
   <data name="Discard" xml:space="preserve"><value>Удалить временный результат</value></data>
   <data name="Discarded" xml:space="preserve"><value>Временный результат удалён.</value></data>
-  <data name="Diagnostics" xml:space="preserve"><value>Диагностика инструмента (исходный язык)</value></data>
+  <data name="Diagnostics" xml:space="preserve"><value>Техническая диагностика (исходный язык)</value></data>
   <data name="Error" xml:space="preserve"><value>Ошибка: {0}</value></data>
   <data name="Details" xml:space="preserve"><value>Подробности</value></data>
   <data name="PersistenceFailure" xml:space="preserve"><value>Переносимые данные недоступны. В режиме без сохранения настроек запись медиа отключена. Для обработки переместите приложение в доступную для записи папку.</value></data>
@@ -76,7 +82,7 @@
   <data name="Unsupported" xml:space="preserve"><value>В исходном файле обнаружена неподдерживаемая возможность: {0}</value></data>
   <data name="DestinationRequired" xml:space="preserve"><value>Выберите папку результата перед проверкой плана.</value></data>
   <data name="SourceRequired" xml:space="preserve"><value>Сначала откройте файл MKV.</value></data>
-  <data name="CleanupHeading" xml:space="preserve"><value>Требуется проверка удаления временных файлов.</value></data>
+  <data name="CleanupHeading" xml:space="preserve"><value>Временные файлы удалены не полностью. Проверьте техническую диагностику ниже; созданный итоговый файл остаётся на месте.</value></data>
   <data name="ErrorInvalidSource" xml:space="preserve"><value>Выберите поддерживаемый локальный обычный файл MKV.</value></data>
   <data name="ErrorUnsupportedContainer" xml:space="preserve"><value>Обнаруженный контейнер не поддерживается на этом этапе.</value></data>
   <data name="ErrorUnsupportedFeature" xml:space="preserve"><value>Обнаруженную возможность медиа нельзя безопасно сохранить.</value></data>
@@ -114,4 +120,14 @@
   <data name="MediaFeatures" xml:space="preserve"><value>Вложения: {0}. Главы: {1}. Пользовательские теги: {2}.</value></data>
   <data name="PreservationSummary" xml:space="preserve"><value>Сохранить все видеодорожки и поддерживаемые вложения, обычные главы и поддерживаемые пользовательские теги. Порядок оставленных потоков и действующие флаги сохраняются.</value></data>
   <data name="InterruptedPaths" xml:space="preserve"><value>Временный результат: {0}&#10;Планируемый файл (сохранение не подтверждено): {1}</value></data>
+  <data name="ErrorReasonLinkedSegments" xml:space="preserve"><value>Связанные сегменты Matroska не поддерживаются. Выберите самостоятельный MKV без связей с другими сегментами.</value></data>
+  <data name="ErrorReasonTrackType" xml:space="preserve"><value>Файл содержит неподдерживаемый тип дорожки. Обрабатываются только видео, аудио и субтитры.</value></data>
+  <data name="ErrorReasonHdrMetadata" xml:space="preserve"><value>Обнаруженные расширенные метаданные HDR или Dolby Vision выходят за пределы поддерживаемых гарантий сохранения.</value></data>
+  <data name="ErrorReasonChapterReferences" xml:space="preserve"><value>Ссылки в главах нельзя безопасно сохранить для этого файла или выбора. Оставьте связанные дорожки или выберите файл без таких ссылок.</value></data>
+  <data name="ErrorReasonOrderedChapters" xml:space="preserve"><value>Упорядоченные главы не поддерживаются. Выберите файл с обычными самостоятельными главами.</value></data>
+  <data name="ErrorReasonTagTargets" xml:space="preserve"><value>Пользовательские теги ссылаются на неподдерживаемые элементы контейнера. Этот файл нельзя безопасно обработать.</value></data>
+  <data name="ErrorReasonDanglingTrackTags" xml:space="preserve"><value>Пользовательские теги содержат ссылки на отсутствующие дорожки. Этот файл нельзя безопасно обработать.</value></data>
+  <data name="ErrorReasonRedirectedPath" xml:space="preserve"><value>Обнаружена символическая ссылка, точка соединения или другая точка перенаправления. Выберите прямые пути к локальному файлу и папке.</value></data>
+  <data name="ErrorReasonNetworkPath" xml:space="preserve"><value>Сетевые пути в этом режиме не поддерживаются. Выберите локальные исходный файл и путь результата.</value></data>
+  <data name="ErrorReasonRegularFileRequired" xml:space="preserve"><value>Выберите обычный локальный файл. Папки и специальные файлы не поддерживаются.</value></data>
 </root>

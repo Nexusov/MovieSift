@@ -27,6 +27,7 @@ public sealed class MkvStructuredOutputTests
         Assert.Equal(4, inspection.Tracks.Length);
         Assert.True(inspection.HasChapters);
         Assert.True(inspection.HasTags);
+        Assert.Contains(TrackDisposition.Commentary, inspection.Tracks.Single(track => track.Id == 2).Dispositions);
         MkvMetadataXml.ValidateChapters(MkvMetadataXml.Read(Path.Combine(directory, "ordinary.chapters.xml")));
         MkvMetadataXml.ValidateTags(MkvMetadataXml.Read(Path.Combine(directory, "ordinary.tags.xml")));
     }
@@ -76,10 +77,12 @@ public sealed class MkvStructuredOutputTests
         root["tracks"]![0]!["properties"]!["color_transfer_characteristics"] = 16;
         var exception = Assert.Throws<OperationFailureException>(() => Parse(root.ToJsonString()));
         Assert.Equal(ErrorCode.UnsupportedFeature, exception.Failure.Code);
+        Assert.Equal(ErrorReason.HdrMetadata, exception.Failure.Reason);
         root = JsonNode.Parse(MinimalIdentification)!;
         root["container"]!["properties"]!["next_segment_uid"] = "linked";
-        Assert.Equal(ErrorCode.UnsupportedFeature,
-            Assert.Throws<OperationFailureException>(() => Parse(root.ToJsonString())).Failure.Code);
+        var linkedFailure = Assert.Throws<OperationFailureException>(() => Parse(root.ToJsonString())).Failure;
+        Assert.Equal(ErrorCode.UnsupportedFeature, linkedFailure.Code);
+        Assert.Equal(ErrorReason.LinkedSegments, linkedFailure.Reason);
     }
 
     /// <summary>Rejects both known HDR light-level properties exposed by the pinned schema.</summary>
@@ -92,6 +95,7 @@ public sealed class MkvStructuredOutputTests
         root["tracks"]![0]!["properties"]![propertyName] = 1000;
         var exception = Assert.Throws<OperationFailureException>(() => Parse(root.ToJsonString()));
         Assert.Equal(ErrorCode.UnsupportedFeature, exception.Failure.Code);
+        Assert.Equal(ErrorReason.HdrMetadata, exception.Failure.Reason);
     }
 
     /// <summary>Disables external XML resolution and rejects excessive nesting before loading a tree.</summary>
@@ -133,12 +137,15 @@ public sealed class MkvStructuredOutputTests
     public void RejectsMixedAndDanglingTagTargets()
     {
         var mixedTargets = XDocument.Parse("<Tags><Tag><Targets><TrackUID>12</TrackUID><AttachmentUID>13</AttachmentUID></Targets></Tag></Tags>");
-        Assert.Equal(ErrorCode.UnsupportedFeature,
-            Assert.Throws<OperationFailureException>(() => MkvMetadataXml.ValidateTags(mixedTargets)).Failure.Code);
+        var mixedFailure = Assert.Throws<OperationFailureException>(() => MkvMetadataXml.ValidateTags(mixedTargets)).Failure;
+        Assert.Equal(ErrorCode.UnsupportedFeature, mixedFailure.Code);
+        Assert.Equal(ErrorReason.TagTargets, mixedFailure.Reason);
         var danglingTarget = XDocument.Parse("<Tags><Tag><Targets><TrackUID>99</TrackUID></Targets></Tag></Tags>");
-        Assert.Equal(ErrorCode.UnsupportedFeature, Assert.Throws<OperationFailureException>(() =>
+        var danglingFailure = Assert.Throws<OperationFailureException>(() =>
             MkvMetadataXml.ValidateTrackTargets(new MkvMetadataXml.TrackTargetValidation(danglingTarget,
-                new HashSet<ulong> { 12 }))).Failure.Code);
+                new HashSet<ulong> { 12 }))).Failure;
+        Assert.Equal(ErrorCode.UnsupportedFeature, danglingFailure.Code);
+        Assert.Equal(ErrorReason.DanglingTrackTags, danglingFailure.Reason);
     }
 
     /// <summary>Rejects chapter semantics that the current remux policy cannot preserve safely.</summary>
@@ -149,8 +156,11 @@ public sealed class MkvStructuredOutputTests
     public void RejectsUnsupportedChapterReferences(string element)
     {
         var chapters = XDocument.Parse($"<Chapters><EditionEntry>{element}</EditionEntry></Chapters>");
-        Assert.Equal(ErrorCode.UnsupportedFeature,
-            Assert.Throws<OperationFailureException>(() => MkvMetadataXml.ValidateChapters(chapters)).Failure.Code);
+        var failure = Assert.Throws<OperationFailureException>(() => MkvMetadataXml.ValidateChapters(chapters)).Failure;
+        var expectedReason = element.Contains("EditionFlagOrdered", StringComparison.Ordinal)
+            ? ErrorReason.OrderedChapters : ErrorReason.ChapterReferences;
+        Assert.Equal(ErrorCode.UnsupportedFeature, failure.Code);
+        Assert.Equal(expectedReason, failure.Reason);
     }
 
     /// <summary>Parses an isolated identification fixture with no filesystem access.</summary>

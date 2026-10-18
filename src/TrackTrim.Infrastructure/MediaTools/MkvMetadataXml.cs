@@ -70,12 +70,14 @@ internal static class MkvMetadataXml
 
         if (unsupportedElement is not null)
         {
-            throw Unsupported($"Chapter element {unsupportedElement.Name.LocalName} requires an unsupported reference-preservation policy.");
+            throw Unsupported(new UnsupportedFeature(ErrorReason.ChapterReferences,
+                $"Chapter element {unsupportedElement.Name.LocalName} requires an unsupported reference-preservation policy."));
         }
 
         if (document.Descendants("EditionFlagOrdered").Any(element => element.Value != "0"))
         {
-            throw Unsupported("Ordered chapters are not supported; use a standalone ordinary MKV.");
+            throw Unsupported(new UnsupportedFeature(ErrorReason.OrderedChapters,
+                "Ordered chapters are not supported; use a standalone ordinary MKV."));
         }
     }
 
@@ -92,7 +94,8 @@ internal static class MkvMetadataXml
 
             if (unsupportedTargets)
             {
-                throw Unsupported("Tags with multiple or mixed track/non-track UID targets require an explicit reference-preservation policy.");
+                throw Unsupported(new UnsupportedFeature(ErrorReason.TagTargets,
+                    "Tags with multiple or mixed track/non-track UID targets require an explicit reference-preservation policy."));
             }
         }
     }
@@ -112,7 +115,8 @@ internal static class MkvMetadataXml
 
             if (identifier != 0 && !request.KnownTrackUids.Contains(identifier))
             {
-                throw Unsupported("A tag references a TrackUID absent from the inspected source.");
+                throw Unsupported(new UnsupportedFeature(ErrorReason.DanglingTrackTags,
+                    "A tag references a TrackUID absent from the inspected source."));
             }
         }
     }
@@ -243,9 +247,9 @@ internal static class MkvMetadataXml
     }
 
     /// <summary>Creates a stable unsupported-feature error.</summary>
-    private static OperationFailureException Unsupported(string detail)
+    private static OperationFailureException Unsupported(UnsupportedFeature feature)
     {
-        return new OperationFailureException(new Failure(ErrorCode.UnsupportedFeature, detail));
+        return new OperationFailureException(new Failure(ErrorCode.UnsupportedFeature, feature.Detail, feature.Reason));
     }
 
     internal sealed record TagExpectation(XDocument Source, IReadOnlyDictionary<ulong, ulong> RetainedUidMapping);
