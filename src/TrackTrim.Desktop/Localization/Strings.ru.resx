@@ -130,4 +130,7 @@
   <data name="ErrorReasonRedirectedPath" xml:space="preserve"><value>Обнаружена символическая ссылка, точка соединения или другая точка перенаправления. Выберите прямые пути к локальному файлу и папке.</value></data>
   <data name="ErrorReasonNetworkPath" xml:space="preserve"><value>Сетевые пути в этом режиме не поддерживаются. Выберите локальные исходный файл и путь результата.</value></data>
   <data name="ErrorReasonRegularFileRequired" xml:space="preserve"><value>Выберите обычный локальный файл. Папки и специальные файлы не поддерживаются.</value></data>
+  <data name="PlanDefaultAudioRetained" xml:space="preserve"><value>Аудио по умолчанию в результате: у сохранённых дорожек с ID {0} остаются действующие флаги по умолчанию.</value></data>
+  <data name="PlanNoDefaultAudio" xml:space="preserve"><value>Аудио по умолчанию в результате: ни одна из сохранённых аудиодорожек не имеет флага по умолчанию. Новая дорожка по умолчанию не назначается.</value></data>
+  <data name="PlanNoAudio" xml:space="preserve"><value>В результате не останется аудиодорожек.</value></data>
 </root>

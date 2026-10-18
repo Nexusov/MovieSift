@@ -105,7 +105,8 @@
             <TextBlock Text="{Binding PlanDestination}" TextWrapping="Wrap" />
             <TextBlock Text="{Binding Localization[PreservationSummary]}" TextWrapping="Wrap" />
             <TextBlock Text="{Binding Localization[PlanInstructions]}" TextWrapping="Wrap" />
-            <TextBlock Text="{Binding Localization[SelectionWarning]}" TextWrapping="Wrap" IsVisible="{Binding RemovesDefaultAudio}" />
+            <TextBlock x:Name="PlanDefaultAudioStatus" Text="{Binding PlanDefaultAudioText}" TextWrapping="Wrap" />
+            <TextBlock x:Name="DefaultAudioDisclaimer" Text="{Binding Localization[SelectionWarning]}" TextWrapping="Wrap" IsVisible="{Binding RemovesDefaultAudio}" />
           </StackPanel>
         </Border>
 

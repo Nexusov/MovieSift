@@ -130,4 +130,7 @@
   <data name="ErrorReasonRedirectedPath" xml:space="preserve"><value>A symbolic link, junction or reparse point was detected. Choose direct local file and directory paths.</value></data>
   <data name="ErrorReasonNetworkPath" xml:space="preserve"><value>Network paths are unsupported in this workflow. Choose a local source and destination.</value></data>
   <data name="ErrorReasonRegularFileRequired" xml:space="preserve"><value>Select an ordinary local file. Directories and special files are unsupported.</value></data>
+  <data name="PlanDefaultAudioRetained" xml:space="preserve"><value>Resulting default audio: retained track IDs {0} keep their existing default flags.</value></data>
+  <data name="PlanNoDefaultAudio" xml:space="preserve"><value>Resulting default audio: none of the retained audio tracks has the default flag. No new default is assigned.</value></data>
+  <data name="PlanNoAudio" xml:space="preserve"><value>Resulting audio: no audio tracks will remain.</value></data>
 </root>

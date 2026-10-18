@@ -12,6 +12,40 @@ namespace TrackTrim.Desktop.Tests;
 /// <summary>Tests compiled bindings, review invalidation and bilingual live-job presentation.</summary>
 public sealed class MainWindowTests
 {
+    /// <summary>Shows the actual retained default-audio situation in both languages, including a confirmed silent plan.</summary>
+    [AvaloniaFact]
+    public async Task PlanReviewShowsResultingDefaultAudioFlagsAcrossSelectionsAndLanguages()
+    {
+        var fixture = new ViewModelFixture();
+        var viewModel = fixture.ViewModel;
+        var window = new MainWindow { DataContext = viewModel };
+        window.Show();
+        await fixture.LoadAsync();
+        viewModel.ReviewPlanCommand.Execute(null);
+        Assert.Equal("Resulting default audio: retained track IDs 1 keep their existing default flags.", viewModel.PlanDefaultAudioText);
+        viewModel.Tracks[1].Keep = false;
+        Assert.False(viewModel.HasPlan);
+        Assert.Empty(viewModel.PlanDefaultAudioText);
+        viewModel.ReviewPlanCommand.Execute(null);
+        Assert.Contains("none of the retained audio tracks has the default flag", viewModel.PlanDefaultAudioText);
+        await viewModel.ChangeLanguageCommand.ExecuteAsync("ru");
+        Assert.True(viewModel.HasPlan);
+        Assert.Contains("ни одна из сохранённых аудиодорожек не имеет флага по умолчанию", viewModel.PlanDefaultAudioText);
+        Assert.Equal(viewModel.PlanDefaultAudioText, window.FindControl<TextBlock>("PlanDefaultAudioStatus")!.Text);
+        Assert.True(window.FindControl<TextBlock>("DefaultAudioDisclaimer")!.IsVisible);
+        Assert.Contains("Выбор проигрывателя может отличаться", window.FindControl<TextBlock>("DefaultAudioDisclaimer")!.Text);
+        viewModel.Tracks[2].Keep = false;
+        viewModel.ZeroAudioConfirmed = true;
+        viewModel.ReviewPlanCommand.Execute(null);
+        Assert.Equal("В результате не останется аудиодорожек.", viewModel.PlanDefaultAudioText);
+        await viewModel.ChangeLanguageCommand.ExecuteAsync("en");
+        Assert.Equal("Resulting audio: no audio tracks will remain.", viewModel.PlanDefaultAudioText);
+        viewModel.Tracks[1].Keep = true;
+        viewModel.ReviewPlanCommand.Execute(null);
+        Assert.Contains("retained track IDs 1 keep their existing default flags", viewModel.PlanDefaultAudioText);
+        window.Close();
+    }
+
     /// <summary>Localizes authored failure reasons while preserving original adapter detail only as diagnostics.</summary>
     [AvaloniaFact]
     public async Task InspectionFailureReasonSwitchesLanguageWithoutTranslatingRawDiagnostics()

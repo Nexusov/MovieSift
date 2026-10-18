@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TrackTrim.Application;
@@ -109,6 +110,7 @@ public sealed partial class MainViewModel : ObservableObject
         approvedPlan.Inspection.Tracks.Length - approvedPlan.RetainedTracks.Length]));
     public string PlanDestination => approvedPlan?.DestinationPath ?? string.Empty;
     public string PlanTracksText => DescribePlanTracks();
+    public string PlanDefaultAudioText => DescribePlanDefaultAudio();
     public string SizeDifferenceText => DescribeSizeDifference();
 
     /// <summary>Restores only explicit language preferences and lists interrupted ownership records.</summary>
@@ -473,6 +475,32 @@ public sealed partial class MainViewModel : ObservableObject
             var title = string.IsNullOrWhiteSpace(track.Title) ? Localization["Untitled"] : track.Title;
             return $"{action}: {Localization[track.Kind.ToString()]} {track.Id} — {title} ({track.Codec}, {track.LanguageIetf ?? track.Language})";
         }));
+    }
+
+    /// <summary>Reports the resulting default-audio flags from the approved immutable selection.</summary>
+    private string DescribePlanDefaultAudio()
+    {
+        var plan = approvedPlan;
+
+        if (plan is null)
+        {
+            return string.Empty;
+        }
+
+        if (!plan.RetainedTracks.Any(track => track.Kind == TrackKind.Audio))
+        {
+            return Localization["PlanNoAudio"];
+        }
+
+        if (!plan.HasDefaultAudio)
+        {
+            return Localization["PlanNoDefaultAudio"];
+        }
+
+        var defaultIdentifiers = plan.RetainedTracks
+            .Where(track => track.Kind == TrackKind.Audio && track.IsDefault)
+            .Select(track => track.Id.ToString(CultureInfo.InvariantCulture));
+        return Localization.Format(new("PlanDefaultAudioRetained", [string.Join(", ", defaultIdentifiers)]));
     }
 
     /// <summary>Shows reviewable paths without treating old journal stages as publication evidence.</summary>
