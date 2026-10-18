@@ -20,9 +20,10 @@ internal static class MkvArguments
     internal static IReadOnlyList<string> BuildRemux(RemuxRequest request)
     {
         var retainedTracks = request.Plan.RetainedTracks;
+        // GUI protocol keys are invariant; tool UI locale identifiers differ between Windows and Linux.
         var arguments = new List<string>
         {
-            "--gui-mode", "--output-charset", "UTF-8", "--ui-language", "en",
+            "--gui-mode", "--output-charset", "UTF-8",
             "--normalize-language-ietf", "off", "--disable-track-statistics-tags",
             "--output", request.CandidatePath,
             "--track-order", string.Join(',', retainedTracks.Select(track => $"0:{track.Id.ToString(CultureInfo.InvariantCulture)}")),

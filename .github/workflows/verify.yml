@@ -46,7 +46,7 @@ jobs:
         shell: bash
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -y squashfs-tools file libx11-6 libice6 libsm6 libfontconfig1 libicu74 libssl3t64 libgssapi-krb5-2 libbrotli1 libgl1 libegl1 libxrandr2 libxcursor1 libxi6 libxinerama1
+          sudo apt-get install --no-install-recommends -y squashfs-tools file libx11-6 libice6 libsm6 libfontconfig1 libicu74 libssl3t64 libgssapi-krb5-2 libbrotli1 libgmp10 libgl1 libegl1 libxrandr2 libxcursor1 libxi6 libxinerama1
       - name: Acquire the pinned backend (mandatory)
         run: ./build/acquire-tools.ps1 -RuntimeIdentifier '${{ matrix.runtime }}' -Destination '${{ github.workspace }}/tools'
       - name: Generate original real-media fixtures

@@ -35,7 +35,7 @@ public sealed class FileSourceAccess : ISourceAccess
                 throw new OperationFailureException(new(ErrorCode.InvalidSource, "Choose a local regular file."));
             }
 
-            var drive = new DriveInfo(Path.GetPathRoot(path)!);
+            var drive = GetContainingDrive(path);
 
             if (drive.DriveType == DriveType.Network)
             {
@@ -122,7 +122,7 @@ public sealed class FileSourceAccess : ISourceAccess
             throw new OperationFailureException(new(ErrorCode.DestinationExists, path));
         }
 
-        var drive = new DriveInfo(Path.GetPathRoot(path)!);
+        var drive = GetContainingDrive(parent!);
 
         if (drive.DriveType == DriveType.Network)
         {
@@ -133,6 +133,22 @@ public sealed class FileSourceAccess : ISourceAccess
         {
             throw new OperationFailureException(new(ErrorCode.InsufficientSpace, "A complete new file must coexist with the original."));
         }
+    }
+
+    /// <summary>Uses the destination's mount rather than assuming every Linux path is on root.</summary>
+    private static DriveInfo GetContainingDrive(string path)
+    {
+        if (OperatingSystem.IsWindows())
+        {
+            return new DriveInfo(Path.GetPathRoot(path)!);
+        }
+
+        return DriveInfo.GetDrives().Where(drive =>
+        {
+            var prefix = drive.Name.EndsWith(Path.DirectorySeparatorChar)
+                ? drive.Name : drive.Name + Path.DirectorySeparatorChar;
+            return path == drive.Name || path.StartsWith(prefix, StringComparison.Ordinal);
+        }).MaxBy(drive => drive.Name.Length) ?? new DriveInfo(Path.GetPathRoot(path)!);
     }
 
     /// <summary>Uses Windows volume and file indexes to distinguish hard links from different files.</summary>

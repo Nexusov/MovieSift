@@ -189,8 +189,9 @@ public sealed class MkvBackend(MkvBackendOptions options) : IMediaBackend
     /// <summary>Rejects incomplete identification and snapshots the real probe properties.</summary>
     private async Task<MediaInspection> IdentifyAsync(IdentifyRequest request)
     {
+        // JSON field names and values are invariant without selecting a platform-specific tool UI locale.
         var result = await RunAsync(new ProcessRequest(options.Tools.MkvMerge,
-            ["--output-charset", "UTF-8", "--ui-language", "en", "-J", request.Source.FullPath],
+            ["--output-charset", "UTF-8", "-J", request.Source.FullPath],
             MkvIdentification.MaximumJsonCharacters, InspectionTimeout, null, request.CancellationToken)).ConfigureAwait(false);
 
         if (result.ExitCode != 0 || result.OutputTruncated)
