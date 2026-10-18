@@ -19,12 +19,18 @@ Read `PROJECT_BRIEF.md` before changing behavior. Work only on the explicitly au
 - One owner controls process, candidate, verification, publication, and cleanup. Cancellation must reap the process; uncertain termination prohibits candidate deletion.
 - Reserve private adjacent temporary storage and persist ownership before media writing. Publish only a verified candidate with a same-filesystem no-overwrite operation.
 - Exit 1 is warnings, never automatic publication. Approval revalidates the existing candidate; it never remuxes again. Failed verification cannot be overridden.
+- Closing warning review requires an explicit remain/discard choice and awaits one owned cleanup; repeated close requests must not race it.
 - Preserve publication facts and primary failures independently from cleanup issues. Never delete a published final output during cleanup.
 - Restart records do not authorize auto-publication, stale-PID termination, resume, or deletion by glob/prefix.
+- Check JSON records/markers/settings through a regular-file handle before length/read operations. Treat every deserialized ownership field as untrusted; validate complete version/identity/stage/path/marker evidence before use. Invalid records remain visible and never authorize deletion.
+- Keep Segment Info linkage checks bounded and schema-position-aware, using a regular read-only handle. Unknown-sized children or ambiguous document boundaries fail closed; do not substitute raw byte searching or a third runtime tool.
+- Preserve every actual frame timestamp/count and known terminal boundary. Any AAC missing-duration exception requires the explicit bounded AAC-LC proof; do not ignore the extractor's last line or relax other codecs/known durations.
 
 ## Code and localization
 
 Use readable names, short cohesive types, early returns, and braces. Keep data type definitions separate from behavior where practical. Explain each function/component briefly in English XML documentation. Avoid nested conditions and unnecessary abstractions. Keep every public-facing application string in aligned English/Russian resources; raw media metadata and tool diagnostics remain original. The initial language is English and persisted values are `en`/`ru`. Plans, CLI values, and serialized data are culture invariant. Language changes must not invalidate a plan or cancel an active job.
+
+Track/chapter/tag language equivalence uses the shared explicit ISO registry table. Preserve regional/script/private/unknown distinctions; do not infer media-language identity through OS cultures.
 
 ## Verification and delivery
 

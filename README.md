@@ -12,11 +12,11 @@ The application uses C#/.NET 10, Avalonia 12 with Fluent controls, CommunityTool
 2. Leave **Keep** checked for each audio/subtitle track to retain. Every video track and supported attachment is retained.
 3. Select a separate destination and review the immutable plan. Confirm removal of all audio explicitly when applicable.
 4. Run the remux, observe measured backend progress, or cancel. A no-change plan does not remux.
-5. The application verifies the candidate before publishing through a no-overwrite move. Warnings require a separate publish/discard decision after successful verification.
+5. The application verifies the candidate before publishing through a no-overwrite move. Warnings require a separate publish/discard decision after successful verification. Closing during warning review offers **remain in review** or **discard and close**; the latter waits for cleanup.
 
 Do not use the application as a universal preservation tool. The [supported MKV matrix](docs/SUPPORTED_FORMATS.md) defines the inspected, verified, and rejected cases. MP4, batch input, folders, presets, playback, source replacement, and recovery/resume of a batch queue are outside this implementation.
 
-Known preservation gap: Matroska segment families (`SegmentFamily`) are outside the supported subset. The current probe cannot reliably detect them, and a real remux dropped that relationship. This build must not be used for family-linked files.
+Preflight supplements MKVToolNix identification with bounded, read-only Segment Info inspection. Detected segment families and previous/next links are rejected before processing; layouts that cannot be inspected within those bounds fail explicitly. This check uses no additional media executable.
 
 These are headless renders of the compiled Fluent view after real MKV inspection, in English and Russian. Native desktop acceptance remains pending.
 
@@ -43,7 +43,7 @@ dotnet format --verify-no-changes --no-restore
 dotnet test --configuration Release --no-build --no-restore
 ```
 
-See [CONTRIBUTING](CONTRIBUTING.md) for mandatory real-media checks. Unit tests and headless UI tests do not replace a real desktop or a packaged workflow.
+See [CONTRIBUTING](CONTRIBUTING.md) for mandatory real-media checks and [fixture provenance](tests/TrackTrim.Infrastructure.Tests/Fixtures/README.md) for the generated VP8/PCM/SRT and checked-in direct FFmpeg-origin H264/AAC/SRT samples. FFmpeg is a development-only fixture encoder, excluded from the application and portable archives. Unit tests and headless UI tests do not replace a real desktop or a packaged workflow.
 
 ## Portable archives
 
@@ -68,7 +68,7 @@ This runs the actual packaged entry point from an unrelated working directory, t
 
 Linux CI also verifies the actual workflow in a pinned Ubuntu 24.04 container with native OS libraries, no installed SDK/runtime/media commands, no network, and a non-root runtime user. Run it with `bash ./build/verify-clean-linux.sh ./artifacts/TrackTrim-linux-x64.tar.gz ./artifacts/fixtures/ordinary.mkv`. The successful check records the exact base image, installed package versions, user, and ASCII parent locale (`C`); the native worker boundary handles Cyrillic paths independently. See [PLAN](docs/PLAN.md) for executed evidence; a container CLI check is separate from Ubuntu Desktop acceptance.
 
-Settings, bounded logs, and temporary-output ownership records are stored in `data` relative to the executable. An unwritable data directory is an error for media writes; the application must not silently redirect to a user profile. Startup recovery offers validated owned-temporary cleanup, never automatic publication or byte resume.
+Settings, bounded logs, and temporary-output ownership records are stored in `data` relative to the executable. An unwritable data directory is an error for media writes; the application must not silently redirect to a user profile. Startup recovery offers validated owned-temporary cleanup, never automatic publication or byte resume. Malformed, incomplete or nonregular records remain visible for manual review; they cannot authorize cleanup, and their original files remain untouched.
 
 ## Licensing
 

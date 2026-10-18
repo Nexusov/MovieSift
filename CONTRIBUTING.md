@@ -23,7 +23,7 @@ Use `linux-x64` on Linux. Downloads and SHA256 hashes are pinned in `build/tools
 
 The production backend resolves `tools/mkvmerge.exe` and `tools/mkvextract.exe` on Windows, and the native executables under `tools/app-root/usr/bin` on Linux. Linux library paths are set on the worker's process environment; the application never invokes media through a shell. The `tools/mkvmerge`/`mkvextract` Linux wrappers are only build-time acquisition/fixture helpers. Tests accept an explicit tool directory; the live application always uses its app-local bundle. A test override does not establish portable-release acceptance. Both executables must match the pinned MKVToolNix version. Do not add an FFmpeg fallback.
 
-The real-media suite uses small generated fixtures and the pinned backend. Fixture generation is a development operation; FFmpeg, if needed for encoding fixtures, is not a production dependency and is excluded from archives. Retained payload comparisons, chapters/tags, attachment payloads, track order/flags, and source hashes are meaningful assertions. Deterministic fake ports/process helpers cover warning/race/failure paths and must be labelled separately from real remux verification.
+The real-media suite uses generated fixtures, two checked-in direct FFmpeg-origin fixtures and the pinned backend. Fixture encoding is a development operation; FFmpeg is not a production or CI test-runtime dependency and is excluded from archives. Retained VP8/PCM/SRT and H264/AAC/SRT payload comparisons, chapters/tags, attachment payloads, track order/flags and source hashes are meaningful assertions. Deterministic fake ports/process helpers cover warning/race/failure paths and must be labelled separately from real remux verification.
 
 Generate the original fixtures without FFmpeg or a production codec dependency:
 
@@ -34,7 +34,18 @@ $env:TRACKTRIM_REQUIRE_MEDIA_TOOLS = '1'
 dotnet test --configuration Release --no-build --no-restore --logger trx
 ```
 
-The generator uses original embedded VP8 frames, synthesized PCM waveforms, subtitles, and XML metadata. In CI `TRACKTRIM_REQUIRE_MEDIA_TOOLS=1` prevents silent omission of the required backend suite; provisioning and fixture generation must succeed first. Record the actual test counts and any local skips in `docs/PLAN.md`; do not turn an unexecuted test definition into a passing result.
+The generator uses original embedded VP8 frames, synthesized PCM waveforms, subtitles and XML metadata. It also generates a longer-frame-count cancellation input: the real cancellation test must observe an active worker at cancellation, retain its process handle, and await that same worker's exit. Progress buffered from an already exited process cannot pass that regression.
+
+The checked-in H264/two-AAC/SRT inputs are direct Matroska output from development FFmpeg 9.0.2 and 7.1.1. Do not pre-remux them through MKVToolNix: their original language aliases and missing AAC duration header are the regression triggers. [Fixture provenance](tests/TrackTrim.Infrastructure.Tests/Fixtures/README.md) records exact input hashes, executable/archive provenance and commands. Regeneration is optional and requires explicitly supplying the matching development encoder:
+
+```powershell
+python ./build/generate-ffmpeg-fixture.py --ffmpeg /absolute/path/to/ffmpeg-9.0.2 --version 9.0.2 --destination ./tests/TrackTrim.Infrastructure.Tests/Fixtures/h264-aac-aliases.mkv
+python ./build/generate-ffmpeg-fixture.py --ffmpeg /absolute/path/to/ffmpeg-7.1.1 --version 7.1.1 --destination ./tests/TrackTrim.Infrastructure.Tests/Fixtures/h264-aac-no-default-duration.mkv
+```
+
+The 7.1.1 cases are positive missing-duration/alias/payload regressions. The 9.0.2 cases must reject a known final AAC duration change; do not weaken timestamp/end-boundary checks to make every AAC source pass. The only terminal-boundary exception is the pinned extractor's duplicate-last-frame sentinel when the bounded AAC-LC missing-duration proof succeeds. Real chapter/tag alias cases use separately generated metadata fixtures.
+
+CI runs the checked-in inputs without installing FFmpeg. `TRACKTRIM_REQUIRE_MEDIA_TOOLS=1` prevents silent omission of the required MKVToolNix suite; provisioning and generated-fixture creation must succeed first. Record actual counts and skips in `docs/PLAN.md`; do not turn an unexecuted test definition into a passing result. Linux-only FIFO tests must run on Linux; their Windows skips are explicit. Controlled filesystem tests establish allocation-stage and malformed-record behavior; headless close/cleanup tests remain separate from native desktop shutdown acceptance.
 
 ## Portable package checks
 
