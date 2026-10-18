@@ -17,6 +17,18 @@ while IFS= read -r -d '' candidate; do
     printf '%s\n\n' "$dependency_output" >> "$temporary_report"
 
     if grep -q 'not found' <<< "$dependency_output"; then
+        missing_lines="$(grep 'not found' <<< "$dependency_output")"
+
+        # .NET 10.0.13 deliberately permits failure to load this optional tracing
+        # provider. Retain the normal publish file and record its unavailable
+        # diagnostic feature; never ignore a missing production dependency.
+        # https://github.com/dotnet/runtime/blob/v10.0.13/src/coreclr/pal/src/misc/tracepointprovider.cpp#L109-L114
+        if [[ "$(basename -- "$candidate")" == 'libcoreclrtraceptprovider.so' ]] \
+            && ! grep -qvE '^[[:space:]]*liblttng-ust\.so\.0 => not found[[:space:]]*$' <<< "$missing_lines"; then
+            printf '%s\n\n' 'Optional .NET LTTng tracing unavailable; application execution does not require liblttng-ust.so.0.' >> "$temporary_report"
+            continue
+        fi
+
         missing_dependency=1
     fi
 done < <(
