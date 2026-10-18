@@ -1,0 +1,39 @@
+# Supported formats and preservation
+
+The current runtime backend is MKVToolNix 102.0, using `mkvmerge` and same-version `mkvextract`. The identification parser accepts format version **20**, established from the pinned executable's JSON, and rejects a different format version. MP4 production processing is not implemented. File extension alone does not establish MKV support; the backend identifies the actual local regular file and rejects unsupported detected cases before writing output.
+
+The supported subset is ordinary self-contained Matroska with video/audio/subtitle tracks, ordinary chapters, supported user tags, and attachments. This matrix describes the intended implemented checks; final executed fixture/platform evidence is recorded in `PLAN.md`. Do not infer that a listed check has run successfully until its evidence is recorded there.
+
+| Feature | Supported/retained | Inspected / per-job check | Integration evidence and limits |
+| --- | --- | --- | --- |
+| Encoded video | Every video track retained; video removal forbidden | Approved retained mapping, order, codec/known properties and metadata | Extracted retained content comparison on generated fixtures; routine probing is not packet proof. |
+| Audio/subtitles | Explicit Keep selection; all subtitles may be removed; zero audio requires confirmation | File-local backend IDs, retained order and effective flags; explicit empty-selection CLI options | Distinguishable same-metadata audio fixture establishes exact retention rather than count-only verification. |
+| Track title/languages/flags | Preserve inspected original values and effective supported flags | Compare mapping and expected retained metadata; documented defaults remain distinct from unknown | Language tags do not prove spoken language or promise player selection. |
+| Container title | Preserve | Compare identified value | Writing application/layout/SegmentUID may change as documented below. |
+| Ordinary chapters | Preserve supported semantic content | Extract same-version chapter XML, securely parse and compare semantic content | Counts/simplified text alone are insufficient; advanced/reference changes require rejection. |
+| User tags | Preserve global and retained-track targets; removed-track tags need deliberate policy | Extract and compare semantic XML against the retained mapping | Do not ignore arbitrary UID-target mismatch or claim all private metadata preserved. |
+| Attachments | Retain supported attachments including fonts/artwork after subtitle removal | Compare order, UID, name, description, MIME type, and size | Fixture payload comparison uses a text attachment; actual font/artwork payload and legacy font MIME variants remain unverified. Per-job metadata does not prove attachment byte equality. Extraction uses app-owned paths. |
+| Duration/timing | Expectations relate to retained content | Extract every retained track's `timestamps_v2`; compare frame count and each timestamp with a **1 ms** tolerance for Matroska tick rounding, plus known default-duration properties | No total-container-duration equality requirement: deleting the longest track may legitimately shorten the container. Per-packet BlockDuration/end-duration fields are not independently checked per job. Timestamp equality does not establish encoded payload equality. |
+| Original source | Remains untouched | Revision checks before/after work and before publication | Integration hashes before/after prove the exercised cases; revision checks have concurrent-change limits. |
+
+## Deliberate container differences
+
+Whole-container byte equality is not expected. Remuxing changes file layout, indexes, writing application, track numbers, and index-entry counts. The adapter permits track UID remapping only for a source identified as written by MakeMKV; other sources retain UIDs. Its retained input/output mapping is explicit by approved order, known codec properties, metadata, effective flags, and timing, rather than a language/codec pair alone. Tag TrackUID references use that map; unsupported chapter references are rejected.
+
+`--track-order`, explicit retention/flags, `--normalize-language-ietf off`, and `--disable-track-statistics-tags` define the command policy. Existing statistics tags remain part of checked tag XML; new statistics are not generated. An absent IETF language field may be added only when it equals the legacy value or its exact alpha-2/alpha-3 equivalent, without discarding a regional distinction. Chapter/tag comparison permits the same equivalent-field addition. All other compared known properties must remain equal; per-frame timestamp verification covers permitted minimum-timestamp/index changes. SegmentUID/container layout are not a retained-content identity oracle.
+
+## Rejected or outside the checked subset
+
+Detected next/previous segment links or segment families, ordered chapters, chapter segment/edition/track/process references, uncommon track types, and tag records with multiple TrackUID targets, mixed track/non-track targets, or dangling nonzero TrackUIDs are rejected. The parser also rejects known advanced luminance/chromaticity/white-point fields, HDR/Dolby Vision properties exposed by identification, and PQ/HLG transfer characteristics. These are concrete property checks, not restrictions inferred from a codec or filename. An identification warning is a preflight failure.
+
+Unknown optional fields can be ignored only if they cannot weaken a required capability check. The current probe cannot enumerate every unknown/private Matroska element or prove that all Dolby Vision/HDR metadata is detectable; no universal container fidelity claim is made. Ordinary SDR fixture coverage does not prove HDR preservation.
+
+MP4, playlists, URLs, external subtitle editing, transcoding, playback, source replacement, batch input, and folders are outside Phase 1. Native Wayland and arbitrary Linux distributions are separate acceptance targets.
+
+## Platform and native requirements
+
+Archives target Windows 11 x64 25H2 and Ubuntu 24.04 x64 Desktop with X11/XWayland. Tested hosts/builds and missing acceptance are listed in `PLAN.md`. Avalonia classifies Ubuntu 24.x as Tier 2; upstream support is not this application's acceptance evidence. [Avalonia platform requirements](https://docs.avaloniaui.net/docs/supported-platforms).
+
+Self-contained .NET includes the runtime but relies on OS native libraries. Ubuntu 24.04 baseline dependencies include glibc, libgcc/libstdc++, zlib, OpenSSL, ICU 74, Kerberos/GSSAPI, CA certificates, tzdata, and the X11/ICE/SM/fontconfig libraries used by Avalonia. The exact combined library resolution is captured in `native-dependencies.txt` inside each Linux package. The CI runner installs native prerequisites for its test environment; users must not install .NET or media tools to complete the intended desktop workflow. [Microsoft Ubuntu dependencies](https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-install?pivots=os-linux-ubuntu-2404&tabs=dotnet10).
+
+The Linux tool bundle retains the extracted upstream AppImage library tree and both native CLI executables, rather than copying a single `mkvmerge` binary. The production backend launches `tools/app-root/usr/bin/mkvmerge`/`mkvextract` directly and supplies the packaged library search path through `ProcessStartInfo.Environment`. Fixed shell wrappers are build-time acquisition/fixture helpers only. Qt is required even for MKVToolNix CLI programs. The package scan checks application native assets and the CLI executables' actual transitive `ldd` closure; retained unused GUI libraries are not standalone runtime requirements. Extraction is a build operation, and FUSE is not used when running the resulting package. [MKVToolNix requirements](https://mkvtoolnix.download/doc/README.md), [AppImage extraction guidance](https://docs.appimage.org/user-guide/troubleshooting/fuse.html).

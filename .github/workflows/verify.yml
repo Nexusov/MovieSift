@@ -1,0 +1,88 @@
+name: Verify and package
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Required media checks and ${{ matrix.runtime }} package
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2025
+            runtime: win-x64
+            archive: TrackTrim-win-x64.zip
+          - os: ubuntu-24.04
+            runtime: linux-x64
+            archive: TrackTrim-linux-x64.tar.gz
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 35
+    env:
+      DOTNET_NOLOGO: '1'
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+      TRACKTRIM_REQUIRE_MEDIA_TOOLS: '1'
+      TRACKTRIM_TOOL_DIRECTORY: ${{ github.workspace }}/tools
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
+        with:
+          global-json-file: global.json
+      - name: Provision Linux build/test native prerequisites
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y squashfs-tools file libx11-6 libice6 libsm6 libfontconfig1 libicu74 libssl3t64 libgssapi-krb5-2 libbrotli1 libgl1 libegl1 libxrandr2 libxcursor1 libxi6 libxinerama1
+      - name: Acquire the pinned backend (mandatory)
+        run: ./build/acquire-tools.ps1 -RuntimeIdentifier '${{ matrix.runtime }}' -Destination '${{ github.workspace }}/tools'
+      - name: Generate original real-media fixtures
+        run: |
+          python ./build/generate-fixtures.py --tool-directory '${{ github.workspace }}/tools' --destination '${{ github.workspace }}/artifacts/fixtures'
+          if ($LASTEXITCODE -ne 0) { throw 'Real fixture generation failed.' }
+      - name: Restore locked dependencies
+        run: dotnet restore --locked-mode
+      - name: Verify formatting
+        run: dotnet format --verify-no-changes --no-restore
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+      - name: Unit, headless UI and required real-backend tests
+        run: dotnet test --configuration Release --no-build --no-restore --logger trx --results-directory ./TestResults
+      - name: Build self-contained archive and run packaged workflow
+        run: ./build/package.ps1 -RuntimeIdentifier '${{ matrix.runtime }}' -FixturePath '${{ github.workspace }}/artifacts/fixtures/ordinary.mkv'
+      - name: Relocate archive and run the actual application workflow
+        run: ./build/verify-package.ps1 -ArchivePath './artifacts/${{ matrix.archive }}' -FixturePath '${{ github.workspace }}/artifacts/fixtures/ordinary.mkv'
+      - name: Verify Linux CLI archive without installed SDK or media tools
+        if: runner.os == 'Linux'
+        shell: bash
+        run: bash ./build/verify-clean-linux.sh ./artifacts/TrackTrim-linux-x64.tar.gz ./artifacts/fixtures/ordinary.mkv
+      - name: Upload test evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: test-evidence-${{ matrix.runtime }}
+          path: |
+            TestResults/
+            artifacts/**/native-dependencies.txt
+            artifacts/**/build-provenance.json
+            artifacts/**/tool-provenance.json
+            artifacts/**/evidence/container-environment.txt
+            artifacts/**/evidence/container-workflow.txt
+          if-no-files-found: warn
+          retention-days: 7
+      # Keep binary archives local to the runner until corresponding-source and
+      # original-application license obligations are resolved. Only test evidence
+      # is uploaded; successful package checks are still mandatory above.
