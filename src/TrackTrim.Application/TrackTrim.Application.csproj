@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../TrackTrim.Core/TrackTrim.Core.csproj" />
+  </ItemGroup>
+</Project>

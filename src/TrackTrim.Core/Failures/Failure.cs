@@ -1,0 +1,30 @@
+namespace TrackTrim.Core.Failures;
+
+public enum ErrorCode
+{
+    InvalidSource,
+    UnsupportedContainer,
+    UnsupportedFeature,
+    ToolUnavailable,
+    ToolVersionMismatch,
+    InvalidToolOutput,
+    ToolFailed,
+    SourceChanged,
+    InvalidSelection,
+    ZeroAudioConfirmationRequired,
+    InvalidDestination,
+    DestinationExists,
+    InsufficientSpace,
+    PersistenceUnavailable,
+    VerificationFailed,
+    PublicationFailed,
+    PublicationUncertain,
+    OwnershipInvalid,
+    ProcessTerminationFailed,
+    Busy,
+    StalePlan,
+    Cancelled,
+    IoFailure
+}
+
+public sealed record Failure(ErrorCode Code, string Detail = "");
