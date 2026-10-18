@@ -133,4 +133,9 @@
   <data name="PlanDefaultAudioRetained" xml:space="preserve"><value>Resulting default audio: retained track IDs {0} keep their existing default flags.</value></data>
   <data name="PlanNoDefaultAudio" xml:space="preserve"><value>Resulting default audio: none of the retained audio tracks has the default flag. No new default is assigned.</value></data>
   <data name="PlanNoAudio" xml:space="preserve"><value>Resulting audio: no audio tracks will remain.</value></data>
+  <data name="CloseWarningReview" xml:space="preserve"><value>This output has not been published. Stay in warning review, or discard the temporary output and close after cleanup finishes. A cleanup failure keeps the window open.</value></data>
+  <data name="RemainInWarningReview" xml:space="preserve"><value>Stay in review</value></data>
+  <data name="DiscardWarningsAndClose" xml:space="preserve"><value>Discard output and close</value></data>
+  <data name="InterruptedInvalidRecord" xml:space="preserve"><value>An ownership record is invalid or incomplete and needs manual review. Automatic cleanup and deletion are disabled for this entry.</value></data>
+  <data name="ErrorReasonSegmentStructure" xml:space="preserve"><value>The Segment Info cannot be inspected within the supported bounds. Choose a standalone MKV with finite element sizes; streaming clusters and multiple segments are unsupported.</value></data>
 </root>

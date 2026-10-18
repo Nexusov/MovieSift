@@ -52,6 +52,10 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private bool persistenceFailed;
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasWarningCloseDecision))]
+    private bool warningCloseRequested;
+
     /// <summary>Connects application use cases to commands without owning media I/O.</summary>
     public MainViewModel(MainViewModelServices services)
     {
@@ -66,7 +70,8 @@ public sealed partial class MainViewModel : ObservableObject
         ChangeLanguageCommand = new AsyncRelayCommand<string>(ChangeLanguageAsync);
         PublishWarningsCommand = new AsyncRelayCommand(PublishWarningsAsync, () => HasWarningCandidate && !IsBusy);
         DiscardWarningsCommand = new AsyncRelayCommand(DiscardWarningsAsync, () => HasWarningCandidate && !IsBusy);
-        CleanInterruptedCommand = new AsyncRelayCommand(CleanInterruptedAsync, () => HasInterrupted && CanEdit);
+        RemainInWarningReviewCommand = new RelayCommand(RemainInWarningReview, () => HasWarningCloseDecision && !IsBusy);
+        CleanInterruptedCommand = new AsyncRelayCommand(CleanInterruptedAsync, () => HasCleanableInterrupted && CanEdit);
     }
 
     public LocalizationService Localization => services.Localization;
@@ -79,6 +84,7 @@ public sealed partial class MainViewModel : ObservableObject
     public IAsyncRelayCommand<string> ChangeLanguageCommand { get; }
     public IAsyncRelayCommand PublishWarningsCommand { get; }
     public IAsyncRelayCommand DiscardWarningsCommand { get; }
+    public IRelayCommand RemainInWarningReviewCommand { get; }
     public IAsyncRelayCommand CleanInterruptedCommand { get; }
     public bool HasBlockingOperation => IsBusy || HasWarningCandidate || RequiresCloseDecision;
     public bool CanEdit => !HasBlockingOperation;
@@ -87,6 +93,8 @@ public sealed partial class MainViewModel : ObservableObject
     public bool HasPlan => approvedPlan is not null;
     public bool HasTracks => Tracks.Count != 0;
     public bool HasWarningCandidate => result?.Phase == JobPhase.AwaitingWarningReview;
+    public bool HasWarningCloseDecision => WarningCloseRequested && HasWarningCandidate;
+    public bool CanRespondToWarningClose => HasWarningCloseDecision && !IsBusy;
     public bool HasInterrupted => !interrupted.IsDefaultOrEmpty;
     public bool HasCleanableInterrupted => interrupted.Any(entry => entry.CanClean && entry.Output is not null);
     public string InterruptedDetails => DescribeInterrupted();
@@ -126,12 +134,21 @@ public sealed partial class MainViewModel : ObservableObject
                 Localization.SetLanguage(savedLanguage);
             }
 
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or OperationFailureException)
+        {
+            PersistenceFailed = true;
+            services.Log.Warning(exception, "Portable language settings could not be read");
+        }
+
+        try
+        {
             interrupted = await services.Outputs.FindInterruptedAsync();
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or OperationFailureException)
         {
             PersistenceFailed = true;
-            services.Log.Warning(exception, "Portable startup data could not be read");
+            services.Log.Warning(exception, "Portable ownership records could not be read");
         }
 
         NotifyPresentation();
@@ -149,6 +166,33 @@ public sealed partial class MainViewModel : ObservableObject
         }
 
         await activeOperation;
+    }
+
+    /// <summary>Requests an explicit decision without discarding or publishing a warning candidate.</summary>
+    public void RequestWarningCloseReview()
+    {
+        if (!HasWarningCandidate)
+        {
+            return;
+        }
+
+        WarningCloseRequested = true;
+        NotifyPresentation();
+    }
+
+    /// <summary>Allows closing only after the existing warning candidate was discarded with complete cleanup.</summary>
+    public async Task<bool> DiscardWarningsForCloseAsync()
+    {
+        var canDiscard = HasWarningCandidate && !IsBusy;
+
+        if (!canDiscard)
+        {
+            return false;
+        }
+
+        await DiscardWarningsCommand.ExecuteAsync(null);
+        var discardCompleted = !HasWarningCandidate && !HasError && !HasCleanupIssue;
+        return discardCompleted;
     }
 
     /// <summary>Invalidates a reviewed destination whenever its editable value changes.</summary>
@@ -335,6 +379,13 @@ public sealed partial class MainViewModel : ObservableObject
         activeCancellation?.Cancel();
     }
 
+    /// <summary>Returns to the same warning review without restarting or disposing the candidate.</summary>
+    private void RemainInWarningReview()
+    {
+        WarningCloseRequested = false;
+        NotifyPresentation();
+    }
+
     /// <summary>Updates the UI immediately and persists only the stable language code.</summary>
     private async Task ChangeLanguageAsync(string? language)
     {
@@ -431,6 +482,7 @@ public sealed partial class MainViewModel : ObservableObject
         if (jobResult.Phase != JobPhase.AwaitingWarningReview)
         {
             approvedPlan = null;
+            WarningCloseRequested = false;
         }
     }
 
@@ -508,12 +560,23 @@ public sealed partial class MainViewModel : ObservableObject
     {
         return string.Join(Environment.NewLine, interrupted.Select(entry =>
         {
-            var state = Localization[entry.CanClean ? "InterruptedCleanable" : "InterruptedUnresolved"];
+            var state = DescribeInterruptedState(entry);
             var paths = entry.Output is { } output
                 ? Localization.Format(new("InterruptedPaths", [output.CandidatePath, output.DestinationPath]))
                 : entry.Issue ?? string.Empty;
             return $"{state}{Environment.NewLine}{paths}";
         }));
+    }
+
+    /// <summary>Distinguishes invalid records from valid ownership that cannot currently be cleaned.</summary>
+    private string DescribeInterruptedState(InterruptedOutput entry)
+    {
+        if (entry.Stage == "InvalidRecord")
+        {
+            return Localization["InterruptedInvalidRecord"];
+        }
+
+        return Localization[entry.CanClean ? "InterruptedCleanable" : "InterruptedUnresolved"];
     }
 
     /// <summary>Keeps original tool, adapter and cleanup details in an explicitly technical presentation.</summary>
@@ -572,6 +635,7 @@ public sealed partial class MainViewModel : ObservableObject
         CancelCommand?.NotifyCanExecuteChanged();
         PublishWarningsCommand?.NotifyCanExecuteChanged();
         DiscardWarningsCommand?.NotifyCanExecuteChanged();
+        RemainInWarningReviewCommand?.NotifyCanExecuteChanged();
         CleanInterruptedCommand?.NotifyCanExecuteChanged();
     }
 

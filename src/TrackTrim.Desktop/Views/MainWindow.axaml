@@ -19,6 +19,19 @@
       </StackPanel>
     </Grid>
 
+    <Border DockPanel.Dock="Top" Padding="12" BorderBrush="Orange" BorderThickness="1" CornerRadius="4"
+            Margin="0,0,0,16" IsVisible="{Binding HasWarningCloseDecision}">
+      <StackPanel Spacing="8">
+        <TextBlock Text="{Binding Localization[CloseWarningReview]}" TextWrapping="Wrap" />
+        <WrapPanel Orientation="Horizontal">
+          <Button x:Name="RemainInWarningReviewButton" Content="{Binding Localization[RemainInWarningReview]}"
+                  Command="{Binding RemainInWarningReviewCommand}" Margin="0,0,8,8" />
+          <Button x:Name="DiscardWarningsAndCloseButton" Content="{Binding Localization[DiscardWarningsAndClose]}"
+                  Click="OnDiscardWarningsAndClose" IsEnabled="{Binding CanRespondToWarningClose}" Margin="0,0,8,8" />
+        </WrapPanel>
+      </StackPanel>
+    </Border>
+
     <StackPanel DockPanel.Dock="Bottom" Spacing="8" Margin="0,16,0,0">
       <TextBlock x:Name="StatusText" Text="{Binding StatusText}" TextWrapping="Wrap" FontWeight="SemiBold" />
       <ProgressBar Minimum="0" Maximum="100" Value="{Binding ProgressValue}" IsIndeterminate="{Binding IsProgressIndeterminate}" IsVisible="{Binding IsBusy}" />

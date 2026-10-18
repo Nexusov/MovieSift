@@ -60,9 +60,18 @@ internal sealed record FixtureTrack(int Identifier, TrackKind Kind, string Title
 internal sealed class FakeSettingsStore : ISettingsStore
 {
     public string Language { get; private set; } = "en";
+    public Exception? LoadException { get; set; }
 
     /// <summary>Returns the explicit in-memory language preference.</summary>
-    public Task<string> LoadLanguageAsync(CancellationToken cancellationToken = default) => Task.FromResult(Language);
+    public Task<string> LoadLanguageAsync(CancellationToken cancellationToken = default)
+    {
+        if (LoadException is { } exception)
+        {
+            return Task.FromException<string>(exception);
+        }
+
+        return Task.FromResult(Language);
+    }
 
     /// <summary>Records the code supplied by the real language command.</summary>
     public Task SaveLanguageAsync(SaveLanguageRequest request)
@@ -142,6 +151,11 @@ internal sealed class FakeMediaBackend(MediaInspection inspection) : IMediaBacke
 internal sealed class FakeOutputStore : IOutputStore
 {
     public ImmutableArray<CleanupIssue> CleanupIssues { get; set; } = [];
+    public ImmutableArray<InterruptedOutput> Interrupted { get; set; } = [];
+    public TaskCompletionSource CleanupStarted { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+    public TaskCompletionSource? ContinueCleanup { get; set; }
+    public int CleanupCount { get; private set; }
+    public int DiscoveryCount { get; private set; }
 
     /// <summary>Creates an in-memory ownership record for the synthetic candidate.</summary>
     public Task<OwnedOutput> ReserveAsync(ReserveOutputRequest request)
@@ -159,8 +173,23 @@ internal sealed class FakeOutputStore : IOutputStore
     public Task<PublishedOutput> PublishAsync(OutputRequest request) => Task.FromResult(new PublishedOutput(request.Output.DestinationPath, 700));
 
     /// <summary>Reports complete cleanup for presentation-only candidates.</summary>
-    public Task<ImmutableArray<CleanupIssue>> CleanupAsync(OutputRequest request) => Task.FromResult(CleanupIssues);
+    public async Task<ImmutableArray<CleanupIssue>> CleanupAsync(OutputRequest request)
+    {
+        CleanupCount++;
+        CleanupStarted.TrySetResult();
+
+        if (ContinueCleanup is not null)
+        {
+            await ContinueCleanup.Task;
+        }
+
+        return CleanupIssues;
+    }
 
     /// <summary>Starts presentation tests with no prior ownership records.</summary>
-    public Task<ImmutableArray<InterruptedOutput>> FindInterruptedAsync(CancellationToken cancellationToken = default) => Task.FromResult(ImmutableArray<InterruptedOutput>.Empty);
+    public Task<ImmutableArray<InterruptedOutput>> FindInterruptedAsync(CancellationToken cancellationToken = default)
+    {
+        DiscoveryCount++;
+        return Task.FromResult(Interrupted);
+    }
 }

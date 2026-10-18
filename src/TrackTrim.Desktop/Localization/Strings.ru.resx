@@ -133,4 +133,9 @@
   <data name="PlanDefaultAudioRetained" xml:space="preserve"><value>Аудио по умолчанию в результате: у сохранённых дорожек с ID {0} остаются действующие флаги по умолчанию.</value></data>
   <data name="PlanNoDefaultAudio" xml:space="preserve"><value>Аудио по умолчанию в результате: ни одна из сохранённых аудиодорожек не имеет флага по умолчанию. Новая дорожка по умолчанию не назначается.</value></data>
   <data name="PlanNoAudio" xml:space="preserve"><value>В результате не останется аудиодорожек.</value></data>
+  <data name="CloseWarningReview" xml:space="preserve"><value>Этот результат ещё не сохранён. Продолжите проверку предупреждений или удалите временный результат и закройте приложение после очистки. При ошибке удаления окно останется открытым.</value></data>
+  <data name="RemainInWarningReview" xml:space="preserve"><value>Продолжить проверку</value></data>
+  <data name="DiscardWarningsAndClose" xml:space="preserve"><value>Удалить результат и закрыть</value></data>
+  <data name="InterruptedInvalidRecord" xml:space="preserve"><value>Запись владения повреждена или неполна и требует ручной проверки. Автоматическая очистка и удаление для этой записи недоступны.</value></data>
+  <data name="ErrorReasonSegmentStructure" xml:space="preserve"><value>Структуру Segment Info невозможно проверить в поддерживаемых пределах. Выберите самостоятельный MKV с конечными размерами элементов; потоковые кластеры и несколько сегментов не поддерживаются.</value></data>
 </root>
