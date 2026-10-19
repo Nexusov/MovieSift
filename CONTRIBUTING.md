@@ -60,6 +60,19 @@ The relocation test clears development runtime/tool variables, changes the worki
 
 On a Linux developer/CI host with Docker, run `bash ./build/verify-clean-linux.sh ./artifacts/TrackTrim-linux-x64.tar.gz ./artifacts/fixtures/ordinary.mkv`. The image uses the pinned official Ubuntu 24.04 amd64 digest in `build/portable-smoke.Dockerfile`, installs only native OS libraries during image construction, then runs the packaged CLI without root or networking. It asserts that `dotnet`, MKVToolNix, and FFmpeg commands are not installed separately. The ASCII parent locale (`LANG=C`, `LC_ALL=C`, `LC_CTYPE=C`) deliberately tests that the native worker boundary handles Unicode independently of the inherited locale. The exact distro/package list, user/locale, and workflow log are retained under `artifacts/clean Linux Кириллица.*/evidence`. Docker is a development/CI dependency only; the distributed application does not use containers.
 
+## Protected main and pull requests
+
+Submit changes through a pull request from a review branch. The active [Protect main ruleset](https://github.com/Nexusov/TrackTrim/rules/25401528) applies only to `main`, with no bypass actors. It requires resolved review conversations and both existing checks from GitHub Actions (App ID `15368`):
+
+- `Required media checks and win-x64 package`
+- `Required media checks and linux-x64 package`
+
+The branch must be up to date with its base before merging. No approving review, code-owner approval or last-push approval is required. Force pushes and branch deletion are blocked. Merge, squash and rebase remain available; automatic merging is disabled.
+
+The existing verification workflow covers draft and documentation-only pull requests as well as ordinary changes, without path or fork exclusions. Fork runs may await GitHub's contributor approval; pending approval or missing checks do not waive the requirements. Preserve mandatory tool/fixture provisioning, full tests, package/relocation checks and the Linux no-SDK container check; do not add a skip guard or rename a required check without updating the policy deliberately.
+
+The [applied protection record](docs/verification/main-protection.md) links the canonical configuration and readback commands. Green CI establishes the checks that ran; native desktop acceptance and licensing obligations retain their separate status.
+
 ## Changes and licensing
 
 Follow `AGENTS.md` and the project dependency boundaries. Prefer small changes with a specific user-visible behavior or safety invariant. Update the relevant preservation matrix and tests when support expands. Do not add future phase modules or claim unsupported container fidelity.
