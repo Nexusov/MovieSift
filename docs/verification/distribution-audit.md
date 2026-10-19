@@ -22,6 +22,21 @@ The report first requires exact `SHA256SUMS` coverage and compares actual ZIP/ta
 
 The report distinguishes original/generated TrackTrim output, self-contained runtime, other managed/native payloads and distributed symbols, bundled executables/libraries/static archives, source archives, documentation/assets/notices, metadata-only restored packages and build-only tools. Every unmatched payload remains an explicit unknown. `TrackTrim.exe`/`TrackTrim` is a generated .NET apphost, not an assertion that the SDK's native template is original C# code. A dependency's presence in a notice roll-up alone does not establish that it was compiled.
 
+## Executed inventory checkpoint
+
+[CI run 39329854903](https://github.com/Nexusov/TrackTrim/actions/runs/39329854903) passed both required jobs for review head `84075d1697ba3fbe8770c8921b330a152df0d0c6`. Both actually checked out synthetic merge `d1dcd46b03999c18563a00ee0cc7cff9189736cf`, with base `69c9babe668c3ba6d0032de3304f793337964c4f` and that head as parents; the checkout/head tree is `34241dd31b6506c010aa5739d05dc31495ee4a18`.
+
+| Actual builder / archive | Bytes | SHA256 | Inventoried files, including manifest |
+| --- | ---: | --- | ---: |
+| Windows Server 2025, `windows-2025-vs2026` image `20261007.264.1`; `TrackTrim-win-x64.zip` | 113111552 | `e198be64afcd023b00d99cda801ec5198428b7381dbf6dcc3e558955c317cd37` | 524 |
+| Ubuntu 24.04.5 LTS, `ubuntu-24.04` image `20261018.339.1`; `TrackTrim-linux-x64.tar.gz` | 104049040 | `2b9378313f02f45a9de5e842a716b0e1353438828b58522cdeedc3062caef1b0` | 502 |
+
+Downloaded [Windows evidence](https://github.com/Nexusov/TrackTrim/actions/runs/39329854903/artifacts/12224650661) and [Linux evidence](https://github.com/Nexusov/TrackTrim/actions/runs/39329854903/artifacts/12224565777) were inspected: all paths are accounted for, ordinary/supplemental material checks passed, and neither upload contains binaries/source archives. Windows has 187 runtime payloads, 34 other matched payloads and two worker executables; Linux has 187 runtime payloads, 31 other matched payloads, both workers, 102 retained shared-library files and three static archives. Metadata, original/generated output and material files make up the remainder. Linux includes the hidden upstream `.cmake.conf`.
+
+Each job passed 16 small archive/evidence regressions, locked restore, formatting, Release build (zero warnings/errors), actual packaged workflow and relocation. The C# suites passed **Windows 222 + five documented Linux-only skips; Linux 227 with no skips**, including 14 real-media cases and 32 headless Desktop tests per platform. The Linux no-SDK/no-separately-installed-media-tools container workflow also passed. These are builder/CLI/headless results, not native desktop acceptance.
+
+These archive identities belong to this checkpoint; later packages emit their own identities. Build provenance now reads stored Git commit parent headers because history traversal hid parents at CI's shallow boundary. A controlled depth-one fetch reproduced the empty traversal result and confirmed the exact two stored parents above; later CI reports must retain them directly. Complete path accounting does not resolve the source/version/licensing unknowns below.
+
 ## Findings and concrete collection corrections
 
 The inspected starting source is `41b036e34eb4663505f0232dfdb96ee626493ef1`. New reports bind their own actual build revision; a pull-request run normally records GitHub's synthetic merge, whose parents identify base and review head. Local dirty preparation packages are not described as clean committed builds. The unchanged native artifact remains associated with `e16050e7de92ab8ee4ac8f86094b41b2e2583cec` and its existing native record; new notice/evidence packages do not replace that history.
