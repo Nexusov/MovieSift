@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "caseId": "W13",
-  "publicationState": "Checkpoint: first attempt only; prepared keyboard retry has no result here",
-  "claimScope": "The first human-operated attempt reached native Cancelled with cleanup after remux 30236 completed normally (exit 0); candidate-identification probe 34684 later exited -1. Operator input timing/method was not independently measured. Active-remux Cancel is not accepted from this evidence.",
+  "publicationState": "Completed two-attempt evidence checkpoint; active-remux Cancel remains unverified",
+  "claimScope": "Both human-operated attempts reached native Cancelled with cleanup after their remux processes completed normally (30236 and 27852, exit 0). The first candidate-identification probe 34684 exited -1; the second candidate-identification probe 36056 exited 0. Actual Cancel input timestamps were not independently measured. Active-remux Cancel is not accepted for either attempt.",
   "provenance": {
     "pathBase": "Task workspace root; application/media paths are relative to it.",
     "sourceFiles": [
@@ -15,11 +15,17 @@
       {
         "id": "workerObserver",
         "path": "work/native-acceptance-20261019/W13-human-workers-01.jsonl",
-        "bytes": 14420,
-        "sha256": "f274c49d3f87792d09fec2fe43d1364a02090f0476b35a2f1c52debb9f2611ff",
-        "hashScope": "Hashed complete-line prefix [0, snapshotByteCount); snapshotRecordCount counts only that prefix. Later appended bytes/records are outside this extract.",
-        "fileBytesAtRead": 14420,
-        "incompleteTrailingBytesExcluded": 0,
+        "bytes": 29370,
+        "sha256": "7f80d63f6cceaf9fdc8ca9afdb5fe91597c165a07d0cbd3183af698000df1528",
+        "hashScope": "Full completed observer file, including the OwnerStopMarker shutdown event.",
+        "completedFileByteCount": 29370,
+        "completedFileRecordCount": 85,
+        "observerStoppedInFile": true,
+        "earlierPublishedPrefix": {
+          "bytes": 14420,
+          "recordCount": 41,
+          "sha256": "f274c49d3f87792d09fec2fe43d1364a02090f0476b35a2f1c52debb9f2611ff"
+        },
         "retainedLineNumbers": [
           1,
           3,
@@ -28,29 +34,49 @@
           38,
           39,
           40,
-          41
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          78,
+          79,
+          80,
+          81,
+          82,
+          83,
+          84,
+          85
         ],
-        "originalEventCount": 41,
-        "omittedEventCount": 33,
-        "observerStoppedInPrefix": false,
-        "snapshotByteCount": 14420,
-        "snapshotRecordCount": 41
+        "originalEventCount": 85,
+        "retainedEventCount": 21,
+        "omittedEventCount": 64
       },
       {
         "id": "nativeUia",
         "path": "work/native-acceptance-20261019/loaded-source-native-events.jsonl",
-        "bytes": 806564,
-        "sha256": "aab6850bfa2fb4d86fccee39c9ff624e4071305e6a4b72e822c998953122aa4a",
+        "bytes": 823330,
+        "sha256": "8a9da5bf2f2799ab9022fba53fdbefbab09766f99fc6e8172bc958f00c0563dc",
         "hashScope": "Hashed complete-line prefix [0, snapshotByteCount); snapshotRecordCount counts only that prefix. Later appended bytes/records are outside this extract.",
-        "fileBytesAtRead": 806564,
+        "snapshotByteCount": 823330,
+        "snapshotRecordCount": 179,
+        "fileBytesAtRead": 823330,
         "incompleteTrailingBytesExcluded": 0,
+        "earlierPublishedPrefix": {
+          "bytes": 806564,
+          "recordCount": 176,
+          "sha256": "aab6850bfa2fb4d86fccee39c9ff624e4071305e6a4b72e822c998953122aa4a"
+        },
         "retainedLineNumbers": [
           167,
           168,
-          169
-        ],
-        "snapshotByteCount": 806564,
-        "snapshotRecordCount": 176
+          169,
+          175,
+          176,
+          178,
+          179
+        ]
       },
       {
         "id": "platform",
@@ -69,16 +95,35 @@
         "path": "work/native-cancellation-large-20261019/1GiB/fixture-provenance.json",
         "bytes": 3909,
         "sha256": "9efc6b13aa2408c2eb106c6c017e1e52758420ada860df3f1a399f73d92ea817"
+      },
+      {
+        "id": "secondAttemptFilesystem",
+        "path": "work/native-acceptance-20261019/W13-keyboard-02-filesystem.json",
+        "bytes": 1815,
+        "sha256": "df8ea96a5736f967b3465690a13f85f32d06d6461a32bc16fadd13cc49c6aebd"
+      },
+      {
+        "id": "secondAttemptReceipt",
+        "path": "work/native-acceptance-20261019/W13-keyboard-02-receipt.json",
+        "bytes": 2716,
+        "sha256": "edeb32cae3e6e1a3f874d26b52c51c62c63d7e4128f28f8798218a8ad62c7a3a"
+      },
+      {
+        "id": "keyboardPreparationSession",
+        "path": "work/native-acceptance-20261019/W13-keyboard-session.json",
+        "bytes": 1801,
+        "sha256": "cd19f25c32fd7fde7589927c456cc8d15b0241a96dbaf03ceaacbebde811c508"
       }
     ],
     "transformations": [
-      "Removed the case-insensitive absolute workspace prefix from paths and embedded command lines; affected Windows separators changed to /.",
+      "Removed the case-insensitive absolute workspace prefix from paths and embedded command lines; affected Windows separator runs changed to /. Repeated separators in keyboard-session/filesystem receipt paths were normalized only for task-relative presentation.",
       "Original observer timestamp strings are retained verbatim from raw JSONL. No PowerShell DateTime round-trip was used."
     ],
     "omissions": [
-      "Intermediate liveness pulses, other unrelated probes and prepared/pending-retry events are omitted; the PID 10020 discovery failure is retained explicitly.",
-      "RemuxWorker and RemuxExit copies from the post-action receipt are omitted because PowerShell normalized some copied timestamp offsets; the retained raw observer events are authoritative for original strings.",
-      "Only selected native approved-plan/focus/status lines are retained; private picker listings, full UIA trees and unrelated events are omitted."
+      "Intermediate liveness pulses and two initial first-attempt version-probe events are omitted; all second-attempt non-liveness events and the shutdown event are retained. Discovery failures for PIDs 10020, 31708 and 2576 are explicit.",
+      "RemuxWorker and RemuxExit copies from the first post-action receipt are omitted because PowerShell normalized some copied timestamp offsets; retained raw observer events supply the original strings.",
+      "Only selected native approved-plan/focus/status lines are retained; private picker listings, full UIA trees and unrelated events are omitted.",
+      "The keyboard preparation session ConcreteTimingChange instruction is omitted from its projection; it describes the intended route, not measured operator behavior. The later report and unreliable fixed-count route are retained in the second receipt."
     ]
   },
   "platformSupportingReceipt": {
@@ -298,27 +343,328 @@
           "screenshot": "blocked by capture timeout"
         }
       ]
+    },
+    {
+      "attempt": "keyboard-02",
+      "activeRemuxCancelAccepted": false,
+      "assessment": "Native Cancelled and clean filesystem are observed, but remux 27852 and candidate -J 36056 both exited 0. No active-remux termination or exact Cancel input boundary is established.",
+      "operatorInputEvidence": "Exact operator report is retained; actual input timestamps and intermediate focus were not independently measured. The prepared fixed Shift+Tab count was unreliable, and no universal three-press route is established.",
+      "preparationSessionProjection": {
+        "SessionId": "w13-keyboard-99bbc614",
+        "PreparedUtc": "2026-10-19T18:50:23.4181158+00:00",
+        "GuiProcessId": 15992,
+        "AppPath": "outputs/TrackTrim native acceptance Кириллица e16050e/fresh app 20261019/TrackTrim-win-x64/TrackTrim.exe",
+        "ToolDirectory": "outputs/TrackTrim native acceptance Кириллица e16050e/fresh app 20261019/TrackTrim-win-x64/tools",
+        "SourcePath": "work/native-cancellation-large-20261019/1GiB/test data Кириллица/source cancellation attachment 1GiB.mkv",
+        "SourceSha256": "0565b34f5fc0965225bf45b8d37e5cb007fe20611b77f0f66c175c970e4307f9",
+        "OutputPath": "outputs/TrackTrim native acceptance Кириллица e16050e/results Кириллица/w13-keyboard-99bbc614/W13 отмена клавиатурой.mkv",
+        "ResultDirectory": "outputs/TrackTrim native acceptance Кириллица e16050e/results Кириллица/w13-keyboard-99bbc614",
+        "ArchiveSource": "e16050e7de92ab8ee4ac8f86094b41b2e2583cec",
+        "ArchiveSha256": "d621ddc50773b20ba5d0f5109e904046765632796d8c256852b878221e091f18",
+        "RepositoryHead": "a44baafff3bc493477f37493700973a7efd3d6f2",
+        "ObserverPath": "work/native-acceptance-20261019/W13-human-workers-01.jsonl"
+      },
+      "postActionReceiptProjection": {
+        "CaseId": "W13",
+        "Attempt": "keyboard-02",
+        "ReceiptSavedUtc": "2026-10-19T19:18:54.839Z",
+        "RepositoryHeadAtExecution": "cd55890b1a97a6b8a1fd34a0fc71c4ab9afb99b8",
+        "ArchiveSource": "e16050e7de92ab8ee4ac8f86094b41b2e2583cec",
+        "ArchiveSha256": "d621ddc50773b20ba5d0f5109e904046765632796d8c256852b878221e091f18",
+        "OperatorReport": "операция успешно отменилось, но на отменить попадало только с 3 раза, а не со второго. на 2й раз попало на инпут \"исходный файл\". но возможно я что-то не так понял или сделал.",
+        "OperatorInputMethod": "Operator-reported native keyboard Run/Cancel; exact input timestamps and intermediate focus were not independently captured.",
+        "ExpectedPreparationRoute": "Space on prepared Run; about 2 seconds; Shift+Tab twice then Space on Cancel. Fixed count was not reliable.",
+        "OperatorReportedFocusRoute": "Second Shift+Tab reached Source; third reached Cancel. This is an operator report, not a universal tab-order guarantee.",
+        "ActiveRemuxCancelAccepted": false,
+        "Assessment": "Native Cancelled and clean filesystem are observed, but remux 27852 and candidate -J 36056 both exited 0. No active-remux termination or exact Cancel input boundary is established.",
+        "RemuxWorkerKey": "27852:639280340481754572",
+        "RemuxStartUtc": "2026-10-19T19:14:08.1754572Z",
+        "RemuxExit": {
+          "ExitUtc": "2026-10-19T19:14:14.9074127Z",
+          "Event": "WorkerExited",
+          "WorkerKey": "27852:639280340481754572",
+          "InvocationKind": "RemuxCandidate",
+          "ObservedUtc": "2026-10-19T19:14:14.9919220+00:00",
+          "ExitCode": 0,
+          "ProcessId": 27852
+        },
+        "NativeObservation": {
+          "caseId": "W13 keyboard operator result: initial native status",
+          "observedUtc": "2026-10-19T19:16:08.832Z",
+          "statusLine": "\t\t13 text Операция отменена. Оригинал сохранён. ID: StatusText",
+          "screenshot": "blocked by capture timeout"
+        },
+        "ResponsivenessObservation": {
+          "caseId": "W13 keyboard completed: native responsiveness check",
+          "observedUtc": "2026-10-19T19:18:06.751Z",
+          "focused": "20 button Открыть MKV… ID: OpenButton",
+          "statusLine": "\t\t13 text Операция отменена. Оригинал сохранён. ID: StatusText"
+        },
+        "FilesystemReceiptFile": "W13-keyboard-02-filesystem.json",
+        "ObserverStopped": {
+          "Event": "ObserverStopped",
+          "KnownWorkerCount": 7,
+          "GuiHasExited": false,
+          "Reason": "OwnerStopMarker",
+          "ObservedUtc": "2026-10-19T19:16:51.5806007+00:00"
+        },
+        "ObserverSessionExitCode": 0,
+        "AgentExternalWorkerTerminationUsed": false
+      },
+      "filesystemReceiptProjection": {
+        "CaseId": "W13",
+        "Attempt": "keyboard-02",
+        "SnapshotStartedUtc": "2026-10-19T19:17:38.1899775+00:00",
+        "ObservedUtc": "2026-10-19T19:17:39.7648911+00:00",
+        "RepositoryHeadAtExecution": "cd55890b1a97a6b8a1fd34a0fc71c4ab9afb99b8",
+        "PreparationRepositoryHead": "a44baafff3bc493477f37493700973a7efd3d6f2",
+        "ArchiveSource": "e16050e7de92ab8ee4ac8f86094b41b2e2583cec",
+        "ArchiveSha256": "d621ddc50773b20ba5d0f5109e904046765632796d8c256852b878221e091f18",
+        "SourceBytes": 1079470784,
+        "SourceSha256": "0565b34f5fc0965225bf45b8d37e5cb007fe20611b77f0f66c175c970e4307f9",
+        "SourceUnchanged": true,
+        "FinalOutputPath": "outputs/TrackTrim native acceptance Кириллица e16050e/results Кириллица/w13-keyboard-99bbc614/W13 отмена клавиатурой.mkv",
+        "FinalOutputExists": false,
+        "CandidatePath": "outputs/TrackTrim native acceptance Кириллица e16050e/results Кириллица/w13-keyboard-99bbc614/.tracktrim-ab2c9bb8d49a40a7b615a080b40b2e4f/candidate.mkv",
+        "CandidateExists": false,
+        "OwnedDirectoryPath": "outputs/TrackTrim native acceptance Кириллица e16050e/results Кириллица/w13-keyboard-99bbc614/.tracktrim-ab2c9bb8d49a40a7b615a080b40b2e4f",
+        "OwnedDirectoryExists": false,
+        "ResultEntries": [],
+        "AppDataFiles": [
+          "settings.json"
+        ],
+        "RemainingMediaChildren": [],
+        "GuiProcessId": 15992,
+        "GuiStartUtc": "2026-10-19T18:25:47.1402183Z",
+        "GuiRespondingAtRead": true,
+        "Bounds": "Point-in-time filesystem/process receipt after the second native cancelled state; no operator key timestamps are inferred."
+      },
+      "observerEvents": [
+        {
+          "Event": "WorkerFirstSeen",
+          "ObservedUtc": "2026-10-19T19:14:08.0320850+00:00",
+          "ProcessId": 4180,
+          "ExecutablePath": "outputs/tracktrim native acceptance Кириллица e16050e/fresh app 20261019/tracktrim-win-x64/tools/mkvmerge.exe",
+          "StartUtc": "2026-10-19T19:14:07.9244187Z",
+          "ParentProcessId": 15992,
+          "HasExited": false,
+          "CommandLine": "\"outputs/tracktrim native acceptance Кириллица e16050e/fresh app 20261019/tracktrim-win-x64/tools/mkvmerge.exe\" --version",
+          "WorkerKey": "4180:639280340479244187",
+          "InvocationKind": "IdentificationOrVersionProbe"
+        },
+        {
+          "ExitUtc": "2026-10-19T19:14:08.0500400Z",
+          "Event": "WorkerExited",
+          "WorkerKey": "4180:639280340479244187",
+          "InvocationKind": "IdentificationOrVersionProbe",
+          "ObservedUtc": "2026-10-19T19:14:08.0653702+00:00",
+          "ExitCode": 0,
+          "ProcessId": 4180
+        },
+        {
+          "Event": "DiscoveryRaceOrReadFailure",
+          "ObservedUtc": "2026-10-19T19:14:08.2031867+00:00",
+          "ProcessId": 31708,
+          "Detail": "Exception calling \"GetProcessById\" with \"1\" argument(s): \"Process with an Id of 31708 is not running.\""
+        },
+        {
+          "Event": "WorkerFirstSeen",
+          "ObservedUtc": "2026-10-19T19:14:08.4046250+00:00",
+          "ProcessId": 27852,
+          "ExecutablePath": "outputs/tracktrim native acceptance Кириллица e16050e/fresh app 20261019/tracktrim-win-x64/tools/mkvmerge.exe",
+          "StartUtc": "2026-10-19T19:14:08.1754572Z",
+          "ParentProcessId": 15992,
+          "HasExited": false,
+          "CommandLine": "\"outputs/tracktrim native acceptance Кириллица e16050e/fresh app 20261019/tracktrim-win-x64/tools/mkvmerge.exe\" --gui-mode --output-charset UTF-8 --normalize-language-ietf off --disable-track-statistics-tags --output \"outputs/TrackTrim native acceptance Кириллица e16050e/results Кириллица/w13-keyboard-99bbc614/.tracktrim-ab2c9bb8d49a40a7b615a080b40b2e4f/candidate.mkv\" --track-order 0:0,0:2,0:3 --video-tracks 0 --audio-tracks 2 --subtitle-tracks 3 --no-buttons --attachments 1 --default-track-flag 0:1 --forced-display-flag 0:0 --track-enabled-flag 0:1 --default-track-flag 2:1 --forced-display-flag 2:0 --track-enabled-flag 2:1 --default-track-flag 3:1 --forced-display-flag 3:0 --track-enabled-flag 3:1 \"work/native-cancellation-large-20261019/1GiB/test data Кириллица/source cancellation attachment 1GiB.mkv\"",
+          "WorkerKey": "27852:639280340481754572",
+          "InvocationKind": "RemuxCandidate"
+        },
+        {
+          "HasExited": false,
+          "ProcessId": 27852,
+          "InvocationKind": "RemuxCandidate",
+          "ObservedUtc": "2026-10-19T19:14:08.4051631+00:00",
+          "WorkerKey": "27852:639280340481754572",
+          "Event": "WorkerAlive",
+          "ReadCompletedUtc": "2026-10-19T19:14:08.4051384+00:00",
+          "ReadStartedUtc": "2026-10-19T19:14:08.4051170+00:00"
+        },
+        {
+          "HasExited": false,
+          "ProcessId": 27852,
+          "InvocationKind": "RemuxCandidate",
+          "ObservedUtc": "2026-10-19T19:14:14.8140271+00:00",
+          "WorkerKey": "27852:639280340481754572",
+          "Event": "WorkerAlive",
+          "ReadCompletedUtc": "2026-10-19T19:14:14.8139926+00:00",
+          "ReadStartedUtc": "2026-10-19T19:14:14.8139545+00:00"
+        },
+        {
+          "Event": "WorkerFirstSeen",
+          "ObservedUtc": "2026-10-19T19:14:14.9916215+00:00",
+          "ProcessId": 36276,
+          "ExecutablePath": "outputs/tracktrim native acceptance Кириллица e16050e/fresh app 20261019/tracktrim-win-x64/tools/mkvmerge.exe",
+          "StartUtc": "2026-10-19T19:14:14.9187322Z",
+          "ParentProcessId": 15992,
+          "HasExited": false,
+          "CommandLine": "\"outputs/tracktrim native acceptance Кириллица e16050e/fresh app 20261019/tracktrim-win-x64/tools/mkvmerge.exe\" --version",
+          "WorkerKey": "36276:639280340549187322",
+          "InvocationKind": "IdentificationOrVersionProbe"
+        },
+        {
+          "ExitUtc": "2026-10-19T19:14:14.9074127Z",
+          "Event": "WorkerExited",
+          "WorkerKey": "27852:639280340481754572",
+          "InvocationKind": "RemuxCandidate",
+          "ObservedUtc": "2026-10-19T19:14:14.9919220+00:00",
+          "ExitCode": 0,
+          "ProcessId": 27852
+        },
+        {
+          "Event": "DiscoveryRaceOrReadFailure",
+          "ObservedUtc": "2026-10-19T19:14:15.1718277+00:00",
+          "ProcessId": 2576,
+          "Detail": "Exception calling \"GetProcessById\" with \"1\" argument(s): \"Process with an Id of 2576 is not running.\""
+        },
+        {
+          "ExitUtc": "2026-10-19T19:14:15.0404385Z",
+          "Event": "WorkerExited",
+          "WorkerKey": "36276:639280340549187322",
+          "InvocationKind": "IdentificationOrVersionProbe",
+          "ObservedUtc": "2026-10-19T19:14:15.2002896+00:00",
+          "ExitCode": 0,
+          "ProcessId": 36276
+        },
+        {
+          "Event": "WorkerFirstSeen",
+          "ObservedUtc": "2026-10-19T19:14:15.3374838+00:00",
+          "ProcessId": 36056,
+          "ExecutablePath": "outputs/tracktrim native acceptance Кириллица e16050e/fresh app 20261019/tracktrim-win-x64/tools/mkvmerge.exe",
+          "StartUtc": "2026-10-19T19:14:15.2465606Z",
+          "ParentProcessId": 15992,
+          "HasExited": false,
+          "CommandLine": "\"outputs/tracktrim native acceptance Кириллица e16050e/fresh app 20261019/tracktrim-win-x64/tools/mkvmerge.exe\" --output-charset UTF-8 -J \"outputs/TrackTrim native acceptance Кириллица e16050e/results Кириллица/w13-keyboard-99bbc614/.tracktrim-ab2c9bb8d49a40a7b615a080b40b2e4f/candidate.mkv\"",
+          "WorkerKey": "36056:639280340552465606",
+          "InvocationKind": "IdentificationOrVersionProbe"
+        },
+        {
+          "ExitUtc": "2026-10-19T19:14:17.3540523Z",
+          "Event": "WorkerExited",
+          "WorkerKey": "36056:639280340552465606",
+          "InvocationKind": "IdentificationOrVersionProbe",
+          "ObservedUtc": "2026-10-19T19:14:17.4790577+00:00",
+          "ExitCode": 0,
+          "ProcessId": 36056
+        }
+      ],
+      "nativeUiaProjections": [
+        {
+          "caseId": "W13 keyboard retry: review confirmed Keep0-2-3",
+          "observedUtc": "2026-10-19T18:50:53.999Z",
+          "method": "native Sky UIA/keyboard",
+          "focused": "14 button Проверить план ID: ReviewButton",
+          "treeLineNumbers": [
+            15,
+            17,
+            24
+          ],
+          "treeExcerpt": [
+            "\t\t13 text План готов к выполнению. ID: StatusText",
+            "\t\t15 button Создать новый MKV",
+            "\t\t\t22 edit (settable, string) Файл результата Description: Выберите отдельную папку для результата. Value: outputs/TrackTrim native acceptance Кириллица e16050e/results Кириллица/w13-keyboard-99bbc614/W13 отмена клавиатурой.mkv ID: OutputTextBox"
+          ],
+          "screenshot": "blocked by capture timeout"
+        },
+        {
+          "caseId": "W13 keyboard retry ready: focus Create",
+          "observedUtc": "2026-10-19T18:51:01.044Z",
+          "method": "native Sky UIA/keyboard",
+          "focused": "15 button Создать новый MKV",
+          "treeLineNumbers": [
+            15,
+            17,
+            24
+          ],
+          "treeExcerpt": [
+            "\t\t13 text План готов к выполнению. ID: StatusText",
+            "\t\t15 button Создать новый MKV",
+            "\t\t\t22 edit (settable, string) Файл результата Description: Выберите отдельную папку для результата. Value: outputs/TrackTrim native acceptance Кириллица e16050e/results Кириллица/w13-keyboard-99bbc614/W13 отмена клавиатурой.mkv ID: OutputTextBox"
+          ],
+          "screenshot": "blocked by capture timeout"
+        },
+        {
+          "caseId": "W13 keyboard operator result: initial native status",
+          "observedUtc": "2026-10-19T19:16:08.832Z",
+          "method": "native Sky UIA/keyboard",
+          "treeLineNumbers": [
+            15,
+            17,
+            24
+          ],
+          "treeExcerpt": [
+            "\t\t13 text Операция отменена. Оригинал сохранён. ID: StatusText",
+            "\t\t15 button (disabled) Создать новый MKV",
+            "\t\t\t22 edit (settable, string) Файл результата Description: Выберите отдельную папку для результата. Value: outputs/TrackTrim native acceptance Кириллица e16050e/results Кириллица/w13-keyboard-99bbc614/W13 отмена клавиатурой.mkv ID: OutputTextBox"
+          ],
+          "screenshot": "blocked by capture timeout"
+        },
+        {
+          "caseId": "W13 keyboard completed: native responsiveness check",
+          "observedUtc": "2026-10-19T19:18:06.751Z",
+          "method": "native Sky UIA/keyboard",
+          "focused": "20 button Открыть MKV… ID: OpenButton",
+          "treeLineNumbers": [
+            15,
+            17,
+            24
+          ],
+          "treeExcerpt": [
+            "\t\t13 text Операция отменена. Оригинал сохранён. ID: StatusText",
+            "\t\t15 button (disabled) Создать новый MKV",
+            "\t\t\t22 edit (settable, string) Файл результата Description: Выберите отдельную папку для результата. Value: outputs/TrackTrim native acceptance Кириллица e16050e/results Кириллица/w13-keyboard-99bbc614/W13 отмена клавиатурой.mkv ID: OutputTextBox"
+          ],
+          "screenshot": "blocked by capture timeout"
+        }
+      ]
     }
   ],
   "limits": [
-    "One short-lived child PID 10020 could not be retained; its original DiscoveryRaceOrReadFailure event is included. The extract does not establish a complete verification-child trace.",
-    "No independently measured physical/keyboard input timestamp exists for this attempt, so sampled worker liveness cannot be tied to the actual Cancel action.",
+    "Short-lived children PIDs 10020, 31708 and 2576 could not be retained; their original DiscoveryRaceOrReadFailure events are included. This does not establish a complete verification-child trace.",
+    "Neither attempt has an independently measured Cancel input timestamp; sampled liveness cannot be tied to the actual Cancel action. Both remux processes exited 0, so active-remux cancellation remains unverified.",
+    "The second operator reported reaching Source on the second Shift+Tab and Cancel on the third, with uncertainty. Intermediate focus was not independently captured; neither a two- nor three-press universal route is established.",
     "No native screenshot, visual/scaling or clean-target-desktop acceptance is established.",
-    "The observer is not asserted stopped; the prepared keyboard retry has no result in this prefix checkpoint.",
-    "AppDataFiles lists files only; the receipt does not measure deletion timestamps or list empty directories."
+    "Filesystem receipts are point-in-time observations. AppDataFiles lists files only; no deletion timestamps or complete list of empty work-root directories is supplied."
   ],
-  "observerStatusAtCheckpoint": {
-    "sourceEvent": "ObserverStarted in the retained prefix",
-    "ObservedUtc": "2026-10-19T18:47:06.7684662+00:00",
-    "MaximumSeconds": 1800,
-    "status": "Armed at this checkpoint with the recorded 1800-second limit; no ObserverStopped event is present in the hashed prefix. Prepared retry and any later events are outside this extract.",
-    "scope": "This is not a stopped-observer receipt and does not claim continuing liveness beyond the checkpoint."
-  },
   "samplingLimits": {
     "configuredLivenessMilliseconds": 100,
-    "actualRemuxWorkerAliveRecordsInPrefix": 33,
-    "firstRemuxWorkerAliveObservedUtc": "2026-10-19T18:48:10.7457414+00:00",
-    "lastRemuxWorkerAliveObservedUtc": "2026-10-19T18:48:18.1456376+00:00",
-    "scope": "100 ms is configuration, not a guaranteed sampling cadence. Actual recorded timestamps govern; process discovery and other work introduce gaps. Intermediate pulses are omitted from the extract but covered by the prefix hash."
+    "actualRemuxWorkerAliveRecordsInCompletedFile": 66,
+    "attempts": [
+      {
+        "attempt": "human-01",
+        "remuxProcessId": 30236,
+        "actualRemuxWorkerAliveRecords": 33,
+        "firstRemuxWorkerAliveObservedUtc": "2026-10-19T18:48:10.7457414+00:00",
+        "lastRemuxWorkerAliveObservedUtc": "2026-10-19T18:48:18.1456376+00:00"
+      },
+      {
+        "attempt": "keyboard-02",
+        "remuxProcessId": 27852,
+        "actualRemuxWorkerAliveRecords": 33,
+        "firstRemuxWorkerAliveObservedUtc": "2026-10-19T19:14:08.4051631+00:00",
+        "lastRemuxWorkerAliveObservedUtc": "2026-10-19T19:14:14.8140271+00:00"
+      }
+    ],
+    "scope": "100 ms is configuration, not a guaranteed sampling cadence. Actual recorded timestamps govern; discovery and other work introduce gaps. Intermediate pulses are omitted but covered by the completed-file hash."
+  },
+  "observerCompletion": {
+    "event": {
+      "Event": "ObserverStopped",
+      "KnownWorkerCount": 7,
+      "GuiHasExited": false,
+      "Reason": "OwnerStopMarker",
+      "ObservedUtc": "2026-10-19T19:16:51.5806007+00:00"
+    },
+    "sessionExitCodeReportedInSecondReceipt": 0,
+    "scope": "OwnerStopMarker shutdown is present in the completed observer file; session exit 0 is recorded in the second receipt. The GUI remained open. No operator input timestamp is supplied."
   }
 }
