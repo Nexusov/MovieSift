@@ -59,6 +59,10 @@ jobs:
         run: dotnet format --verify-no-changes --no-restore
       - name: Build
         run: dotnet build --configuration Release --no-restore
+      - name: Distribution evidence regression checks
+        run: |
+          python -m unittest discover -s build/tests -v
+          if ($LASTEXITCODE -ne 0) { throw 'Distribution evidence regression checks failed.' }
       - name: Unit, headless UI and required real-backend tests
         run: dotnet test --configuration Release --no-build --no-restore --logger trx --results-directory ./TestResults
       - name: Build self-contained archive and run packaged workflow
@@ -76,6 +80,7 @@ jobs:
           name: test-evidence-${{ matrix.runtime }}
           path: |
             TestResults/
+            artifacts/distribution-reports/
             artifacts/**/native-dependencies.txt
             artifacts/**/build-provenance.json
             artifacts/**/tool-provenance.json

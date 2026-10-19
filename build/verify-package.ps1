@@ -144,7 +144,7 @@ if ($PSCmdlet.ParameterSetName -eq 'Archive') {
         }
     }
 
-    $unexpectedFiles = @(Get-ChildItem -LiteralPath $PackageDirectory -File -Recurse | Where-Object {
+    $unexpectedFiles = @(Get-ChildItem -LiteralPath $PackageDirectory -File -Recurse -Force | Where-Object {
         $relativePath = [IO.Path]::GetRelativePath($PackageDirectory, $_.FullName).Replace('\', '/')
         $relativePath -ne 'SHA256SUMS' -and -not $manifestPaths.Contains($relativePath)
     })

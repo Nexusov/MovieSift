@@ -73,7 +73,7 @@ try {
 
     Copy-Item -LiteralPath (Join-Path $repositoryRoot 'docs') -Destination $packageRoot -Recurse
     Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'tools.lock.json') -Destination (Join-Path $packageRoot 'tool-provenance.json')
-    & (Join-Path $PSScriptRoot 'collect-licenses.ps1') -AssetsFile (Join-Path $repositoryRoot 'src/TrackTrim.Desktop/obj/project.assets.json') -Destination (Join-Path $licenseRoot 'nuget') -AdditionalPackages @("Microsoft.NETCore.App.Runtime.$RuntimeIdentifier/$runtimeVersion")
+    & (Join-Path $PSScriptRoot 'collect-licenses.ps1') -AssetsFile (Join-Path $repositoryRoot 'src/TrackTrim.Desktop/obj/project.assets.json') -Destination (Join-Path $licenseRoot 'nuget') -AdditionalPackages @("Microsoft.NETCore.App.Runtime.$RuntimeIdentifier/$runtimeVersion") -CacheDirectory (Join-Path $ToolCacheDirectory 'license-materials')
     Set-Content -LiteralPath (Join-Path $licenseRoot 'APPLICATION-LICENSE-PENDING.txt') -Encoding utf8NoBOM -Value 'No license for original TrackTrim code has been selected. These are review/test artifacts, not public release artifacts. Consult THIRD_PARTY_NOTICES.md for outstanding corresponding-source and redistribution work.'
     $runtimeConfiguration = Get-Content -LiteralPath (Join-Path $packageRoot 'TrackTrim.runtimeconfig.json') -Raw | ConvertFrom-Json
     $shippedRuntime = $runtimeConfiguration.runtimeOptions.includedFrameworks | Where-Object name -EQ 'Microsoft.NETCore.App'
@@ -88,11 +88,39 @@ try {
         throw 'Could not record the SDK version.'
     }
 
+    $sourceRevision = & git rev-parse HEAD
+
+    if ($LASTEXITCODE -ne 0) {
+        throw 'Could not record the source revision.'
+    }
+
+    $sourceTree = & git rev-parse 'HEAD^{tree}'
+
+    if ($LASTEXITCODE -ne 0) {
+        throw 'Could not record the source tree.'
+    }
+
+    $sourceParents = & git show --no-patch --format=%P HEAD
+
+    if ($LASTEXITCODE -ne 0) {
+        throw 'Could not record the source parents.'
+    }
+
+    $sourceChanges = @(& git status --porcelain --untracked-files=normal)
+
+    if ($LASTEXITCODE -ne 0) {
+        throw 'Could not record the worktree state.'
+    }
+
     $provenance = [ordered]@{
         schemaVersion = 1
         runtimeIdentifier = $RuntimeIdentifier
         sdkVersion = $sdkVersion.Trim()
         runtimeVersion = $shippedRuntime.version
+        sourceRevision = $sourceRevision.Trim()
+        sourceTree = $sourceTree.Trim()
+        sourceParents = @($sourceParents.Trim().Split(' ', [StringSplitOptions]::RemoveEmptyEntries))
+        worktreeDirty = $sourceChanges.Count -gt 0
         configuration = 'Release; self-contained; untrimmed; non-single-file; no AOT'
         operatingSystem = [Runtime.InteropServices.RuntimeInformation]::OSDescription
         artifactPurpose = 'review and acceptance testing; public-release obligations remain'
@@ -119,7 +147,7 @@ try {
     Remove-Item -LiteralPath $generatedDataDirectory -Recurse
     New-Item -ItemType Directory -Path $generatedDataDirectory | Out-Null
 
-    $manifest = Get-ChildItem -LiteralPath $packageRoot -File -Recurse | Sort-Object FullName | ForEach-Object {
+    $manifest = Get-ChildItem -LiteralPath $packageRoot -File -Recurse -Force | Sort-Object FullName | ForEach-Object {
         $relativePath = [IO.Path]::GetRelativePath($packageRoot, $_.FullName).Replace('\', '/')
         $hash = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
         "$hash  $relativePath"
@@ -144,6 +172,12 @@ try {
 
     $archiveHash = (Get-FileHash -LiteralPath $archivePath -Algorithm SHA256).Hash.ToLowerInvariant()
     "$archiveHash  $([IO.Path]::GetFileName($archivePath))" | Set-Content -LiteralPath ($archivePath + '.sha256') -Encoding utf8NoBOM
+    & python (Join-Path $PSScriptRoot 'distribution-inventory.py') --package-root $packageRoot --archive $archivePath --assets (Join-Path $repositoryRoot 'src/TrackTrim.Desktop/obj/project.assets.json') --output (Join-Path $OutputDirectory "distribution-reports/$RuntimeIdentifier")
+
+    if ($LASTEXITCODE -ne 0) {
+        throw 'Distribution inventory failed; the archive is not accepted.'
+    }
+
     Write-Output "Package: $archivePath"
     Write-Output "Unpacked test directory: $packageRoot"
 }

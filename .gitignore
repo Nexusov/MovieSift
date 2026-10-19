@@ -7,3 +7,4 @@ artifacts/
 tools/
 data/
 *.user
+__pycache__/
