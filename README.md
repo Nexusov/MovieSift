@@ -1,12 +1,12 @@
 # TrackTrim
 
-TrackTrim is a portable Windows/Linux desktop application for removing selected embedded audio and subtitle tracks from one local MKV without re-encoding. It writes a separate MKV; the original remains on disk. Removing tracks from a second file does not free the original's space.
+TrackTrim is a portable Windows/Linux desktop application for removing selected embedded audio and subtitle tracks from local MKV files without re-encoding. It writes separate MKVs; originals remain on disk. Creating a trimmed copy does not free the original's space.
 
-This branch implements the Phase 0 foundation and Phase 1 workflow. It is a review build, not a public release. [Acceptance status and executed checks](docs/PLAN.md) distinguish implemented code from verified behavior and outstanding platform requirements. CI builds and tests archives but uploads only test/provenance evidence while binary redistribution obligations remain unresolved.
+This branch adds Phase 2A manual batch processing to the Phase 0/1 foundation. It is a review build, not a public release. [Acceptance status and executed checks](docs/PLAN.md) distinguish implemented code from verified behavior and outstanding platform requirements. CI builds and tests archives but uploads only test/provenance evidence while binary redistribution obligations remain unresolved.
 
 The application uses C#/.NET 10, Avalonia 12 with Fluent controls, CommunityToolkit.Mvvm, and pinned MKVToolNix executables. English is the initial language, including on a Russian OS. The English / Русский selector changes application text without discarding the current selection; the choice is saved beside the application.
 
-## Current workflow
+## Single-file workflow
 
 1. Open one MKV with the native file picker and inspect its real tracks.
 2. Leave **Keep** checked for each audio/subtitle track to retain. Every video track and supported attachment is retained.
@@ -14,11 +14,21 @@ The application uses C#/.NET 10, Avalonia 12 with Fluent controls, CommunityTool
 4. Run the remux, observe measured backend progress, or cancel. A no-change plan does not remux.
 5. The application verifies the candidate before publishing through a no-overwrite move. Warnings require a separate publish/discard decision after successful verification. Closing during warning review offers **remain in review** or **discard and close**; the latter waits for cleanup.
 
-Do not use the application as a universal preservation tool. The [supported MKV matrix](docs/SUPPORTED_FORMATS.md) defines the inspected, verified, and rejected cases. MP4, batch input, folders, presets, playback, source replacement, and recovery/resume of a batch queue are outside this implementation.
+## Manual batch workflow
+
+1. In **Batch**, add several MKV files or one folder. Only immediate `.mkv` entries are discovered; subfolders and redirected paths are not traversed. A session holds at most **100** entries, including failed entries. A folder scan examines at most **10,000** entries. Exceeding either limit rejects the addition visibly instead of accepting a truncated subset.
+2. Choose an output folder. Each file is inspected independently. Select a row, adjust its own Keep choices, confirm zero audio for that file when needed, and approve its plan. Switch rows freely; selections and approvals stay with their source. Remove unwanted unstarted rows or explicitly exclude them. Failed inspections have no invented tracks.
+3. Review the remaining included plans, sources, outputs and retained/removed tracks. Every included item needs approval; unresolved items must be corrected or visibly excluded. Names use `<source>.trimmed.mkv`; existing files, source aliases and duplicate batch destinations are errors. Correct the destination explicitly; there is no automatic renaming or overwrite.
+4. Start the reviewed batch. One job runs at a time through the same verification/publication lifecycle as a single file. No-change items remain visible and do not remux. Editing a selection or destination invalidates its approval; changing the shared output folder invalidates every affected approval. Language changes preserve plan semantics.
+5. **Pause after current file** lets that job finish. **Cancel batch** cancels the active job and prevents the next one starting. Warnings, failures, cancellation or cleanup problems stop the queue. Resolve the warning or correct/exclude an unsuccessful item, then explicitly review and start the remaining work. Previously published outputs stay intact; uncertain worker termination or unresolved cleanup blocks further work.
+
+The queue exists only in memory. Closing uses the same owned-job shutdown and warning remain/discard policy; restart does not restore or resume the queue. Ownership journals retain their existing conservative interruption handling.
+
+Do not use the application as a universal preservation tool. The [supported MKV matrix](docs/SUPPORTED_FORMATS.md) defines the inspected, verified, and rejected cases. Automatic cross-file rules, presets, recursive discovery, persisted queues/retries, MP4, playback and source replacement remain outside this implementation.
 
 Preflight supplements MKVToolNix identification with bounded, read-only Segment Info inspection. Detected segment families and previous/next links are rejected before processing; layouts that cannot be inspected within those bounds fail explicitly. This check uses no additional media executable.
 
-These are headless renders of the compiled Fluent view after real MKV inspection, in English and Russian. The [native record and matrix](docs/verification/native-desktop-acceptance.md) separately document actual Windows 10 GUI workflows for ordinary VP8/PCM and direct FFmpeg-origin H264/AAC/SRT inputs, with retained payload comparisons, unchanged source hashes and cleanup. Computer Use operated the application through UI Automation and keyboard input; the owner completed native file and output-folder selection. EN/RU plans, preference persistence, picker cancellation, collision protection, no-change/zero-audio behavior and one close during an observed active remux also have functional evidence. Both owner-operated Cancel attempts reached Cancelled and cleanup, but active-remux Cancel input timing remains unverified. Native screenshots, visual/scaling checks and the intended target desktops remain open.
+The images below are historical headless renders of the Phase 1 inspector. The [native record and matrix](docs/verification/native-desktop-acceptance.md) belong to its recorded `e16050e` binary on Windows 10, including ordinary and H264/AAC/SRT functional workflows. They are not acceptance of the new batch UI. Batch headless/real-media results are recorded in [PLAN](docs/PLAN.md); native batch interaction, screenshots, visual/scaling checks and the intended target desktops remain unverified. The existing W13 active-remux input-correlation gap and W14 single-close limits are unchanged.
 
 ![English TrackTrim inspector with real video, two audio tracks, and subtitles](docs/images/tracktrim-en.png)
 

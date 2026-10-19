@@ -41,7 +41,7 @@ public sealed partial class MainWindow : Window
             return;
         }
 
-        var needsWarningReview = !shutdownCompleted && DataContext is MainViewModel { HasWarningCandidate: true, IsBusy: false };
+        var needsWarningReview = !shutdownCompleted && DataContext is MainViewModel { HasWarningCandidate: true, HasActiveOperation: false };
 
         if (needsWarningReview)
         {
@@ -60,7 +60,7 @@ public sealed partial class MainWindow : Window
             return;
         }
 
-        var requiresShutdown = !shutdownCompleted && DataContext is MainViewModel { IsBusy: true };
+        var requiresShutdown = !shutdownCompleted && DataContext is MainViewModel { HasActiveOperation: true };
 
         if (!requiresShutdown)
         {

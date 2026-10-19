@@ -87,6 +87,12 @@ internal sealed class FakeDialogs(string sourcePath) : IFileDialogs
     /// <summary>Returns the test's selected local source without opening native UI.</summary>
     public Task<string?> SelectSourceAsync() => Task.FromResult<string?>(sourcePath);
 
+    /// <summary>Returns selected paths for controlled batch presentation tests.</summary>
+    public Task<IReadOnlyList<string>> SelectSourcesAsync() => Task.FromResult<IReadOnlyList<string>>([sourcePath]);
+
+    /// <summary>Returns a folder without claiming native dialog acceptance.</summary>
+    public Task<string?> SelectInputFolderAsync() => Task.FromResult<string?>(Path.GetTempPath());
+
     /// <summary>Returns a writable test destination folder.</summary>
     public Task<string?> SelectOutputFolderAsync() => Task.FromResult<string?>(Path.GetTempPath());
 }

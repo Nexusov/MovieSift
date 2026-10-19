@@ -1,8 +1,37 @@
-# Phase 0 and Phase 1 acceptance
+# Phase 0/1 foundation and Phase 2A acceptance
 
-Scope stops before Phase 2. Implemented code, an executed test, and acceptance on a clean desktop are different evidence. The review corrections passed final locked restore, format verification, Release build and complete platform CI: **Windows 222 passed + 5 Linux-only skips; Linux 227/227 passed**. Both archives, relocated workflows and the no-SDK Linux container passed. Native target-desktop and licensing acceptance remain open.
+Phase 2A is explicitly authorized on a dependent review branch. Scope stops after manual independent file plans and sequential in-memory batch processing. Implemented code, an executed test, and acceptance on a clean desktop are different evidence. Historical Phase 0/1 evidence below belongs to its recorded revisions; native target-desktop and licensing acceptance remain open.
 
-## Current review corrections
+## Phase 2A — bounded manual batch
+
+The comparison base is foundation `19cb79ab0542addaec264e11c14f829526bc2066` (`review/phase-0-1`, draft PR #1), fetched and inspected with a clean worktree before creating isolated branch `review/phase-2a-batch`. No foundation advance was present. Main, its ruleset, dependency/tool pins and the existing two required CI contexts are unchanged.
+
+| Capability | Implemented behavior | Verification |
+| --- | --- | --- |
+| Discovery | Explicit multi-file picker or one top-level folder; asynchronous/cancellable; canonical path/file-identity deduplication; ordinal ordering; 100 session entries / 10,000 examined entries; overflow rejects the entire addition; visible per-entry failures | Focused real-filesystem tests; final platform results recorded below. |
+| Independent inspection/planning | Every stable row owns its revision, actual file-local IDs, Keep choices, destination, zero-audio consent, immutable approval and result; all video retained; row/language switches preserve plans | Controlled Application and headless UI tests; real batch uses different input order/IDs. |
+| Batch review | All included remaining plans must be approved; failures require explicit correction/exclusion; source/destination changes, existing and intra-batch collisions are checked; shared-folder edits invalidate all affected approvals | Controlled late source/collision tests and headless editing tests. Per-job checks still run immediately before work/publication. |
+| Queue | One shared single-job owner; no parallel jobs; no-change remains visible without remux; failure/warning/cancellation/cleanup issues pause; review/start explicitly resumes remaining work | Deterministic lifecycle tests cover boundaries and published-output preservation. Warning scenarios are simulated. |
+| Window ownership | Single and Batch tabs share the same job gate; close awaits active work or an explicit warning discard; warning actions use the candidate owner; repeated actions do not duplicate disposal | Headless controlled lifecycle tests. No new native batch acceptance is claimed. |
+| Actual media | Two independently planned MKVs with permuted track IDs/order retain different audio/subtitle selections; pinned backend verification plus extracted retained payloads, original hashes and cleanup are checked | Required real-media integration runs locally and in the existing Windows/Linux jobs. |
+
+The queue is not persisted. Automatic cross-file language rules, presets, recursion, automatic retries, parallel remuxing, MP4 and the rest of Phase 2/3 are not implemented. Existing journals retain conservative interruption behavior. Phase 1 native W04/W07, W13 and W14 observations remain associated with the old `e16050e` artifact/platform, not this binary. W13 active-remux input correlation, W11/W12 visual/scaling checks, clean Windows 11/Ubuntu Desktop, real warning-remux fixture and release/source/license obligations stay open. The unchanged capture blocker was not retried.
+
+### Phase 2A executed checks
+
+Local verification on Windows 10 Home Single Language 22H2 x64 (build 19045) used SDK **10.0.402**, runtime **10.0.13**, pinned MKVToolNix **102.0**, `TRACKTRIM_REQUIRE_MEDIA_TOOLS=1`, and the existing explicit tool/fixture directories. Locked restore, full formatting verification and Release build passed with **0 warnings / 0 errors**. Complete C# results: Core **8**, Application **104 + 4 Linux-only skips**, Infrastructure **126 + 3 Linux-only skips**, Desktop **50** — **288 passed, 7 skipped, 295 total**. The 16 distribution-evidence Python regressions also passed. These are controlled/filesystem, real-media and headless checks, not native desktop execution.
+
+The new tests include **35 controlled Application batch cases**, **18 headless UI cases**, bounded real-filesystem discovery and one actual-media batch case. Deterministic signals establish sequential probes/jobs, cancellation/close cleanup, warning ownership and explicit resume, late progress rejection, per-file zero-audio consent, source/destination rechecks and preservation of a first publication after a later failure/cancellation. Linux-only FIFO/symlink cases remain skips on Windows and must run in Linux CI.
+
+The actual-media case uses the original synthetic fixture (`ordinary.mkv`, local SHA256 `055c7f3ebdc3c579dd6d7740c78a1e8ee0e2525f23542b5c6af9a0869ce4a0f8`) plus a pinned-tool permutation `[subtitle, second audio, video, first audio]`. It publishes two independently selected outputs, compares all **five** retained VP8/PCM/SRT payloads, verifies both source container hashes, and checks empty candidate/ownership/scratch storage. Its TRX output contains compact per-file identities, retained ID mappings, before/after source hashes and output hashes without private directory paths. The permutation disables statistics-tag generation consistently with the original generator; existing strict statistics-property rejection is documented in `SUPPORTED_FORMATS.md`.
+
+The separate draft PR targets the unchanged foundation branch. Platform CI/package results and checkout identities are recorded at the delivery checkpoint below. Package file counts are observations from each build, not acceptance constants. The local portable artifact is rebuilt from a clean committed revision before relocation verification.
+
+## Historical Phase 0/1 acceptance
+
+The Phase 0/1 corrections passed locked restore, format verification, Release build and complete platform CI: **Windows 222 passed + 5 Linux-only skips; Linux 227/227 passed**. Both archives, relocated workflows and the no-SDK Linux container passed at the recorded revisions below.
+
+## Phase 0/1 review corrections
 
 | Finding | Implemented behavior | Current evidence |
 | --- | --- | --- |
@@ -100,4 +129,4 @@ Restart cleanup is deliberately conservative: if a recovered candidate still exi
 
 Malformed or insufficient ownership JSON remains visible for manual review and never authorizes cleanup. Its original record, marker and candidate are retained. Headless warning-close and invalid-record regressions do not replace a real desktop shutdown test.
 
-Public release readiness is blocked by the unresolved licensing/source-distribution review and any unmet platform/safety acceptance above. The next bounded task after this implementation is to close the recorded Phase 0/1 acceptance gaps, not to begin batch processing or MP4.
+Public release readiness is blocked by the unresolved licensing/source-distribution review and any unmet platform/safety acceptance above. After Phase 2A verification, the next bounded task is native acceptance of the new manual batch workflow on an available desktop; automatic matching and MP4 require separate authorization.

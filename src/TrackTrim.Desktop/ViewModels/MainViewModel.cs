@@ -1,6 +1,5 @@
 using System.Collections.Immutable;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TrackTrim.Application;
@@ -68,13 +67,20 @@ public sealed partial class MainViewModel : ObservableObject
         RunCommand = new AsyncRelayCommand(RunAsync, () => CanRun);
         CancelCommand = new RelayCommand(Cancel, () => IsBusy);
         ChangeLanguageCommand = new AsyncRelayCommand<string>(ChangeLanguageAsync);
-        PublishWarningsCommand = new AsyncRelayCommand(PublishWarningsAsync, () => HasWarningCandidate && !IsBusy);
-        DiscardWarningsCommand = new AsyncRelayCommand(DiscardWarningsAsync, () => HasWarningCandidate && !IsBusy);
-        RemainInWarningReviewCommand = new RelayCommand(RemainInWarningReview, () => HasWarningCloseDecision && !IsBusy);
+        PublishWarningsCommand = new AsyncRelayCommand(PublishWarningsAsync, () => HasSingleWarningCandidate && !IsBusy);
+        DiscardWarningsCommand = new AsyncRelayCommand(DiscardWarningsAsync, () => HasSingleWarningCandidate && !IsBusy);
+        RemainInWarningReviewCommand = new RelayCommand(RemainInWarningReview, () => CanRespondToWarningClose);
         CleanInterruptedCommand = new AsyncRelayCommand(CleanInterruptedAsync, () => HasCleanableInterrupted && CanEdit);
+
+        if (Batch is not null)
+        {
+            Batch.PropertyChanged += (_, _) => NotifyPresentation();
+        }
     }
 
     public LocalizationService Localization => services.Localization;
+    public BatchViewModel? Batch => services.Batch;
+    public bool HasBatch => Batch is not null;
     public ObservableCollection<TrackViewModel> Tracks { get; } = [];
     public IAsyncRelayCommand OpenSourceCommand { get; }
     public IAsyncRelayCommand ChooseOutputCommand { get; }
@@ -86,15 +92,20 @@ public sealed partial class MainViewModel : ObservableObject
     public IAsyncRelayCommand DiscardWarningsCommand { get; }
     public IRelayCommand RemainInWarningReviewCommand { get; }
     public IAsyncRelayCommand CleanInterruptedCommand { get; }
-    public bool HasBlockingOperation => IsBusy || HasWarningCandidate || RequiresCloseDecision;
+    public bool HasActiveOperation => IsBusy || Batch?.IsBusy == true;
+    public bool HasBlockingOperation => IsBusy || HasWarningCandidate || RequiresCloseDecision || Batch?.HasBlockingOperation == true;
     public bool CanEdit => !HasBlockingOperation;
     public bool CanRun => approvedPlan is not null && CanEdit && !PersistenceFailed;
-    public bool RequiresCloseDecision => failure?.Code == ErrorCode.ProcessTerminationFailed;
+    public bool RequiresCloseDecision => failure?.Code == ErrorCode.ProcessTerminationFailed || Batch?.HasSafetyBlock == true;
+    public string CloseDecisionText => Batch is { HasSafetyBlock: true, RequiresTerminationDecision: false }
+        ? Localization["BatchCleanupCloseNotice"] : Localization["CloseUnconfirmedNotice"];
     public bool HasPlan => approvedPlan is not null;
     public bool HasTracks => Tracks.Count != 0;
-    public bool HasWarningCandidate => result?.Phase == JobPhase.AwaitingWarningReview;
-    public bool HasWarningCloseDecision => WarningCloseRequested && HasWarningCandidate;
-    public bool CanRespondToWarningClose => HasWarningCloseDecision && !IsBusy;
+    public bool HasSingleWarningCandidate => result?.Phase == JobPhase.AwaitingWarningReview;
+    public bool HasWarningCandidate => HasSingleWarningCandidate || Batch?.HasWarningCandidate == true;
+    public string WarningCloseSource => Batch?.HasWarningCandidate == true ? Batch.CurrentItemText : SourcePath;
+    public bool HasWarningCloseDecision => WarningCloseRequested && result?.Phase == JobPhase.AwaitingWarningReview || Batch?.HasWarningCloseDecision == true;
+    public bool CanRespondToWarningClose => HasWarningCloseDecision && !HasActiveOperation;
     public bool HasInterrupted => !interrupted.IsDefaultOrEmpty;
     public bool HasCleanableInterrupted => interrupted.Any(entry => entry.CanClean && entry.Output is not null);
     public string InterruptedDetails => DescribeInterrupted();
@@ -102,7 +113,7 @@ public sealed partial class MainViewModel : ObservableObject
     public bool HasDiagnostics => !string.IsNullOrWhiteSpace(Diagnostics);
     public string Diagnostics => DescribeDiagnostics();
     public bool HasErrorDetail => !string.IsNullOrWhiteSpace(ErrorDetail);
-    public bool HasCleanupIssue => !string.IsNullOrWhiteSpace(CleanupDetails);
+    public bool HasCleanupIssue => !string.IsNullOrWhiteSpace(CleanupDetails) || Batch?.HasCleanupIssue == true;
     public bool HasSizeDifference => result?.OutputLength is not null && inspection is not null && result.PublishedPath is not null;
     public bool RemovesDefaultAudio => approvedPlan?.RemovesDefaultAudio == true;
     public bool NeedsZeroAudioConfirmation => inspection?.Tracks.Any(track => track.Kind == TrackKind.Audio) == true &&
@@ -159,6 +170,7 @@ public sealed partial class MainViewModel : ObservableObject
     {
         statusKey = "CloseDuringWork";
         NotifyPresentation();
+        var batchShutdown = Batch?.ShutdownAsync() ?? Task.CompletedTask;
 
         if (activeCancellation is not null)
         {
@@ -166,11 +178,18 @@ public sealed partial class MainViewModel : ObservableObject
         }
 
         await activeOperation;
+        await batchShutdown;
     }
 
     /// <summary>Requests an explicit decision without discarding or publishing a warning candidate.</summary>
     public void RequestWarningCloseReview()
     {
+        if (Batch?.HasWarningCandidate == true)
+        {
+            Batch.RequestWarningCloseReview();
+            return;
+        }
+
         if (!HasWarningCandidate)
         {
             return;
@@ -183,6 +202,11 @@ public sealed partial class MainViewModel : ObservableObject
     /// <summary>Allows closing only after the existing warning candidate was discarded with complete cleanup.</summary>
     public async Task<bool> DiscardWarningsForCloseAsync()
     {
+        if (Batch?.HasWarningCandidate == true)
+        {
+            return await Batch.DiscardWarningsForCloseAsync();
+        }
+
         var canDiscard = HasWarningCandidate && !IsBusy;
 
         if (!canDiscard)
@@ -382,6 +406,7 @@ public sealed partial class MainViewModel : ObservableObject
     /// <summary>Returns to the same warning review without restarting or disposing the candidate.</summary>
     private void RemainInWarningReview()
     {
+        Batch?.RemainInWarningReview();
         WarningCloseRequested = false;
         NotifyPresentation();
     }
@@ -515,44 +540,13 @@ public sealed partial class MainViewModel : ObservableObject
     /// <summary>Lists exact retained and removed file-local identities from the immutable review.</summary>
     private string DescribePlanTracks()
     {
-        if (approvedPlan is null)
-        {
-            return string.Empty;
-        }
-
-        var retainedIdentifiers = approvedPlan.RetainedTracks.Select(track => track.Id).ToHashSet();
-        return string.Join(Environment.NewLine, approvedPlan.Inspection.Tracks.Select(track =>
-        {
-            var action = retainedIdentifiers.Contains(track.Id) ? Localization["Keep"] : Localization["Remove"];
-            var title = string.IsNullOrWhiteSpace(track.Title) ? Localization["Untitled"] : track.Title;
-            return $"{action}: {Localization[track.Kind.ToString()]} {track.Id} — {title} ({track.Codec}, {track.LanguageIetf ?? track.Language})";
-        }));
+        return PlanPresentation.DescribeTracks(approvedPlan, Localization);
     }
 
     /// <summary>Reports the resulting default-audio flags from the approved immutable selection.</summary>
     private string DescribePlanDefaultAudio()
     {
-        var plan = approvedPlan;
-
-        if (plan is null)
-        {
-            return string.Empty;
-        }
-
-        if (!plan.RetainedTracks.Any(track => track.Kind == TrackKind.Audio))
-        {
-            return Localization["PlanNoAudio"];
-        }
-
-        if (!plan.HasDefaultAudio)
-        {
-            return Localization["PlanNoDefaultAudio"];
-        }
-
-        var defaultIdentifiers = plan.RetainedTracks
-            .Where(track => track.Kind == TrackKind.Audio && track.IsDefault)
-            .Select(track => track.Id.ToString(CultureInfo.InvariantCulture));
-        return Localization.Format(new("PlanDefaultAudioRetained", [string.Join(", ", defaultIdentifiers)]));
+        return PlanPresentation.DescribeDefaultAudio(approvedPlan, Localization);
     }
 
     /// <summary>Shows reviewable paths without treating old journal stages as publication evidence.</summary>
@@ -627,6 +621,8 @@ public sealed partial class MainViewModel : ObservableObject
     /// <summary>Refreshes language-sensitive values and all command predicates.</summary>
     private void NotifyPresentation()
     {
+        var blocksOtherWorkflow = IsBusy || result?.Phase == JobPhase.AwaitingWarningReview || failure?.Code == ErrorCode.ProcessTerminationFailed || !string.IsNullOrWhiteSpace(CleanupDetails);
+        Batch?.SetWorkspaceAccess(new(blocksOtherWorkflow, PersistenceFailed));
         OnPropertyChanged(string.Empty);
         OpenSourceCommand?.NotifyCanExecuteChanged();
         ChooseOutputCommand?.NotifyCanExecuteChanged();
