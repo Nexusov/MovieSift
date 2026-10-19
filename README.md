@@ -72,4 +72,4 @@ Settings, bounded logs, and temporary-output ownership records are stored in `da
 
 ## Licensing
 
-The original application license has not been selected. Bundled components retain their own licenses; [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES.md) records provenance and unresolved corresponding-source obligations. Calling an archive a review build does not exempt its redistribution from those obligations. CI does not upload binary archives, and no installer or release is published by this implementation.
+The original application license has not been selected. [The decision note](docs/license-decision.md) compares MIT, Apache-2.0 and GPL-3.0-or-later without adopting one. Bundled components retain their own licenses; [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES.md) and the [actual distribution audit](docs/verification/distribution-audit.md) record provenance and unresolved source/build obligations. Calling an archive a review build does not exempt redistribution from those obligations. CI uploads compact evidence, not binary archives; no installer or release is published.
