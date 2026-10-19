@@ -100,12 +100,14 @@ try {
         throw 'Could not record the source tree.'
     }
 
-    $sourceParents = & git show --no-patch --format=%P HEAD
+    # Read the stored commit headers: history traversal hides parents at CI's shallow boundary.
+    $sourceCommit = & git cat-file -p HEAD
 
     if ($LASTEXITCODE -ne 0) {
         throw 'Could not record the source parents.'
     }
 
+    $sourceParents = @($sourceCommit | Where-Object { $_ -match '^parent [a-f0-9]{40}$' } | ForEach-Object { $_.Substring('parent '.Length) })
     $sourceChanges = @(& git status --porcelain --untracked-files=normal)
 
     if ($LASTEXITCODE -ne 0) {
@@ -119,7 +121,7 @@ try {
         runtimeVersion = $shippedRuntime.version
         sourceRevision = $sourceRevision.Trim()
         sourceTree = $sourceTree.Trim()
-        sourceParents = @($sourceParents.Trim().Split(' ', [StringSplitOptions]::RemoveEmptyEntries))
+        sourceParents = $sourceParents
         worktreeDirty = $sourceChanges.Count -gt 0
         configuration = 'Release; self-contained; untrimmed; non-single-file; no AOT'
         operatingSystem = [Runtime.InteropServices.RuntimeInformation]::OSDescription
