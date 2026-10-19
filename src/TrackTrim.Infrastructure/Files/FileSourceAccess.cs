@@ -156,7 +156,7 @@ public sealed class FileSourceAccess : ISourceAccess
     }
 
     /// <summary>Uses the destination's mount rather than assuming every Linux path is on root.</summary>
-    private static DriveInfo GetContainingDrive(string path)
+    internal static DriveInfo GetContainingDrive(string path)
     {
         if (OperatingSystem.IsWindows())
         {
