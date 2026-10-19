@@ -1,8 +1,8 @@
 # Native desktop acceptance — Phase 0/1
 
 This record covers the native acceptance attempt for the existing review artifact, not new product functionality.
-**No desktop GUI was launched, no native screenshots were produced, and no application defect was demonstrated.**
-Supported computer-use initialization failed before the JavaScript import could execute. No fallback UI automation was used.
+**The current retry launched the native GUI and observed limited functional behavior through its UIA tree. No native screenshot or application defect has been demonstrated.**
+The earlier pre-JavaScript initialization failure is historical; its cause remains unknown. Current capture and file-picker automation limitations prevent full acceptance. No fallback UI automation was used.
 
 ## Artifact and supporting receipts
 
@@ -10,17 +10,18 @@ Supported computer-use initialization failed before the JavaScript import could 
 | --- | --- |
 | Attempt dates | 2026-10-18 and 2026-10-19 UTC |
 | Repository source baseline | `e16050e7de92ab8ee4ac8f86094b41b2e2583cec` |
+| Documentation/configuration HEAD at the current retry | `fc7e4df`; this does not change the archive's source revision |
 | Windows archive | `TrackTrim-win-x64.zip`, **112,923,570 bytes** |
 | Windows archive SHA256 | `d621ddc50773b20ba5d0f5109e904046765632796d8c256852b878221e091f18` |
 | Assembly ProductVersion | `1.0.0+e16050e7de92ab8ee4ac8f86094b41b2e2583cec` |
 | Bundle | SDK 10.0.402 publication; self-contained runtime 10.0.13; MKVToolNix 102.0 |
 | Fresh Windows supporting checks | **passed**, repeated 2026-10-19: archive identity, 443 manifest payloads, bundled-tool checks, actual CLI inspection/remux/verification/publication; source SHA256 unchanged |
-| Native GUI acceptance | **blocked**: initialization error below; CLI/headless receipts do not establish native behavior |
-| Confirmed application defects from this attempt | None; no GUI action reached the application |
+| Native GUI acceptance | **blocked** overall: startup, output editing, focus navigation and picker open/cancel were observed through native UIA; full cases remain incomplete |
+| Confirmed application defects from this attempt | None; capture/automation errors below do not establish application defects |
 
 The [CI and preservation receipts](../PLAN.md) identify their own revisions and remain separate evidence. A later documentation-only CI build cannot turn these blocked native cases into passes.
 
-## Available environment and exact blocker
+## Available environment and runtime limitations
 
 - Windows 10 Home Single Language (`CoreSingleLanguage`) 22H2 x64, build **19045.6456**.
 - Interactive session **1**, Explorer and DWM present; display **1920×1080 at 60 Hz**.
@@ -29,21 +30,33 @@ The [CI and preservation receipts](../PLAN.md) identify their own revisions and 
 - No MKVToolNix/FFmpeg/ffprobe commands were found in PATH. Bundled executables were used for supporting CLI checks.
 - Windows 11 target unavailable. WSL contains only stopped `docker-desktop`; the Docker Linux engine pipe, Ubuntu Desktop session and usable local Linux builder are unavailable.
 
-Initialization stopped with the exact error:
+The earlier initialization attempt stopped with the exact error:
 
 ```text
 failed to write kernel assets: Системе не удается найти указанный путь. (os error 3)
 ```
 
-### 2026-10-19 diagnosis and bounded recovery
+### Earlier 2026-10-19 diagnosis and bounded recovery
 
-The installed Computer Use skill `26.1013.40934` and its documented `node_repl` tools were available. A fresh minimal `@oai/sky` initialization failed before JavaScript executed. The documented `js_reset({})` returned `js kernel reset`; one initialization after that concrete recovery action produced the identical error above. No further unchanged retry was made.
+The installed Computer Use skill `26.1013.40934` and its documented `node_repl` tools were available. A fresh minimal `@oai/sky` initialization failed before JavaScript executed. The documented `js_reset({})` returned `js kernel reset`; one initialization after that concrete recovery action produced the identical error above. No further unchanged retry was made in that attempt.
 
-Read-only diagnostics of the current Codex app log found `node_repl status=ready` at **11:57:39.033Z** and **11:57:45.177Z**, followed by OS error 3 at **11:57:45.484Z**. A bounded search of relevant technical WARN/ERROR records provided no failing asset path or additional cause. Private conversation/feedback bodies and raw logs are excluded from this repository. MCP discovery/readiness therefore worked, while kernel asset creation remained blocked. The import, app enumeration, application approval and desktop interaction were never reached. Unicode paths, permissions and desktop locking are not established causes.
+Read-only diagnostics of the Codex app log found `node_repl status=ready` at **11:57:39.033Z** and **11:57:45.177Z**, followed by OS error 3 at **11:57:45.484Z**. A bounded search of relevant technical WARN/ERROR records provided no failing asset path or additional cause. Private conversation/feedback bodies and raw logs are excluded from this repository. MCP discovery/readiness worked, while kernel asset creation was blocked. Import, app enumeration, application approval and desktop interaction were not reached in that earlier attempt. Unicode paths, permissions and desktop locking are not established causes.
 
-The smallest owner recovery step is to finish active chats, restart the Codex host, then try the documented minimal initialization once. This is general [official troubleshooting guidance](https://learn.chatgpt.com/docs/reference/troubleshooting), not a proven fix for this OS error. If it persists, submit Feedback with the exact error, app/OS versions and reviewed/redacted relevant logs. No Codex-managed assets, plugin caches or security settings were modified. [Computer Use setup and desktop requirements](https://learn.chatgpt.com/docs/computer-use) remain separate from this pre-JavaScript failure.
+Finishing active chats and restarting the Codex host was the proposed general [official recovery step](https://learn.chatgpt.com/docs/reference/troubleshooting), not a proven fix for this OS error. The user-requested retry below initialized successfully; the cause of the earlier failure and its resolution is unknown. No Codex-managed assets, plugin caches or security settings were modified. [Computer Use setup and desktop requirements](https://learn.chatgpt.com/docs/computer-use) remain separate from the historical pre-JavaScript failure.
 
-No TrackTrim native window was opened and no native picker, screenshot, language, scaling or worker-cancellation action occurred on either attempt. W01–W14 remain **blocked**; W15–W17 remain **not run**. There is no observed application defect to correct.
+### Current 2026-10-19 native retry
+
+On the user's explicit retry request, minimal `@oai/sky` initialization and app/window enumeration succeeded. The unchanged archive was rehashed at **12:43:55Z**; the fresh extraction's `data` directory was empty before launch. Supported `sky.launch_app` started the exact prepared application as **PID 13440**, session **1**, at **12:44:03.590Z**, returning native window **2690126**. The user explicitly confirmed that the window was visible. Read-only process observation reported `Responding=true` and no owned media workers.
+
+Native UIA-only observation (`include_screenshot:false, include_text:true`) showed the initial English window, **Open MKV…** and **Ready**. The application created portable `settings.json` with `Language=en`. App-only first-launch UIA evidence is retained locally at `work/native-acceptance-20261019/native-uia-first-launch.json`; unrelated app listings and private file-picker contents are not published.
+
+Image capture first failed with `FrameArrived timed out: timed out waiting on channel`. Refreshing window selection and retrying once produced `window capture timed out: timed out waiting on channel`; a later capture after confirmed GUI interaction produced the same error. No native screenshot was obtained. Bounded technical-log inspection around **12:44–12:46Z** established no cause or failing path. Pixel appearance, clipping and effective scaling remain unverified.
+
+The initial element-index click on **Open MKV…** (then index 20) failed with `coordinate input geometry is unavailable`. Supported `sky.set_value` on **OutputTextBox** (then index 22) did work, setting a unique synthetic destination containing spaces and Cyrillic; this created no media output. **Shift+Tab**, then **Return**, opened the native **Select an MKV file** picker. **Escape** closed it and preserved the entered output. At this point there was no source, selection or approved plan. A later user-requested **Tab** observation confirmed focus moving from Open to Output. These are observed functional parts, not complete W03/W04/W11 passes.
+
+A second keyboard-opened picker was observed. Its UIA fields 399/398 advertised settable values, but each `sky.set_value` attempt reported that the element was not available in the cached app state for `TrackTrim.exe`. Keyboard shortcuts did not confirm filename-field focus; `list_windows` returned no separate picker window. These are tool limitations, not confirmed application defects. All indexes here identify past observations and must not be reused. The owner was given the original O fixture path for manual selection; no response or fixture loading has been confirmed. At **13:06Z**, native UIA still showed an empty source and **Ready**, with Open disabled while the picker remained modal. No GUI remux occurred.
+
+Full W01–W14 remain **blocked**; W15–W17 remain **not run**. Startup/UIA, limited focus navigation and source-picker open/cancel do not establish source inspection, plan preservation, remux, cancellation, warning review, scaling or native visual acceptance.
 
 Use report outcomes **passed**, **failed**, **blocked**, or **not run**. A native pass requires an observed GUI action and its evidence.
 Use **failed** only for observed incorrect application behavior; environment failure is **blocked**. An unreached transient stage is **not run**.
@@ -59,7 +72,7 @@ outputs/TrackTrim native acceptance Кириллица e16050e/
   results Кириллица/collision existing.mkv
 ```
 
-The 2026-10-19 extraction is isolated from the older `app windows` copy. Its **443** payload hashes match the manifest, ProductVersion identifies `e16050e7de92ab8ee4ac8f86094b41b2e2583cec`, and `data` is empty. All three fixture hashes and the existing collision sentinel were rechecked unchanged. The separate supporting CLI relocation used a different extraction; it did not populate this fresh GUI copy. Later branch changes are documentation/repository policy only and do not change this artifact's source revision.
+The 2026-10-19 extraction is isolated from the older `app windows` copy. Its **443** payload hashes match the manifest, ProductVersion identifies `e16050e7de92ab8ee4ac8f86094b41b2e2583cec`, and `data` was empty before the current GUI launch; that launch subsequently created English settings. All three fixture hashes and the existing collision sentinel were rechecked unchanged. The separate supporting CLI relocation used a different extraction; it did not populate this GUI copy. Later branch changes are documentation/repository policy only and do not change this artifact's source revision.
 
 | Alias / input relative to the kit | SHA256 |
 | --- | --- |
@@ -74,6 +87,8 @@ The packaged CLI rejected inspection with `UnsupportedFeature/SegmentStructure`:
 No remux/publication occurred; its source hash remained unchanged. This is a fail-closed supported-subset limit, not a demonstrated native GUI defect.
 The rejected generated file is outside the manual kit. Use the existing 60,000-frame C input; it does not guarantee an observable active interval.
 
+A separate 1,000,000-frame input was also **excluded**: 90,813,320 bytes, SHA256 `af7602a38dbc81118da8de84553844737102faefdb101469d4e161f8f862a3cf`. Packaged CLI inspection hit the same 100,000-header bound; no remux/publication occurred and its source hash remained unchanged. The rejected source was renamed as rejected in its own scratch directory. It is not approved for native GUI cancellation checks.
+
 Preserve inputs/sentinel; hash before and after each media case. Give every successful case a new destination under `results Кириллица`.
 Resolve kit-relative paths to absolute paths before entering the output textbox or recording evidence.
 **S0:** fresh writable extraction, `data` empty, no GUI launch. If CLI checking populated that copy, extract another copy; do not clear existing user data.
@@ -86,7 +101,7 @@ Every row requires archive identity, fixture/initial state, concrete action, exp
 
 | ID / current outcome | Initial state and native actions | Expected visible state / file or process evidence |
 | --- | --- | --- |
-| W01 — blocked | S0; launch EXE normally, without CLI arguments. | English first window; `OpenFile` **Open MKV…**, `ReviewPlan` **Review output plan**. Capture complete native window and effective scale. |
+| W01 — blocked | S0; launch EXE normally, without CLI arguments. | English first window; `OpenFile` **Open MKV…**, `ReviewPlan` **Review output plan**. Native launch/English/Ready observed through UIA; complete image and effective-scale evidence remain blocked. |
 | W02 — blocked | S0; **Open MKV… / Открыть MKV…** → real picker → O. | Four rows: VP8 video 0, PCM audio 1/2, SubRip/SRT 3; both audio titles `Matching audio`; audio 1 default, audio 2 commentary, subtitle 3 forced. All Keep; video **Always kept / Всегда сохраняется** cannot be removed. |
 | W03 — blocked | S2; open and cancel source picker; open and cancel **Choose output folder… / Выбрать папку результата…**. | Each Cancel preserves source, Keep, destination and approved plan; focus returns to usable application controls. Record app-provided dialog title and OS control language separately. |
 | W04 — blocked | S1; remove audio 1/subtitle 3; choose output folder; edit output to `results Кириллица/результат с пробелом ; &.mkv`; **Review output plan / Проверить план**. | Approved plan retains 2/removes 2, shows exact destination and `PlanNoDefaultAudio` (no replacement default). Editing selection/destination invalidates review and disables Run until reviewed again. |
@@ -137,7 +152,7 @@ $observedWorker.Dispose()
 
 Record exit time/elapsed and inspect only the correlated job's candidate, marker, journal and final path. Never delete a published output.
 Correlate the observer and native action in one recording; if the worker already exited or liveness at the request is uncertain, record **not run: active stage not exercised**.
-Any replacement input must first pass packaged CLI inspection; the rejected 3,000,000-frame input cannot serve this purpose.
+Any replacement input must first pass packaged CLI inspection; the rejected 3,000,000-frame and 1,000,000-frame inputs cannot serve this purpose.
 If termination is unconfirmed, retain temporary files and diagnostics; never force-delete or kill a stale PID to obtain a pass.
 Cleanup failure must remain separately visible; no false clean/success outcome. An external Kill, CLI run or headless test cannot count as native Cancel/X.
 Existing `WarningReviewCloseTests` use deterministic headless ports. There is no native warning harness or production warning switch in this baseline.
