@@ -261,8 +261,16 @@ public sealed partial class BatchViewModel : ObservableObject
             return;
         }
 
-        failure = services.Session.Remove(selected.Id).Failure;
-        Refresh();
+        var removal = services.Session.Remove(selected.Id);
+
+        if (!removal.Applied)
+        {
+            failure = removal.Failure;
+            Refresh();
+            return;
+        }
+
+        OnEditorChanged();
     }
 
     /// <summary>Approves only the selected editor's immutable retention plan.</summary>

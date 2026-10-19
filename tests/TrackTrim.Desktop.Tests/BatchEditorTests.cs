@@ -191,6 +191,44 @@ public sealed class BatchEditorTests
         Assert.Empty(fixture.Backend.RemuxRequests);
     }
 
+    /// <summary>Removes obsolete aggregate errors while requiring a new review of the remaining approved files.</summary>
+    [AvaloniaFact]
+    public async Task RemovingFailedDiscoveryRowClearsObsoleteReviewErrorsAndRequiresFreshReview()
+    {
+        var fixture = new BatchViewModelFixture();
+        var missingPath = Path.Combine(Path.GetTempPath(), "missing batch source.mkv");
+        fixture.Discovery.Result = new(fixture.Backend.Inspections.Values.Select(inspection => inspection.Source).ToImmutableArray(),
+            [new(missingPath, new(ErrorCode.InvalidSource, "raw discovery failure"))]);
+        await fixture.PrepareAsync();
+        var missing = Assert.Single(fixture.Batch.Items, item => item.SourcePath == missingPath);
+        var remainingPlans = fixture.Batch.Items.Where(item => item.Id != missing.Id).Select(item => item.ApprovedPlan).ToArray();
+        Assert.True(fixture.Batch.HasError);
+        Assert.Contains(missingPath, fixture.Batch.ReviewIssuesText);
+        Assert.False(fixture.Batch.HasReview);
+        fixture.Batch.SelectedItem = missing;
+        Assert.True(fixture.Batch.RemoveSelectedCommand.CanExecute(null));
+
+        fixture.Batch.RemoveSelectedCommand.Execute(null);
+
+        Assert.Equal(2, fixture.Batch.Items.Count);
+        Assert.DoesNotContain(fixture.Batch.Items, item => item.Id == missing.Id);
+        Assert.Empty(fixture.Batch.ReviewIssuesText);
+        Assert.False(fixture.Batch.HasError);
+        Assert.Equal(remainingPlans, fixture.Batch.Items.Select(item => item.ApprovedPlan));
+        Assert.False(fixture.Batch.HasReview);
+        Assert.False(fixture.Batch.RunCommand.CanExecute(null));
+        Assert.Empty(fixture.Backend.RemuxRequests);
+
+        await fixture.Batch.ReviewCommand.ExecuteAsync(null);
+
+        Assert.True(fixture.Batch.HasReview);
+        Assert.False(fixture.Batch.HasError);
+        Assert.Empty(fixture.Batch.ReviewIssuesText);
+        Assert.Equal(remainingPlans, fixture.Batch.Snapshot.Review!.Items.Select(item => item.Plan));
+        Assert.True(fixture.Batch.RunCommand.CanExecute(null));
+        Assert.Empty(fixture.Backend.RemuxRequests);
+    }
+
     /// <summary>Keeps failed evidence visible while an explicitly excluded item no longer blocks remaining work.</summary>
     [AvaloniaFact]
     public async Task FailedRunRequiresExclusionAndCompletedRowsCannotBeEdited()
