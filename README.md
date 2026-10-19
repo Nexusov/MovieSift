@@ -28,7 +28,7 @@ Do not use the application as a universal preservation tool. The [supported MKV 
 
 Preflight supplements MKVToolNix identification with bounded, read-only Segment Info inspection. Detected segment families and previous/next links are rejected before processing; layouts that cannot be inspected within those bounds fail explicitly. This check uses no additional media executable.
 
-The images below are historical headless renders of the Phase 1 inspector. The [native record and matrix](docs/verification/native-desktop-acceptance.md) belong to its recorded `e16050e` binary on Windows 10, including ordinary and H264/AAC/SRT functional workflows. They are not acceptance of the new batch UI. Batch headless/real-media results are recorded in [PLAN](docs/PLAN.md); native batch interaction, screenshots, visual/scaling checks and the intended target desktops remain unverified. The existing W13 active-remux input-correlation gap and W14 single-close limits are unchanged.
+The images below are historical headless renders of the Phase 1 inspector. The [native record and matrix](docs/verification/native-desktop-acceptance.md) belong to its recorded `e16050e` binary on Windows 10, including ordinary and H264/AAC/SRT functional workflows. They are not acceptance of the new batch UI. [PLAN](docs/PLAN.md) records new batch headless/real-media results and limited native startup/EN–RU tab navigation. Native batch pickers/processing, screenshots, visual/scaling checks and the intended target desktops remain unverified. The existing W13 active-remux input-correlation gap and W14 single-close limits are unchanged.
 
 ![English TrackTrim inspector with real video, two audio tracks, and subtitles](docs/images/tracktrim-en.png)
 
