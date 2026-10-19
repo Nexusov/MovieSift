@@ -91,6 +91,14 @@ The successful W14 action used the unchanged e160 archive on the same Windows 10
 
 The observer was stopped and handles disposed after GUI exit. The [sanitized W14 evidence extract](native-w14-evidence.json) publishes the actual native-action record, seven correlated observer events and post-action receipt, with raw-source byte counts/hashes, artifact/fixture identities and disclosed path redactions/omissions. It was derived from task-local `W14-close-1GiB-01-native-action.json`, `workers-native-04.jsonl` and `W14-close-1GiB-receipt.json`; the successful close was not repeated for this extract. Its separately timestamped current OS inventory is supporting context, not a reconstructed historical observation. W13's missed action has its own receipt and is not conflated with W14.
 
+### Bounded W13 input preparation retry
+
+At **18:25:20Z on 2026-10-19**, the same archive and accepted C1GiB fixture were rehashed; both identities above matched. Computer Use launched the same portable copy as **GUI PID 15992**, start **18:25:47.1402183Z**, in the same Windows 10/session/display context. Russian settings persisted. A fresh destination under `results Кириллица/w13-a711db73/` was reserved; previous published outputs were preserved.
+
+The installed `26.1013.40934` API exposes one key/chord per `press_key`, indexed `click`, and only advertised secondary actions; no batch-key API or generic Invoke is documented. Its guidance requires one state-derived action followed by refresh. An idle Open-button click at **18:26:03.309Z** again failed with `coordinate input geometry is unavailable`. Keyboard input opened the real MKV picker, but setting its advertised filename combo failed with `Cannot set a value for an element that is not settable`; native enumeration exposed no separately targetable picker. No screenshot timeout was retried and no alternative automation was introduced.
+
+Owner-assisted C1GiB opening is pending at this checkpoint; source selection, changed plan and the actual Run/Cancel interval are therefore **blocked in preparation / not run**. The read-only helper has passed syntax, recorded-remux/probe classification and a three-second idle identity check, but the actual cancellation observer has not been armed and no new Run or Cancel was sent. The former 20-second route was not repeated. These observations constrain the available route; they do not prove that native cancellation is impossible or defective. Once the source is loaded, prepare the plan and arm the observer before asking the operator for the short Run/Cancel actions.
+
 ### Independent output evidence
 
 Outputs are under the fresh kit directory `results Кириллица/gui-1019-dbebe4/`; paths contain spaces/Cyrillic and W07 also contains `; &`. Read-only bundled `mkvmerge -J` and `mkvextract` ran after the native GUI operation; they did not create the application result.
