@@ -1,0 +1,276 @@
+{
+  "schemaVersion": 1,
+  "caseId": "W14",
+  "claimScope": "One native Alt+F4 during the correlated live remux. No W14 rerun was performed to create this extract. Cancel-button, repeated-close, verification-close and visual acceptance are not established by this extract.",
+  "provenance": {
+    "pathBase": "Task workspace root; every retained application/media path is relative to it.",
+    "sourceFiles": [
+      {
+        "id": "nativeAction",
+        "path": "work/native-acceptance-20261019/W14-close-1GiB-01-native-action.json",
+        "bytes": 2742,
+        "sha256": "dd254ed0aefbd809c832d9bc6be3bcccd8880492ff33bf448f685a1223e65ba5"
+      },
+      {
+        "id": "workerObserver",
+        "path": "work/native-acceptance-20261019/workers-native-04.jsonl",
+        "bytes": 12900,
+        "sha256": "45a03760668ba5344bf10a66786e5fa0db4557bd13875049c1335345d709cb1b",
+        "retainedLineNumbers": [
+          1,
+          13,
+          14,
+          15,
+          21,
+          22,
+          23
+        ],
+        "originalEventCount": 23,
+        "omittedEventCount": 16
+      },
+      {
+        "id": "postActionReceipt",
+        "path": "work/native-acceptance-20261019/W14-close-1GiB-receipt.json",
+        "bytes": 1481,
+        "sha256": "5e6ffe290d73e2b672b2e0b7a1a63ccbd8b27b3f6c07cb27b801db684c73f997"
+      },
+      {
+        "id": "preparedArtifact",
+        "path": "work/native-acceptance-20261019/prepared-artifact.json",
+        "bytes": 1390,
+        "sha256": "9993b7b0ac37ece712fcbe855a70d4addf0b49601aa37b1338a037a9eebd2688"
+      },
+      {
+        "id": "fixtureProvenance",
+        "path": "work/native-cancellation-large-20261019/1GiB/fixture-provenance.json",
+        "bytes": 3909,
+        "sha256": "9efc6b13aa2408c2eb106c6c017e1e52758420ada860df3f1a399f73d92ea817"
+      },
+      {
+        "id": "nativeUia",
+        "path": "work/native-acceptance-20261019/loaded-source-native-events.jsonl",
+        "bytes": 684433,
+        "sha256": "744c31aa436b98da30ee4ee27a410ac63351acc74cb0761421848dad8984d215",
+        "retainedLineNumbers": [
+          142
+        ],
+        "hashScope": "Entire raw file snapshot as read; later appended events are outside this byte count/hash."
+      }
+    ],
+    "transformations": [
+      "Removed the case-insensitive absolute workspace prefix from paths and embedded command lines; affected Windows separators changed to /.",
+      "Original timestamp strings, process IDs/keys, Boolean outcomes and exit codes are unchanged."
+    ],
+    "omissions": [
+      "Observer events for other workers, unrelated probes and the earlier W13 attempt are omitted.",
+      "Only the native Run event identity and its output-textbox line are retained from UIA; private picker listings, other app data, full UIA trees and unrelated events are omitted.",
+      "Prepared-artifact inputs/prelaunch flags and fixture-generation arguments/budget are omitted; selected identity fields are retained."
+    ],
+    "crossChecks": "The duplicated retained-worker/liveness objects, exit fields, native-key times, archive/source identity and temporal ordering were compared directly with the raw sources before writing."
+  },
+  "currentPlatformSupportingObservation": {
+    "captureStartedUtc": "2026-10-19T18:33:41.3692229+00:00",
+    "observedUtc": "2026-10-19T18:33:41.6565461+00:00",
+    "scope": "Current read-only supporting inventory, not an original W14 runtime observation; the three original W14 files contain no OS inventory.",
+    "sourceQueries": [
+      "Get-CimInstance Win32_OperatingSystem | Select-Object Caption,Version,BuildNumber,OSArchitecture",
+      "Get-ItemProperty HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion | Select-Object ProductName,EditionID,DisplayVersion,CurrentBuild,UBR"
+    ],
+    "encoding": "CIM/registry values serialized directly by PowerShell and written with System.IO.File.WriteAllText using UTF8Encoding(false); no native-program stdin conversion.",
+    "operatingSystem": {
+      "Caption": "Майкрософт Windows 10 Домашняя для одного языка",
+      "Version": "10.0.19045",
+      "BuildNumber": "19045",
+      "OSArchitecture": "64-разрядная"
+    },
+    "windowsVersion": {
+      "ProductName": "Windows 10 Home Single Language",
+      "EditionID": "CoreSingleLanguage",
+      "DisplayVersion": "22H2",
+      "CurrentBuild": "19045",
+      "UBR": 6456
+    }
+  },
+  "artifactIdentity": {
+    "observedUtc": "2026-10-19T12:07:05.4459724Z",
+    "archive": "outputs/TrackTrim-win-x64.zip",
+    "bytes": 112923570,
+    "sha256": "d621ddc50773b20ba5d0f5109e904046765632796d8c256852b878221e091f18",
+    "source": "e16050e7de92ab8ee4ac8f86094b41b2e2583cec",
+    "productVersion": "1.0.0+e16050e7de92ab8ee4ac8f86094b41b2e2583cec",
+    "freshApp": "outputs/TrackTrim native acceptance Кириллица e16050e/fresh app 20261019/TrackTrim-win-x64/TrackTrim.exe",
+    "manifestPayloads": 443
+  },
+  "fixtureIdentity": {
+    "variant": "1GiB",
+    "archiveSha256": "d621ddc50773b20ba5d0f5109e904046765632796d8c256852b878221e091f18",
+    "sourceRevision": "e16050e7de92ab8ee4ac8f86094b41b2e2583cec",
+    "tool": "mkvmerge v102.0 ('Little Houses') 64-bit",
+    "source": {
+      "path": "work/native-cancellation-large-20261019/1GiB/test data Кириллица/source cancellation attachment 1GiB.mkv",
+      "bytes": 1079470784,
+      "sha256": "0565b34f5fc0965225bf45b8d37e5cb007fe20611b77f0f66c175c970e4307f9"
+    },
+    "approvedForGui": true
+  },
+  "nativeRunOutputProjection": {
+    "caseId": "W14 start native 1GiB remux",
+    "observedUtc": "2026-10-19T14:13:33.171Z",
+    "method": "native Sky UIA/keyboard",
+    "treeExcerpt": "\t\t\t22 edit (disabled, settable, string) Файл результата Description: Выберите отдельную папку для результата. Value: outputs/TrackTrim native acceptance Кириллица e16050e/results Кириллица/gui-1019-dbebe4/W14 закрытие 1GiB.mkv ID: OutputTextBox",
+    "screenshot": "blocked by capture timeout",
+    "finalOutputPath": "outputs/TrackTrim native acceptance Кириллица e16050e/results Кириллица/gui-1019-dbebe4/W14 закрытие 1GiB.mkv",
+    "candidatePath": "outputs/TrackTrim native acceptance Кириллица e16050e/results Кириллица/gui-1019-dbebe4/.tracktrim-817f3821564d48c29128e5d955d72bba/candidate.mkv",
+    "scope": "Paths are derived from the recorded native Run textbox and actual remux command line; existence/cleanup results below come from the later receipt."
+  },
+  "observerEvents": [
+    {
+      "Event": "ObserverStarted",
+      "StopMarkerPath": "work/native-acceptance-20261019/stop-native-04.marker",
+      "PollMilliseconds": 25,
+      "GuiStartUtc": "2026-10-19T13:47:51.2574106Z",
+      "ProductVersion": "1.0.0+e16050e7de92ab8ee4ac8f86094b41b2e2583cec",
+      "ToolDirectory": "outputs/TrackTrim native acceptance Кириллица e16050e/fresh app 20261019/TrackTrim-win-x64/tools",
+      "ObservedUtc": "2026-10-19T14:09:54.6333560+00:00",
+      "ActionMarkerPath": "work/native-acceptance-20261019/action-native-04.json",
+      "ApplicationPath": "outputs/TrackTrim native acceptance Кириллица e16050e/fresh app 20261019/TrackTrim-win-x64/TrackTrim.exe",
+      "GuiProcessId": 25792
+    },
+    {
+      "WorkerKey": "4780:639280160127640420",
+      "Event": "WorkerFirstSeen",
+      "HasExited": false,
+      "ProcessId": 4780,
+      "ObservedUtc": "2026-10-19T14:13:32.8635302+00:00",
+      "CommandLine": "\"outputs/tracktrim native acceptance Кириллица e16050e/fresh app 20261019/tracktrim-win-x64/tools/mkvmerge.exe\" --gui-mode --output-charset UTF-8 --normalize-language-ietf off --disable-track-statistics-tags --output \"outputs/TrackTrim native acceptance Кириллица e16050e/results Кириллица/gui-1019-dbebe4/.tracktrim-817f3821564d48c29128e5d955d72bba/candidate.mkv\" --track-order 0:0,0:2,0:3 --video-tracks 0 --audio-tracks 2 --subtitle-tracks 3 --no-buttons --attachments 1 --default-track-flag 0:1 --forced-display-flag 0:0 --track-enabled-flag 0:1 --default-track-flag 2:1 --forced-display-flag 2:0 --track-enabled-flag 2:1 --default-track-flag 3:1 --forced-display-flag 3:0 --track-enabled-flag 3:1 \"work/native-cancellation-large-20261019/1GiB/test data Кириллица/source cancellation attachment 1GiB.mkv\"",
+      "InvocationKind": "RemuxCandidate",
+      "ParentProcessId": 25792,
+      "ExecutablePath": "outputs/tracktrim native acceptance Кириллица e16050e/fresh app 20261019/tracktrim-win-x64/tools/mkvmerge.exe",
+      "StartUtc": "2026-10-19T14:13:32.7640428Z"
+    },
+    {
+      "ActionStartUtc": "2026-10-19T14:13:37.4870000+00:00",
+      "ObservedUtc": "2026-10-19T14:13:37.6042930+00:00",
+      "ActionId": "W14-close-1GiB-01",
+      "Event": "ActionMarkerObserved",
+      "KnownWorkerCount": 6,
+      "MarkerObservedUtc": "2026-10-19T14:13:37.6019347+00:00",
+      "Action": "Native Alt_L+F4"
+    },
+    {
+      "ObservedUtc": "2026-10-19T14:13:37.6046439+00:00",
+      "HasExited": false,
+      "WorkerKey": "4780:639280160127640420",
+      "ProcessId": 4780,
+      "ActionStartUtc": "2026-10-19T14:13:37.4870000+00:00",
+      "Event": "WorkerAtActionMarker",
+      "MarkerObservedUtc": "2026-10-19T14:13:37.6019347+00:00",
+      "ActionId": "W14-close-1GiB-01",
+      "InvocationKind": "RemuxCandidate"
+    },
+    {
+      "ExitUtc": "2026-10-19T14:13:37.8167765Z",
+      "WorkerKey": "4780:639280160127640420",
+      "Event": "WorkerExited",
+      "ProcessId": 4780,
+      "ObservedUtc": "2026-10-19T14:13:37.9209714+00:00",
+      "InvocationKind": "RemuxCandidate",
+      "ExitCode": -1
+    },
+    {
+      "ExitCode": 0,
+      "Event": "GuiExited",
+      "ObservedUtc": "2026-10-19T14:13:38.1683659+00:00",
+      "ExitUtc": "2026-10-19T14:13:38.0386043Z"
+    },
+    {
+      "ObservedUtc": "2026-10-19T14:14:25.0316044+00:00",
+      "Reason": "OwnerStopMarker",
+      "Event": "ObserverStopped",
+      "KnownWorkerCount": 6
+    }
+  ],
+  "nativeAction": {
+    "caseId": "W14",
+    "actionId": "W14-close-1GiB-01",
+    "attemptStartedUtc": "2026-10-19T14:13:37.486Z",
+    "requestedKey": "Alt_L+F4",
+    "nativeInputCompleted": true,
+    "retainedWorker": {
+      "WorkerKey": "4780:639280160127640420",
+      "Event": "WorkerFirstSeen",
+      "HasExited": false,
+      "ProcessId": 4780,
+      "ObservedUtc": "2026-10-19T14:13:32.8635302+00:00",
+      "CommandLine": "\"outputs/tracktrim native acceptance Кириллица e16050e/fresh app 20261019/tracktrim-win-x64/tools/mkvmerge.exe\" --gui-mode --output-charset UTF-8 --normalize-language-ietf off --disable-track-statistics-tags --output \"outputs/TrackTrim native acceptance Кириллица e16050e/results Кириллица/gui-1019-dbebe4/.tracktrim-817f3821564d48c29128e5d955d72bba/candidate.mkv\" --track-order 0:0,0:2,0:3 --video-tracks 0 --audio-tracks 2 --subtitle-tracks 3 --no-buttons --attachments 1 --default-track-flag 0:1 --forced-display-flag 0:0 --track-enabled-flag 0:1 --default-track-flag 2:1 --forced-display-flag 2:0 --track-enabled-flag 2:1 --default-track-flag 3:1 --forced-display-flag 3:0 --track-enabled-flag 3:1 \"work/native-cancellation-large-20261019/1GiB/test data Кириллица/source cancellation attachment 1GiB.mkv\"",
+      "InvocationKind": "RemuxCandidate",
+      "ParentProcessId": 25792,
+      "ExecutablePath": "outputs/tracktrim native acceptance Кириллица e16050e/fresh app 20261019/tracktrim-win-x64/tools/mkvmerge.exe",
+      "StartUtc": "2026-10-19T14:13:32.7640428Z"
+    },
+    "intent": {
+      "ActionId": "W14-close-1GiB-01",
+      "Action": "Native Alt_L+F4",
+      "ActionStartUtc": "2026-10-19T14:13:37.487Z"
+    },
+    "liveness": {
+      "ObservedUtc": "2026-10-19T14:13:37.6046439+00:00",
+      "HasExited": false,
+      "WorkerKey": "4780:639280160127640420",
+      "ProcessId": 4780,
+      "ActionStartUtc": "2026-10-19T14:13:37.4870000+00:00",
+      "Event": "WorkerAtActionMarker",
+      "MarkerObservedUtc": "2026-10-19T14:13:37.6019347+00:00",
+      "ActionId": "W14-close-1GiB-01",
+      "InvocationKind": "RemuxCandidate"
+    },
+    "nativeKeyStartUtc": "2026-10-19T14:13:37.611Z",
+    "nativeKeyEndUtc": "2026-10-19T14:13:37.729Z",
+    "returnedWindows": [
+      {
+        "app": "process:outputs/TrackTrim native acceptance Кириллица e16050e/fresh app 20261019/TrackTrim-win-x64/TrackTrim.exe",
+        "id": 134258,
+        "title": "TrackTrim"
+      }
+    ],
+    "finishedUtc": "2026-10-19T14:13:37.768Z"
+  },
+  "postActionReceipt": {
+    "CaseId": "W14",
+    "ObservedUtc": "2026-10-19T14:14:24.5267737+00:00",
+    "NativeInput": "Computer Use Sky Alt+F4",
+    "ArchiveSourceRevision": "e16050e7de92ab8ee4ac8f86094b41b2e2583cec",
+    "ArchiveSha256": "d621ddc50773b20ba5d0f5109e904046765632796d8c256852b878221e091f18",
+    "SourceSha256": "0565b34f5fc0965225bf45b8d37e5cb007fe20611b77f0f66c175c970e4307f9",
+    "SourceUnchanged": true,
+    "FinalOutputExists": false,
+    "PrivateCandidateDirectoryExists": false,
+    "AppDataFiles": [
+      "settings.json"
+    ],
+    "WorkerId": 4780,
+    "WorkerStartUtc": "2026-10-19T14:13:32.7640428Z",
+    "Liveness": {
+      "ObservedUtc": "2026-10-19T14:13:37.6046439+00:00",
+      "HasExited": false,
+      "WorkerKey": "4780:639280160127640420",
+      "ProcessId": 4780,
+      "ActionStartUtc": "2026-10-19T14:13:37.4870000+00:00",
+      "Event": "WorkerAtActionMarker",
+      "MarkerObservedUtc": "2026-10-19T14:13:37.6019347+00:00",
+      "ActionId": "W14-close-1GiB-01",
+      "InvocationKind": "RemuxCandidate"
+    },
+    "NativeKeyStartUtc": "2026-10-19T14:13:37.611Z",
+    "NativeKeyEndUtc": "2026-10-19T14:13:37.729Z",
+    "WorkerExitUtc": "2026-10-19T14:13:37.8167765Z",
+    "WorkerExitCode": -1,
+    "GuiExitUtc": "2026-10-19T14:13:38.0386043Z",
+    "GuiExitCode": 0,
+    "WorkerExitedAfterNativeAction": true,
+    "GuiExitedAfterWorker": true,
+    "RepeatedCloseDuringShutdown": "Not run; interval too short for a second observed input",
+    "StoppingTextAndPixelAppearance": "Not observed"
+  },
+  "receiptLimits": "AppDataFiles enumerates files only; the original post-action receipt does not record directory inventory, deletion timestamps, stopping text or a second close action. nativeAction.returnedWindows is the immediate post-key enumeration; GUI exit evidence is the later GuiExited observer event."
+}

@@ -89,7 +89,7 @@ The successful W14 action used the unchanged e160 archive on the same Windows 10
 | C1GiB original SHA256 after close | `0565b34f5fc0965225bf45b8d37e5cb007fe20611b77f0f66c175c970e4307f9`, unchanged |
 | Limits | No second close during the short shutdown interval, no captured stopping text/pixels, no verification-close; those are **not run**, not inferred passes. |
 
-The observer was stopped and handles disposed after GUI exit. Task-local `W14-close-1GiB-01-native-action.json`, `workers-native-04.jsonl` and `W14-close-1GiB-receipt.json` preserve the detailed action/exit/filesystem evidence. W13's missed action has its own receipt and is not conflated with W14.
+The observer was stopped and handles disposed after GUI exit. The [sanitized W14 evidence extract](native-w14-evidence.json) publishes the actual native-action record, seven correlated observer events and post-action receipt, with raw-source byte counts/hashes, artifact/fixture identities and disclosed path redactions/omissions. It was derived from task-local `W14-close-1GiB-01-native-action.json`, `workers-native-04.jsonl` and `W14-close-1GiB-receipt.json`; the successful close was not repeated for this extract. Its separately timestamped current OS inventory is supporting context, not a reconstructed historical observation. W13's missed action has its own receipt and is not conflated with W14.
 
 ### Independent output evidence
 
@@ -204,6 +204,14 @@ Any replacement input must first pass packaged CLI inspection; the rejected 3,00
 If termination is unconfirmed, retain temporary files and diagnostics; never force-delete or kill a stale PID to obtain a pass.
 Cleanup failure must remain separately visible; no false clean/success outcome. An external Kill, CLI run or headless test cannot count as native Cancel/X.
 Existing `WarningReviewCloseTests` use deterministic headless ports. There is no native warning harness or production warning switch in this baseline.
+
+The development-only [Windows worker observer](../../build/observe-native-workers.ps1) automates this read-only process evidence. Run it in PowerShell 7 before native Run/Cancel, supplying the already observed GUI PID, exact portable executable/ProductVersion and its `tools` directory, plus fresh evidence/stop-marker paths:
+
+```powershell
+./build/observe-native-workers.ps1 -GuiProcessId <observed PID> -ExpectedApplicationPath '<portable executable>' -ExpectedProductVersion '1.0.0+e16050e7de92ab8ee4ac8f86094b41b2e2583cec' -ToolDirectory '<portable tools directory>' -EvidencePath '<fresh task-local JSONL>' -StopMarkerPath '<fresh task-local marker>' -MaximumSeconds 300
+```
+
+It retains the GUI/worker path/start identities, distinguishes private-candidate remux from probes, records remux `HasExited=false` read intervals about every 100 ms, and records exit from the same handles. Evidence is bounded to 2 MiB/128 workers and handles are disposed on stop; creating the specified stop marker stops observation only. The script sends no GUI input, changes no media and records no operator-action timestamp. Idle validation and command-line classification are supporting checks, not a W13 pass. It is not copied into portable production packages.
 
 For the remaining W13 check on the available Windows host, restart the exact portable copy above, select C1GiB, remove audio 1, choose a fresh result path and Review. With the read-only worker observer ready, Run and physically press **Отменить** while the same retained remux worker is confirmed alive. The demonstrated Computer Use keyboard route took about 20 seconds across observed actions, longer than this remux's 8.22 seconds; reaching the button after worker exit cannot pass W13. Capture the native action/time, **Cancelled** state, retained-worker exit, unchanged source hash and absence of final/candidate/journal. No larger fixture or production delay is required by this handoff. W14's rapid repeated-close and W15's active verification interval still need separate observed actions; do not infer either from the successful single close.
 
