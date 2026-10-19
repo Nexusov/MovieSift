@@ -8,13 +8,13 @@ Supported computer-use initialization failed before the JavaScript import could 
 
 | Item | Recorded value |
 | --- | --- |
-| Attempt date | 2026-10-18 UTC |
+| Attempt dates | 2026-10-18 and 2026-10-19 UTC |
 | Repository source baseline | `e16050e7de92ab8ee4ac8f86094b41b2e2583cec` |
 | Windows archive | `TrackTrim-win-x64.zip`, **112,923,570 bytes** |
 | Windows archive SHA256 | `d621ddc50773b20ba5d0f5109e904046765632796d8c256852b878221e091f18` |
 | Assembly ProductVersion | `1.0.0+e16050e7de92ab8ee4ac8f86094b41b2e2583cec` |
 | Bundle | SDK 10.0.402 publication; self-contained runtime 10.0.13; MKVToolNix 102.0 |
-| Fresh Windows supporting checks | **passed**: 443 manifest payloads, bundled-tool checks, actual CLI inspection/remux/verification/publication; source SHA256 unchanged |
+| Fresh Windows supporting checks | **passed**, repeated 2026-10-19: archive identity, 443 manifest payloads, bundled-tool checks, actual CLI inspection/remux/verification/publication; source SHA256 unchanged |
 | Native GUI acceptance | **blocked**: initialization error below; CLI/headless receipts do not establish native behavior |
 | Confirmed application defects from this attempt | None; no GUI action reached the application |
 
@@ -35,7 +35,15 @@ Initialization stopped with the exact error:
 failed to write kernel assets: Системе не удается найти указанный путь. (os error 3)
 ```
 
-The `node_repl` runtime failed before the computer-use `@oai/sky` import; the missing path was not returned. The same initialization was not retried.
+### 2026-10-19 diagnosis and bounded recovery
+
+The installed Computer Use skill `26.1013.40934` and its documented `node_repl` tools were available. A fresh minimal `@oai/sky` initialization failed before JavaScript executed. The documented `js_reset({})` returned `js kernel reset`; one initialization after that concrete recovery action produced the identical error above. No further unchanged retry was made.
+
+Read-only diagnostics of the current Codex app log found `node_repl status=ready` at **11:57:39.033Z** and **11:57:45.177Z**, followed by OS error 3 at **11:57:45.484Z**. A bounded search of relevant technical WARN/ERROR records provided no failing asset path or additional cause. Private conversation/feedback bodies and raw logs are excluded from this repository. MCP discovery/readiness therefore worked, while kernel asset creation remained blocked. The import, app enumeration, application approval and desktop interaction were never reached. Unicode paths, permissions and desktop locking are not established causes.
+
+The smallest owner recovery step is to finish active chats, restart the Codex host, then try the documented minimal initialization once. This is general [official troubleshooting guidance](https://learn.chatgpt.com/docs/reference/troubleshooting), not a proven fix for this OS error. If it persists, submit Feedback with the exact error, app/OS versions and reviewed/redacted relevant logs. No Codex-managed assets, plugin caches or security settings were modified. [Computer Use setup and desktop requirements](https://learn.chatgpt.com/docs/computer-use) remain separate from this pre-JavaScript failure.
+
+No TrackTrim native window was opened and no native picker, screenshot, language, scaling or worker-cancellation action occurred on either attempt. W01–W14 remain **blocked**; W15–W17 remain **not run**. There is no observed application defect to correct.
 
 Use report outcomes **passed**, **failed**, **blocked**, or **not run**. A native pass requires an observed GUI action and its evidence.
 Use **failed** only for observed incorrect application behavior; environment failure is **blocked**. An unreached transient stage is **not run**.
@@ -46,10 +54,12 @@ All Windows matrix rows use the exact archive/hash above and this workspace-rela
 
 ```text
 outputs/TrackTrim native acceptance Кириллица e16050e/
-  app windows/TrackTrim-win-x64/TrackTrim.exe
+  fresh app 20261019/TrackTrim-win-x64/TrackTrim.exe
   test data Кириллица/{source ordinary.mkv,source cancellation.mkv,source h264 aac.mkv}
   results Кириллица/collision existing.mkv
 ```
+
+The 2026-10-19 extraction is isolated from the older `app windows` copy. Its **443** payload hashes match the manifest, ProductVersion identifies `e16050e7de92ab8ee4ac8f86094b41b2e2583cec`, and `data` is empty. All three fixture hashes and the existing collision sentinel were rechecked unchanged. The separate supporting CLI relocation used a different extraction; it did not populate this fresh GUI copy. Later branch changes are documentation/repository policy only and do not change this artifact's source revision.
 
 | Alias / input relative to the kit | SHA256 |
 | --- | --- |

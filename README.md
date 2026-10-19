@@ -18,7 +18,7 @@ Do not use the application as a universal preservation tool. The [supported MKV 
 
 Preflight supplements MKVToolNix identification with bounded, read-only Segment Info inspection. Detected segment families and previous/next links are rejected before processing; layouts that cannot be inspected within those bounds fail explicitly. This check uses no additional media executable.
 
-These are headless renders of the compiled Fluent view after real MKV inspection, in English and Russian. Native desktop acceptance remains pending; the [current native attempt and manual handoff](docs/verification/native-desktop-acceptance.md) record the initialization blocker, exact artifact and unexecuted checks.
+These are headless renders of the compiled Fluent view after real MKV inspection, in English and Russian. Native desktop acceptance remains pending; the [current native attempt and manual handoff](docs/verification/native-desktop-acceptance.md) record the 2026-10-19 kernel reset/retry and log diagnosis, unchanged archive identity and unexecuted checks. Computer Use still fails before JavaScript; no native GUI action has reached TrackTrim.
 
 ![English TrackTrim inspector with real video, two audio tracks, and subtitles](docs/images/tracktrim-en.png)
 
