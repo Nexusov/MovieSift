@@ -296,6 +296,8 @@ Capture language, native dialogs, scaling, cancellation/close and worker identit
 
 ## Phase 2A limited native startup (separate binary)
 
+The later [bounded native batch receipt](native-batch-evidence.json) covers the fixed `83f6116` portable GUI on the same Windows 10 host, including owner-assisted dialogs/start and independently verified A/B outputs. It does not change the historical scope below or the open visual, timing-sensitive cancellation, warning and target-desktop requirements.
+
 On 2026-10-20 (local time), a new isolated extraction of code revision `78a5b170184d01f3e3a348e8bbc4a81ab933c533` ran on **Windows 10 Home Single Language 22H2 x64, build 19045.6456**. Its clean-build Windows ZIP is **113,185,284 bytes**, SHA256 `4031cf21f291585ffcf0ed2d3caa3f04f0f615a2cc447fa6833a565f15e1ad48`. The extraction path contains spaces/Cyrillic and started with empty app-local data. This is a new binary; all W01–W17 evidence above retains the historical e160 artifact and limits.
 
 **Passed, limited native functional scope:** Computer Use `@oai/sky` launched the exact extracted executable, observed English first launch through UIA, navigated by native Tab/Right to **Several files / folder**, then Shift+Tab/Space on the observed Russian language control. Settled UIA exposed the Russian Batch instructions, limits, file list and correctly disabled empty-queue execution controls. Alt+F4 closed only this empty test window; subsequent native enumeration and a read-only process check found it gone. App-local settings contain `ru`; no ownership entries exist. The [sanitized receipt](phase-2a-batch-evidence.json) retains actual EN/RU observations and the asynchronous close observations without private workspace paths.
