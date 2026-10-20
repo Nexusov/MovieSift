@@ -17,6 +17,24 @@ public sealed class BatchCoordinator(
     private readonly object cancellationSynchronization = new();
     private CancellationTokenSource? activeCancellation;
 
+    /// <summary>Starts an empty in-memory batch only when no operation or unresolved ownership is present.</summary>
+    public BatchEditResult StartNewBatch(long? expectedRevision = null)
+    {
+        if (!gate.Wait(0))
+        {
+            return new(false, new(ErrorCode.Busy));
+        }
+
+        try
+        {
+            return session.Reset(expectedRevision);
+        }
+        finally
+        {
+            gate.Release();
+        }
+    }
+
     /// <summary>Inspects every included pending source independently, with at most one active probe.</summary>
     public async Task<BatchSnapshot> InspectPendingAsync(CancellationToken cancellationToken = default)
     {

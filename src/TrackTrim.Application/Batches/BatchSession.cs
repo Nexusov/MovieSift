@@ -133,6 +133,32 @@ public sealed class BatchSession
         Failure = null
     }, null));
 
+    /// <summary>Atomically clears safe in-memory state after the coordinator has acquired its operation gate.</summary>
+    internal BatchEditResult Reset(long? expectedRevision)
+    {
+        BatchSnapshot updated;
+
+        lock (synchronization)
+        {
+            var failure = EditFailure();
+
+            if (failure is not null)
+            {
+                return new(false, DescribeResetFailure(failure));
+            }
+
+            if (expectedRevision is { } revision && revision != snapshot.Revision)
+            {
+                return new(false, new(ErrorCode.StalePlan));
+            }
+
+            updated = snapshot = new(snapshot.Revision + 1, BatchPhase.Preparing, []);
+        }
+
+        Changed?.Invoke(updated);
+        return new(true);
+    }
+
     /// <summary>Claims an inspection or review operation while preventing conflicting edits.</summary>
     internal bool TryBegin(BatchPhase phase, out Failure? failure)
     {
@@ -217,6 +243,19 @@ public sealed class BatchSession
             snapshot.Items.Any(item => item.State == BatchItemState.AwaitingWarningReview);
 
         return busy ? new(ErrorCode.Busy) : null;
+    }
+
+    /// <summary>Preserves a concrete ownership failure instead of replacing it with a generic reset refusal.</summary>
+    private Failure DescribeResetFailure(Failure fallback)
+    {
+        if (fallback.Code != ErrorCode.OwnershipInvalid)
+        {
+            return fallback;
+        }
+
+        var ownershipFailure = snapshot.Items.SelectMany(item => new[] { item.Failure, item.Result?.Failure })
+            .FirstOrDefault(failure => failure?.Code is ErrorCode.ProcessTerminationFailed or ErrorCode.PublicationUncertain);
+        return ownershipFailure ?? (snapshot.PauseReason == BatchPauseReason.UnsafeOwnership ? snapshot.Failure : null) ?? fallback;
     }
 
     /// <summary>Adds all unique rows atomically or rejects the entire addition at the session limit.</summary>
