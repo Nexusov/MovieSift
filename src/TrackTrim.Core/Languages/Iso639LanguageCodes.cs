@@ -1,14 +1,21 @@
 using System.Collections.Frozen;
+using System.Diagnostics.CodeAnalysis;
 
-namespace TrackTrim.Infrastructure.MediaTools;
+namespace TrackTrim.Core.Languages;
 
 /// <summary>Contains explicit ISO 639-2 B/T and ISO 639-1 equivalences from the Library of Congress registry.</summary>
-internal static class Iso639LanguageCodes
+public static class Iso639LanguageCodes
 {
     // Registry: https://www.loc.gov/standards/iso639-2/ISO-639-2_utf-8.txt
     // Registry snapshot SHA-256: 42b71885e4dc885559fda5ad059fd81838cf4782cedb5fd08cc3431f7d067371.
     // Reserved private-use ranges are deliberately not expanded or inferred.
-    internal static readonly FrozenDictionary<string, string> CanonicalByAlias = CreateAliases();
+    private static readonly FrozenDictionary<string, string> CanonicalByAlias = CreateAliases();
+
+    /// <summary>Resolves only an explicitly registered plain code without changing metadata or interpreting suffixes.</summary>
+    public static bool TryCanonicalPlainCode(string value, [NotNullWhen(true)] out string? canonical)
+    {
+        return CanonicalByAlias.TryGetValue(value, out canonical);
+    }
 
     /// <summary>Builds a platform-independent immutable lookup from the explicit registry groups.</summary>
     private static FrozenDictionary<string, string> CreateAliases()

@@ -1,3 +1,5 @@
+using TrackTrim.Core.Languages;
+
 namespace TrackTrim.Infrastructure.MediaTools;
 
 /// <summary>Permits explicit ISO language aliases while retaining exact regional/script/private distinctions.</summary>
@@ -12,8 +14,8 @@ internal static class LanguageAliasPolicy
     /// <summary>Allows a new IETF field only for a registered equivalent plain legacy language code.</summary>
     internal static bool EquivalentPlainCodes(LanguageComparison request)
     {
-        var expectedKnown = Iso639LanguageCodes.CanonicalByAlias.TryGetValue(request.Expected, out var expected);
-        var actualKnown = Iso639LanguageCodes.CanonicalByAlias.TryGetValue(request.Actual, out var actual);
+        var expectedKnown = Iso639LanguageCodes.TryCanonicalPlainCode(request.Expected, out var expected);
+        var actualKnown = Iso639LanguageCodes.TryCanonicalPlainCode(request.Actual, out var actual);
         return expectedKnown && actualKnown && expected == actual;
     }
 
@@ -40,7 +42,7 @@ internal static class LanguageAliasPolicy
         var separator = value.IndexOf('-');
         var primary = separator < 0 ? value : value[..separator];
 
-        if (!Iso639LanguageCodes.CanonicalByAlias.TryGetValue(primary, out var canonical))
+        if (!Iso639LanguageCodes.TryCanonicalPlainCode(primary, out var canonical))
         {
             return value;
         }
