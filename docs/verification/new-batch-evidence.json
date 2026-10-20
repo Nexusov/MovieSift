@@ -250,7 +250,7 @@
   },
   "native": {
     "date": "2026-10-20",
-    "status": "blocked",
+    "status": "passed",
     "platform": "Windows 10 Home Single Language 22H2 x64, 19045.6456; interactive session 1",
     "execution": "Installed Computer Use @oai/sky through node_repl; native UIA and individual keyboard actions using observed focus. No screenshots, direct ViewModel calls or alternative UI automation. No developer tool-path overrides.",
     "executableTaskRelative": "Новая очередь portable с пробелами/TrackTrim-win-x64/TrackTrim.exe",
@@ -260,7 +260,19 @@
       "Selected the prepared ordinary MKV in the opened native file dialog.",
       "Confirmed the prepared output folder in the opened native folder dialog."
     ],
-    "observations": [
+    "artifact": {
+      "archiveName": "TrackTrim-win-x64.zip",
+      "archiveSize": 113205423,
+      "archiveSha256": "d1e7b4e5f26eb5e14b434abdd3703960056459785ab14e1998b55db677ed9e5a",
+      "sourceSize": 392464,
+      "sourceSha256": "055c7f3ebdc3c579dd6d7740c78a1e8ee0e2525f23542b5c6af9a0869ce4a0f8",
+      "sentinelSha256": "5bd9df83f47a984515977d5d10a042f662c0756caefcd1ed77bb596dedbf8794",
+      "sourceRevision": "bec2dd0b796f3fc5ffcdac244d2adbe7d1bdbe48",
+      "cleanWorktree": true,
+      "appLocalDataInitiallyEmpty": true
+    },
+    "initialAttemptStatus": "blocked",
+    "initialAttemptObservations": [
       {
         "case": "Fresh English launch and empty-list availability",
         "status": "passed",
@@ -316,19 +328,8 @@
         "reason": "Same user stop. No further Computer Use input or observation was issued; controlled/headless and real integration results are separate evidence."
       }
     ],
-    "limits": "The native row was inspected with all tracks initially retained. No individual approval, aggregate Review or media Run occurred in this short check. Last observed UI was the Russian confirmation with one row; state after the physical Escape stop was not queried. Appearance, visible focus and effective scaling are unverified; no display setting was changed.",
-    "artifact": {
-      "archiveName": "TrackTrim-win-x64.zip",
-      "archiveSize": 113205423,
-      "archiveSha256": "d1e7b4e5f26eb5e14b434abdd3703960056459785ab14e1998b55db677ed9e5a",
-      "sourceSize": 392464,
-      "sourceSha256": "055c7f3ebdc3c579dd6d7740c78a1e8ee0e2525f23542b5c6af9a0869ce4a0f8",
-      "sentinelSha256": "5bd9df83f47a984515977d5d10a042f662c0756caefcd1ed77bb596dedbf8794",
-      "sourceRevision": "bec2dd0b796f3fc5ffcdac244d2adbe7d1bdbe48",
-      "cleanWorktree": true,
-      "appLocalDataInitiallyEmpty": true
-    },
-    "postCheck": {
+    "initialAttemptLimits": "The native row was inspected with all tracks initially retained. No individual approval, aggregate Review or media Run occurred in this short check. Last observed UI was the Russian confirmation with one row; state after the physical Escape stop was not queried. Appearance, visible focus and effective scaling are unverified; no display setting was changed.",
+    "initialAttemptPostCheck": {
       "sourceSha256": "055c7f3ebdc3c579dd6d7740c78a1e8ee0e2525f23542b5c6af9a0869ce4a0f8",
       "sentinelSha256": "5bd9df83f47a984515977d5d10a042f662c0756caefcd1ed77bb596dedbf8794",
       "proposedOutputExists": false,
@@ -341,10 +342,188 @@
         "Language": "ru"
       },
       "method": "Read-only shell hashes, process list filtered to this extraction and app-local file listing after Computer Use stopped. This does not observe the UI after Escape."
+    },
+    "scope": "Bounded functional check: idle/picker availability, EN/RU confirmation, decline preserving one inspected row/destination, and confirmed reset to an empty list preserving Russian/output folder. Native reset of approved or completed plans was not exercised; those cases have separate controlled/headless and real-backend coverage.",
+    "resumedCheck": {
+      "status": "passed",
+      "continuationBase": "43883aca024ad2065eb80b5f9e8f6f21d9a437e3",
+      "startingState": "The same identified package remained open at its Russian confirmation with one inspected, unapproved row. The owner explicitly requested continuation after the earlier physical-Escape stop.",
+      "method": "Computer Use sky.press_key with individually observed native focus and fresh UIA reads; no fixed Tab-count assumption, mouse geometry, screenshot or alternate automation. Cached immediate snapshots were reacquired before activation.",
+      "ownerAssistance": [],
+      "observations": [
+        {
+          "observedAtUtc": "2026-10-20T02:19:33.918Z",
+          "label": "resume-current-state",
+          "focusedElement": null,
+          "excerpt": [
+            "21 button (disabled) Новая очередь ID: NewBatchButton",
+            "22 button (disabled) Запустить / продолжить проверенные планы ID: StartBatchButton",
+            "25 text Начать новую очередь? Текущий список и планы будут очищены. Уже созданные файлы останутся на диске.",
+            "26 button Очистить список и начать новую очередь ID: ConfirmNewBatchButton",
+            "27 button Оставить текущую очередь ID: KeepCurrentBatchButton",
+            "31 button (disabled) Добавить MKV… ID: AddBatchFilesButton",
+            "32 button (disabled) Добавить папку… ID: AddBatchFolderButton",
+            "35 text Результаты остаются на диске",
+            "36 text Файлов: 1 · включено: 1 · завершено: 0",
+            "46 text Тестовые источники с пробелами/обычная серия.mkv ID: BatchSelectedSource",
+            "49 edit (disabled, settable, string) Файл результата Value: Результаты остаются на диске/обычная серия.trimmed.mkv",
+            "Начать новую очередь? Текущий список и планы будут очищены. Уже созданные файлы останутся на диске.",
+            "Файлов: 1 · включено: 1 · завершено: 0"
+          ]
+        },
+        {
+          "observedAtUtc": "2026-10-20T02:20:09.685Z",
+          "label": "decline-control-focused",
+          "focusedElement": "27 button Оставить текущую очередь ID: KeepCurrentBatchButton",
+          "excerpt": [
+            "21 button (disabled) Новая очередь ID: NewBatchButton",
+            "22 button (disabled) Запустить / продолжить проверенные планы ID: StartBatchButton",
+            "25 text Начать новую очередь? Текущий список и планы будут очищены. Уже созданные файлы останутся на диске.",
+            "26 button Очистить список и начать новую очередь ID: ConfirmNewBatchButton",
+            "27 button Оставить текущую очередь ID: KeepCurrentBatchButton",
+            "31 button (disabled) Добавить MKV… ID: AddBatchFilesButton",
+            "32 button (disabled) Добавить папку… ID: AddBatchFolderButton",
+            "35 text Результаты остаются на диске",
+            "36 text Файлов: 1 · включено: 1 · завершено: 0",
+            "46 text Тестовые источники с пробелами/обычная серия.mkv ID: BatchSelectedSource",
+            "49 edit (disabled, settable, string) Файл результата Value: Результаты остаются на диске/обычная серия.trimmed.mkv",
+            "Начать новую очередь? Текущий список и планы будут очищены. Уже созданные файлы останутся на диске.",
+            "Файлов: 1 · включено: 1 · завершено: 0"
+          ]
+        },
+        {
+          "observedAtUtc": "2026-10-20T02:20:24.629Z",
+          "label": "declined-confirmation-kept-source-and-folder",
+          "focusedElement": "0 window TrackTrim Secondary Actions: Raise",
+          "excerpt": [
+            "21 button Новая очередь ID: NewBatchButton",
+            "22 button (disabled) Запустить / продолжить проверенные планы ID: StartBatchButton",
+            "31 button Добавить MKV… ID: AddBatchFilesButton",
+            "32 button Добавить папку… ID: AddBatchFolderButton",
+            "35 text Результаты остаются на диске",
+            "36 text Файлов: 1 · включено: 1 · завершено: 0",
+            "46 text Тестовые источники с пробелами/обычная серия.mkv ID: BatchSelectedSource",
+            "49 edit (settable, string) Файл результата Value: Результаты остаются на диске/обычная серия.trimmed.mkv",
+            "Файлов: 1 · включено: 1 · завершено: 0"
+          ]
+        },
+        {
+          "observedAtUtc": "2026-10-20T02:21:20.340Z",
+          "label": "fresh-reset-confirmation-before-consent",
+          "focusedElement": "0 window TrackTrim Secondary Actions: Raise",
+          "excerpt": [
+            "21 button (disabled) Новая очередь ID: NewBatchButton",
+            "22 button (disabled) Запустить / продолжить проверенные планы ID: StartBatchButton",
+            "99 text Начать новую очередь? Текущий список и планы будут очищены. Уже созданные файлы останутся на диске.",
+            "100 button Очистить список и начать новую очередь ID: ConfirmNewBatchButton",
+            "101 button Оставить текущую очередь ID: KeepCurrentBatchButton",
+            "31 button (disabled) Добавить MKV… ID: AddBatchFilesButton",
+            "32 button (disabled) Добавить папку… ID: AddBatchFolderButton",
+            "35 text Результаты остаются на диске",
+            "36 text Файлов: 1 · включено: 1 · завершено: 0",
+            "46 text Тестовые источники с пробелами/обычная серия.mkv ID: BatchSelectedSource",
+            "49 edit (disabled, settable, string) Файл результата Value: Результаты остаются на диске/обычная серия.trimmed.mkv",
+            "Начать новую очередь? Текущий список и планы будут очищены. Уже созданные файлы останутся на диске.",
+            "Файлов: 1 · включено: 1 · завершено: 0"
+          ]
+        },
+        {
+          "observedAtUtc": "2026-10-20T02:22:08.451Z",
+          "label": "explicit-clear-control-focused",
+          "focusedElement": "100 button Очистить список и начать новую очередь ID: ConfirmNewBatchButton",
+          "excerpt": [
+            "21 button (disabled) Новая очередь ID: NewBatchButton",
+            "22 button (disabled) Запустить / продолжить проверенные планы ID: StartBatchButton",
+            "99 text Начать новую очередь? Текущий список и планы будут очищены. Уже созданные файлы останутся на диске.",
+            "100 button Очистить список и начать новую очередь ID: ConfirmNewBatchButton",
+            "101 button Оставить текущую очередь ID: KeepCurrentBatchButton",
+            "31 button (disabled) Добавить MKV… ID: AddBatchFilesButton",
+            "32 button (disabled) Добавить папку… ID: AddBatchFolderButton",
+            "35 text Результаты остаются на диске",
+            "36 text Файлов: 1 · включено: 1 · завершено: 0",
+            "46 text Тестовые источники с пробелами/обычная серия.mkv ID: BatchSelectedSource",
+            "49 edit (disabled, settable, string) Файл результата Value: Результаты остаются на диске/обычная серия.trimmed.mkv",
+            "Начать новую очередь? Текущий список и планы будут очищены. Уже созданные файлы останутся на диске.",
+            "Файлов: 1 · включено: 1 · завершено: 0"
+          ]
+        },
+        {
+          "observedAtUtc": "2026-10-20T02:22:15.579Z",
+          "label": "confirmed-new-batch-empty-russian-folder-retained",
+          "focusedElement": "0 window TrackTrim Secondary Actions: Raise",
+          "excerpt": [
+            "21 button Новая очередь ID: NewBatchButton",
+            "22 button (disabled) Запустить / продолжить проверенные планы ID: StartBatchButton",
+            "31 button Добавить MKV… ID: AddBatchFilesButton",
+            "32 button Добавить папку… ID: AddBatchFolderButton",
+            "35 text Результаты остаются на диске",
+            "36 text Файлов: 0 · включено: 0 · завершено: 0",
+            "Файлов: 0 · включено: 0 · завершено: 0"
+          ]
+        }
+      ],
+      "activationRequests": [
+        {
+          "requestAtUtc": "2026-10-20T02:20:17.033Z",
+          "key": "space",
+          "observedFocus": "27 button Оставить текущую очередь ID: KeepCurrentBatchButton",
+          "purpose": "decline-new-batch"
+        },
+        {
+          "requestAtUtc": "2026-10-20T02:21:10.375Z",
+          "key": "space",
+          "observedFocus": "21 button Новая очередь ID: NewBatchButton",
+          "purpose": "request-confirmed-new-batch"
+        },
+        {
+          "requestAtUtc": "2026-10-20T02:22:08.451Z",
+          "key": "space",
+          "observedFocus": "100 button Очистить список и начать новую очередь ID: ConfirmNewBatchButton",
+          "purpose": "confirm-new-batch"
+        }
+      ],
+      "timestampScope": "Observation times and API request-start times, not physical input-event timestamps or cancellation timing evidence.",
+      "postCheck": {
+        "capturedUtc": "2026-10-20T02:23:00.5272580Z",
+        "sourceSha256Before": "055c7f3ebdc3c579dd6d7740c78a1e8ee0e2525f23542b5c6af9a0869ce4a0f8",
+        "sourceSha256After": "055c7f3ebdc3c579dd6d7740c78a1e8ee0e2525f23542b5c6af9a0869ce4a0f8",
+        "sentinelSha256Before": "5bd9df83f47a984515977d5d10a042f662c0756caefcd1ed77bb596dedbf8794",
+        "sentinelSha256After": "5bd9df83f47a984515977d5d10a042f662c0756caefcd1ed77bb596dedbf8794",
+        "expectedOutputExists": false,
+        "outputFolderEntries": [
+          "existing-owned-sentinel.txt"
+        ],
+        "appLocalFiles": [
+          "settings.json"
+        ],
+        "matchingMediaWorkerCount": 0,
+        "settings": {
+          "Version": 1,
+          "Language": "ru"
+        },
+        "verifiedApplicationPayloads": [
+          {
+            "path": "TrackTrim.dll",
+            "sha256": "5a5b51233b5309c7e8e21539bfb67c987804ca0956a8cf04bf0b6d3f33775614"
+          },
+          {
+            "path": "TrackTrim.exe",
+            "sha256": "b7017e6b89344a4229bf15b1750acee9d7761ed2d09946429d6efa49cfb79ed5"
+          }
+        ],
+        "platform": {
+          "edition": "Windows 10 Home Single Language",
+          "version": "22H2",
+          "build": "19045.6456",
+          "architecture": "X64",
+          "sessionId": 1
+        }
+      },
+      "postCheckMethod": "Read-only source/sentinel SHA256, installed DLL/EXE hash equality with the existing package manifest, app-local/output-folder listing and media-process filtering to this extraction. No files were deleted or media jobs started by the native check.",
+      "finalState": "The packaged window remains open with an empty Russian batch, the original output folder retained, Run disabled and Add files/folder enabled. No warning, cancellation, active-close or scaling scenario was run."
     }
   },
   "remaining": [
-    "Native decline and confirmed clear of New batch.",
     "Historical W13 timing correlation, repeated/verification close, native warning scenarios, real warning fixture, visual/scaling and clean Windows 11/Ubuntu Desktop acceptance retain their previous scope.",
     "Original application licensing and corresponding-source/redistribution obligations remain unresolved; no binary release or source-distribution assurance."
   ],
