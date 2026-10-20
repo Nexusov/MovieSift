@@ -166,7 +166,7 @@
   <data name="BatchPauseAfterCurrent" xml:space="preserve"><value>Приостановить после текущего файла</value></data>
   <data name="BatchCancel" xml:space="preserve"><value>Отменить очередь</value></data>
   <data name="BatchExplicitResume" xml:space="preserve"><value>Решение по предупреждению не запускает следующий файл. Проверьте оставшуюся очередь и явно продолжите её.</value></data>
-  <data name="BatchQueuePolicy" xml:space="preserve"><value>Очередь существует только в этом окне и не восстанавливается после перезапуска. Опубликованные результаты сохраняются. Ошибки, предупреждения, отмена и проблемы очистки останавливают очередь; продолжение требует явной проверки и запуска. Автоматического сопоставления дорожек и рекурсивного поиска нет.</value></data>
+  <data name="BatchQueuePolicy" xml:space="preserve"><value>Очередь существует только в этом окне и не восстанавливается после перезапуска. Опубликованные результаты сохраняются. Ошибки, предупреждения, отмена и проблемы очистки останавливают очередь; продолжение требует явной проверки и запуска. Языковые правила требуют предпросмотра и применения; вложенные папки не сканируются.</value></data>
   <data name="BatchPreparing" xml:space="preserve"><value>Добавьте файлы и подтвердите их отдельные планы.</value></data>
   <data name="BatchInspecting" xml:space="preserve"><value>Проверка каждого файла отдельно…</value></data>
   <data name="BatchReviewing" xml:space="preserve"><value>Проверка всех исходников, назначений и планов…</value></data>

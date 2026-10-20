@@ -166,7 +166,7 @@
   <data name="BatchPauseAfterCurrent" xml:space="preserve"><value>Pause after current file</value></data>
   <data name="BatchCancel" xml:space="preserve"><value>Cancel batch</value></data>
   <data name="BatchExplicitResume" xml:space="preserve"><value>Resolving this warning does not start the next file. Review the remaining batch and explicitly start it.</value></data>
-  <data name="BatchQueuePolicy" xml:space="preserve"><value>The queue exists only in this window and is not restored after restart. Published outputs remain intact. Failures, warnings, cancellation and cleanup problems pause the queue; remaining plans need explicit review and start. No automatic track matching or recursive discovery.</value></data>
+  <data name="BatchQueuePolicy" xml:space="preserve"><value>The queue exists only in this window and is not restored after restart. Published outputs remain intact. Failures, warnings, cancellation and cleanup problems pause the queue; remaining plans need explicit review and start. Language rules require Preview and Apply; subfolders are never scanned.</value></data>
   <data name="BatchPreparing" xml:space="preserve"><value>Add files and approve their independent plans.</value></data>
   <data name="BatchInspecting" xml:space="preserve"><value>Inspecting each file independently…</value></data>
   <data name="BatchReviewing" xml:space="preserve"><value>Checking all sources, destinations and approvals…</value></data>
