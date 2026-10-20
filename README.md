@@ -33,7 +33,7 @@ Supported ISO aliases match canonically, while complete script/region tags match
 
 Preview never edits selections or approvals. Relevant batch edits make it stale; only actual applied changes invalidate affected approvals and aggregate Review. Excluded/completed items remain unchanged. Rules do not approve, exclude or run unresolved files, and never apply automatically to later additions/reinspections. Language switching preserves the configuration and valid proposal; New batch clears transient proposals. Active work and unresolved ownership block preview/application through the existing gates.
 
-[Language-rule verification](docs/verification/phase-2b-language-rules-evidence.json) separates the real two-file backend case, controlled/headless tests, portable checks and the currently blocked native preview/application check.
+[Language-rule verification](docs/verification/phase-2b-language-rules-evidence.json) separates the real two-file backend case, controlled/headless tests, portable checks and the bounded Windows 10 native Preview/Apply/EN-RU functional check. Native source selection was owner-assisted; visual and target-desktop acceptance remain open.
 
 Do not use the application as a universal preservation tool. The [supported MKV matrix](docs/SUPPORTED_FORMATS.md) defines the inspected, verified, and rejected cases. Title/regex/forced-only rules, presets, recursive discovery, persisted queues/retries, MP4, playback and source replacement remain outside this implementation.
 

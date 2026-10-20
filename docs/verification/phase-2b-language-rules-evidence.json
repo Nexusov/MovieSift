@@ -364,10 +364,10 @@
     "publicBinaryUploaded": false
   },
   "native": {
-    "status": "blocked",
-    "scope": "Native preview/application and EN/RU preservation await the prepared source-picker handoff; no feature pass is inferred from startup or UIA text.",
+    "status": "passed",
+    "scope": "One-fixture native functional preview/application with EN -> RU -> EN state preservation and explicit reapproval, on the identified e79a00b Windows 10 binary. This is not native remux/publication or visual/target-desktop acceptance.",
     "platform": "Windows 10 Home Single Language 22H2 x64, 19045.6456; actual native host with installed developer SDK/tools",
-    "executionMethod": "Installed computer-use skill, @oai/sky through node_repl; native launch, returned exact executable/window identity, observed keyboard focus, Tab/Right/Space and accessibility-only observation.",
+    "executionMethod": "Installed computer-use skill, @oai/sky through node_repl. Owner completed the prepared source picker only; Computer Use entered the destination/codes through actual native editable controls, enabled rules and activated Preview/language buttons/Apply/approval using freshly observed keyboard focus. No direct ViewModel commands or alternate UI automation were used.",
     "sourceRevision": "e79a00b7dfa971e1c965c97fdad33ff2534aaff5",
     "archiveSHA256": "8A53C6F4C2AE4B87B000DC992EE459AEDC5038BE61BF4F8D1C3216800692BF0E",
     "extraction": "Правила языка portable с пробелами/TrackTrim-win-x64",
@@ -428,26 +428,237 @@
         "observation": "Computer Use keyboard-activated observed Add MKV files focus and observed Select MKV files for independent review. App-local media tool overrides were not used."
       },
       {
-        "case": "Inspect source, preview, explicit Apply and EN/RU media-state preservation",
-        "status": "not run",
-        "observation": "Concrete single-file picker handoff requested. Existing modal cached-app-state/geometry limitations were not retried, nor was the known screenshot timeout. No owner source-selection completion observed at this checkpoint."
+        "case": "Owner-assisted source selection and actual inspection",
+        "status": "passed",
+        "observation": "One included row at the exact prepared path displayed video 0, English PCM audio 1 and 2, and Russian SRT 3. Computer Use entered a fresh separate destination and explicitly approved the initial all-track plan; its text retained 0/1/2/3, with Run disabled."
+      },
+      {
+        "case": "Read-only preview and every matching audio retained",
+        "status": "passed",
+        "observation": "Audio en / subtitles eng preview showed one changed file, zero manual-review issues, Keep 0/1/2 and Remove 3. It explicitly reported no subtitle match. The original approved plan still showed Keep 0/1/2/3, nothing applied, same destination and disabled Run."
+      },
+      {
+        "case": "EN -> RU -> EN proposal and approval preservation",
+        "status": "passed",
+        "observation": "Without recomputing or applying the preview, both language switches preserved code values en/eng, proposed Keep 0/1/2 and Remove 3, the initial all-track approval and the same destination. Application labels/reasons translated; media titles and metadata remained original."
+      },
+      {
+        "case": "Explicit Apply invalidates the old approval",
+        "status": "passed",
+        "observation": "Space on observed ApplyLanguageRulesButton produced Files changed: 1 and Needs an independent approved plan. The old approved-plan text disappeared; repeat Apply and Run were disabled. No automatic approval, aggregate Review or Start occurred."
+      },
+      {
+        "case": "New explicit plan corroborates the applied editor choices",
+        "status": "passed",
+        "observation": "A separate Space on observed ApproveBatchItemButton created Approved; pending execution with actual plan Keep 0/1/2 and Remove 3 at the unchanged destination. This approval invalidated the old preview with the fresh-preview notice. Run remained disabled; aggregate Review/Start were not performed."
       }
     ],
-    "manualHandoff": "In the already open Select MKV files for independent review dialog, select the task-relative fixture above and Open. Then enable audio en and subtitles eng, Preview: retain 0/1/2 and remove 3 while editor still keeps all; switch EN/RU without changing proposal/configuration; Apply: editor keeps 0/1/2, remains unapproved, Run disabled. This is a functional check only; do not rerun remux, W13, New batch or screenshot/scaling scenarios.",
     "limits": [
-      "No native feature claim before source selection/preview/application observations.",
+      "Native UIA functional evidence only; ToggleState was not exposed, so actual editor choices are corroborated by explicit approved-plan text rather than checkbox names.",
       "No screenshots, visible focus/layout/resizing/effective-scale or clean target-desktop acceptance.",
-      "No native remux or cancellation in this bounded attempt; existing real backend integration is separate."
+      "One ordinary fixture and no native remux/publication/cancellation here. Real two-file backend processing/payload preservation remains separate integration evidence.",
+      "No New batch, W13, close or native warning scenarios were rerun. Capture/picker limitations are not application defects."
     ],
     "postChecks": {
-      "observedUtc": "2026-10-20T13:52:02.9649082Z",
+      "observedUtc": "2026-10-20T14:34:21.1155898Z",
       "sourceHashAfter": "055C7F3EBDC3C579DD6D7740C78A1E8EE0E2525F23542B5C6AF9A0869CE4A0F8",
+      "destinationExists": false,
+      "resultDirectoryEntries": [],
       "matchingMediaWorkerCount": 0,
-      "appLocalFiles": [],
+      "appLocalEntries": [
+        {
+          "path": "inspection",
+          "type": "directory"
+        },
+        {
+          "path": "settings.json",
+          "type": "file"
+        }
+      ],
       "siblingMedia": [
         "обычная серия.mkv"
-      ]
-    }
+      ],
+      "method": "Read-only complete source SHA256, top-level results enumeration, recursive app-local data enumeration and process executable-path filter. Captured after the native actions on 2026-10-20; no fresh GUI operation is implied by later documentation."
+    },
+    "observationDate": "2026-10-20",
+    "ownerAssistance": "Owner selected the prepared ordinary-series fixture and accepted Select MKV files for independent review; its loaded row/path/tracks were observed at 14:08:59.479Z. All subsequent UI actions were performed through Computer Use.",
+    "destination": "Результаты preview с пробелами/обычная серия.trimmed.mkv",
+    "rules": {
+      "audio": {
+        "mode": "KeepMatching",
+        "codes": [
+          "en"
+        ]
+      },
+      "subtitles": {
+        "mode": "KeepMatching",
+        "codes": [
+          "eng"
+        ]
+      }
+    },
+    "applyInput": {
+      "method": "Computer Use sky.press_key space on observed ApplyLanguageRulesButton focus",
+      "beforeUtc": "2026-10-20T14:32:24.392Z",
+      "focusedElement": "43 button Apply proposed choices ID: ApplyLanguageRulesButton",
+      "afterUtc": "2026-10-20T14:32:24.498Z"
+    },
+    "explicitReapprovalInput": {
+      "method": "Computer Use sky.press_key space on observed ApproveBatchItemButton",
+      "beforeUtc": "2026-10-20T14:33:20.502Z",
+      "focusedElement": "97 button Approve this file’s plan ID: ApproveBatchItemButton",
+      "afterUtc": "2026-10-20T14:33:20.641Z"
+    },
+    "observations": [
+      {
+        "label": "owner-source-opened",
+        "observedUtc": "2026-10-20T14:08:59.479Z",
+        "nativeUiaExcerpt": [
+          "22 button (disabled) Start / resume reviewed items ID: StartBatchButton",
+          "38 edit (disabled, settable, string) Audio language codes (comma separated) Description: en, rus, de-DE ID: AudioRuleLanguagesTextBox",
+          "40 edit (disabled, settable, string) Subtitle language codes (comma separated) Description: ru, en-US, sr-Latn ID: SubtitleRuleLanguagesTextBox",
+          "43 button (disabled) Apply proposed choices ID: ApplyLanguageRulesButton",
+          "45 text ID: LanguageRuleStatusText",
+          "51 text Needs an independent approved plan",
+          "55 text $TASK/Тестовые файлы с пробелами/обычная серия.mkv ID: BatchSelectedSource",
+          "56 text Needs an independent approved plan"
+        ]
+      },
+      {
+        "label": "initial-approved-all-track-plan-en",
+        "observedUtc": "2026-10-20T14:11:54.477Z",
+        "nativeUiaExcerpt": [
+          "22 button (disabled) Start / resume reviewed items ID: StartBatchButton",
+          "38 edit (disabled, settable, string) Audio language codes (comma separated) Description: en, rus, de-DE ID: AudioRuleLanguagesTextBox",
+          "40 edit (disabled, settable, string) Subtitle language codes (comma separated) Description: ru, en-US, sr-Latn ID: SubtitleRuleLanguagesTextBox",
+          "43 button (disabled) Apply proposed choices ID: ApplyLanguageRulesButton",
+          "45 text ID: LanguageRuleStatusText",
+          "51 text Approved: no change; no remux or output",
+          "55 text $TASK/Тестовые файлы с пробелами/обычная серия.mkv ID: BatchSelectedSource",
+          "56 text Approved: no change; no remux or output",
+          "58 edit (settable, string) Output file Value: $TASK/Результаты preview с пробелами/обычная серия.trimmed.mkv",
+          "108 text Keep: Video 0 — Untitled (VP8, und) Keep: Audio 1 — Matching audio (PCM, en) Keep: Audio 2 — Matching audio (PCM, en) Keep: Subtitles 3 — Captions (SubRip/SRT, ru)"
+        ]
+      },
+      {
+        "label": "preview-en-before-apply",
+        "observedUtc": "2026-10-20T14:18:22.482Z",
+        "nativeUiaExcerpt": [
+          "22 button (disabled) Start / resume reviewed items ID: StartBatchButton",
+          "38 edit (settable, string) Audio language codes (comma separated) Description: en, rus, de-DE Value: en ID: AudioRuleLanguagesTextBox",
+          "40 edit (settable, string) Subtitle language codes (comma separated) Description: ru, en-US, sr-Latn Value: eng ID: SubtitleRuleLanguagesTextBox",
+          "43 button Apply proposed choices ID: ApplyLanguageRulesButton",
+          "45 text Entries shown: 1; would change: 1; manual review: 0. Nothing has been applied. ID: LanguageRuleStatusText",
+          "114 text No subtitle language matched. This proposal keeps no subtitles.",
+          "116 text Keep: Video 0 — Untitled (VP8; Legacy language: und; IETF: und; default, enabled) Keep: Audio 1 — Matching audio (PCM; Legacy language: eng; IETF: en; Channels: 1; default, enabled) Keep: Audio 2 — Matching audio (PCM; Legacy language: eng; IETF: en; Channels: 1; enabled, commentary) Remove: Subtitles 3 — Captions (SubRip/SRT; Legacy language: rus; IETF: ru; forced, enabled)",
+          "51 text Approved: no change; no remux or output",
+          "55 text $TASK/Тестовые файлы с пробелами/обычная серия.mkv ID: BatchSelectedSource",
+          "56 text Approved: no change; no remux or output",
+          "58 edit (settable, string) Output file Value: $TASK/Результаты preview с пробелами/обычная серия.trimmed.mkv",
+          "108 text Keep: Video 0 — Untitled (VP8, und) Keep: Audio 1 — Matching audio (PCM, en) Keep: Audio 2 — Matching audio (PCM, en) Keep: Subtitles 3 — Captions (SubRip/SRT, ru)"
+        ]
+      },
+      {
+        "label": "preview-ru-before-apply",
+        "observedUtc": "2026-10-20T14:28:16.883Z",
+        "nativeUiaExcerpt": [
+          "22 button (disabled) Запустить / продолжить проверенные планы ID: StartBatchButton",
+          "38 edit (settable, string) Коды языков аудио через запятую Description: en, rus, de-DE Value: en ID: AudioRuleLanguagesTextBox",
+          "40 edit (settable, string) Коды языков субтитров через запятую Description: ru, en-US, sr-Latn Value: eng ID: SubtitleRuleLanguagesTextBox",
+          "43 button Применить предложенный выбор ID: ApplyLanguageRulesButton",
+          "45 text Записей: 1; изменится: 1; требуют ручной проверки: 0. Выбор ещё не применён. ID: LanguageRuleStatusText",
+          "114 text Язык ни одних субтитров не совпал. Этот выбор не сохраняет субтитры.",
+          "116 text Оставить: Видео 0 — Без названия (VP8; Прежний код языка: und; IETF: und; по умолчанию, включена) Оставить: Аудио 1 — Matching audio (PCM; Прежний код языка: eng; IETF: en; Каналы: 1; по умолчанию, включена) Оставить: Аудио 2 — Matching audio (PCM; Прежний код языка: eng; IETF: en; Каналы: 1; включена, комментарий) Удалить: Субтитры 3 — Captions (SubRip/SRT; Прежний код языка: rus; IETF: ru; принудительная, включена)",
+          "51 text Подтверждено: изменений нет; копирования и результата не будет",
+          "55 text $TASK/Тестовые файлы с пробелами/обычная серия.mkv ID: BatchSelectedSource",
+          "56 text Подтверждено: изменений нет; копирования и результата не будет",
+          "58 edit (settable, string) Файл результата Value: $TASK/Результаты preview с пробелами/обычная серия.trimmed.mkv",
+          "108 text Оставить: Видео 0 — Без названия (VP8, und) Оставить: Аудио 1 — Matching audio (PCM, en) Оставить: Аудио 2 — Matching audio (PCM, en) Оставить: Субтитры 3 — Captions (SubRip/SRT, ru)"
+        ]
+      },
+      {
+        "label": "preview-en-roundtrip-before-apply",
+        "observedUtc": "2026-10-20T14:29:16.769Z",
+        "nativeUiaExcerpt": [
+          "22 button (disabled) Start / resume reviewed items ID: StartBatchButton",
+          "38 edit (settable, string) Audio language codes (comma separated) Description: en, rus, de-DE Value: en ID: AudioRuleLanguagesTextBox",
+          "40 edit (settable, string) Subtitle language codes (comma separated) Description: ru, en-US, sr-Latn Value: eng ID: SubtitleRuleLanguagesTextBox",
+          "43 button Apply proposed choices ID: ApplyLanguageRulesButton",
+          "45 text Entries shown: 1; would change: 1; manual review: 0. Nothing has been applied. ID: LanguageRuleStatusText",
+          "114 text No subtitle language matched. This proposal keeps no subtitles.",
+          "116 text Keep: Video 0 — Untitled (VP8; Legacy language: und; IETF: und; default, enabled) Keep: Audio 1 — Matching audio (PCM; Legacy language: eng; IETF: en; Channels: 1; default, enabled) Keep: Audio 2 — Matching audio (PCM; Legacy language: eng; IETF: en; Channels: 1; enabled, commentary) Remove: Subtitles 3 — Captions (SubRip/SRT; Legacy language: rus; IETF: ru; forced, enabled)",
+          "51 text Approved: no change; no remux or output",
+          "55 text $TASK/Тестовые файлы с пробелами/обычная серия.mkv ID: BatchSelectedSource",
+          "56 text Approved: no change; no remux or output",
+          "58 edit (settable, string) Output file Value: $TASK/Результаты preview с пробелами/обычная серия.trimmed.mkv",
+          "108 text Keep: Video 0 — Untitled (VP8, und) Keep: Audio 1 — Matching audio (PCM, en) Keep: Audio 2 — Matching audio (PCM, en) Keep: Subtitles 3 — Captions (SubRip/SRT, ru)"
+        ]
+      },
+      {
+        "label": "after-explicit-apply-en-unapproved",
+        "observedUtc": "2026-10-20T14:32:32.642Z",
+        "nativeUiaExcerpt": [
+          "22 button (disabled) Start / resume reviewed items ID: StartBatchButton",
+          "38 edit (settable, string) Audio language codes (comma separated) Description: en, rus, de-DE Value: en ID: AudioRuleLanguagesTextBox",
+          "40 edit (settable, string) Subtitle language codes (comma separated) Description: ru, en-US, sr-Latn Value: eng ID: SubtitleRuleLanguagesTextBox",
+          "43 button (disabled) Apply proposed choices ID: ApplyLanguageRulesButton",
+          "45 text Files changed: 1. Files requiring manual review and left unchanged: 0. Approve changed plans, then explicitly Review and Start. ID: LanguageRuleStatusText",
+          "119 text No subtitle language matched. This proposal keeps no subtitles.",
+          "121 text Keep: Video 0 — Untitled (VP8; Legacy language: und; IETF: und; default, enabled) Keep: Audio 1 — Matching audio (PCM; Legacy language: eng; IETF: en; Channels: 1; default, enabled) Keep: Audio 2 — Matching audio (PCM; Legacy language: eng; IETF: en; Channels: 1; enabled, commentary) Remove: Subtitles 3 — Captions (SubRip/SRT; Legacy language: rus; IETF: ru; forced, enabled)",
+          "51 text Needs an independent approved plan",
+          "55 text $TASK/Тестовые файлы с пробелами/обычная серия.mkv ID: BatchSelectedSource",
+          "56 text Needs an independent approved plan",
+          "58 edit (settable, string) Output file Value: $TASK/Результаты preview с пробелами/обычная серия.trimmed.mkv"
+        ]
+      },
+      {
+        "label": "explicit-reapproval-proves-applied-choices-en",
+        "observedUtc": "2026-10-20T14:33:29.026Z",
+        "nativeUiaExcerpt": [
+          "22 button (disabled) Start / resume reviewed items ID: StartBatchButton",
+          "38 edit (settable, string) Audio language codes (comma separated) Description: en, rus, de-DE Value: en ID: AudioRuleLanguagesTextBox",
+          "40 edit (settable, string) Subtitle language codes (comma separated) Description: ru, en-US, sr-Latn Value: eng ID: SubtitleRuleLanguagesTextBox",
+          "43 button (disabled) Apply proposed choices ID: ApplyLanguageRulesButton",
+          "45 text The batch changed. Create a fresh language preview before applying. ID: LanguageRuleStatusText",
+          "51 text Approved; pending execution",
+          "55 text $TASK/Тестовые файлы с пробелами/обычная серия.mkv ID: BatchSelectedSource",
+          "56 text Approved; pending execution",
+          "58 edit (settable, string) Output file Value: $TASK/Результаты preview с пробелами/обычная серия.trimmed.mkv",
+          "122 text Keep: Video 0 — Untitled (VP8, und) Keep: Audio 1 — Matching audio (PCM, en) Keep: Audio 2 — Matching audio (PCM, en) Remove: Subtitles 3 — Captions (SubRip/SRT, ru)"
+        ]
+      }
+    ],
+    "result": {
+      "initialApprovedRetainedIds": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "proposedRetainedIds": [
+        0,
+        1,
+        2
+      ],
+      "proposedRemovedIds": [
+        3
+      ],
+      "matchingAudioIds": [
+        1,
+        2
+      ],
+      "noSubtitleMatches": true,
+      "oldApprovalRemovedAfterApply": true,
+      "explicitlyReapprovedRetainedIds": [
+        0,
+        1,
+        2
+      ],
+      "aggregateReviewPerformed": false,
+      "runRequested": false,
+      "finalRunDisabled": true
+    },
+    "inputTimingNote": "beforeUtc/afterUtc bound Computer Use API requests; they are not physical input-event timestamps. No active-worker/input timing correlation is claimed."
   },
   "inheritedGaps": [
     "Native visual capture/layout/visible focus/resizing/effective scaling",
@@ -456,5 +667,5 @@
     "Native warning review and genuine warning-remux fixture",
     "Original application license and corresponding-source/redistribution review"
   ],
-  "redactions": "Machine-absolute roots and unrelated desktop/picker data omitted. Paths are task-relative or file basenames. No raw screenshot, binaries, media, large logs or source archives are included."
+  "redactions": "Selected actual native UIA lines are included with original indexes/timestamps; task-root paths use $TASK and other paths are task-relative/basenames. Duplicate document-text/full-tree repetition, unrelated desktop/picker data, binaries, media, screenshots, large raw logs and source archives are omitted."
 }
