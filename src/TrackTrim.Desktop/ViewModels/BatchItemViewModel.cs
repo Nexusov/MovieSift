@@ -216,6 +216,11 @@ public sealed class BatchItemViewModel : ObservableObject
     /// <summary>Invalidates only this file's approval and the aggregate review.</summary>
     private void Invalidate()
     {
+        if (!options.Session.Snapshot.Items.Any(current => current.Id == Id))
+        {
+            return;
+        }
+
         planningFailure = null;
         options.Session.InvalidatePlan(Id);
         Refresh();

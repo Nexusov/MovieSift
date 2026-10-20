@@ -96,8 +96,10 @@ public sealed partial class MainViewModel : ObservableObject
     public bool HasBlockingOperation => IsBusy || HasWarningCandidate || RequiresCloseDecision || Batch?.HasBlockingOperation == true;
     public bool CanEdit => !HasBlockingOperation;
     public bool CanRun => approvedPlan is not null && CanEdit && !PersistenceFailed;
-    public bool RequiresCloseDecision => failure?.Code == ErrorCode.ProcessTerminationFailed || Batch?.HasSafetyBlock == true;
-    public string CloseDecisionText => Batch is { HasSafetyBlock: true, RequiresTerminationDecision: false }
+    private bool HasUncertainSingleOwnership => failure?.Code is ErrorCode.ProcessTerminationFailed or ErrorCode.PublicationUncertain;
+    public bool RequiresCloseDecision => HasUncertainSingleOwnership || Batch?.HasSafetyBlock == true;
+    public string CloseDecisionText => failure?.Code == ErrorCode.PublicationUncertain ? Localization["ErrorPublicationUncertain"] :
+        Batch is { HasSafetyBlock: true, RequiresTerminationDecision: false }
         ? Localization["BatchCleanupCloseNotice"] : Localization["CloseUnconfirmedNotice"];
     public bool HasPlan => approvedPlan is not null;
     public bool HasTracks => Tracks.Count != 0;
@@ -621,7 +623,7 @@ public sealed partial class MainViewModel : ObservableObject
     /// <summary>Refreshes language-sensitive values and all command predicates.</summary>
     private void NotifyPresentation()
     {
-        var blocksOtherWorkflow = IsBusy || result?.Phase == JobPhase.AwaitingWarningReview || failure?.Code == ErrorCode.ProcessTerminationFailed || !string.IsNullOrWhiteSpace(CleanupDetails);
+        var blocksOtherWorkflow = IsBusy || result?.Phase == JobPhase.AwaitingWarningReview || HasUncertainSingleOwnership || !string.IsNullOrWhiteSpace(CleanupDetails);
         Batch?.SetWorkspaceAccess(new(blocksOtherWorkflow, PersistenceFailed));
         OnPropertyChanged(string.Empty);
         OpenSourceCommand?.NotifyCanExecuteChanged();

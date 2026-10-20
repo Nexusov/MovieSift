@@ -159,6 +159,10 @@
   <data name="BatchReviewedPlans" xml:space="preserve"><value>Проверенные неизменяемые планы к запуску</value></data>
   <data name="BatchExcluded" xml:space="preserve"><value>Явно исключённые файлы (не будут запущены)</value></data>
   <data name="BatchStart" xml:space="preserve"><value>Запустить / продолжить проверенные планы</value></data>
+  <data name="BatchNew" xml:space="preserve"><value>Новая очередь</value></data>
+  <data name="BatchNewConfirmation" xml:space="preserve"><value>Начать новую очередь? Текущий список и планы будут очищены. Уже созданные файлы останутся на диске.</value></data>
+  <data name="BatchNewConfirm" xml:space="preserve"><value>Очистить список и начать новую очередь</value></data>
+  <data name="BatchKeepCurrent" xml:space="preserve"><value>Оставить текущую очередь</value></data>
   <data name="BatchPauseAfterCurrent" xml:space="preserve"><value>Приостановить после текущего файла</value></data>
   <data name="BatchCancel" xml:space="preserve"><value>Отменить очередь</value></data>
   <data name="BatchExplicitResume" xml:space="preserve"><value>Решение по предупреждению не запускает следующий файл. Проверьте оставшуюся очередь и явно продолжите её.</value></data>

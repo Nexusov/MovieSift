@@ -11,10 +11,21 @@
       <TextBlock Text="{Binding StageText}" TextWrapping="Wrap" />
       <ProgressBar Minimum="0" Maximum="100" Value="{Binding ProgressValue}" IsIndeterminate="{Binding IsProgressIndeterminate}" IsVisible="{Binding IsBusy}" />
       <WrapPanel>
+        <Button x:Name="NewBatchButton" Content="{Binding Localization[BatchNew]}" Command="{Binding NewBatchCommand}" Margin="0,0,8,8" />
         <Button x:Name="StartBatchButton" Content="{Binding Localization[BatchStart]}" Command="{Binding RunCommand}" Margin="0,0,8,8" />
         <Button Content="{Binding Localization[BatchPauseAfterCurrent]}" Command="{Binding PauseCommand}" Margin="0,0,8,8" />
         <Button x:Name="CancelBatchButton" Content="{Binding Localization[BatchCancel]}" Command="{Binding CancelCommand}" Margin="0,0,8,8" />
       </WrapPanel>
+      <Border x:Name="NewBatchConfirmation" IsVisible="{Binding HasNewBatchConfirmation}" Padding="12" BorderThickness="1"
+              BorderBrush="{DynamicResource SystemControlHighlightAccentBrush}" CornerRadius="4">
+        <StackPanel Spacing="8">
+          <TextBlock Text="{Binding Localization[BatchNewConfirmation]}" TextWrapping="Wrap" />
+          <WrapPanel>
+            <Button x:Name="ConfirmNewBatchButton" Content="{Binding Localization[BatchNewConfirm]}" Command="{Binding ConfirmNewBatchCommand}" Margin="0,0,8,8" />
+            <Button x:Name="KeepCurrentBatchButton" Content="{Binding Localization[BatchKeepCurrent]}" Command="{Binding KeepCurrentBatchCommand}" Margin="0,0,8,8" />
+          </WrapPanel>
+        </StackPanel>
+      </Border>
     </StackPanel>
     <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
       <StackPanel Spacing="12" Margin="0,12,0,0">

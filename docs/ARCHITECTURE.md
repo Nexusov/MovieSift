@@ -41,6 +41,8 @@ Each expected failure carries a stable error code and structured diagnostic deta
 
 The queue is in memory only. Ownership journals describe individual temporary outputs, not queue persistence or permission to retry. There is no automatic matching, recursive discovery, parallel remuxing, persisted queue, automatic retry or byte-offset resume.
 
+`BatchCoordinator.StartNewBatch` acquires the existing operation gate and atomically replaces a safe session with an empty snapshot at the next review revision. It rejects busy or unresolved warning/cleanup/ownership state without changing the old snapshot and performs no I/O. Desktop requires confirmation for a nonempty list and binds consent to that revision; declining preserves presentation. Successful reset clears editors, review diagnostics and progress while retaining language and the output folder. Old editor/progress callbacks are rejected by the existing item, plan and operation identities. The same source may be added again, but receives a new inspection and explicit approvals; existing files and collision checks remain intact.
+
 ## Process boundary
 
 Production executables are absolute app-relative paths. `ProcessStartInfo.ArgumentList` and `UseShellExecute=false` keep paths out of shell parsing. Both streams drain asynchronously even when retained diagnostics reach their bound; excessive/truncated structured data is a failure. Probe/startup operations have bounds; a valid large remux is not subject to a tiny fixed deadline.

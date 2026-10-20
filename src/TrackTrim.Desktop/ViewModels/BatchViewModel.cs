@@ -25,6 +25,7 @@ public sealed partial class BatchViewModel : ObservableObject
     private bool writesBlocked;
     private bool warningCloseRequested;
     private Guid? lastProgressItem;
+    private long? newBatchConfirmationRevision;
 
     [ObservableProperty]
     private bool isBusy;
@@ -59,6 +60,9 @@ public sealed partial class BatchViewModel : ObservableObject
         PauseCommand = new RelayCommand(services.Coordinator.Pause, () => Snapshot.Phase == BatchPhase.Running && !Snapshot.PauseRequested);
         PublishWarningsCommand = new AsyncRelayCommand(PublishWarningsAsync, () => HasWarningCandidate && !IsBusy && !externalOperationActive);
         DiscardWarningsCommand = new AsyncRelayCommand(DiscardWarningsAsync, () => HasWarningCandidate && !IsBusy && !externalOperationActive);
+        NewBatchCommand = new RelayCommand(RequestNewBatch, () => CanEdit);
+        ConfirmNewBatchCommand = new RelayCommand(ConfirmNewBatch, () => HasNewBatchConfirmation && IsWorkspaceAvailable);
+        KeepCurrentBatchCommand = new RelayCommand(KeepCurrentBatch, () => HasNewBatchConfirmation);
         services.Session.Changed += OnSessionChanged;
         services.Localization.PropertyChanged += (_, _) => Refresh();
         Synchronize();
@@ -68,13 +72,14 @@ public sealed partial class BatchViewModel : ObservableObject
     public ObservableCollection<BatchItemViewModel> Items { get; } = [];
     public BatchSnapshot Snapshot { get; private set; }
     public string OutputFolder => outputFolder;
-    public bool CanEdit => !IsBusy && !externalOperationActive && !HasWarningCandidate && !HasSafetyBlock;
+    public bool CanEdit => IsWorkspaceAvailable && !HasNewBatchConfirmation;
     public bool CanRun => CanEdit && !writesBlocked && Snapshot.Review is not null;
     public bool CanRemoveSelected => CanEdit && SelectedItem is { Snapshot.Result: null };
     public bool CanInspectSelected => CanEdit && SelectedItem is { } selected && selected.Snapshot.State is not (BatchItemState.Completed or BatchItemState.NoChange);
     public bool HasSafetyBlock => Snapshot.HasSafetyBlock;
     public bool HasWarningCandidate => WarningOwner is not null;
-    public bool HasBlockingOperation => IsBusy || HasWarningCandidate || HasSafetyBlock;
+    public bool HasBlockingOperation => IsBusy || HasWarningCandidate || HasSafetyBlock || HasNewBatchConfirmation;
+    public bool HasNewBatchConfirmation => newBatchConfirmationRevision is not null;
     public bool HasCleanupIssue => Snapshot.Items.Any(item => item.Result is { CleanupIssues.IsDefaultOrEmpty: false });
     public bool HasWarningCloseDecision => warningCloseRequested && HasWarningCandidate;
     public bool RequiresTerminationDecision => Snapshot.PauseReason == BatchPauseReason.UnsafeOwnership ||
@@ -106,6 +111,8 @@ public sealed partial class BatchViewModel : ObservableObject
     public bool HasDiagnostics => !string.IsNullOrWhiteSpace(Diagnostics);
     private Failure? EffectiveFailure => failure ?? Snapshot.Failure;
     private BatchItem? WarningOwner => Snapshot.Items.FirstOrDefault(item => item.State == BatchItemState.AwaitingWarningReview && item.Result?.Phase == JobPhase.AwaitingWarningReview);
+    private bool IsWorkspaceAvailable => !IsBusy && !externalOperationActive && !HasWarningCandidate && !HasSafetyBlock &&
+        Snapshot.Phase is not (BatchPhase.Inspecting or BatchPhase.Reviewing or BatchPhase.Running);
 
     public IAsyncRelayCommand AddFilesCommand { get; }
     public IAsyncRelayCommand AddFolderCommand { get; }
@@ -120,6 +127,69 @@ public sealed partial class BatchViewModel : ObservableObject
     public IRelayCommand PauseCommand { get; }
     public IAsyncRelayCommand PublishWarningsCommand { get; }
     public IAsyncRelayCommand DiscardWarningsCommand { get; }
+    public IRelayCommand NewBatchCommand { get; }
+    public IRelayCommand ConfirmNewBatchCommand { get; }
+    public IRelayCommand KeepCurrentBatchCommand { get; }
+
+    /// <summary>Requests explicit consent before clearing any existing list, plans or results.</summary>
+    private void RequestNewBatch()
+    {
+        if (!IsWorkspaceAvailable || HasNewBatchConfirmation)
+        {
+            return;
+        }
+
+        if (Snapshot.Items.IsEmpty)
+        {
+            StartNewBatch(Snapshot.Revision);
+            return;
+        }
+
+        newBatchConfirmationRevision = Snapshot.Revision;
+        Refresh();
+    }
+
+    /// <summary>Clears only the exact reviewed session to which the user consented.</summary>
+    private void ConfirmNewBatch()
+    {
+        if (newBatchConfirmationRevision is not { } revision || !IsWorkspaceAvailable)
+        {
+            return;
+        }
+
+        StartNewBatch(revision);
+    }
+
+    /// <summary>Declines a reset without clearing errors, progress, selections or approvals.</summary>
+    private void KeepCurrentBatch()
+    {
+        newBatchConfirmationRevision = null;
+        Refresh();
+    }
+
+    /// <summary>Resets presentation only after Application accepts an ownership-safe atomic reset.</summary>
+    private void StartNewBatch(long revision)
+    {
+        var reset = services.Coordinator.StartNewBatch(revision);
+        newBatchConfirmationRevision = null;
+
+        if (!reset.Applied)
+        {
+            failure = reset.Failure;
+            Refresh();
+            return;
+        }
+
+        operationRevision++;
+        failure = null;
+        reviewFailures = [];
+        activeProgress = null;
+        lastProgressItem = null;
+        warningCloseRequested = false;
+        ProgressValue = 0;
+        IsProgressIndeterminate = false;
+        Synchronize();
+    }
 
     /// <summary>Shares only workspace ownership availability, never another item's media state.</summary>
     public void SetWorkspaceAccess(BatchWorkspaceAccess access)
@@ -426,7 +496,8 @@ public sealed partial class BatchViewModel : ObservableObject
         {
             if (!editors.TryGetValue(item.Id, out var editor))
             {
-                editor = new(new(item, services.Session, Localization, outputFolder, () => CanEdit, OnEditorChanged));
+                editor = new(new(item, services.Session, Localization, outputFolder,
+                    () => CanEditItem(item.Id), () => OnItemEdited(item.Id)));
                 editors.Add(item.Id, editor);
                 Items.Add(editor);
             }
@@ -457,6 +528,20 @@ public sealed partial class BatchViewModel : ObservableObject
         Refresh();
     }
 
+    /// <summary>Rejects callbacks from editors whose item identity belongs to a previous list.</summary>
+    private bool CanEditItem(Guid itemId) => CanEdit && services.Session.Snapshot.Items.Any(item => item.Id == itemId);
+
+    /// <summary>Refreshes diagnostics only for an editor that still belongs to the current list.</summary>
+    private void OnItemEdited(Guid itemId)
+    {
+        if (!services.Session.Snapshot.Items.Any(item => item.Id == itemId))
+        {
+            return;
+        }
+
+        OnEditorChanged();
+    }
+
     /// <summary>Localizes all existing editors and updates queue commands without changing selections.</summary>
     private void Refresh()
     {
@@ -479,6 +564,9 @@ public sealed partial class BatchViewModel : ObservableObject
         PauseCommand?.NotifyCanExecuteChanged();
         PublishWarningsCommand?.NotifyCanExecuteChanged();
         DiscardWarningsCommand?.NotifyCanExecuteChanged();
+        NewBatchCommand?.NotifyCanExecuteChanged();
+        ConfirmNewBatchCommand?.NotifyCanExecuteChanged();
+        KeepCurrentBatchCommand?.NotifyCanExecuteChanged();
     }
 
     /// <summary>Maps the existing single-job progress vocabulary to shared resources.</summary>

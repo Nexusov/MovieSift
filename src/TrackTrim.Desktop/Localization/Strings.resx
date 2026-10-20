@@ -159,6 +159,10 @@
   <data name="BatchReviewedPlans" xml:space="preserve"><value>Reviewed immutable plans to run</value></data>
   <data name="BatchExcluded" xml:space="preserve"><value>Explicitly excluded files (will not run)</value></data>
   <data name="BatchStart" xml:space="preserve"><value>Start / resume reviewed items</value></data>
+  <data name="BatchNew" xml:space="preserve"><value>New batch</value></data>
+  <data name="BatchNewConfirmation" xml:space="preserve"><value>Start a new batch? The current list and plans will be cleared. Files already created remain on disk.</value></data>
+  <data name="BatchNewConfirm" xml:space="preserve"><value>Clear list and start new batch</value></data>
+  <data name="BatchKeepCurrent" xml:space="preserve"><value>Keep current batch</value></data>
   <data name="BatchPauseAfterCurrent" xml:space="preserve"><value>Pause after current file</value></data>
   <data name="BatchCancel" xml:space="preserve"><value>Cancel batch</value></data>
   <data name="BatchExplicitResume" xml:space="preserve"><value>Resolving this warning does not start the next file. Review the remaining batch and explicitly start it.</value></data>

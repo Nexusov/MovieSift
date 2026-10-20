@@ -156,6 +156,7 @@ internal sealed class FakeMediaBackend(MediaInspection inspection) : IMediaBacke
 /// <summary>Supplies outcome evidence without creating files in presentation tests.</summary>
 internal sealed class FakeOutputStore : IOutputStore
 {
+    public Failure? PublicationFailure { get; set; }
     public ImmutableArray<CleanupIssue> CleanupIssues { get; set; } = [];
     public ImmutableArray<InterruptedOutput> Interrupted { get; set; } = [];
     public TaskCompletionSource CleanupStarted { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -176,7 +177,9 @@ internal sealed class FakeOutputStore : IOutputStore
     public Task MarkPublishingAsync(OutputRequest request) => Task.CompletedTask;
 
     /// <summary>Returns publication evidence without creating a media file.</summary>
-    public Task<PublishedOutput> PublishAsync(OutputRequest request) => Task.FromResult(new PublishedOutput(request.Output.DestinationPath, 700));
+    public Task<PublishedOutput> PublishAsync(OutputRequest request) => PublicationFailure is { } failure
+        ? Task.FromException<PublishedOutput>(new OperationFailureException(failure))
+        : Task.FromResult(new PublishedOutput(request.Output.DestinationPath, 700));
 
     /// <summary>Reports complete cleanup for presentation-only candidates.</summary>
     public async Task<ImmutableArray<CleanupIssue>> CleanupAsync(OutputRequest request)
