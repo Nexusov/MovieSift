@@ -1,0 +1,460 @@
+{
+  "schemaVersion": 1,
+  "scope": "Phase 2B1 explicit batch language-rule preview/application only; historical native evidence retains its original binary/platform.",
+  "comparisonBase": "ab4957ada299e263351cffcc6f47445ff2ab1880",
+  "pullRequest": "https://github.com/Nexusov/TrackTrim/pull/3",
+  "pullRequestBase": "review/phase-2a-batch",
+  "runtimeCodeRevision": "e79a00b7dfa971e1c965c97fdad33ff2534aaff5",
+  "localChecks": {
+    "status": "passed",
+    "sdk": "10.0.402",
+    "runtime": "10.0.13",
+    "backend": "MKVToolNix 102.0; TRACKTRIM_REQUIRE_MEDIA_TOOLS=1",
+    "commands": [
+      "dotnet restore --locked-mode",
+      "dotnet format --verify-no-changes --no-restore",
+      "dotnet build --configuration Release --no-restore",
+      "dotnet test --configuration Release --no-build --no-restore --logger trx",
+      "python -m unittest discover -s build/tests -v"
+    ],
+    "buildWarnings": 0,
+    "buildErrors": 0,
+    "csharpPassed": 447,
+    "documentedLinuxOnlySkips": 7,
+    "pythonPassed": 16,
+    "groups": [
+      {
+        "name": "Core",
+        "passed": 84,
+        "skipped": 0
+      },
+      {
+        "name": "Application",
+        "passed": 164,
+        "skipped": 4
+      },
+      {
+        "name": "Infrastructure",
+        "passed": 128,
+        "skipped": 3
+      },
+      {
+        "name": "Desktop",
+        "passed": 71,
+        "skipped": 0
+      }
+    ],
+    "newCoverage": {
+      "pureCore": 76,
+      "controlledApplication": 38,
+      "headlessUi": 11,
+      "realBackend": 1
+    },
+    "finalTextCorrection": "After the complete run, only BatchQueuePolicy EN/RU text changed; the 19 affected language-rule/localization headless cases and formatting passed again."
+  },
+  "realBackend": {
+    "status": "passed",
+    "method": "Production Preview/Apply -> current file-local IDs -> explicit PlanBuilder/approval/Review -> existing sequential queue. Both outputs independently pass backend metadata/XML/attachment-metadata/timestamp verification. Complete nonempty mkvextract VP8/PCM representations are SHA256-compared; five comparisons asserted. Individual payload digests are not emitted by the helper. Attachment payload bytes are covered by existing cases, not newly claimed here.",
+    "files": [
+      {
+        "kind": "real-language-rule-batch-file",
+        "fixture": "TrackTrim original synthetic ordinary.mkv with test-only reordered/French-language variant",
+        "toolVersion": "102.0",
+        "source": "A English audio русские subtitles.mkv",
+        "sourceHashBefore": "055C7F3EBDC3C579DD6D7740C78A1E8EE0E2525F23542B5C6AF9A0869CE4A0F8",
+        "sourceHashAfter": "055C7F3EBDC3C579DD6D7740C78A1E8EE0E2525F23542B5C6AF9A0869CE4A0F8",
+        "output": "A English audio русские subtitles.trimmed.mkv",
+        "outputHash": "338994772AB896380AD629494192295CEA0A8444FF4CECFB5D5BA18E4F93EF6D",
+        "rules": {
+          "audio": "KeepMatching eng",
+          "subtitles": "KeepMatching eng"
+        },
+        "previewId": "bc4a7121-c9ea-4d38-9d56-066f7f2ecb86",
+        "previewRetainedIds": [
+          0,
+          1,
+          2
+        ],
+        "rawInputTracks": [
+          {
+            "Id": 0,
+            "uid": "12774094189724925210",
+            "kind": "Video",
+            "Language": "und",
+            "LanguageIetf": "und"
+          },
+          {
+            "Id": 1,
+            "uid": "13675876335307270593",
+            "kind": "Audio",
+            "Language": "eng",
+            "LanguageIetf": "en"
+          },
+          {
+            "Id": 2,
+            "uid": "15985661122095681775",
+            "kind": "Audio",
+            "Language": "eng",
+            "LanguageIetf": "en"
+          },
+          {
+            "Id": 3,
+            "uid": "10803935449919660822",
+            "kind": "Subtitles",
+            "Language": "rus",
+            "LanguageIetf": "ru"
+          }
+        ],
+        "retained": [
+          {
+            "sourceTrackId": 0,
+            "outputTrackId": 0,
+            "uid": "12774094189724925210",
+            "payloadCompared": true
+          },
+          {
+            "sourceTrackId": 1,
+            "outputTrackId": 1,
+            "uid": "13675876335307270593",
+            "payloadCompared": true
+          },
+          {
+            "sourceTrackId": 2,
+            "outputTrackId": 2,
+            "uid": "15985661122095681775",
+            "payloadCompared": true
+          }
+        ],
+        "metadataAndTimestampsVerified": true,
+        "attachmentMetadataCompared": true,
+        "toolExitCode": 0,
+        "cleanupIssues": 0
+      },
+      {
+        "kind": "real-language-rule-batch-file",
+        "fixture": "TrackTrim original synthetic ordinary.mkv with test-only reordered/French-language variant",
+        "toolVersion": "102.0",
+        "source": "B перестановка English French audio.mkv",
+        "sourceHashBefore": "89FB397A860369C4B487539EE6E007D0EB9EE5244F60EB107642EA5EA3E01966",
+        "sourceHashAfter": "89FB397A860369C4B487539EE6E007D0EB9EE5244F60EB107642EA5EA3E01966",
+        "output": "B перестановка English French audio.trimmed.mkv",
+        "outputHash": "2E9AEDC3F3DD4057A61EF689C50D603DD4721206A9D346F7720FEC0C25A63777",
+        "rules": {
+          "audio": "KeepMatching eng",
+          "subtitles": "KeepMatching eng"
+        },
+        "previewId": "bc4a7121-c9ea-4d38-9d56-066f7f2ecb86",
+        "previewRetainedIds": [
+          2,
+          3
+        ],
+        "rawInputTracks": [
+          {
+            "Id": 0,
+            "uid": "10803935449919660822",
+            "kind": "Subtitles",
+            "Language": "rus",
+            "LanguageIetf": "ru"
+          },
+          {
+            "Id": 1,
+            "uid": "15985661122095681775",
+            "kind": "Audio",
+            "Language": "fre",
+            "LanguageIetf": "fr"
+          },
+          {
+            "Id": 2,
+            "uid": "12774094189724925210",
+            "kind": "Video",
+            "Language": "und",
+            "LanguageIetf": "und"
+          },
+          {
+            "Id": 3,
+            "uid": "13675876335307270593",
+            "kind": "Audio",
+            "Language": "eng",
+            "LanguageIetf": "en"
+          }
+        ],
+        "retained": [
+          {
+            "sourceTrackId": 2,
+            "outputTrackId": 0,
+            "uid": "12774094189724925210",
+            "payloadCompared": true
+          },
+          {
+            "sourceTrackId": 3,
+            "outputTrackId": 1,
+            "uid": "13675876335307270593",
+            "payloadCompared": true
+          }
+        ],
+        "metadataAndTimestampsVerified": true,
+        "attachmentMetadataCompared": true,
+        "toolExitCode": 0,
+        "cleanupIssues": 0
+      }
+    ],
+    "retainedPayloadComparisons": 5,
+    "sourceHashesUnchanged": true,
+    "noCandidateJournalScratch": true
+  },
+  "codeCi": {
+    "url": "https://github.com/Nexusov/TrackTrim/actions/runs/39433530792",
+    "status": "passed",
+    "branchHead": "e79a00b7dfa971e1c965c97fdad33ff2534aaff5",
+    "actualCheckout": "cea4af08f3fa96cc970f6714f0b3c03eea0bd3b6",
+    "relationship": "Synthetic PR merge parents are comparisonBase and branchHead; source tree 77084662a5dec92a1323defaee115639b3eda127 equals the branch HEAD tree. Final evidence-only commits are validated by the same PR workflow; final run is linked on the PR.",
+    "requiredChecks": [
+      "Required media checks and win-x64 package",
+      "Required media checks and linux-x64 package"
+    ],
+    "windows": {
+      "passed": 447,
+      "linuxOnlySkipped": 7
+    },
+    "linux": {
+      "passed": 454,
+      "skipped": 0
+    },
+    "requiredPipeline": "Both jobs passed locked restore, formatting, warning-free Release build, 16 Python checks, mandatory media/headless/controlled suites, packaging/inventory and relocation. The applicable Linux no-SDK/no-media-tools container passed. Workflow, pins, main/protection and required contexts are unchanged.",
+    "platforms": [
+      {
+        "runtimeIdentifier": "win-x64",
+        "build": {
+          "schemaVersion": 1,
+          "runtimeIdentifier": "win-x64",
+          "sdkVersion": "10.0.402",
+          "runtimeVersion": "10.0.13",
+          "sourceRevision": "cea4af08f3fa96cc970f6714f0b3c03eea0bd3b6",
+          "sourceTree": "77084662a5dec92a1323defaee115639b3eda127",
+          "sourceParents": [
+            "ab4957ada299e263351cffcc6f47445ff2ab1880",
+            "e79a00b7dfa971e1c965c97fdad33ff2534aaff5"
+          ],
+          "worktreeDirty": false,
+          "configuration": "Release; self-contained; untrimmed; non-single-file; no AOT",
+          "operatingSystem": "Microsoft Windows 10.0.26100",
+          "artifactPurpose": "review and acceptance testing; public-release obligations remain"
+        },
+        "archive": {
+          "name": "TrackTrim-win-x64.zip",
+          "size": 113249108,
+          "sha256": "d5030929990a5090d8a252a53f777dcba18745dc97e2dff38302a2948e5c1234"
+        },
+        "counts": {
+          "third-party-payload": 34,
+          "original-or-generated-project-output": 36,
+          "self-contained-runtime": 187,
+          "notice-or-package-metadata": 68,
+          "bundled-tool-material": 198,
+          "included-source-archive": 1,
+          "bundled-executable": 2,
+          "generated-build-material": 1
+        },
+        "mechanicalChecks": {
+          "manifestCoverage": "passed",
+          "archiveMatchesStaging": "passed",
+          "includedMaterialReferences": "passed",
+          "pinnedMkvSourceHash": "passed"
+        },
+        "testGroups": [
+          {
+            "total": 84,
+            "passed": 84,
+            "failed": 0
+          },
+          {
+            "total": 168,
+            "passed": 164,
+            "failed": 0
+          },
+          {
+            "total": 71,
+            "passed": 71,
+            "failed": 0
+          },
+          {
+            "total": 131,
+            "passed": 128,
+            "failed": 0
+          }
+        ]
+      },
+      {
+        "runtimeIdentifier": "linux-x64",
+        "build": {
+          "schemaVersion": 1,
+          "runtimeIdentifier": "linux-x64",
+          "sdkVersion": "10.0.402",
+          "runtimeVersion": "10.0.13",
+          "sourceRevision": "cea4af08f3fa96cc970f6714f0b3c03eea0bd3b6",
+          "sourceTree": "77084662a5dec92a1323defaee115639b3eda127",
+          "sourceParents": [
+            "ab4957ada299e263351cffcc6f47445ff2ab1880",
+            "e79a00b7dfa971e1c965c97fdad33ff2534aaff5"
+          ],
+          "worktreeDirty": false,
+          "configuration": "Release; self-contained; untrimmed; non-single-file; no AOT",
+          "operatingSystem": "Ubuntu 24.04.5 LTS",
+          "artifactPurpose": "review and acceptance testing; public-release obligations remain"
+        },
+        "archive": {
+          "name": "TrackTrim-linux-x64.tar.gz",
+          "size": 104189086,
+          "sha256": "1a5dc1a40a17c3ab8c6a0027f8b0e5e79a768e470a749f3b37e52827145188b8"
+        },
+        "counts": {
+          "third-party-payload": 31,
+          "original-or-generated-project-output": 37,
+          "self-contained-runtime": 187,
+          "notice-or-package-metadata": 68,
+          "bundled-executable": 2,
+          "bundled-native-library": 102,
+          "distributed-static-archive": 3,
+          "bundled-tool-material": 71,
+          "included-source-archive": 1,
+          "generated-build-material": 3
+        },
+        "mechanicalChecks": {
+          "manifestCoverage": "passed",
+          "archiveMatchesStaging": "passed",
+          "includedMaterialReferences": "passed",
+          "pinnedMkvSourceHash": "passed"
+        },
+        "testGroups": [
+          {
+            "total": 84,
+            "passed": 84,
+            "failed": 0
+          },
+          {
+            "total": 168,
+            "passed": 168,
+            "failed": 0
+          },
+          {
+            "total": 131,
+            "passed": 131,
+            "failed": 0
+          },
+          {
+            "total": 71,
+            "passed": 71,
+            "failed": 0
+          }
+        ]
+      }
+    ]
+  },
+  "portable": {
+    "status": "passed",
+    "sourceRevision": "e79a00b7dfa971e1c965c97fdad33ff2534aaff5",
+    "sourceTree": "77084662a5dec92a1323defaee115639b3eda127",
+    "worktreeDirtyAtBuild": false,
+    "archive": "TrackTrim-win-x64.zip",
+    "size": 113249625,
+    "sha256": "8A53C6F4C2AE4B87B000DC992EE459AEDC5038BE61BF4F8D1C3216800692BF0E",
+    "inventoryFiles": 527,
+    "relocatedManifestPayloads": 526,
+    "method": "Existing package.ps1 and verify-package.ps1 -ArchivePath; actual self-contained single-file CLI workflow, full distribution inventory, relocation hashes and source immutability.",
+    "publicBinaryUploaded": false
+  },
+  "native": {
+    "status": "blocked",
+    "scope": "Native preview/application and EN/RU preservation await the prepared source-picker handoff; no feature pass is inferred from startup or UIA text.",
+    "platform": "Windows 10 Home Single Language 22H2 x64, 19045.6456; actual native host with installed developer SDK/tools",
+    "executionMethod": "Installed computer-use skill, @oai/sky through node_repl; native launch, returned exact executable/window identity, observed keyboard focus, Tab/Right/Space and accessibility-only observation.",
+    "sourceRevision": "e79a00b7dfa971e1c965c97fdad33ff2534aaff5",
+    "archiveSHA256": "8A53C6F4C2AE4B87B000DC992EE459AEDC5038BE61BF4F8D1C3216800692BF0E",
+    "extraction": "Правила языка portable с пробелами/TrackTrim-win-x64",
+    "freshAppLocalDataEntries": 0,
+    "fixture": {
+      "path": "Тестовые файлы с пробелами/обычная серия.mkv",
+      "size": 392464,
+      "sha256": "055C7F3EBDC3C579DD6D7740C78A1E8EE0E2525F23542B5C6AF9A0869CE4A0F8",
+      "provenance": "Existing original synthetic ordinary.mkv copied unchanged; pinned bundled mkvmerge -J independently confirmed actual track metadata."
+    },
+    "inputTracks": [
+      {
+        "id": 0,
+        "kind": "Video",
+        "legacy": "und",
+        "ietf": "und",
+        "codec": "VP8"
+      },
+      {
+        "id": 1,
+        "kind": "Audio",
+        "legacy": "eng",
+        "ietf": "en",
+        "codec": "PCM",
+        "title": "Matching audio"
+      },
+      {
+        "id": 2,
+        "kind": "Audio",
+        "legacy": "eng",
+        "ietf": "en",
+        "codec": "PCM",
+        "title": "Matching audio"
+      },
+      {
+        "id": 3,
+        "kind": "Subtitles",
+        "legacy": "rus",
+        "ietf": "ru",
+        "codec": "SubRip/SRT",
+        "title": "Captions"
+      }
+    ],
+    "checks": [
+      {
+        "case": "Fresh exact portable launch / English-first / Batch navigation",
+        "status": "passed",
+        "observation": "Computer Use launched the identified fresh executable, observed English first launch and used actual focused One file tab -> Right to open Several files / folder. Unchecked audio/subtitle rules and disabled Preview/Apply on the empty list were visible through native UIA."
+      },
+      {
+        "case": "Current English batch policy text",
+        "status": "passed",
+        "observation": "Initial 68cef3d startup exposed an obsolete Phase 2A sentence. EN/RU text was corrected in e79a00b, 19 relevant headless cases and formatting passed, package rebuilt cleanly; the final native window showed Language rules require Preview and Apply; subfolders are never scanned."
+      },
+      {
+        "case": "Open source picker",
+        "status": "passed",
+        "observation": "Computer Use keyboard-activated observed Add MKV files focus and observed Select MKV files for independent review. App-local media tool overrides were not used."
+      },
+      {
+        "case": "Inspect source, preview, explicit Apply and EN/RU media-state preservation",
+        "status": "not run",
+        "observation": "Concrete single-file picker handoff requested. Existing modal cached-app-state/geometry limitations were not retried, nor was the known screenshot timeout. No owner source-selection completion observed at this checkpoint."
+      }
+    ],
+    "manualHandoff": "In the already open Select MKV files for independent review dialog, select the task-relative fixture above and Open. Then enable audio en and subtitles eng, Preview: retain 0/1/2 and remove 3 while editor still keeps all; switch EN/RU without changing proposal/configuration; Apply: editor keeps 0/1/2, remains unapproved, Run disabled. This is a functional check only; do not rerun remux, W13, New batch or screenshot/scaling scenarios.",
+    "limits": [
+      "No native feature claim before source selection/preview/application observations.",
+      "No screenshots, visible focus/layout/resizing/effective-scale or clean target-desktop acceptance.",
+      "No native remux or cancellation in this bounded attempt; existing real backend integration is separate."
+    ],
+    "postChecks": {
+      "observedUtc": "2026-10-20T13:52:02.9649082Z",
+      "sourceHashAfter": "055C7F3EBDC3C579DD6D7740C78A1E8EE0E2525F23542B5C6AF9A0869CE4A0F8",
+      "matchingMediaWorkerCount": 0,
+      "appLocalFiles": [],
+      "siblingMedia": [
+        "обычная серия.mkv"
+      ]
+    }
+  },
+  "inheritedGaps": [
+    "Native visual capture/layout/visible focus/resizing/effective scaling",
+    "Clean Windows 11 25H2 and Ubuntu 24.04 Desktop acceptance",
+    "W13 active-remux input correlation; repeated and verification-stage close",
+    "Native warning review and genuine warning-remux fixture",
+    "Original application license and corresponding-source/redistribution review"
+  ],
+  "redactions": "Machine-absolute roots and unrelated desktop/picker data omitted. Paths are task-relative or file basenames. No raw screenshot, binaries, media, large logs or source archives are included."
+}
