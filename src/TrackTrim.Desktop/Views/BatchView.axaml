@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:viewModels="using:TrackTrim.Desktop.ViewModels"
+             xmlns:views="using:TrackTrim.Desktop.Views"
              x:Class="TrackTrim.Desktop.Views.BatchView"
              x:DataType="viewModels:BatchViewModel">
   <DockPanel LastChildFill="True">
@@ -41,6 +42,7 @@
           <TextBlock Text="{Binding OutputFolder}" TextWrapping="Wrap" VerticalAlignment="Center" />
         </WrapPanel>
         <TextBlock Text="{Binding SummaryText}" TextWrapping="Wrap" />
+        <views:BatchLanguageRulesView DataContext="{Binding LanguageRules}" />
         <TextBlock Text="{Binding Localization[BatchInclusionHint]}" TextWrapping="Wrap" Opacity="0.8" />
         <ListBox x:Name="BatchFileList" ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
                  Height="200" ScrollViewer.HorizontalScrollBarVisibility="Disabled" AutomationProperties.Name="{Binding Localization[BatchFiles]}">

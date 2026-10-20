@@ -1,6 +1,20 @@
-# Phase 0/1 foundation and Phase 2A acceptance
+# Phase 0/1 foundation and Phase 2 acceptance
 
-Phase 2A is explicitly authorized on a dependent review branch. Scope stops after manual independent file plans and sequential in-memory batch processing. Implemented code, an executed test, and acceptance on a clean desktop are different evidence. Historical Phase 0/1 evidence below belongs to its recorded revisions; native target-desktop and licensing acceptance remain open.
+Phase 2A and the separately authorized Phase 2B1 language-rule slice use dependent review branches. Scope stops after independent plans, sequential in-memory processing and explicit language-rule preview/application. Implemented code, an executed test, and acceptance on a clean desktop are different evidence. Historical evidence below belongs to its recorded revisions; native target-desktop and licensing acceptance remain open.
+
+## Phase 2B1 — explicit batch language rules
+
+Comparison base: `ab4957ada299e263351cffcc6f47445ff2ab1880`, matching the fetched, clean `review/phase-2a-batch` at task start with no newer changes. Isolated branch `review/phase-2b-language-rules` targets that branch and depends on draft PR #2; PR #1/#2, main/protection, pins and the two required CI contexts are unchanged.
+
+Audio/subtitle rules independently default to unchanged or keep all exact canonical matches. Per-file preview shows original track identity/metadata, proposed Keep choices and manual-review issues without mutation. Explicit Apply uses the captured item/inspection/revision and current selections; relevant edits reject stale application. Only actual changes invalidate affected approvals and aggregate Review. Unknown/conflicting/unsupported targeted metadata or no audio matches leaves the whole file unchanged; no subtitle matches may remove subtitles. Completed/excluded/untargeted state is preserved. Approval, zero-audio consent, review and execution remain explicit. The [matching contract](SUPPORTED_FORMATS.md#language-selection-rules) defines the narrow supported tag grammar and alias policy.
+
+Core owns pure matching and the shared frozen ISO table; preservation comparison keeps its existing behavior. Application stores file-local current selections and performs atomic revision-bound application under existing ownership gates. A small Desktop component owns rule configuration and preview presentation. EN/RU and row changes preserve valid proposals; New batch clears proposals and old callbacks cannot revive them. Rules never apply automatically to added/reinspected files.
+
+Local Windows checks passed locked restore, formatting verification, Release build (**0 warnings / 0 errors**), **447 C# tests + 7 existing Linux-only skips**, and **16/16 Python evidence checks**. C# groups: Core **84**, Application **164 + 4 skips**, Infrastructure **128 + 3 skips**, Desktop **71**. New coverage consists of **76 pure cases, 38 controlled Application cases, 11 headless cases and one real-media case**. Guard tests use deterministic synchronization across inspection/review/remux/verification/cleanup, warning ownership and uncertain outcomes. These are separate from native desktop acceptance.
+
+The actual-media case produces selections through production Preview/Apply for two differently ordered inputs: two English audio matches in A, one English match in B whose other audio is French; neither has matching English subtitles. Explicit per-file approval/review then dispatches the existing queue. Both outputs pass preservation verification, all **five retained VP8/PCM payloads** compare, both sources retain their full hashes, and candidate/journal/scratch storage is empty. TRX emits compact per-file rule/ID/hash evidence. The [Phase 2B1 evidence record](verification/phase-2b-language-rules-evidence.json) records package/native identities and actual execution scope separately.
+
+Title/regex/forced-only filtering, presets, recursion, persistence, parallel work, MP4 and the rest of Phase 2/3 remain outside this slice. Historical native acceptance is not reassigned to this binary. Visual/scaling/capture, target desktops, W13 input correlation, repeated/verification close, native warning/real warning-remux fixture and licensing/distribution gaps remain open.
 
 ## Phase 2A — bounded manual batch
 
@@ -16,7 +30,7 @@ The comparison base is foundation `19cb79ab0542addaec264e11c14f829526bc2066` (`r
 | Window ownership | Single and Batch tabs share the same job gate; close awaits active work or an explicit warning discard; warning actions use the candidate owner; repeated actions do not duplicate disposal | Headless controlled lifecycle tests. Active native batch cancel/close and warning review remain acceptance gaps. |
 | Actual media | Two independently planned MKVs with permuted track IDs/order retain different audio/subtitle selections; pinned backend verification plus extracted retained payloads, original hashes and cleanup are checked | Required real-media integration runs locally and in the existing Windows/Linux jobs. |
 
-The queue is not persisted. Automatic cross-file language rules, presets, recursion, automatic retries, parallel remuxing, MP4 and the rest of Phase 2/3 are not implemented. Existing journals retain conservative interruption behavior. Phase 1 native W04/W07, W13 and W14 observations remain associated with the old `e16050e` artifact/platform, not this binary. W13 active-remux input correlation, W11/W12 visual/scaling checks, clean Windows 11/Ubuntu Desktop, real warning-remux fixture and release/source/license obligations stay open. The unchanged capture blocker was not retried.
+The queue is not persisted. Phase 2A did not implement cross-file rules; the separately authorized Phase 2B1 slice above adds explicit language-only preview/application. Presets, recursion, automatic retries, parallel remuxing, MP4 and the rest of Phase 2/3 are not implemented. Existing journals retain conservative interruption behavior. Phase 1 native W04/W07, W13 and W14 observations remain associated with the old `e16050e` artifact/platform, not this binary. W13 active-remux input correlation, W11/W12 visual/scaling checks, clean Windows 11/Ubuntu Desktop, real warning-remux fixture and release/source/license obligations stay open. The unchanged capture blocker was not retried.
 
 ### Initial Phase 2A executed checks (`78a5b17`)
 
@@ -152,4 +166,4 @@ Restart cleanup is deliberately conservative: if a recovered candidate still exi
 
 Malformed or insufficient ownership JSON remains visible for manual review and never authorizes cleanup. Its original record, marker and candidate are retained. Headless warning-close and invalid-record regressions do not replace a real desktop shutdown test.
 
-Public release readiness is blocked by the unresolved licensing/source-distribution review and any unmet platform/safety acceptance above. After Phase 2A verification, the next bounded task is native acceptance of the new manual batch workflow on an available desktop; automatic matching and MP4 require separate authorization.
+Public release readiness is blocked by the unresolved licensing/source-distribution review and any unmet platform/safety acceptance above. The current bounded slice is Phase 2B1 language-rule preview/application; remaining matching features and MP4 require separate authorization.

@@ -25,7 +25,7 @@ The production backend resolves `tools/mkvmerge.exe` and `tools/mkvextract.exe` 
 
 The real-media suite uses generated fixtures, two checked-in direct FFmpeg-origin fixtures and the pinned backend. Fixture encoding is a development operation; FFmpeg is not a production or CI test-runtime dependency and is excluded from archives. Retained VP8/PCM/SRT and H264/AAC/SRT payload comparisons, chapters/tags, attachment payloads, track order/flags and source hashes are meaningful assertions. Deterministic fake ports/process helpers cover warning/race/failure paths and must be labelled separately from real remux verification.
 
-Phase 2A tests are grouped under Application `Batches`, Infrastructure `BatchInputDiscoveryTests` / `BatchMediaIntegrationTests`, and Desktop batch headless tests. Use deterministic signals for inspection/worker boundaries. The actual-media batch case must retain different content from two files with different track order/IDs, compare extracted retained payloads and source hashes, and verify both owned cleanups. It is not native desktop acceptance. Preserve the existing required media-test environment; do not turn missing tools/fixtures into a successful skip in CI.
+Phase 2A tests are grouped under Application `Batches`, Infrastructure `BatchInputDiscoveryTests` / `BatchMediaIntegrationTests`, and Desktop batch headless tests. Phase 2B1 adds Core `LanguageRuleMatcherTests`, Application language/selection guard tests, Desktop `BatchLanguageRulesTests`, and real `BatchLanguageRuleIntegrationTests`. The latter must obtain selections through production Preview/Apply before explicit approval/review, compare all retained extracted payloads from reordered inputs, source hashes and owned cleanup. Use deterministic signals for lifecycle boundaries. These checks are separate from native desktop acceptance. Preserve the existing required media-test environment; do not turn missing tools/fixtures into a successful skip in CI.
 
 Generate the original fixtures without FFmpeg or a production codec dependency:
 
@@ -77,9 +77,11 @@ The [applied protection record](docs/verification/main-protection.md) links the 
 
 ## Changes and licensing
 
-Follow `AGENTS.md` and the project dependency boundaries. Prefer small changes with a specific user-visible behavior or safety invariant. Update the relevant preservation matrix and tests when support expands. Current Phase 2A scope is manual independent plans, bounded top-level discovery and sequential in-memory dispatch through the existing job owner. Automatic cross-file rules, presets, recursion, persistent queues and MP4 require another task. Do not claim unsupported container fidelity.
+Follow `AGENTS.md` and the project dependency boundaries. Prefer small changes with a specific user-visible behavior or safety invariant. Update the relevant preservation matrix and tests when support expands. Current scope is Phase 2A independent plans/bounded discovery/sequential dispatch plus Phase 2B1 explicit language-rule preview/application. Matching uses Core policy and file-local inspections, never another file's IDs. Preview must not mutate approvals, Apply must reject stale state, and only real choice changes invalidate plans. Title/regex/forced-only matching, presets, recursion, persistent queues and MP4 require another task. Do not claim unsupported container fidelity.
 
 The Phase 2A review branch targets `review/phase-0-1` and depends on draft PR #1. Keep both reviews unmerged until separately authorized; the unfiltered `pull_request` workflow runs the same complete platform jobs on dependent PRs. Do not change required contexts or protected-main policy to deliver a feature.
+
+The Phase 2B1 branch `review/phase-2b-language-rules` targets `review/phase-2a-batch` and depends on draft PR #2. Preserve both existing draft PRs. The same unfiltered workflow must run both exact platform contexts, including packaging/inventory/relocation and the applicable Linux container check.
 
 Keep code, documentation, and commit messages in English. Keep English/Russian resource keys and formatting arguments aligned. Never log full media probe XML/JSON or collect remote telemetry.
 

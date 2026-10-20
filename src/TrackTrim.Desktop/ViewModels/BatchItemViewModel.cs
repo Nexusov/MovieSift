@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using TrackTrim.Application.Batches;
@@ -17,6 +18,7 @@ public sealed class BatchItemViewModel : ObservableObject
     private string outputPath;
     private bool zeroAudioConfirmed;
     private Failure? planningFailure;
+    private bool applyingSnapshot;
 
     /// <summary>Creates an editor for a stable item ID without loading global preferences.</summary>
     public BatchItemViewModel(BatchItemViewModelOptions options)
@@ -132,6 +134,7 @@ public sealed class BatchItemViewModel : ObservableObject
             throw new ArgumentException("The snapshot belongs to another batch item.", nameof(snapshot));
         }
 
+        var selectionChanged = !snapshot.CurrentRetainedTrackIds.SequenceEqual(item.CurrentRetainedTrackIds);
         item = snapshot;
 
         if (snapshot.Inspection is { } inspection && !ReferenceEquals(displayedInspection, inspection))
@@ -143,7 +146,7 @@ public sealed class BatchItemViewModel : ObservableObject
 
             foreach (var track in inspection.Tracks)
             {
-                Tracks.Add(new(new(track, Localization, Invalidate)));
+                Tracks.Add(new(new(track, Localization, OnTrackSelectionChanged)));
             }
         }
 
@@ -153,6 +156,28 @@ public sealed class BatchItemViewModel : ObservableObject
             Tracks.Clear();
             zeroAudioConfirmed = false;
             planningFailure = null;
+        }
+
+        if (selectionChanged)
+        {
+            zeroAudioConfirmed = false;
+            planningFailure = null;
+        }
+
+        applyingSnapshot = true;
+
+        try
+        {
+            var retained = snapshot.CurrentRetainedTrackIds.ToHashSet();
+
+            foreach (var track in Tracks)
+            {
+                track.Keep = retained.Contains(track.Track.Id);
+            }
+        }
+        finally
+        {
+            applyingSnapshot = false;
         }
 
         Refresh();
@@ -223,6 +248,29 @@ public sealed class BatchItemViewModel : ObservableObject
 
         planningFailure = null;
         options.Session.InvalidatePlan(Id);
+        Refresh();
+        options.Changed();
+    }
+
+    /// <summary>Stores the current file's choices and never carries silent-output consent into a changed selection.</summary>
+    private void OnTrackSelectionChanged()
+    {
+        if (applyingSnapshot || !options.CanEdit())
+        {
+            return;
+        }
+
+        var identifiers = Tracks.Where(track => track.Keep).Select(track => track.Track.Id).ToImmutableArray();
+        var edit = options.Session.SetSelection(new(Id, identifiers));
+
+        var current = options.Session.Snapshot.Items.FirstOrDefault(current => current.Id == Id);
+
+        if (!edit.Applied && current is not null)
+        {
+            ApplySnapshot(current);
+        }
+
+        planningFailure = edit.Failure;
         Refresh();
         options.Changed();
     }
