@@ -19,7 +19,14 @@ public sealed record BatchItem(
     RemuxPlan? ApprovedPlan = null,
     BatchItemState State = BatchItemState.PendingInspection,
     JobResult? Result = null,
-    Failure? Failure = null);
+    Failure? Failure = null,
+    ImmutableArray<int> RetainedTrackIds = default)
+{
+    public ImmutableArray<int> CurrentRetainedTrackIds => !RetainedTrackIds.IsDefault
+        ? RetainedTrackIds
+        : ApprovedPlan?.RetainedTracks.Select(track => track.Id).ToImmutableArray()
+            ?? Inspection?.Tracks.Select(track => track.Id).ToImmutableArray() ?? [];
+}
 
 public sealed record BatchReviewItem(Guid ItemId, RemuxPlan Plan);
 public sealed record BatchReview(Guid Id, long Revision, ImmutableArray<BatchReviewItem> Items);
@@ -27,6 +34,7 @@ public sealed record BatchItemFailure(Guid ItemId, Failure Failure);
 public sealed record BatchReviewResult(BatchReview? Review, ImmutableArray<BatchItemFailure> ItemFailures, Failure? Failure = null);
 public sealed record BatchEditResult(bool Applied, Failure? Failure = null);
 public sealed record BatchPlanApprovalRequest(Guid ItemId, RemuxPlan Plan);
+public sealed record BatchSelectionRequest(Guid ItemId, ImmutableArray<int> RetainedTrackIds);
 public sealed record BatchItemRequest(Guid ItemId, CancellationToken CancellationToken = default);
 public sealed record BatchRunRequest(Guid ReviewId, IProgress<BatchProgress>? Progress = null, CancellationToken CancellationToken = default);
 public sealed record BatchWarningRequest(Guid ItemId, CancellationToken CancellationToken = default);

@@ -3,6 +3,7 @@ using TrackTrim.Application.Inspection;
 using TrackTrim.Application.Jobs;
 using TrackTrim.Application.Ports;
 using TrackTrim.Core.Failures;
+using TrackTrim.Core.Rules;
 
 namespace TrackTrim.Application.Batches;
 
@@ -16,6 +17,7 @@ public sealed class BatchCoordinator(
     private readonly SemaphoreSlim gate = new(1, 1);
     private readonly object cancellationSynchronization = new();
     private CancellationTokenSource? activeCancellation;
+    private BatchLanguagePreview? issuedLanguagePreview;
 
     /// <summary>Starts an empty in-memory batch only when no operation or unresolved ownership is present.</summary>
     public BatchEditResult StartNewBatch(long? expectedRevision = null)
@@ -27,7 +29,58 @@ public sealed class BatchCoordinator(
 
         try
         {
-            return session.Reset(expectedRevision);
+            var result = session.Reset(expectedRevision);
+
+            if (result.Applied)
+            {
+                issuedLanguagePreview = null;
+            }
+
+            return result;
+        }
+        finally
+        {
+            gate.Release();
+        }
+    }
+
+    /// <summary>Previews independent language selections without changing any queue or approval state.</summary>
+    public BatchLanguagePreviewResult PreviewLanguageRules(LanguageRules rules)
+    {
+        if (!gate.Wait(0))
+        {
+            return new(null, new(ErrorCode.Busy));
+        }
+
+        try
+        {
+            var result = session.PreviewLanguageRules(rules);
+
+            if (result.Preview is not null)
+            {
+                issuedLanguagePreview = result.Preview;
+            }
+
+            return result;
+        }
+        finally
+        {
+            gate.Release();
+        }
+    }
+
+    /// <summary>Applies only this coordinator's unchanged issued preview at one atomic selection boundary.</summary>
+    public BatchLanguageApplyResult ApplyLanguageRules(BatchLanguagePreview preview)
+    {
+        if (!gate.Wait(0))
+        {
+            return new(false, [], new(ErrorCode.Busy));
+        }
+
+        try
+        {
+            var isIssued = preview is not null && ReferenceEquals(preview, issuedLanguagePreview);
+            return session.ApplyLanguageRules(new(preview!, isIssued));
         }
         finally
         {
@@ -278,7 +331,8 @@ public sealed class BatchCoordinator(
             Inspection = null,
             ApprovedPlan = null,
             Result = null,
-            Failure = null
+            Failure = null,
+            RetainedTrackIds = default
         });
         var result = await inspectionService.InspectAsync(new(item.SourcePath, request.CancellationToken));
         var failure = result.IsStale ? new Failure(ErrorCode.StalePlan) : result.Failure;
@@ -289,7 +343,8 @@ public sealed class BatchCoordinator(
             Inspection = result.Inspection,
             DiscoveredSource = result.Inspection?.Source ?? current.DiscoveredSource,
             State = state,
-            Failure = failure
+            Failure = failure,
+            RetainedTrackIds = result.Inspection?.Tracks.Select(track => track.Id).ToImmutableArray() ?? []
         });
     }
 
