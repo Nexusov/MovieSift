@@ -37,6 +37,9 @@
           <Button x:Name="AddBatchFolderButton" Content="{Binding Localization[BatchAddFolder]}" Command="{Binding AddFolderCommand}" Margin="0,0,8,8" />
           <Button Content="{Binding Localization[BatchInspectPending]}" Command="{Binding InspectPendingCommand}" Margin="0,0,8,8" />
         </WrapPanel>
+        <CheckBox x:Name="IncludeSubfoldersCheckBox" IsChecked="{Binding IncludeSubfolders, Mode=TwoWay}"
+                  IsEnabled="{Binding CanEdit}" Content="{Binding Localization[BatchIncludeSubfolders]}" />
+        <TextBlock Text="{Binding Localization[BatchFolderScopeHelp]}" TextWrapping="Wrap" Opacity="0.8" />
         <WrapPanel>
           <Button x:Name="BatchOutputFolderButton" Content="{Binding Localization[ChooseOutput]}" Command="{Binding ChooseOutputCommand}" Margin="0,0,8,8" />
           <TextBlock Text="{Binding OutputFolder}" TextWrapping="Wrap" VerticalAlignment="Center" />
@@ -54,6 +57,7 @@
                           Content="{Binding Localization[BatchInclude]}" VerticalAlignment="Top" />
                 <StackPanel Grid.Column="1" Spacing="3">
                   <TextBlock Text="{Binding SourcePath}" TextWrapping="Wrap" FontWeight="SemiBold" />
+                  <TextBlock Text="{Binding RelativeSourcePath}" IsVisible="{Binding HasFolderOrigin}" TextWrapping="Wrap" />
                   <TextBlock Text="{Binding StateText}" TextWrapping="Wrap" />
                   <TextBlock Text="{Binding PublishedPath}" TextWrapping="Wrap" IsVisible="{Binding HasPublishedPath}" />
                 </StackPanel>

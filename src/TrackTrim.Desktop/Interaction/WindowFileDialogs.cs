@@ -33,7 +33,7 @@ public sealed class WindowFileDialogs(WindowFileDialogsOptions options) : IFileD
         return files.Select(file => RequireLocalPath(file, ErrorCode.InvalidSource)).ToArray();
     }
 
-    /// <summary>Prompts for one folder; discovery never descends into its children.</summary>
+    /// <summary>Prompts for one root; the batch request separately captures whether to include subfolders.</summary>
     public async Task<string?> SelectInputFolderAsync()
     {
         var folders = await options.Window.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions

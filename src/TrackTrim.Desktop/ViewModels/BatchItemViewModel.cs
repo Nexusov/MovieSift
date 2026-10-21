@@ -16,6 +16,8 @@ public sealed class BatchItemViewModel : ObservableObject
     private BatchItem item;
     private MediaInspection? displayedInspection;
     private string outputPath;
+    private string outputFolder;
+    private string? outputDirectoryRoot;
     private bool zeroAudioConfirmed;
     private Failure? planningFailure;
     private bool applyingSnapshot;
@@ -25,12 +27,16 @@ public sealed class BatchItemViewModel : ObservableObject
     {
         this.options = options;
         item = options.Item;
+        outputFolder = options.OutputFolder;
+        outputDirectoryRoot = item.FolderOrigin is not null && !string.IsNullOrEmpty(outputFolder) ? outputFolder : null;
         outputPath = string.IsNullOrEmpty(options.OutputFolder) ? string.Empty : DeriveDestination(options.OutputFolder);
         ApplySnapshot(item);
     }
 
     public Guid Id => item.Id;
     public string SourcePath => item.SourcePath;
+    public string RelativeSourcePath => item.FolderOrigin?.RelativePath ?? string.Empty;
+    public bool HasFolderOrigin => item.FolderOrigin is not null;
     public LocalizationService Localization => options.Localization;
     public ObservableCollection<TrackViewModel> Tracks { get; } = [];
     public BatchItem Snapshot => item;
@@ -108,6 +114,8 @@ public sealed class BatchItemViewModel : ObservableObject
                 return;
             }
 
+            outputDirectoryRoot = item.FolderOrigin is not null && OutputPathPolicy.IsWithinDirectory(outputFolder, value)
+                ? outputFolder : null;
             Invalidate();
         }
     }
@@ -192,7 +200,7 @@ public sealed class BatchItemViewModel : ObservableObject
         }
 
         var identifiers = Tracks.Where(track => track.Keep).Select(track => track.Track.Id).ToArray();
-        var result = PlanBuilder.Build(new(item.Inspection, identifiers, OutputPath, ZeroAudioConfirmed));
+        var result = PlanBuilder.Build(new(item.Inspection, identifiers, OutputPath, ZeroAudioConfirmed, outputDirectoryRoot));
         planningFailure = result.Failure;
 
         if (result.Plan is { } plan)
@@ -215,7 +223,18 @@ public sealed class BatchItemViewModel : ObservableObject
             return;
         }
 
-        outputPath = DeriveDestination(folder);
+        var destination = DeriveDestination(folder);
+        var directoryRoot = item.FolderOrigin is not null ? folder : null;
+        var unchanged = outputPath == destination && outputDirectoryRoot == directoryRoot;
+        outputFolder = folder;
+
+        if (unchanged)
+        {
+            return;
+        }
+
+        outputPath = destination;
+        outputDirectoryRoot = directoryRoot;
 
         if (item.Inspection is null)
         {
@@ -278,6 +297,13 @@ public sealed class BatchItemViewModel : ObservableObject
     /// <summary>Uses the established naming convention without silently resolving collisions.</summary>
     private string DeriveDestination(string folder)
     {
+        if (item.FolderOrigin is { } origin)
+        {
+            var result = OutputPathPolicy.DeriveFolderDestination(new(folder, origin.RelativePath));
+            planningFailure = result.Failure;
+            return result.DestinationPath ?? string.Empty;
+        }
+
         return Path.Combine(folder, $"{Path.GetFileNameWithoutExtension(SourcePath)}.trimmed.mkv");
     }
 }

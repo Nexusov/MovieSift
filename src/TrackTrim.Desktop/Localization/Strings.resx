@@ -140,12 +140,12 @@
   <data name="ErrorReasonSegmentStructure" xml:space="preserve"><value>The Segment Info cannot be inspected within the supported bounds. Choose a standalone MKV with finite element sizes; streaming clusters and multiple segments are unsupported.</value></data>
   <data name="SingleWorkflow" xml:space="preserve"><value>One file</value></data>
   <data name="BatchWorkflow" xml:space="preserve"><value>Several files / folder</value></data>
-  <data name="BatchInstructions" xml:space="preserve"><value>Add MKV files or one folder (direct contents only). Inspect and approve each file independently, choose separate destinations, then review the batch.</value></data>
-  <data name="BatchLimits" xml:space="preserve"><value>Limits: {0} files per queue; {1} examined folder entries. An excessive addition is rejected in full; subfolders are never scanned.</value></data>
+  <data name="BatchInstructions" xml:space="preserve"><value>Add MKV files or one folder. Include subfolders only when requested. Inspect and approve each file independently, choose separate destinations, then review the batch.</value></data>
+  <data name="BatchLimits" xml:space="preserve"><value>Limits: {0} files per queue; {1} examined entries across the whole folder scan. Exceeding a limit rejects the addition in full.</value></data>
   <data name="BatchAddFiles" xml:space="preserve"><value>Add MKV files…</value></data>
   <data name="BatchAddFolder" xml:space="preserve"><value>Add a folder…</value></data>
   <data name="BatchFilesDialogTitle" xml:space="preserve"><value>Select MKV files for independent review</value></data>
-  <data name="BatchFolderDialogTitle" xml:space="preserve"><value>Choose a folder with MKV files (no subfolders)</value></data>
+  <data name="BatchFolderDialogTitle" xml:space="preserve"><value>Choose one folder with MKV files</value></data>
   <data name="BatchFiles" xml:space="preserve"><value>Batch files (full paths)</value></data>
   <data name="BatchInclusionHint" xml:space="preserve"><value>Included files must have an approved plan. Explicitly exclude or remove unwanted/failed entries; exclusion is shown in review.</value></data>
   <data name="BatchInclude" xml:space="preserve"><value>Include file</value></data>
@@ -166,7 +166,7 @@
   <data name="BatchPauseAfterCurrent" xml:space="preserve"><value>Pause after current file</value></data>
   <data name="BatchCancel" xml:space="preserve"><value>Cancel batch</value></data>
   <data name="BatchExplicitResume" xml:space="preserve"><value>Resolving this warning does not start the next file. Review the remaining batch and explicitly start it.</value></data>
-  <data name="BatchQueuePolicy" xml:space="preserve"><value>The queue exists only in this window and is not restored after restart. Published outputs remain intact. Failures, warnings, cancellation and cleanup problems pause the queue; remaining plans need explicit review and start. Language rules require Preview and Apply; subfolders are never scanned.</value></data>
+  <data name="BatchQueuePolicy" xml:space="preserve"><value>The queue exists only in this window and is not restored after restart. Published outputs remain intact. Failures, warnings, cancellation and cleanup problems pause the queue; remaining plans need explicit review and start. Rules require Preview and Apply.</value></data>
   <data name="BatchPreparing" xml:space="preserve"><value>Add files and approve their independent plans.</value></data>
   <data name="BatchInspecting" xml:space="preserve"><value>Inspecting each file independently…</value></data>
   <data name="BatchReviewing" xml:space="preserve"><value>Checking all sources, destinations and approvals…</value></data>
@@ -196,7 +196,7 @@
   <data name="BatchCleanupCloseNotice" xml:space="preserve"><value>Owned cleanup remains unresolved. Review diagnostics before closing. Remaining evidence is retained; this in-memory queue will not be restored.</value></data>
   <data name="ErrorReasonBatchFileLimit" xml:space="preserve"><value>Too many file entries. Reduce the selection or folder contents; no partial addition was accepted.</value></data>
   <data name="ErrorReasonBatchEntryLimit" xml:space="preserve"><value>The folder contains too many entries to scan within the displayed limit. Use a smaller folder; no partial addition was accepted.</value></data>
-  <data name="ErrorReasonInvalidBatchInput" xml:space="preserve"><value>Choose several local MKV files or one local folder, without directory links or subfolder traversal.</value></data>
+  <data name="ErrorReasonInvalidBatchInput" xml:space="preserve"><value>Choose several local MKV files or exactly one local folder, without directory links.</value></data>
   <data name="RuleHeading" xml:space="preserve"><value>Batch language and title rules</value></data>
   <data name="RuleHint" xml:space="preserve"><value>Unchecked categories leave current choices unchanged. Enable a category to keep every matching track independently in each file. Preview first; nothing changes until you apply.</value></data>
   <data name="RuleAudio" xml:space="preserve"><value>Keep all audio matching these language codes</value></data>
@@ -274,4 +274,9 @@
   <data name="PresetIssueEmptyTitleFilter" xml:space="preserve"><value>Enter non-blank title text or disable the title filter.</value></data>
   <data name="PresetIssueInvalidRuleLanguage" xml:space="preserve"><value>Correct the unknown or unsupported rule language code.</value></data>
   <data name="PresetCleanupIssue" xml:space="preserve"><value>Preset temporary-file cleanup reported a problem. See details.</value></data>
+  <data name="BatchIncludeSubfolders" xml:space="preserve"><value>Include subfolders</value></data>
+  <data name="BatchFolderScopeHelp" xml:space="preserve"><value>Off: immediate MKVs only. On: choose an existing output folder first; relative season folders are preserved. This setting affects only the next folder addition. Output and known application working folders are excluded.</value></data>
+  <data name="ErrorReasonRecursiveOutputRequired" xml:space="preserve"><value>Choose an existing output folder before adding a folder with subfolders.</value></data>
+  <data name="ErrorReasonRecursiveRootConflict" xml:space="preserve"><value>The output folder cannot equal or contain the selected source folder. Choose a separate output root or a child that can be excluded.</value></data>
+  <data name="ErrorReasonBatchDepthLimit" xml:space="preserve"><value>The folder tree exceeds the supported depth of 32 subfolders. Nothing was added.</value></data>
 </root>
