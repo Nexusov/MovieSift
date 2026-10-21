@@ -15,7 +15,7 @@
   },
   "localChecks": {
     "status": "passed",
-    "sourceState": "Feature diff against comparisonBase; same production/test tree is committed before portable packaging.",
+    "sourceState": "Checks executed on the feature diff before commit; production/test files are identical in d808da67dfa68c02f16cda9ce507bc184b4a47bb. Portable built from that clean committed revision.",
     "platform": "Windows 10 Home Single Language 22H2 x64 19045.6456",
     "sdk": "10.0.402",
     "runtime": "10.0.13",
@@ -250,8 +250,125 @@
     "nativeGui": false
   },
   "native": {
-    "status": "not run",
-    "reason": "New clean source package and bounded GUI check are prepared after the implementation commit."
+    "status": "blocked",
+    "platform": {
+      "os": "Windows 10 Home Single Language 22H2",
+      "architecture": "x64",
+      "build": "19045.6456",
+      "sessionId": 1,
+      "reportedDisplay": "NVIDIA GeForce RTX 3050, 1920x1080",
+      "effectiveScale": "not observed; unchanged"
+    },
+    "artifactSourceRevision": "d808da67dfa68c02f16cda9ce507bc184b4a47bb",
+    "archiveSha256": "28fc7de574b98d20fc97b723ae0f1de3c5135c102a9f3c400e96ceafefed3215",
+    "executable": "Portable Новый пакет с пробелами/TrackTrim-win-x64/TrackTrim.exe",
+    "execution": "Installed computer-use skill; @oai/sky through node_repl, returned exact window, native keyboard and UIA observations without screenshots. No alternative automation, ViewModel invocation or developer tool-path override.",
+    "completed": [
+      "Computer Use initialized successfully and launched the new packaged executable with initially empty app-local data; previous Phase 2B2 process/session was preserved.",
+      "Observed English first launch; navigated the actual Several files / folder tab through observed focus.",
+      "Observed SubtitleForcedOnlyCheckBox and the exact English label/help; it was disabled while subtitle matching was unchanged. No checked state was inferred from the caption.",
+      "Opened the actual Select MKV files for independent review dialog using the focused Add MKV files button."
+    ],
+    "fixture": {
+      "name": "A forced субтитры.mkv",
+      "length": 392628,
+      "sha256": "2EF4572E1C94124A2088EB6CB3DDF9D97785230C0DCAEF5AE443720F49DCF3A5",
+      "tracks": [
+        {
+          "id": 0,
+          "kind": "video",
+          "uid": "12774094189724925210",
+          "title": null,
+          "language": "und",
+          "ietf": "und",
+          "forced": false,
+          "default": true
+        },
+        {
+          "id": 1,
+          "kind": "audio",
+          "uid": "13675876335307270593",
+          "title": "Matching audio",
+          "language": "eng",
+          "ietf": "en",
+          "forced": false,
+          "default": true
+        },
+        {
+          "id": 2,
+          "kind": "audio",
+          "uid": "15985661122095681775",
+          "title": "Matching audio",
+          "language": "eng",
+          "ietf": "en",
+          "forced": false,
+          "default": false
+        },
+        {
+          "id": 3,
+          "kind": "subtitles",
+          "uid": "10803935449919660822",
+          "title": "Captions",
+          "language": "eng",
+          "ietf": "en",
+          "forced": true,
+          "default": false
+        },
+        {
+          "id": 4,
+          "kind": "subtitles",
+          "uid": "16676310963708293741",
+          "title": "Captions",
+          "language": "eng",
+          "ietf": "en",
+          "forced": false,
+          "default": false
+        }
+      ]
+    },
+    "preparedDestination": "Результаты с пробелами/A forced субтитры.trimmed.mkv",
+    "blocker": {
+      "action": "Selecting/opening the prepared fixture in the system MKV picker",
+      "cause": "The previously confirmed cached-app-state modal-input limitation remains the known route boundary. Its failing set_value/click route was not retried; one concrete owner-assisted fixture selection was requested. No completed selection was received/observed at the final bounded recheck.",
+      "lastObservedAt": "2026-10-21T15:41:44.616Z",
+      "lastFocus": "Native picker search field; modal still open; application list remains empty.",
+      "recovery": "Complete only the already prepared native fixture selection; then resume the bounded approval, off/on Preview, EN/RU and explicit Apply check. No timing-sensitive input is needed."
+    },
+    "notRun": [
+      "Native default-off selection semantics (ToggleState is not exposed)",
+      "Approved-plan baseline and forced-off proposal",
+      "Forced edit preserving actual choices/approval and invalidating displayed proposal",
+      "Fresh forced proposal, EN -> RU -> EN preservation without recomputation, explicit Apply/approval invalidation"
+    ],
+    "notInvoked": [
+      "aggregate Review",
+      "Run",
+      "screenshots",
+      "display scaling",
+      "cancellation/close/warning scenarios"
+    ],
+    "observedUiExcerpts": [
+      "58 check box (disabled) Keep only forced subtitles ID: SubtitleForcedOnlyCheckBox",
+      "59 text Uses the MKV track's forced flag in addition to language and optional title. Selects whole tracks; subtitle text and individual events are not inspected.",
+      "35 button (disabled) Start / resume reviewed items ID: StartBatchButton",
+      "62 button (disabled) Preview language choices ID: PreviewLanguageRulesButton",
+      "63 button (disabled) Apply proposed choices ID: ApplyLanguageRulesButton",
+      "0 files · 0 included · 0 finished"
+    ],
+    "readOnlyChecks": {
+      "checkedAt": "2026-10-21T15:38:42.3887636Z",
+      "sourceSha256": "2EF4572E1C94124A2088EB6CB3DDF9D97785230C0DCAEF5AE443720F49DCF3A5",
+      "matchesBefore": true,
+      "resultEntries": 0,
+      "matchingBundledMediaWorkers": 0,
+      "appLocalDataEntries": 0,
+      "meaning": "Idle preparation check only; not remux, cancellation, worker-termination or cleanup acceptance."
+    },
+    "limits": [
+      "UIA exposes no checkbox ToggleState; captions alone do not prove checked state.",
+      "Functional UIA/keyboard observations do not establish appearance, visible focus, effective scale or target-desktop acceptance.",
+      "Only sanitized task-specific excerpts are included; full picker trees, unrelated shell content and local raw logs are omitted. Times are observation times, not physical input-event timestamps."
+    ]
   },
   "remaining": [
     "Native visual layout/focus appearance/scaling and clean Windows 11 / Ubuntu Desktop acceptance",
@@ -259,5 +376,54 @@
     "Real warning-remux fixture and native warning review",
     "Original application license and corresponding-source/redistribution obligations",
     "No presets, persistence, recursion, title-only/regex, additional forced modes, MP4, parallel jobs or source replacement"
-  ]
+  ],
+  "pullRequest": "https://github.com/Nexusov/TrackTrim/pull/5",
+  "runtimeCodeRevision": "d808da67dfa68c02f16cda9ce507bc184b4a47bb",
+  "codeCi": {
+    "status": "passed",
+    "run": "https://github.com/Nexusov/TrackTrim/actions/runs/39626541991",
+    "branchHead": "d808da67dfa68c02f16cda9ce507bc184b4a47bb",
+    "checkout": "2eba2aa51b174b7dda66e4b3554c066a09aa5609",
+    "parents": [
+      "8fc2e103f9bfbfa1a3e2bd148b80e33a0e0dc10c",
+      "d808da67dfa68c02f16cda9ce507bc184b4a47bb"
+    ],
+    "tree": "958beea675c44d0615dd27f7e4cfa058e4fa53eb",
+    "treeEqualsHead": true,
+    "windows": {
+      "context": "Required media checks and win-x64 package",
+      "passed": 543,
+      "existingLinuxOnlySkips": 7,
+      "pythonPassed": 16,
+      "inventoryFiles": 530,
+      "relocatedManifestPayloads": 529
+    },
+    "linux": {
+      "context": "Required media checks and linux-x64 package",
+      "passed": 550,
+      "skipped": 0,
+      "pythonPassed": 16,
+      "inventoryFiles": 508,
+      "relocatedManifestPayloads": 507,
+      "nativeLibrariesOnlyContainer": "passed"
+    },
+    "scope": "Both full existing required jobs: locked restore, formatting, warning-free Release build, mandatory media/headless/controlled tests, packaging, distribution inventory and relocation; Linux CLI container has no separately installed SDK/media tools. Hosted CI is not native desktop acceptance."
+  },
+  "portable": {
+    "status": "passed",
+    "sourceRevision": "d808da67dfa68c02f16cda9ce507bc184b4a47bb",
+    "worktreeDirty": false,
+    "runtimeIdentifier": "win-x64",
+    "archive": "package/TrackTrim-win-x64.zip",
+    "bytes": 113284442,
+    "sha256": "28fc7de574b98d20fc97b723ae0f1de3c5135c102a9f3c400e96ceafefed3215",
+    "checks": [
+      "packaged full workflow",
+      "distribution inventory: 530 files, zero unmatched origins",
+      "relocation: 529 manifest payloads, full packaged workflow and unchanged original hash"
+    ],
+    "nativeExtraction": "Portable Новый пакет с пробелами/TrackTrim-win-x64",
+    "initialDataEntries": 0,
+    "releaseStatus": "Local review artifact only; no binary upload or redistribution-readiness claim."
+  }
 }
