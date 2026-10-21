@@ -106,12 +106,25 @@ internal static class RulePresetJson
 
         foreach (var property in element.EnumerateObject())
         {
-            if (!names.Add(property.Name))
+            if (!names.Add(ReadPropertyName(property)))
             {
                 throw new JsonException("The preset catalog contains a duplicate JSON property.");
             }
 
             RejectDuplicateProperties(property.Value);
+        }
+    }
+
+    /// <summary>Translates invalid escaped UTF-16 only at the property-name decoding boundary.</summary>
+    private static string ReadPropertyName(JsonProperty property)
+    {
+        try
+        {
+            return property.Name;
+        }
+        catch (InvalidOperationException exception)
+        {
+            throw new JsonException("A preset catalog property name contains invalid escaped Unicode.", exception);
         }
     }
 

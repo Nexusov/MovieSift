@@ -32,7 +32,7 @@ internal sealed class BatchViewModelFixture
     public MainViewModel Main { get; }
 
     /// <summary>Shares one job coordinator while keeping single and batch inspection revisions independent.</summary>
-    public BatchViewModelFixture()
+    public BatchViewModelFixture(IRulePresetStore? presetStore = null)
     {
         Dialogs = new(Backend.Inspections.Keys.ToArray());
         Discovery = new(Backend.Inspections.Values.Select(inspection => inspection.Source).ToImmutableArray());
@@ -40,7 +40,7 @@ internal sealed class BatchViewModelFixture
         var jobs = new JobCoordinator(Backend, sourceAccess, Outputs);
         Coordinator = new(Session, new InspectionService(Backend, sourceAccess), jobs, sourceAccess);
         var logger = new LoggerConfiguration().CreateLogger();
-        Batch = new(new(Session, Coordinator, Discovery, Dialogs, Localization, true, logger, new(PresetStore)));
+        Batch = new(new(Session, Coordinator, Discovery, Dialogs, Localization, true, logger, new(presetStore ?? PresetStore)));
         Main = new(new(new InspectionService(Backend, sourceAccess), jobs, Settings, Outputs, Dialogs,
             Localization, true, logger, Batch));
     }
