@@ -670,6 +670,302 @@
     "Existing warning-fixture/cancellation and licensing/redistribution gaps remain open.",
     "No preset overwrite/update, import/export, automatic loading/application, persistent queue or new media filter."
   ],
+  "reviewFollowUp": {
+    "taskStartHead": "b00b5874f05dabc9c4c65f42462209a1a8dd32f6",
+    "comparisonBase": "5cc5fcf37522eeec2fbce74d9c5795d7e5998d6e",
+    "codeHead": "62dd4ff0390f8c8ba391cbe2ea974073ab7dcedf",
+    "scope": "Two Phase 2C1 review fixes only: malformed escaped JSON property names and Confirm Delete write-gate revalidation.",
+    "findings": [
+      {
+        "name": "Escaped unpaired surrogate in a property name",
+        "status": "reproduced and fixed",
+        "priorEvidence": "Source review; no prior native crash reproduction was claimed.",
+        "reproduction": "On pinned .NET 10.0.402, literal ASCII \\uD800, \\uDC00 and \\uD800x property names, including a nested property, reached JsonProperty.Name and threw InvalidOperationException outside the existing InvalidCatalog mapping.",
+        "fix": "Only the JsonProperty.Name getter translates InvalidOperationException into JsonException. The existing store maps that expected decoding error to InvalidCatalog. No store/service/UI exception filters were broadened.",
+        "guaranteesTested": "Read and attempted mutation preserve exact original bytes and publish no mutation or owned temporary file. A permanent lock is permitted. A valid escaped surrogate pair round-trips in name/title values. Production-store startup/Refresh/Load preserve manual editing and existing workflow; mutations need a successful valid reread."
+      },
+      {
+        "name": "Confirm Delete after workspace writes become blocked",
+        "status": "reproduced and fixed",
+        "reproduction": "With confirmation open, WritesBlocked left CanExecute true; direct ExecuteAsync deleted the selected catalog entry.",
+        "fix": "One CanConfirmDelete predicate checks current edit/write gates, busy state and the captured selected stable ID at command availability and execution. It does not reuse CanWrite, whose CanRead is false during confirmation.",
+        "guaranteesTested": "Blocked confirmation preserves catalog/write count, selected identity, loaded rules, Preview, approvals, Review and media state. Decline stays effectively enabled. Permitted confirmation deletes only its captured ID."
+      }
+    ],
+    "regressionVerification": {
+      "sdk": "10.0.402",
+      "backend": "MKVToolNix 102.0",
+      "before": {
+        "newCases": 15,
+        "passed": 2,
+        "failed": 13,
+        "skipped": 0,
+        "groups": [
+          {
+            "name": "Real-file Unicode read/mutation and valid-pair control",
+            "failed": 8,
+            "passed": 1
+          },
+          {
+            "name": "Production-store Desktop startup/Refresh/Load",
+            "failed": 3,
+            "passed": 0
+          },
+          {
+            "name": "Controlled headless Confirm Delete gates and permitted control",
+            "failed": 2,
+            "passed": 1
+          }
+        ]
+      },
+      "after": {
+        "newCases": 15,
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0,
+        "realFileUnicode": 9,
+        "productionStoreDesktop": 3,
+        "controlledDeleteGate": 3,
+        "focusedDesktopIncludingExistingPresetCases": {
+          "passed": 17,
+          "failed": 0,
+          "skipped": 0
+        }
+      },
+      "fullLocal": {
+        "lockedRestore": "passed",
+        "formatVerification": "passed",
+        "releaseBuild": {
+          "warnings": 0,
+          "errors": 0
+        },
+        "mandatoryMediaEnvironment": true,
+        "passed": 694,
+        "linuxOnlySkipped": 13,
+        "failed": 0,
+        "pythonPassed": 16,
+        "suites": [
+          {
+            "assembly": "tracktrim.infrastructure.tests.dll",
+            "passed": 210,
+            "failed": 0,
+            "skipped": 9
+          },
+          {
+            "assembly": "tracktrim.core.tests.dll",
+            "passed": 148,
+            "failed": 0,
+            "skipped": 0
+          },
+          {
+            "assembly": "tracktrim.application.tests.dll",
+            "passed": 233,
+            "failed": 0,
+            "skipped": 4
+          },
+          {
+            "assembly": "tracktrim.desktop.tests.dll",
+            "passed": 103,
+            "failed": 0,
+            "skipped": 0
+          }
+        ]
+      },
+      "testObservationLimit": "An intermediate headless assertion inspected Button.IsEnabled instead of command-aware IsEffectivelyEnabled. The assertion was corrected against the pinned Avalonia contract; production scope was not broadened. Injected write-gate changes are controlled headless evidence, not a native settings-write-failure test."
+    },
+    "portable": {
+      "sourceRevision": "62dd4ff0390f8c8ba391cbe2ea974073ab7dcedf",
+      "sourceTree": "9b11d7edc64efab5475494a40ed60b66aef1e6b7",
+      "worktreeDirty": false,
+      "runtimeIdentifier": "win-x64",
+      "archive": "TrackTrim-win-x64.zip",
+      "bytes": 113349144,
+      "sha256": "e2c1414463088d895b6c485904dc268d9dc41917260dc55f3953f005ef7bc68b",
+      "packagedWorkflow": "passed",
+      "inventory": {
+        "shippedFiles": 531,
+        "unmatchedOrigins": 0,
+        "redistributionReady": false
+      },
+      "relocation": {
+        "status": "passed",
+        "manifestPayloads": 530
+      }
+    },
+    "nativeSmoke": {
+      "status": "passed",
+      "executionMethod": "Installed Computer Use @oai/sky keyboard/UIA; owner opened only Several files / folder.",
+      "platform": {
+        "os": "Windows 10 Home Single Language",
+        "edition": "CoreSingleLanguage",
+        "release": "22H2",
+        "build": "19045.6456",
+        "architecture": "X64",
+        "effectiveScale": "not observed; unchanged"
+      },
+      "artifactSourceRevision": "62dd4ff0390f8c8ba391cbe2ea974073ab7dcedf",
+      "archiveSha256": "e2c1414463088d895b6c485904dc268d9dc41917260dc55f3953f005ef7bc68b",
+      "executable": "{review-task}/Новый portable с пробелами/TrackTrim-win-x64/TrackTrim.exe",
+      "initiallyEmptyData": true,
+      "catalog": {
+        "path": "data/rule-presets.json",
+        "literalAscii": "{\"version\":1,\"presets\":[],\"\\uD800\":0}",
+        "bytes": 37,
+        "sha256Before": "ab3b213921054975b0811e5b6126e96157eac99addc54094b82a22020d99f226",
+        "sha256After": "ab3b213921054975b0811e5b6126e96157eac99addc54094b82a22020d99f226",
+        "unchanged": true
+      },
+      "observations": [
+        {
+          "label": "malformed-catalog-native-startup",
+          "observedUtc": "2026-10-21T22:00:17.791Z",
+          "focusedElement": null,
+          "text": [
+            "16 text Ready ID: StatusText"
+          ]
+        },
+        {
+          "label": "owner-opened-batch-error-visible",
+          "observedUtc": "2026-10-21T22:01:08.708Z",
+          "focusedElement": "15 tab item (selectable) Several files / folder",
+          "text": [
+            "36 button (disabled) Start / resume reviewed items ID: StartBatchButton",
+            "42 button Add MKV files… ID: AddBatchFilesButton",
+            "47 text 0 files · 0 included · 0 finished",
+            "54 button (disabled) Save as new ID: SaveRulePresetButton",
+            "55 button (disabled) Load ID: LoadRulePresetButton",
+            "56 button (disabled) Rename ID: RenameRulePresetButton",
+            "57 button (disabled) Delete preset… ID: DeleteRulePresetButton",
+            "60 text The preset catalog is invalid and was preserved. Correct the file, then reload the catalog. Manual rules remain available.",
+            "67 check box Keep all audio matching these language codes ID: AudioLanguageRuleCheckBox",
+            "68 edit (disabled, settable, string) Audio language codes (comma separated) Description: en, rus, de-DE ID: AudioRuleLanguagesTextBox",
+            "79 button (disabled) Preview language choices ID: PreviewLanguageRulesButton",
+            "80 button (disabled) Apply proposed choices ID: ApplyLanguageRulesButton",
+            "87 button (disabled) Approve this file’s plan ID: ApproveBatchItemButton",
+            "88 button (disabled) Review remaining batch ID: ReviewBatchButton"
+          ]
+        },
+        {
+          "label": "manual-rule-edited-catalog-error-preserved",
+          "observedUtc": "2026-10-21T22:03:32.062Z",
+          "focusedElement": "68 edit (settable, string) Audio language codes (comma separated) Description: en, rus, de-DE Value: en ID: AudioRuleLanguagesTextBox",
+          "text": [
+            "36 button (disabled) Start / resume reviewed items ID: StartBatchButton",
+            "42 button Add MKV files… ID: AddBatchFilesButton",
+            "47 text 0 files · 0 included · 0 finished",
+            "54 button (disabled) Save as new ID: SaveRulePresetButton",
+            "55 button (disabled) Load ID: LoadRulePresetButton",
+            "56 button (disabled) Rename ID: RenameRulePresetButton",
+            "57 button (disabled) Delete preset… ID: DeleteRulePresetButton",
+            "60 text The preset catalog is invalid and was preserved. Correct the file, then reload the catalog. Manual rules remain available.",
+            "67 check box Keep all audio matching these language codes ID: AudioLanguageRuleCheckBox",
+            "68 edit (settable, string) Audio language codes (comma separated) Description: en, rus, de-DE Value: en ID: AudioRuleLanguagesTextBox",
+            "79 button (disabled) Preview language choices ID: PreviewLanguageRulesButton",
+            "80 button (disabled) Apply proposed choices ID: ApplyLanguageRulesButton",
+            "87 button (disabled) Approve this file’s plan ID: ApproveBatchItemButton",
+            "88 button (disabled) Review remaining batch ID: ReviewBatchButton"
+          ]
+        }
+      ],
+      "observed": "Startup remained usable. The English InvalidCatalog guidance was exposed in the native window; Save/Load/Rename/Delete stayed disabled. Computer Use enabled the audio rule and typed en into the newly enabled language field while the error remained. No catalog repair/replacement occurred.",
+      "readOnlyReceipt": {
+        "observedUtc": "2026-10-21T22:03:32.8839425Z",
+        "dataEntries": [
+          "rule-presets.json"
+        ],
+        "matchingBundledMediaWorkers": 0,
+        "mediaOpened": false,
+        "mediaJobsStarted": 0
+      },
+      "actionsNotInvoked": [
+        "Preview",
+        "Apply",
+        "plan approval",
+        "aggregate Review",
+        "Run"
+      ],
+      "limits": [
+        "UIA functional evidence, not native image/layout/scaling or clean Windows 11/Ubuntu Desktop acceptance. ToggleState was not exposed; enabled input and accepted en text corroborate manual editing.",
+        "No native pre-fix crash or native mid-confirmation write-failure scenario was executed; those findings were reproduced by the real-file/production-store and controlled headless regressions.",
+        "A set_value response timed out; current focus/value was reread before continuing. A reported user-input boundary also caused a fresh observation before further input.",
+        "No screenshot, unsupported click/picker route, historical CRUD replay or media processing was attempted. Public excerpts omit unchanged chrome; full states remain task-local."
+      ]
+    },
+    "codeCi": {
+      "run": "https://github.com/Nexusov/TrackTrim/actions/runs/39682946511",
+      "status": "passed",
+      "head": "62dd4ff0390f8c8ba391cbe2ea974073ab7dcedf",
+      "checkout": "1237e888f6a003cb8ba4469a3eff5ca055e2b9dd",
+      "parents": [
+        "5cc5fcf37522eeec2fbce74d9c5795d7e5998d6e",
+        "62dd4ff0390f8c8ba391cbe2ea974073ab7dcedf"
+      ],
+      "tree": "9b11d7edc64efab5475494a40ed60b66aef1e6b7",
+      "treeEqualsHead": true,
+      "results": [
+        {
+          "runtimeIdentifier": "win-x64",
+          "suites": [
+            {
+              "assembly": "tracktrim.core.tests.dll",
+              "passed": 148,
+              "failed": 0,
+              "skipped": 0
+            },
+            {
+              "assembly": "tracktrim.application.tests.dll",
+              "passed": 233,
+              "failed": 0,
+              "skipped": 4
+            },
+            {
+              "assembly": "tracktrim.infrastructure.tests.dll",
+              "passed": 210,
+              "failed": 0,
+              "skipped": 9
+            },
+            {
+              "assembly": "tracktrim.desktop.tests.dll",
+              "passed": 103,
+              "failed": 0,
+              "skipped": 0
+            }
+          ]
+        },
+        {
+          "runtimeIdentifier": "linux-x64",
+          "suites": [
+            {
+              "assembly": "tracktrim.application.tests.dll",
+              "passed": 237,
+              "failed": 0,
+              "skipped": 0
+            },
+            {
+              "assembly": "tracktrim.core.tests.dll",
+              "passed": 148,
+              "failed": 0,
+              "skipped": 0
+            },
+            {
+              "assembly": "tracktrim.infrastructure.tests.dll",
+              "passed": 219,
+              "failed": 0,
+              "skipped": 0
+            },
+            {
+              "assembly": "tracktrim.desktop.tests.dll",
+              "passed": 103,
+              "failed": 0,
+              "skipped": 0
+            }
+          ]
+        }
+      ],
+      "stages": "Both complete required jobs passed, including mandatory media tests, packaging/inventory/relocation and the Linux no-SDK/no-installed-media-tools container. Final documentation-only checkout links belong in PR #6."
+    },
+    "historicalEvidence": "The original e301fc2 CRUD native record and all earlier acceptance limits remain unchanged; these regressions were not previously covered."
+  },
   "codeCi": {
     "run": "https://github.com/Nexusov/TrackTrim/actions/runs/39661495778",
     "head": "e301fc2a01891c56a6c286ffe62b67a01bdcba91",
