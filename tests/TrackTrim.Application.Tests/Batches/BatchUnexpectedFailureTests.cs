@@ -312,6 +312,9 @@ public sealed class BatchUnexpectedFailureTests
             return inner.ReadRevisionAsync(request);
         }
 
+        /// <summary>Implements the explicit preparation boundary without adding filesystem effects to this controlled port.</summary>
+        public Task PrepareDestinationAsync(ValidateDestinationRequest request) => inner.PrepareDestinationAsync(request);
+
         /// <summary>Fails before worker ownership when the requested destination review is under test.</summary>
         public Task ValidateDestinationAsync(ValidateDestinationRequest request)
         {

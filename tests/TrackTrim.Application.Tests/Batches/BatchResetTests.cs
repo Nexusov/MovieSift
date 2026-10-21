@@ -452,6 +452,9 @@ public sealed class BatchResetTests
             return await inner.ReadRevisionAsync(request);
         }
 
+        /// <summary>Implements the explicit preparation boundary without adding filesystem effects to this controlled port.</summary>
+        public Task PrepareDestinationAsync(ValidateDestinationRequest request) => inner.PrepareDestinationAsync(request);
+
         /// <summary>Forwards destination validation without introducing another job lifecycle.</summary>
         public Task ValidateDestinationAsync(ValidateDestinationRequest request) => inner.ValidateDestinationAsync(request);
     }

@@ -43,7 +43,10 @@ public enum ErrorReason
     RegularFileRequired,
     BatchFileLimit,
     BatchEntryLimit,
-    InvalidBatchInput
+    InvalidBatchInput,
+    RecursiveOutputRequired,
+    RecursiveRootConflict,
+    BatchDepthLimit
 }
 
 public sealed record Failure(ErrorCode Code, string Detail = "", ErrorReason Reason = ErrorReason.None);

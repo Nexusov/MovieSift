@@ -82,6 +82,13 @@ internal sealed class JobTestHarness : IMediaBackend, ISourceAccess, IOutputStor
         return Task.FromResult(SourceChanges ? Inspection.Source with { Length = 101 } : Inspection.Source);
     }
 
+    /// <summary>Implements the explicit preparation boundary without adding filesystem effects to this controlled port.</summary>
+    public Task PrepareDestinationAsync(ValidateDestinationRequest request)
+    {
+        request.CancellationToken.ThrowIfCancellationRequested();
+        return Task.CompletedTask;
+    }
+
     /// <summary>Models changing capacity without allocating large files; publication races remain separate.</summary>
     public Task ValidateDestinationAsync(ValidateDestinationRequest request)
     {

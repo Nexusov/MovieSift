@@ -50,9 +50,11 @@ public sealed class BatchSession
             return new(false, result.Rejection);
         }
 
-        var sources = result.Sources.Select(source => new BatchItem(Guid.NewGuid(), source.FullPath, source));
+        var sources = result.Sources.Select(source => new BatchItem(Guid.NewGuid(), source.FullPath, source,
+            FolderOrigin: result.FolderOrigins?.GetValueOrDefault(source.FullPath)));
         var issues = result.Issues.Select(issue => new BatchItem(Guid.NewGuid(), issue.Path, null,
-            State: BatchItemState.Failed, Failure: issue.Failure));
+            State: BatchItemState.Failed, Failure: issue.Failure,
+            FolderOrigin: result.FolderOrigins?.GetValueOrDefault(issue.Path)));
         return AddItems(sources.Concat(issues));
     }
 
@@ -95,7 +97,8 @@ public sealed class BatchSession
     public BatchEditResult ApprovePlan(BatchPlanApprovalRequest request) => EditItem(request.ItemId, item =>
     {
         var invalidPlan = item.Inspection is null || request.Plan.Inspection != item.Inspection ||
-            item.Result?.JobId == request.Plan.Id;
+            item.Result?.JobId == request.Plan.Id ||
+            request.Plan.OutputDirectoryRoot is not null && item.FolderOrigin is null;
 
         if (invalidPlan)
         {
@@ -111,7 +114,7 @@ public sealed class BatchSession
         }
 
         var rebuilt = PlanBuilder.Build(new(item.Inspection!, request.Plan.RetainedTracks.Select(track => track.Id).ToArray(),
-            request.Plan.DestinationPath, request.Plan.ZeroAudioConfirmed));
+            request.Plan.DestinationPath, request.Plan.ZeroAudioConfirmed, request.Plan.OutputDirectoryRoot));
 
         if (rebuilt.Plan is null)
         {

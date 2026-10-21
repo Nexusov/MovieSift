@@ -215,6 +215,9 @@ public sealed class BatchLanguageGuardTests
             return await inner.ReadRevisionAsync(request);
         }
 
+        /// <summary>Implements the explicit preparation boundary without adding filesystem effects to this controlled port.</summary>
+        public Task PrepareDestinationAsync(ValidateDestinationRequest request) => inner.PrepareDestinationAsync(request);
+
         /// <summary>Forwards existing destination checks after release.</summary>
         public Task ValidateDestinationAsync(ValidateDestinationRequest request) => inner.ValidateDestinationAsync(request);
     }

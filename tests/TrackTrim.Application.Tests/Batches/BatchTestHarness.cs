@@ -165,6 +165,13 @@ internal sealed class BatchTestHarness : IMediaBackend, ISourceAccess, IOutputSt
         return Task.FromResult(Revisions[request.Path]);
     }
 
+    /// <summary>Implements the explicit preparation boundary without adding filesystem effects to this controlled port.</summary>
+    public Task PrepareDestinationAsync(ValidateDestinationRequest request)
+    {
+        request.CancellationToken.ThrowIfCancellationRequested();
+        return Task.CompletedTask;
+    }
+
     /// <summary>Exposes required destination checks and controlled late conflicts.</summary>
     public Task ValidateDestinationAsync(ValidateDestinationRequest request)
     {
