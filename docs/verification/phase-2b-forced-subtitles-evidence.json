@@ -250,7 +250,9 @@
     "nativeGui": false
   },
   "native": {
-    "status": "blocked",
+    "status": "failed",
+    "resultKind": "Automation protocol deviation; observed forced-filter, bilingual and explicit-Apply functional assertions passed. This is not an application failure or a clean pass of the requested no-Review sequence.",
+    "continuationComparisonBase": "1ee82fde16e35d2cd502786dfe74efc6653b1745",
     "platform": {
       "os": "Windows 10 Home Single Language 22H2",
       "architecture": "x64",
@@ -263,12 +265,7 @@
     "archiveSha256": "28fc7de574b98d20fc97b723ae0f1de3c5135c102a9f3c400e96ceafefed3215",
     "executable": "Portable Новый пакет с пробелами/TrackTrim-win-x64/TrackTrim.exe",
     "execution": "Installed computer-use skill; @oai/sky through node_repl, returned exact window, native keyboard and UIA observations without screenshots. No alternative automation, ViewModel invocation or developer tool-path override.",
-    "completed": [
-      "Computer Use initialized successfully and launched the new packaged executable with initially empty app-local data; previous Phase 2B2 process/session was preserved.",
-      "Observed English first launch; navigated the actual Several files / folder tab through observed focus.",
-      "Observed SubtitleForcedOnlyCheckBox and the exact English label/help; it was disabled while subtitle matching was unchanged. No checked state was inferred from the caption.",
-      "Opened the actual Select MKV files for independent review dialog using the focused Add MKV files button."
-    ],
+    "ownerAssistance": "Owner selected/opened the exact prepared A fixture in the real picker. Computer Use performed all later destination/configuration/approval/Preview/language/Apply input. No additional owner actions were requested.",
     "fixture": {
       "name": "A forced субтитры.mkv",
       "length": 392628,
@@ -326,51 +323,159 @@
         }
       ]
     },
-    "preparedDestination": "Результаты с пробелами/A forced субтитры.trimmed.mkv",
-    "blocker": {
-      "action": "Selecting/opening the prepared fixture in the system MKV picker",
-      "cause": "The previously confirmed cached-app-state modal-input limitation remains the known route boundary. Its failing set_value/click route was not retried; one concrete owner-assisted fixture selection was requested. No completed selection was received/observed at the final bounded recheck.",
-      "lastObservedAt": "2026-10-21T15:41:44.616Z",
-      "lastFocus": "Native picker search field; modal still open; application list remains empty.",
-      "recovery": "Complete only the already prepared native fixture selection; then resume the bounded approval, off/on Preview, EN/RU and explicit Apply check. No timing-sensitive input is needed."
+    "destination": "Результаты с пробелами/A forced субтитры.trimmed.mkv",
+    "sourceAndDestination": "The exact same task-owned source/destination paths occur in baseline, forced proposal, RU, returned EN and post-Apply snapshots. Private absolute parent is omitted here.",
+    "setup": "Reused the identified package/session after rechecking archive/source SHA256 and clean d808da67 provenance; no rebuild or production change. Reacquired the returned window and recovered UIA with documented activation after the picker. Previous Phase 2B2 session remained running.",
+    "functionalChecks": [
+      {
+        "check": "Default off and independent approval",
+        "status": "passed",
+        "observed": "No forced checkbox toggle preceded baseline. Native independent approval retained 0/1/2/3/4 and displayed Approved: no change; no remux or output. Subtitle en AND literal Captions Preview kept both matching subtitles 3(forced) and 4(non-forced), with zero changes/manual issues."
+      },
+      {
+        "check": "Configuration edit and fresh proposal",
+        "status": "passed",
+        "observed": "One explicit forced checkbox toggle cleared the displayed proposal and disabled Apply without changing the approved all-track plan. One fresh Preview proposed Keep 0/1/2/3, Remove 4; one changed file, zero manual issues, Nothing has been applied."
+      },
+      {
+        "check": "EN -> RU -> EN preservation",
+        "status": "passed",
+        "observed": "No Preview command or selection/destination edit occurred between the forced baseline and either switch. Subtitle en, Captions, the same proposed IDs, source/destination and visible all-track approval content persisted. Forced label/help and application labels translated; original Captions/Matching audio titles and eng/en metadata stayed original. Audio remained untargeted."
+      },
+      {
+        "check": "Explicit Apply and approval invalidation",
+        "status": "passed",
+        "observed": "After a separate settled focus observation of ApplyLanguageRulesButton, Space applied one changed file and displayed applied Keep 0/1/2/3, Remove 4. Both row/editor required a new independent approval; old approval and aggregate Review were cleared, Start and repeat Apply disabled. No automatic approval or Run."
+      }
+    ],
+    "protocolDeviation": {
+      "status": "failed",
+      "required": "Leave aggregate Review and Run uninvoked during the bounded native check.",
+      "actual": "One Space intended for RussianButton instead activated ReviewBatchButton after relying on an intermediate focus observation. Settled UIA confirmed Batch reviewed. Explicitly start the approved items. and enabled Start. The UI remained English. This was an operator/automation navigation error, not evidence of an application defect.",
+      "requestInterval": {
+        "action": "switch EN to RU without recomputing Preview",
+        "startedAt": "2026-10-21T16:23:28.308Z",
+        "endedAt": "2026-10-21T16:23:28.419Z",
+        "actualOutcome": "Aggregate Review was activated instead; UI remained English. No Run."
+      },
+      "recordedStateAt": "2026-10-21T16:24:44.244Z",
+      "containment": "Run was never invoked. After separately observing settled focus, actual EN -> RU -> EN and Apply were completed. Apply invalidated the accidentally created Review and disabled Start. The scenario was not rerun or relabeled a clean no-Review pass."
     },
-    "notRun": [
-      "Native default-off selection semantics (ToggleState is not exposed)",
-      "Approved-plan baseline and forced-off proposal",
-      "Forced edit preserving actual choices/approval and invalidating displayed proposal",
-      "Fresh forced proposal, EN -> RU -> EN preservation without recomputation, explicit Apply/approval invalidation"
+    "observedUiExcerpts": {
+      "offBaseline": [
+        "22 button (disabled) Start / resume reviewed items ID: StartBatchButton",
+        "42 edit (settable, string) Subtitle language codes (comma separated) Description: ru, en-US, sr-Latn Value: en ID: SubtitleRuleLanguagesTextBox",
+        "44 edit (settable, string) Subtitle title contains (literal text) Value: Captions ID: SubtitleTitleContainsTextBox",
+        "45 check box Keep only forced subtitles ID: SubtitleForcedOnlyCheckBox",
+        "50 button Apply proposed choices ID: ApplyLanguageRulesButton",
+        "52 text Entries shown: 1; would change: 0; manual review: 0. Nothing has been applied. ID: LanguageRuleStatusText"
+      ],
+      "afterForcedToggle": [
+        "22 button (disabled) Start / resume reviewed items ID: StartBatchButton",
+        "42 edit (settable, string) Subtitle language codes (comma separated) Description: ru, en-US, sr-Latn Value: en ID: SubtitleRuleLanguagesTextBox",
+        "44 edit (settable, string) Subtitle title contains (literal text) Value: Captions ID: SubtitleTitleContainsTextBox",
+        "45 check box Keep only forced subtitles ID: SubtitleForcedOnlyCheckBox",
+        "50 button (disabled) Apply proposed choices ID: ApplyLanguageRulesButton",
+        "52 text ID: LanguageRuleStatusText"
+      ],
+      "forcedEnglish": [
+        "22 button (disabled) Start / resume reviewed items ID: StartBatchButton",
+        "42 edit (settable, string) Subtitle language codes (comma separated) Description: ru, en-US, sr-Latn Value: en ID: SubtitleRuleLanguagesTextBox",
+        "44 edit (settable, string) Subtitle title contains (literal text) Value: Captions ID: SubtitleTitleContainsTextBox",
+        "45 check box Keep only forced subtitles ID: SubtitleForcedOnlyCheckBox",
+        "50 button Apply proposed choices ID: ApplyLanguageRulesButton",
+        "52 text Entries shown: 1; would change: 1; manual review: 0. Nothing has been applied. ID: LanguageRuleStatusText"
+      ],
+      "russian": [
+        "22 button Запустить / продолжить проверенные планы ID: StartBatchButton",
+        "42 edit (settable, string) Коды языков субтитров через запятую Description: ru, en-US, sr-Latn Value: en ID: SubtitleRuleLanguagesTextBox",
+        "44 edit (settable, string) Название субтитров содержит (буквальный текст) Value: Captions ID: SubtitleTitleContainsTextBox",
+        "45 check box Оставлять только принудительные субтитры ID: SubtitleForcedOnlyCheckBox",
+        "50 button Применить предложенный выбор ID: ApplyLanguageRulesButton",
+        "52 text Записей: 1; изменится: 1; требуют ручной проверки: 0. Выбор ещё не применён. ID: LanguageRuleStatusText"
+      ],
+      "returnedEnglish": [
+        "22 button Start / resume reviewed items ID: StartBatchButton",
+        "42 edit (settable, string) Subtitle language codes (comma separated) Description: ru, en-US, sr-Latn Value: en ID: SubtitleRuleLanguagesTextBox",
+        "44 edit (settable, string) Subtitle title contains (literal text) Value: Captions ID: SubtitleTitleContainsTextBox",
+        "45 check box Keep only forced subtitles ID: SubtitleForcedOnlyCheckBox",
+        "50 button Apply proposed choices ID: ApplyLanguageRulesButton",
+        "52 text Entries shown: 1; would change: 1; manual review: 0. Nothing has been applied. ID: LanguageRuleStatusText"
+      ],
+      "afterApply": [
+        "22 button (disabled) Start / resume reviewed items ID: StartBatchButton",
+        "42 edit (settable, string) Subtitle language codes (comma separated) Description: ru, en-US, sr-Latn Value: en ID: SubtitleRuleLanguagesTextBox",
+        "44 edit (settable, string) Subtitle title contains (literal text) Value: Captions ID: SubtitleTitleContainsTextBox",
+        "45 check box Keep only forced subtitles ID: SubtitleForcedOnlyCheckBox",
+        "50 button (disabled) Apply proposed choices ID: ApplyLanguageRulesButton",
+        "52 text Files changed: 1. Files requiring manual review and left unchanged: 0. Approve changed plans, then explicitly Review and Start. ID: LanguageRuleStatusText"
+      ]
+    },
+    "inputIntervals": [
+      {
+        "action": "baseline Preview with forced-only never toggled",
+        "startedAt": "2026-10-21T16:13:57.091Z",
+        "endedAt": "2026-10-21T16:13:57.227Z"
+      },
+      {
+        "action": "fresh forced-only Preview",
+        "startedAt": "2026-10-21T16:15:05.742Z",
+        "endedAt": "2026-10-21T16:15:05.850Z"
+      },
+      {
+        "action": "EN to RU on independently confirmed RussianButton focus",
+        "startedAt": "2026-10-21T16:25:18.926Z",
+        "endedAt": "2026-10-21T16:25:19.047Z"
+      },
+      {
+        "action": "RU to EN on independently confirmed EnglishButton focus",
+        "startedAt": "2026-10-21T16:26:19.138Z",
+        "endedAt": "2026-10-21T16:26:19.261Z"
+      },
+      {
+        "action": "explicit Apply on independently confirmed ApplyLanguageRulesButton",
+        "startedAt": "2026-10-21T16:30:15.557Z",
+        "endedAt": "2026-10-21T16:30:15.671Z"
+      }
+    ],
+    "infrastructureObservations": [
+      "Initial post-picker accessibility:null recovered with documented activation; no screenshot/click/modal-input failure route was repeated.",
+      "Application destination set_value returned wait for accessibility set value: timed out waiting on channel; separate re-observation confirmed the complete correct value. Input was not repeated.",
+      "Intermediate focus snapshots sometimes lagged. One lost-focus boundary recovered through activation; after the unintended Review, every activation used a separate settled focus observation. No production focus fix was inferred."
     ],
     "notInvoked": [
-      "aggregate Review",
       "Run",
       "screenshots",
       "display scaling",
-      "cancellation/close/warning scenarios"
-    ],
-    "observedUiExcerpts": [
-      "58 check box (disabled) Keep only forced subtitles ID: SubtitleForcedOnlyCheckBox",
-      "59 text Uses the MKV track's forced flag in addition to language and optional title. Selects whole tracks; subtitle text and individual events are not inspected.",
-      "35 button (disabled) Start / resume reviewed items ID: StartBatchButton",
-      "62 button (disabled) Preview language choices ID: PreviewLanguageRulesButton",
-      "63 button (disabled) Apply proposed choices ID: ApplyLanguageRulesButton",
-      "0 files · 0 included · 0 finished"
+      "cancellation/close/warning scenarios",
+      "a repeat of this native scenario"
     ],
     "readOnlyChecks": {
-      "checkedAt": "2026-10-21T15:38:42.3887636Z",
-      "sourceSha256": "2EF4572E1C94124A2088EB6CB3DDF9D97785230C0DCAEF5AE443720F49DCF3A5",
+      "checkedAt": "2026-10-21T16:31:06.8833361Z",
+      "sourceSha256Before": "2EF4572E1C94124A2088EB6CB3DDF9D97785230C0DCAEF5AE443720F49DCF3A5",
+      "sourceSha256After": "2EF4572E1C94124A2088EB6CB3DDF9D97785230C0DCAEF5AE443720F49DCF3A5",
       "matchesBefore": true,
+      "outputExists": false,
       "resultEntries": 0,
       "matchingBundledMediaWorkers": 0,
-      "appLocalDataEntries": 0,
-      "meaning": "Idle preparation check only; not remux, cancellation, worker-termination or cleanup acceptance."
+      "appLocalDataEntries": [
+        "data\\inspection",
+        "data\\settings.json"
+      ],
+      "settingsLanguage": "en",
+      "meaning": "No media job was requested; idle post-interaction/source checks only, not remux, cancellation or worker-termination acceptance."
     },
+    "productionCodeChanged": false,
     "limits": [
-      "UIA exposes no checkbox ToggleState; captions alone do not prove checked state.",
-      "Functional UIA/keyboard observations do not establish appearance, visible focus, effective scale or target-desktop acceptance.",
-      "Only sanitized task-specific excerpts are included; full picker trees, unrelated shell content and local raw logs are omitted. Times are observation times, not physical input-event timestamps."
+      "UIA exposes neither checkbox ToggleState nor internal Preview/approval identity. Explicit native actions plus unchanged/changed proposal and approval content establish observable semantics, not independent checkbox/reference identity.",
+      "Applied IDs are visible in the applied proposal/status; no further per-file approval was issued solely to inspect underlying checkbox values.",
+      "The prescribed no-aggregate-Review sequence was not achieved; the exact automation deviation is recorded separately from passed functional observations.",
+      "UIA/keyboard evidence does not establish visual layout, visible focus appearance, effective scaling or clean Windows 11/Ubuntu Desktop acceptance.",
+      "Only sanitized task-specific excerpts are published. Full trees/local logs are omitted. API intervals and observation logging times are not physical input-event timestamps."
     ]
   },
   "remaining": [
+    "Exact Phase 2B3 native no-aggregate-Review sequence; one automation protocol deviation remains recorded",
     "Native visual layout/focus appearance/scaling and clean Windows 11 / Ubuntu Desktop acceptance",
     "W13 active-remux input correlation; repeated/verification close",
     "Real warning-remux fixture and native warning review",
