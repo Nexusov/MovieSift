@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
+using TrackTrim.Infrastructure.Persistence;
 
 namespace TrackTrim.ProcessTestWorker;
 
@@ -53,6 +54,19 @@ internal static class Program
             case "warning":
                 Console.Error.WriteLine("Controlled warning exit; this is not a real mkvmerge warning fixture.");
                 return 1;
+            case "preset-lock":
+                if (arguments.Length != 2)
+                {
+                    return 2;
+                }
+
+                using (RulePresetFileLock.Acquire(arguments[1]))
+                {
+                    Console.WriteLine("PRESET_LOCK_ACQUIRED");
+                    await Console.In.ReadLineAsync().WaitAsync(TimeSpan.FromSeconds(60));
+                }
+
+                return 0;
             default:
                 return 2;
         }
