@@ -1,0 +1,296 @@
+{
+  "schemaVersion": 1,
+  "scope": "Phase 2B2 optional literal title constraints; historical native evidence retains its original binary/platform.",
+  "comparisonBase": "3cd6845169913ebec1b21afacda8e03f04680f3b",
+  "pullRequest": "https://github.com/Nexusov/TrackTrim/pull/4",
+  "pullRequestBase": "review/phase-2b-language-rules",
+  "runtimeCodeRevision": "30deab43cf565e417338ad4dc146e017e0449a2f",
+  "matching": {
+    "optionalPerCategory": "Disabled by default; only KeepMatching audio/subtitles use the constraint.",
+    "predicate": "Known exact canonical language AND actual inspected Title contains trimmed literal search text, StringComparison.OrdinalIgnoreCase.",
+    "titleBoundaries": "All matches retained in original order. Missing/blank titles do not match; no filename, codec, UI fallback, normalization, regex or wildcard matching. Enabled blank searches are invalid.",
+    "languageSafety": "Every targeted track language is validated even if its title does not match. Unknown/conflicting metadata or no combined audio matches leaves the whole file unchanged for manual review. Silent inputs remain valid; no subtitle matches explicitly proposes none.",
+    "lifecycle": "Read-only issued/revision-bound Preview; explicit Apply; changed-only approval/Review invalidation. No automatic application, approval, exclusion or Run. Language switches preserve valid proposals; New batch clears them."
+  },
+  "localChecks": {
+    "status": "passed",
+    "sdk": "10.0.402",
+    "runtime": "10.0.13",
+    "backend": "MKVToolNix 102.0",
+    "requiredMediaSetting": "TRACKTRIM_REQUIRE_MEDIA_TOOLS=1; explicit acquired-tools-with-source and generated fixture directories",
+    "commands": [
+      "dotnet restore TrackTrim.slnx --locked-mode",
+      "dotnet format TrackTrim.slnx --verify-no-changes --no-restore",
+      "dotnet build TrackTrim.slnx -c Release --no-restore",
+      "dotnet test TrackTrim.slnx -c Release --no-build --no-restore --logger trx",
+      "python -m unittest discover -s build/tests -v"
+    ],
+    "buildWarnings": 0,
+    "buildErrors": 0,
+    "csharpPassed": 503,
+    "documentedLinuxOnlySkips": 7,
+    "pythonPassed": 16,
+    "groups": [
+      {
+        "assembly": "Core",
+        "passed": 114,
+        "skipped": 0,
+        "failed": 0
+      },
+      {
+        "assembly": "Application",
+        "passed": 179,
+        "skipped": 4,
+        "failed": 0
+      },
+      {
+        "assembly": "Desktop",
+        "passed": 81,
+        "skipped": 0,
+        "failed": 0
+      },
+      {
+        "assembly": "Infrastructure",
+        "passed": 129,
+        "skipped": 3,
+        "failed": 0
+      }
+    ],
+    "newCoverage": {
+      "pureCore": 30,
+      "controlledApplication": 15,
+      "headlessUi": 10,
+      "realBackend": 1
+    }
+  },
+  "realBackend": {
+    "status": "passed",
+    "test": "BatchTitleFilterIntegrationTests.LiteralTitleAndLanguagePreviewPublishesTheIntendedReorderedAudio",
+    "method": "Pinned tool creates tiny original VP8/PCM/SRT title variants with reordered tracks; production Preview/Apply derives selections before explicit approval/Review and the existing queue. Both outputs independently pass backend metadata/XML/attachment-metadata/timestamp checks. Four nonempty extracted VP8/PCM payload representations are SHA256-compared by MediaPayloadEvidence; individual payload digests are not emitted. This is integration, not native GUI evidence.",
+    "files": [
+      {
+        "kind": "real-language-and-literal-title-rule",
+        "source": "A literal название.mkv",
+        "sourceHashBefore": "6CEAEBD3DF5367603CB2D1CF0EBC1AF901A914C4095FFD935828343096A3E90C",
+        "sourceHashAfter": "6CEAEBD3DF5367603CB2D1CF0EBC1AF901A914C4095FFD935828343096A3E90C",
+        "output": "A literal название.trimmed.mkv",
+        "outputHash": "748499C77B305C89F0A5EFBF1739D1AC87F71934446A568F2F4EDEC4CD3AB04E",
+        "titleFilter": "main [cut].*",
+        "audioLanguage": "eng",
+        "previewId": "d100c0ee-f2d4-42d7-b965-dc1caddab5e1",
+        "appliedIds": [
+          0,
+          2
+        ],
+        "originalTracks": [
+          {
+            "Id": 0,
+            "uid": "12774094189724925210",
+            "Title": "",
+            "Language": "und",
+            "LanguageIetf": "und"
+          },
+          {
+            "Id": 1,
+            "uid": "13675876335307270593",
+            "Title": "Main cut anything",
+            "Language": "eng",
+            "LanguageIetf": "en"
+          },
+          {
+            "Id": 2,
+            "uid": "15985661122095681775",
+            "Title": "Main [cut].*",
+            "Language": "eng",
+            "LanguageIetf": "en"
+          },
+          {
+            "Id": 3,
+            "uid": "10803935449919660822",
+            "Title": "Captions",
+            "Language": "rus",
+            "LanguageIetf": "ru"
+          }
+        ],
+        "retained": [
+          {
+            "outputId": 0,
+            "uid": "12774094189724925210",
+            "payloadCompared": true
+          },
+          {
+            "outputId": 1,
+            "uid": "15985661122095681775",
+            "payloadCompared": true
+          }
+        ],
+        "metadataAndTimestampsVerified": true,
+        "cleanupIssues": 0
+      },
+      {
+        "kind": "real-language-and-literal-title-rule",
+        "source": "B reordered название.mkv",
+        "sourceHashBefore": "535E9293D326A9826715B5CB938B4537BDF84F3E8A87CC385379856A035AEE70",
+        "sourceHashAfter": "535E9293D326A9826715B5CB938B4537BDF84F3E8A87CC385379856A035AEE70",
+        "output": "B reordered название.trimmed.mkv",
+        "outputHash": "CA82C586E954EF30434A496A37B31677E57AE729142F25B6DE72104658167904",
+        "titleFilter": "main [cut].*",
+        "audioLanguage": "eng",
+        "previewId": "d100c0ee-f2d4-42d7-b965-dc1caddab5e1",
+        "appliedIds": [
+          2,
+          3
+        ],
+        "originalTracks": [
+          {
+            "Id": 0,
+            "uid": "10803935449919660822",
+            "Title": "Captions",
+            "Language": "rus",
+            "LanguageIetf": "ru"
+          },
+          {
+            "Id": 1,
+            "uid": "15985661122095681775",
+            "Title": "Main [cut].* Français",
+            "Language": "fre",
+            "LanguageIetf": "fr"
+          },
+          {
+            "Id": 2,
+            "uid": "12774094189724925210",
+            "Title": "",
+            "Language": "und",
+            "LanguageIetf": "und"
+          },
+          {
+            "Id": 3,
+            "uid": "13675876335307270593",
+            "Title": "Main [cut].* English",
+            "Language": "eng",
+            "LanguageIetf": "en"
+          }
+        ],
+        "retained": [
+          {
+            "outputId": 0,
+            "uid": "12774094189724925210",
+            "payloadCompared": true
+          },
+          {
+            "outputId": 1,
+            "uid": "13675876335307270593",
+            "payloadCompared": true
+          }
+        ],
+        "metadataAndTimestampsVerified": true,
+        "cleanupIssues": 0
+      }
+    ],
+    "ownedCandidateDirectoriesRemaining": 0,
+    "ownershipRecordsRemaining": 0,
+    "scratchEntriesRemaining": 0
+  },
+  "portable": {
+    "sourceRevision": "30deab43cf565e417338ad4dc146e017e0449a2f",
+    "worktreeDirty": false,
+    "runtimeIdentifier": "win-x64",
+    "archive": "TrackTrim-win-x64.zip",
+    "sizeBytes": 113265286,
+    "sha256": "4eb13945c969c4453562c953a809441843edc231a21d440e2c7ac5da86bae5f8",
+    "packageWorkflow": "passed",
+    "distributionInventoryFiles": 528,
+    "unmatchedOrigins": 0,
+    "relocationManifestPayloadsVerified": 527,
+    "redistributionReady": false
+  },
+  "codeCi": {
+    "status": "passed",
+    "url": "https://github.com/Nexusov/TrackTrim/actions/runs/39519527395",
+    "branchHead": "30deab43cf565e417338ad4dc146e017e0449a2f",
+    "actualCheckout": "e63e5c84ddf86da0b2335d06bba9141d6fdd82e1",
+    "parents": [
+      "3cd6845169913ebec1b21afacda8e03f04680f3b",
+      "30deab43cf565e417338ad4dc146e017e0449a2f"
+    ],
+    "tree": "64fb1753ece080081156c232c64d84d6c6a3adf0",
+    "relationship": "Synthetic PR merge; tree equals branch HEAD. Final evidence-only commits use the same full workflow; current links are on PR #4.",
+    "windowsPassed": 503,
+    "windowsLinuxOnlySkips": 7,
+    "linuxPassed": 510,
+    "linuxSkipped": 0,
+    "pythonPassedPerPlatform": 16,
+    "requiredContexts": [
+      "Required media checks and win-x64 package",
+      "Required media checks and linux-x64 package"
+    ],
+    "requiredStages": "Both complete platform jobs: mandatory tools/fixtures, locked restore, format, warning-free Release build, Python checks, real/backend/headless/controlled tests, package/inventory and relocation. Linux also passed the no-SDK/no-separately-installed-media-tools container check."
+  },
+  "native": {
+    "status": "blocked",
+    "date": "2026-10-21",
+    "executionMethod": "Installed computer-use skill, @oai/sky via node_repl; native launch, get_window_state without screenshots, observed keyboard focus and press_key.",
+    "platform": {
+      "os": "Windows 10 Home Single Language 22H2 x64",
+      "build": "19045.6456",
+      "sessionId": 1,
+      "display": "NVIDIA GeForce RTX 3050, 1920x1080",
+      "configuredDpiEvidence": "Win8DpiScaling=0; LogPixels absent",
+      "effectiveScale": "unverified",
+      "scaleChangesMade": false,
+      "installedRuntimeContext": "Separately installed .NET runtimes 3.1/5/6/8/9/10 (10.0.10); developer SDK10.0.402 and media tools also exist in the task workspace. No mkvmerge/mkvextract command on the default PATH. This is not a clean target-desktop test."
+    },
+    "archiveSourceRevision": "30deab43cf565e417338ad4dc146e017e0449a2f",
+    "archiveSha256": "4eb13945c969c4453562c953a809441843edc231a21d440e2c7ac5da86bae5f8",
+    "extraction": "$TASK/Portable Пакет с пробелами/TrackTrim-win-x64",
+    "executable": "$TASK/Portable Пакет с пробелами/TrackTrim-win-x64/TrackTrim.exe",
+    "initialDataEmpty": true,
+    "developerToolPathOverrides": false,
+    "fixture": {
+      "path": "$TASK/Тестовые файлы с пробелами/серия literal title.mkv",
+      "sizeBytes": 392476,
+      "sha256Before": "3d7f4959a255309b1c1ba0ef3239c31e37f57d0703f66ba17d7ace1c393387bf",
+      "provenance": "Byte-identical copy of the actual pinned-tool prototype A produced with the integration test recipe: ordinary.mkv SHA256055c7f3ebdc3c579dd6d7740c78a1e8ee0e2525f23542b5c6af9a0869ce4a0f8, --disable-track-statistics-tags --normalize-language-ietf off --track-order 0:0,0:1,0:2,0:3 --track-name 1:Main cut anything --track-name 2:Main [cut].*",
+      "actualTracks": [
+        "0 video VP8 und",
+        "1 audio PCM eng/en: Main cut anything",
+        "2 audio PCM eng/en: Main [cut].*",
+        "3 subtitles SRT rus/ru: Captions"
+      ]
+    },
+    "completed": [
+      "Launched this fresh identified portable executable through Computer Use.",
+      "Observed first-launch English and the new default-disabled audio/subtitle title controls.",
+      "Observed native focus and selected the batch tab with Right; opened the actual multiple-file picker with keyboard Space."
+    ],
+    "blocker": "The prepared file picker is open. Its input has the previously confirmed cached-app-state limitation; the unchanged failing modal-input and screenshot routes were not retried. Requested only the exact source selection from the owner; title predicate Preview/Apply remains unrun until it completes.",
+    "notRun": [
+      "Native title predicate and Preview/Apply on a loaded source",
+      "Native EN/RU preservation for the new controls",
+      "Native remux/publication"
+    ],
+    "observation": {
+      "label": "fresh-empty-batch-english",
+      "observedAt": "2026-10-21T00:11:40.094Z",
+      "focusedElement": "15 tab item (selectable) Several files / folder",
+      "exactUiaExcerpt": [
+        "\t\t\t\t\t\t48 text Batch language and title rules",
+        "\t\t\t\t\t\t52 check box (disabled) Also require audio title to contain text ID: AudioTitleFilterCheckBox",
+        "\t\t\t\t\t\t53 edit (disabled, settable, string) Audio title contains (literal text) ID: AudioTitleContainsTextBox",
+        "\t\t\t\t\t\t56 check box (disabled) Also require subtitle title to contain text ID: SubtitleTitleFilterCheckBox",
+        "\t\t\t\t\t\t57 edit (disabled, settable, string) Subtitle title contains (literal text) ID: SubtitleTitleContainsTextBox",
+        "\t\t\t\t\t\t59 text Optional title text is combined with the language rule. It matches the actual track title, ignoring case and trimming surrounding search whitespace. Punctuation is literal; blank titles do not match. No regular expressions or wildcards.",
+        "\t\t\t\t\t\t60 button (disabled) Preview language choices ID: PreviewLanguageRulesButton",
+        "\t\t\t\t\t\t61 button (disabled) Apply proposed choices ID: ApplyLanguageRulesButton"
+      ]
+    },
+    "sanitization": "Task-relative paths; source/media data are original generated fixtures. Unrelated shell/picker tree and raw logs are omitted. UIA is functional evidence, not visible appearance/focus/scaling or physical input-event timing."
+  },
+  "remainingLimits": [
+    "Visual capture/layout/focus/scaling remain unverified; unchanged screenshot failure was not retried.",
+    "Clean Windows 11 and Ubuntu Desktop acceptance remains open.",
+    "W13 active-remux input correlation, repeated/verification close and native warning/real-warning-fixture acceptance remain at their documented scope.",
+    "Application license and corresponding-source/build/redistribution obligations remain unresolved. No binary upload or release.",
+    "Title-only rules, regex/wildcards, forced-only matching, presets, persistence, recursion, MP4 and parallel work are outside Phase2B2."
+  ]
+}
