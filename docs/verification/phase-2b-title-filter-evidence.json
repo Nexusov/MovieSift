@@ -227,7 +227,7 @@
     "requiredStages": "Both complete platform jobs: mandatory tools/fixtures, locked restore, format, warning-free Release build, Python checks, real/backend/headless/controlled tests, package/inventory and relocation. Linux also passed the no-SDK/no-separately-installed-media-tools container check."
   },
   "native": {
-    "status": "blocked",
+    "status": "passed",
     "date": "2026-10-21",
     "executionMethod": "Installed computer-use skill, @oai/sky via node_repl; native launch, get_window_state without screenshots, observed keyboard focus and press_key.",
     "platform": {
@@ -259,15 +259,18 @@
       ]
     },
     "completed": [
-      "Launched this fresh identified portable executable through Computer Use.",
-      "Observed first-launch English and the new default-disabled audio/subtitle title controls.",
-      "Observed native focus and selected the batch tab with Right; opened the actual multiple-file picker with keyboard Space."
+      "Launched the identified portable executable through Computer Use; observed English/new disabled title controls, selected Batch and opened the real file picker.",
+      "Owner selected the exact prepared fixture in the native picker. Reacquired the returned window and recovered UIA with documented activation; actual inspection showed both English audio titles and file-local IDs.",
+      "Computer Use enabled the audio language rule, entered en, enabled its title constraint and requested literal search text with surrounding spaces: main [cut].*. Subtitle rules remained unchanged.",
+      "Explicit keyboard Preview displayed one proposed changed file, zero manual-review files and Nothing has been applied; retained video0/audio2/subtitles3, removed audio1.",
+      "Explicit keyboard Apply displayed Files changed:1, disabled repeat Apply, retained Needs an independent approved plan and disabled Start. No approval or media job started automatically.",
+      "Set a fresh per-file destination through the application textbox. The API timed out, but fresh UIA confirmed the full intended path and stale-preview notice; no blind retry was sent.",
+      "Navigated each observed audio/subtitle focus without toggling Keep, then explicitly approved the file. Actual approved-plan text corroborated Keep0/2/3 and Remove1; no new default audio was assigned. Aggregate Review/Run were not invoked."
     ],
-    "blocker": "The prepared file picker is open. Its input has the previously confirmed cached-app-state limitation; the unchanged failing modal-input and screenshot routes were not retried. Requested only the exact source selection from the owner; title predicate Preview/Apply remains unrun until it completes.",
     "notRun": [
-      "Native title predicate and Preview/Apply on a loaded source",
-      "Native EN/RU preservation for the new controls",
-      "Native remux/publication"
+      "Native EN/RU preservation for the new controls (covered by headless tests; old native results remain tied to the old binary).",
+      "Native subtitle title constraint and blank-search validation (covered by Core/headless tests).",
+      "Native remux/publication; this bounded check stops after independent plan approval."
     ],
     "observation": {
       "label": "fresh-empty-batch-english",
@@ -284,7 +287,166 @@
         "\t\t\t\t\t\t61 button (disabled) Apply proposed choices ID: ApplyLanguageRulesButton"
       ]
     },
-    "sanitization": "Task-relative paths; source/media data are original generated fixtures. Unrelated shell/picker tree and raw logs are omitted. UIA is functional evidence, not visible appearance/focus/scaling or physical input-event timing."
+    "sanitization": "Original task-owned snapshots supply the exact selected UIA excerpts; full trees, unrelated shell/picker content and raw logs are omitted. Paths are task-relative. API request intervals are not physical input-event timestamps. UIA is functional evidence, not appearance, visible focus or effective scaling.",
+    "scope": "Bounded English native audio title-conjunction Preview/explicit Apply and independent-plan corroboration only; not visual or full platform acceptance.",
+    "ownerAssistance": "Only selecting/opening the exact fixture in the already prepared native MKV picker. All title/language configuration, Preview, Apply, destination editing and independent approval used Computer Use. Physical input time for the owner action was not captured.",
+    "result": {
+      "audioLanguage": "en",
+      "titleSearchRequested": " main [cut].* ",
+      "titleValueDisplayed": "main [cut].*",
+      "subtitleRule": "Unchanged",
+      "previewRetainedIds": [
+        0,
+        2,
+        3
+      ],
+      "previewRemovedIds": [
+        1
+      ],
+      "actualApprovedRetainedIds": [
+        0,
+        2,
+        3
+      ],
+      "actualApprovedRemovedIds": [
+        1
+      ],
+      "selectedDestination": "$TASK/Результаты с пробелами/серия literal title.trimmed.mkv",
+      "runInvoked": false,
+      "noCheckboxStateClaim": "Native UIA does not expose checked values here. Actual Keep choices are corroborated by the explicitly approved plan; no Keep toggle was sent."
+    },
+    "actions": [
+      {
+        "action": "set audio language codes",
+        "value": "en",
+        "requestedAt": "2026-10-21T13:19:14.87Z",
+        "returnedAt": "2026-10-21T13:19:22.776Z"
+      },
+      {
+        "action": "set literal audio title substring",
+        "value": " main [cut].* ",
+        "requestedAt": "2026-10-21T13:20:08.132Z",
+        "returnedAt": "2026-10-21T13:20:15.376Z"
+      },
+      {
+        "action": "explicit Preview button Space",
+        "requestedAt": "2026-10-21T13:21:13.86Z",
+        "returnedAt": "2026-10-21T13:21:13.977Z"
+      },
+      {
+        "action": "explicit Apply button Space",
+        "requestedAt": "2026-10-21T13:22:20.496Z",
+        "returnedAt": "2026-10-21T13:22:20.602Z"
+      },
+      {
+        "action": "set fresh destination",
+        "apiOutcome": "wait for accessibility set value: timed out waiting on channel",
+        "observedAt": "2026-10-21T13:23:30.037Z",
+        "verifiedOutcome": "Fresh UIA confirms the complete intended destination; preview became stale. No retry sent."
+      },
+      {
+        "action": "explicit independent file-plan approval Space",
+        "requestedAt": "2026-10-21T13:24:28.772Z",
+        "returnedAt": "2026-10-21T13:24:28.868Z"
+      }
+    ],
+    "observations": [
+      {
+        "label": "owner-selected-source-inspected",
+        "observedAt": "2026-10-21T13:18:09.42Z",
+        "exactUiaExcerpt": [
+          "22 button (disabled) Start / resume reviewed items ID: StartBatchButton",
+          "38 edit (disabled, settable, string) Audio language codes (comma separated) Description: en, rus, de-DE ID: AudioRuleLanguagesTextBox",
+          "39 check box (disabled) Also require audio title to contain text ID: AudioTitleFilterCheckBox",
+          "40 edit (disabled, settable, string) Audio title contains (literal text) ID: AudioTitleContainsTextBox",
+          "48 button (disabled) Apply proposed choices ID: ApplyLanguageRulesButton",
+          "50 text ID: LanguageRuleStatusText",
+          "56 text Needs an independent approved plan",
+          "61 text Needs an independent approved plan"
+        ]
+      },
+      {
+        "label": "literal-title-preview-read-only",
+        "observedAt": "2026-10-21T13:21:26.163Z",
+        "exactUiaExcerpt": [
+          "22 button (disabled) Start / resume reviewed items ID: StartBatchButton",
+          "38 edit (settable, string) Audio language codes (comma separated) Description: en, rus, de-DE Value: en ID: AudioRuleLanguagesTextBox",
+          "39 check box Also require audio title to contain text ID: AudioTitleFilterCheckBox",
+          "40 edit (settable, string) Audio title contains (literal text) Value: main [cut].* ID: AudioTitleContainsTextBox",
+          "48 button Apply proposed choices ID: ApplyLanguageRulesButton",
+          "50 text Entries shown: 1; would change: 1; manual review: 0. Nothing has been applied. ID: LanguageRuleStatusText",
+          "116 text Proposed choices — not yet applied.",
+          "118 text Keep: Video 0 — Untitled (VP8; Legacy language: und; IETF: und; default, enabled) Remove: Audio 1 — Main cut anything (PCM; Legacy language: eng; IETF: en; Channels: 1; default, enabled) Keep: Audio 2 — Main [cut].* (PCM; Legacy language: eng; IETF: en; Channels: 1; enabled, commentary) Keep: Subtitles 3 — Captions (SubRip/SRT; Legacy language: rus; IETF: ru; forced, enabled)",
+          "56 text Needs an independent approved plan",
+          "61 text Needs an independent approved plan"
+        ]
+      },
+      {
+        "label": "literal-title-explicit-apply",
+        "observedAt": "2026-10-21T13:22:32.004Z",
+        "exactUiaExcerpt": [
+          "22 button (disabled) Start / resume reviewed items ID: StartBatchButton",
+          "38 edit (settable, string) Audio language codes (comma separated) Description: en, rus, de-DE Value: en ID: AudioRuleLanguagesTextBox",
+          "39 check box Also require audio title to contain text ID: AudioTitleFilterCheckBox",
+          "40 edit (settable, string) Audio title contains (literal text) Value: main [cut].* ID: AudioTitleContainsTextBox",
+          "48 button (disabled) Apply proposed choices ID: ApplyLanguageRulesButton",
+          "50 text Files changed: 1. Files requiring manual review and left unchanged: 0. Approve changed plans, then explicitly Review and Start. ID: LanguageRuleStatusText",
+          "120 text Choices applied. Review this file and explicitly approve its plan.",
+          "122 text Keep: Video 0 — Untitled (VP8; Legacy language: und; IETF: und; default, enabled) Remove: Audio 1 — Main cut anything (PCM; Legacy language: eng; IETF: en; Channels: 1; default, enabled) Keep: Audio 2 — Main [cut].* (PCM; Legacy language: eng; IETF: en; Channels: 1; enabled, commentary) Keep: Subtitles 3 — Captions (SubRip/SRT; Legacy language: rus; IETF: ru; forced, enabled)",
+          "56 text Needs an independent approved plan",
+          "61 text Needs an independent approved plan"
+        ]
+      },
+      {
+        "label": "destination-edit-confirmed-after-api-timeout",
+        "observedAt": "2026-10-21T13:23:30.037Z",
+        "exactUiaExcerpt": [
+          "22 button (disabled) Start / resume reviewed items ID: StartBatchButton",
+          "38 edit (settable, string) Audio language codes (comma separated) Description: en, rus, de-DE Value: en ID: AudioRuleLanguagesTextBox",
+          "39 check box Also require audio title to contain text ID: AudioTitleFilterCheckBox",
+          "40 edit (settable, string) Audio title contains (literal text) Value: main [cut].* ID: AudioTitleContainsTextBox",
+          "48 button (disabled) Apply proposed choices ID: ApplyLanguageRulesButton",
+          "50 text The batch changed. Create a fresh language preview before applying. ID: LanguageRuleStatusText",
+          "56 text Needs an independent approved plan",
+          "61 text Needs an independent approved plan",
+          "63 edit (settable, string) Output file Value: $TASK\\Результаты с пробелами\\серия literal title.trimmed.mkv"
+        ]
+      },
+      {
+        "label": "independently-approved-actual-title-selection-no-run",
+        "observedAt": "2026-10-21T13:24:39.581Z",
+        "exactUiaExcerpt": [
+          "22 button (disabled) Start / resume reviewed items ID: StartBatchButton",
+          "38 edit (settable, string) Audio language codes (comma separated) Description: en, rus, de-DE Value: en ID: AudioRuleLanguagesTextBox",
+          "39 check box Also require audio title to contain text ID: AudioTitleFilterCheckBox",
+          "40 edit (settable, string) Audio title contains (literal text) Value: main [cut].* ID: AudioTitleContainsTextBox",
+          "48 button (disabled) Apply proposed choices ID: ApplyLanguageRulesButton",
+          "50 text The batch changed. Create a fresh language preview before applying. ID: LanguageRuleStatusText",
+          "56 text Approved; pending execution",
+          "61 text Approved; pending execution",
+          "63 edit (settable, string) Output file Value: $TASK\\Результаты с пробелами\\серия literal title.trimmed.mkv",
+          "123 text Keep: Video 0 — Untitled (VP8, und) Remove: Audio 1 — Main cut anything (PCM, en) Keep: Audio 2 — Main [cut].* (PCM, en) Keep: Subtitles 3 — Captions (SubRip/SRT, ru)",
+          "124 text Resulting default audio: none of the retained audio tracks has the default flag. No new default is assigned."
+        ]
+      }
+    ],
+    "readOnlyAfter": {
+      "observedAt": "2026-10-21T16:25:41.3312522+03:00",
+      "sourceSha256Before": "3d7f4959a255309b1c1ba0ef3239c31e37f57d0703f66ba17d7ace1c393387bf",
+      "sourceSha256After": "3d7f4959a255309b1c1ba0ef3239c31e37f57d0703f66ba17d7ace1c393387bf",
+      "finalDestinationExists": false,
+      "outputEntries": 0,
+      "matchingBundledMediaWorkers": 0,
+      "dataEntries": [
+        {
+          "path": "data\\inspection",
+          "directory": true
+        }
+      ],
+      "temporaryMediaFiles": 0,
+      "ownershipRecords": 0,
+      "note": "No remux was started. Only an empty inspection directory remained; no owned media output or journal was created. This is not a cancellation or remux-cleanup test."
+    }
   },
   "remainingLimits": [
     "Visual capture/layout/focus/scaling remain unverified; unchanged screenshot failure was not retried.",

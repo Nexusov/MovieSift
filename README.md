@@ -37,7 +37,7 @@ Preview never edits selections or approvals. Relevant batch edits make it stale;
 
 [Language-rule verification](docs/verification/phase-2b-language-rules-evidence.json) separates the real two-file backend case, controlled/headless tests, portable checks and the bounded Windows 10 native Preview/Apply/EN-RU functional check. Native source selection was owner-assisted; visual and target-desktop acceptance remain open.
 
-[Literal-title verification](docs/verification/phase-2b-title-filter-evidence.json) records the new real two-file conjunction/payload case and 56 focused tests, full platform CI, and the separately identified Phase 2B2 portable GUI. Native title Preview/Apply remains blocked at owner-assisted source selection; a successful launch and UIA text do not establish that workflow or visual acceptance.
+[Literal-title verification](docs/verification/phase-2b-title-filter-evidence.json) records the real two-file conjunction/payload case, 56 focused tests, full platform CI and a bounded English native title Preview/Apply check on the identified Phase 2B2 Windows 10 GUI. Source selection was owner-assisted; Computer Use configured the rule, applied it and independently approved the resulting plan without Run. Native EN/RU preservation for these new controls and visual/target-desktop acceptance remain open.
 
 Do not use the application as a universal preservation tool. The [supported MKV matrix](docs/SUPPORTED_FORMATS.md) defines the inspected, verified, and rejected cases. Title-only/regex/forced-only rules, presets, recursive discovery, persisted queues/retries, MP4, playback and source replacement remain outside this implementation.
 
