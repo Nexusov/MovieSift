@@ -125,16 +125,302 @@
     "limits": "No new remux is claimed for preset CRUD. The unchanged mandatory real-backend suite separately exercises retained payloads, preservation verification and publication."
   },
   "portable": {
-    "status": "not run"
+    "status": "passed",
+    "runtimeIdentifier": "win-x64",
+    "sourceRevision": "e301fc2a01891c56a6c286ffe62b67a01bdcba91",
+    "sourceTree": "06af6ba79d043e0ad89efb3fcc027b95d17806fb",
+    "worktreeDirty": false,
+    "archive": "TrackTrim-win-x64.zip",
+    "bytes": 113340898,
+    "sha256": "4b7a6d2f218c0e4719dca65a97244e7431f9beb18096096d03cbfc5cbf7c1a2b",
+    "packagedWorkflow": "passed",
+    "distributionInventory": {
+      "shippedFiles": 531,
+      "unmatchedOrigins": 0,
+      "redistributionReady": false
+    },
+    "relocation": {
+      "status": "passed",
+      "manifestPayloads": 530
+    },
+    "limits": "CLI package/relocation checks are separate from the bounded native preset scenario and clean target-desktop acceptance."
   },
   "native": {
-    "status": "not run",
-    "scope": "One isolated persistence-focused native scenario; no media processing."
+    "status": "blocked",
+    "executionMethod": "Installed Computer Use @oai/sky native keyboard and editable UIA controls; owner opened the Batch tab once.",
+    "platform": {
+      "os": "Windows 10 Home Single Language",
+      "edition": "CoreSingleLanguage",
+      "release": "22H2",
+      "build": "19045.6456",
+      "architecture": "x64",
+      "desktopSession": 1,
+      "reportedDisplay": "1920x1080 NVIDIA GeForce RTX 3050",
+      "effectiveScale": "not observed; unchanged",
+      "dotnetOnDefaultPath": true,
+      "mkvmergeOrFfmpegOnDefaultPath": false,
+      "limits": "Not clean Windows 11 or Ubuntu Desktop acceptance."
+    },
+    "artifactSourceRevision": "e301fc2a01891c56a6c286ffe62b67a01bdcba91",
+    "archiveSha256": "4b7a6d2f218c0e4719dca65a97244e7431f9beb18096096d03cbfc5cbf7c1a2b",
+    "executable": "{task-kit}/Портативный TrackTrim с пробелами/TrackTrim-win-x64/TrackTrim.exe",
+    "isolatedDataInitiallyEmpty": true,
+    "fixture": {
+      "path": "{task-kit}/Тестовые источники с пробелами/серия forced preset.mkv",
+      "bytes": 392628,
+      "sha256": "2ef4572e1c94124a2088eb6cb3ddf9d97785230c0dcaef5ae443720f49dcf3a5",
+      "provenance": "Byte-identical task-owned copy of the previous original ForcedSubtitleFixture A; actual bundled mkvmerge 102.0 JSON probe verified IDs 0(video),1/2(audio),3(forced subtitle),4(non-forced subtitle). Not yet opened in this native session."
+    },
+    "checks": [
+      {
+        "name": "English first launch, empty catalog and empty-batch preset availability",
+        "status": "passed",
+        "observed": "0 files; Save as new available, Load/Rename/Delete and Preview/Apply/Start unavailable. Both categories initially unchanged, with disabled empty rule inputs."
+      },
+      {
+        "name": "Configure and Save as new",
+        "status": "passed",
+        "observed": "Computer Use configured audio en + enabled Matching audio title, subtitles en + enabled Captions title + forced-only, and saved Сериал — English + forced. Native success text, unchanged editor fields, no selected preset and disabled Load/Start were observed. Read-only JSON confirmed both modes and enabled flags."
+      },
+      {
+        "name": "Saved snapshot independent of later editor changes",
+        "status": "passed",
+        "observed": "Computer Use changed subtitle title to Temporary editor change [literal].*. Read-only catalog retained Captions and all original settings, including forced-only true."
+      },
+      {
+        "name": "Close and restart same isolated copy",
+        "status": "passed",
+        "observed": "Native Alt+F4 closed the task window; list_windows returned none for that exact executable path. The same executable was relaunched with a different returned window ID. Ready/English and empty source were observed; catalog bytes remained unchanged."
+      },
+      {
+        "name": "Restored catalog visible without automatic loading; explicit selection/Load; source Preview; EN/RU; Rename; Delete decline/confirm",
+        "status": "not run",
+        "reason": "After restart the app starts on One file. The requested owner-assisted Batch-tab click is pending; no repeated unsupported click or keyboard-tab-switch route was attempted."
+      }
+    ],
+    "savedCatalog": {
+      "version": 1,
+      "presetId": "5f3b6bf8-aaae-41ae-a944-636e5a3470c6",
+      "name": "Сериал — English + forced",
+      "sha256AfterEditorEditAndRestart": "7504756ef5970fdd39b7f90b9fbd5f43742b4140be21fe2575ba4945727a0d8b",
+      "rules": {
+        "audio": {
+          "mode": "KeepMatching",
+          "languages": [
+            "en"
+          ],
+          "titleFilter": {
+            "enabled": true,
+            "text": "Matching audio"
+          }
+        },
+        "subtitles": {
+          "mode": "KeepMatching",
+          "languages": [
+            "en"
+          ],
+          "titleFilter": {
+            "enabled": true,
+            "text": "Captions"
+          }
+        },
+        "keepOnlyForcedSubtitles": true
+      }
+    },
+    "blocker": {
+      "action": "Open Several files / folder after restarting the isolated copy",
+      "cause": "Previously demonstrated Computer Use coordinate-input geometry limitation and unavailable keyboard switching of this tab; owner assistance was requested. This is an automation/handoff limitation, not an application test failure.",
+      "smallestOwnerAction": "Click only Several files / folder in the restarted isolated Phase 2C1 window. Leave preset selection and Load untouched so their behavior can be observed."
+    },
+    "recoveredInfrastructureIssue": {
+      "action": "set_value on RulePresetNameTextBox",
+      "requestStarted": "2026-10-21T19:30:10.487Z",
+      "error": "wait for accessibility set value: timed out waiting on channel",
+      "recovery": "Separate current-state observation at 2026-10-21T19:30:27.694Z confirmed the complete intended name. No blind input retry."
+    },
+    "idleReadOnlyCheck": {
+      "observedUtc": "2026-10-21T19:43:43.4284719Z",
+      "sourceSha256": "2ef4572e1c94124a2088eb6cb3ddf9d97785230c0dcaef5ae443720f49dcf3a5",
+      "matchingBundledMediaWorkers": 0,
+      "dataEntries": [
+        "data/rule-presets.json",
+        "data/rule-presets.lock"
+      ],
+      "fixtureDirectoryEntries": [
+        "серия forced preset.mkv"
+      ],
+      "limits": "No media was opened or processed in this partial native scenario; this is idle/source/catalog evidence, not remux, cleanup, cancellation or publication evidence."
+    },
+    "observations": [
+      {
+        "label": "empty-catalog-first-launch-owner-opened-batch-tab",
+        "observedUtc": "2026-10-21T19:28:59.824Z",
+        "focusedElement": "15 tab item (selectable) Several files / folder",
+        "text": [
+          "0 window TrackTrim Secondary Actions: Raise",
+          "14 tab item (selectable) One file",
+          "15 tab item (selectable) Several files / folder",
+          "30 text Add files and approve their independent plans. ID: BatchStatusText",
+          "35 button (disabled) Start / resume reviewed items ID: StartBatchButton",
+          "46 text 0 files · 0 included · 0 finished",
+          "50 combo box Saved rule preset ID: RulePresetList",
+          "51 edit (settable, string) Name for Save as new or Rename Description: Name for Save as new or Rename ID: RulePresetNameTextBox",
+          "53 button Save as new ID: SaveRulePresetButton",
+          "54 button (disabled) Load ID: LoadRulePresetButton",
+          "55 button (disabled) Rename ID: RenameRulePresetButton",
+          "56 button (disabled) Delete preset… ID: DeleteRulePresetButton",
+          "58 text ID: RulePresetStatusText",
+          "63 edit (disabled, settable, string) Audio language codes (comma separated) Description: en, rus, de-DE ID: AudioRuleLanguagesTextBox",
+          "65 edit (disabled, settable, string) Audio title contains (literal text) ID: AudioTitleContainsTextBox",
+          "67 edit (disabled, settable, string) Subtitle language codes (comma separated) Description: ru, en-US, sr-Latn ID: SubtitleRuleLanguagesTextBox",
+          "69 edit (disabled, settable, string) Subtitle title contains (literal text) ID: SubtitleTitleContainsTextBox",
+          "70 check box (disabled) Keep only forced subtitles ID: SubtitleForcedOnlyCheckBox",
+          "74 button (disabled) Preview language choices ID: PreviewLanguageRulesButton",
+          "75 button (disabled) Apply proposed choices ID: ApplyLanguageRulesButton",
+          "77 text ID: LanguageRuleStatusText",
+          "0 files · 0 included · 0 finished"
+        ]
+      },
+      {
+        "label": "configured-before-save-empty-batch",
+        "observedUtc": "2026-10-21T19:34:51.955Z",
+        "focusedElement": "70 check box Keep only forced subtitles ID: SubtitleForcedOnlyCheckBox",
+        "text": [
+          "0 window TrackTrim Secondary Actions: Raise",
+          "14 tab item (selectable) One file",
+          "15 tab item (selectable) Several files / folder",
+          "30 text Add files and approve their independent plans. ID: BatchStatusText",
+          "35 button (disabled) Start / resume reviewed items ID: StartBatchButton",
+          "46 text 0 files · 0 included · 0 finished",
+          "50 combo box Saved rule preset ID: RulePresetList",
+          "51 edit (settable, string) Name for Save as new or Rename Description: Name for Save as new or Rename Value: Сериал — English + forced ID: RulePresetNameTextBox",
+          "53 button Save as new ID: SaveRulePresetButton",
+          "54 button (disabled) Load ID: LoadRulePresetButton",
+          "55 button (disabled) Rename ID: RenameRulePresetButton",
+          "56 button (disabled) Delete preset… ID: DeleteRulePresetButton",
+          "58 text ID: RulePresetStatusText",
+          "63 edit (settable, string) Audio language codes (comma separated) Description: en, rus, de-DE Value: en ID: AudioRuleLanguagesTextBox",
+          "65 edit (settable, string) Audio title contains (literal text) Value: Matching audio ID: AudioTitleContainsTextBox",
+          "67 edit (settable, string) Subtitle language codes (comma separated) Description: ru, en-US, sr-Latn Value: en ID: SubtitleRuleLanguagesTextBox",
+          "69 edit (settable, string) Subtitle title contains (literal text) Value: Captions ID: SubtitleTitleContainsTextBox",
+          "70 check box Keep only forced subtitles ID: SubtitleForcedOnlyCheckBox",
+          "74 button (disabled) Preview language choices ID: PreviewLanguageRulesButton",
+          "75 button (disabled) Apply proposed choices ID: ApplyLanguageRulesButton",
+          "77 text ID: LanguageRuleStatusText",
+          "0 files · 0 included · 0 finished"
+        ]
+      },
+      {
+        "label": "save-as-new-completed-no-selection-no-media",
+        "observedUtc": "2026-10-21T19:36:28.165Z",
+        "requestStarted": "2026-10-21T19:36:20.278Z",
+        "focusedElement": "0 window TrackTrim Secondary Actions: Raise",
+        "text": [
+          "0 window TrackTrim Secondary Actions: Raise",
+          "14 tab item (selectable) One file",
+          "15 tab item (selectable) Several files / folder",
+          "30 text Add files and approve their independent plans. ID: BatchStatusText",
+          "35 button (disabled) Start / resume reviewed items ID: StartBatchButton",
+          "46 text 0 files · 0 included · 0 finished",
+          "50 combo box Saved rule preset ID: RulePresetList",
+          "51 edit (settable, string) Name for Save as new or Rename Description: Name for Save as new or Rename Value: Сериал — English + forced ID: RulePresetNameTextBox",
+          "53 button Save as new ID: SaveRulePresetButton",
+          "54 button (disabled) Load ID: LoadRulePresetButton",
+          "55 button (disabled) Rename ID: RenameRulePresetButton",
+          "56 button (disabled) Delete preset… ID: DeleteRulePresetButton",
+          "58 text Saved as a new preset. Current rules and plans are unchanged. ID: RulePresetStatusText",
+          "63 edit (settable, string) Audio language codes (comma separated) Description: en, rus, de-DE Value: en ID: AudioRuleLanguagesTextBox",
+          "65 edit (settable, string) Audio title contains (literal text) Value: Matching audio ID: AudioTitleContainsTextBox",
+          "67 edit (settable, string) Subtitle language codes (comma separated) Description: ru, en-US, sr-Latn Value: en ID: SubtitleRuleLanguagesTextBox",
+          "69 edit (settable, string) Subtitle title contains (literal text) Value: Captions ID: SubtitleTitleContainsTextBox",
+          "70 check box Keep only forced subtitles ID: SubtitleForcedOnlyCheckBox",
+          "74 button (disabled) Preview language choices ID: PreviewLanguageRulesButton",
+          "75 button (disabled) Apply proposed choices ID: ApplyLanguageRulesButton",
+          "77 text ID: LanguageRuleStatusText",
+          "0 files · 0 included · 0 finished"
+        ]
+      },
+      {
+        "label": "editor-changed-after-save-catalog-snapshot-independent",
+        "observedUtc": "2026-10-21T19:37:25.495Z",
+        "focusedElement": "69 edit (settable, string) Subtitle title contains (literal text) Value: Temporary editor change [literal].* ID: SubtitleTitleContainsTextBox",
+        "text": [
+          "0 window TrackTrim Secondary Actions: Raise",
+          "14 tab item (selectable) One file",
+          "15 tab item (selectable) Several files / folder",
+          "30 text Add files and approve their independent plans. ID: BatchStatusText",
+          "35 button (disabled) Start / resume reviewed items ID: StartBatchButton",
+          "46 text 0 files · 0 included · 0 finished",
+          "50 combo box Saved rule preset ID: RulePresetList",
+          "51 edit (settable, string) Name for Save as new or Rename Description: Name for Save as new or Rename Value: Сериал — English + forced ID: RulePresetNameTextBox",
+          "53 button Save as new ID: SaveRulePresetButton",
+          "54 button (disabled) Load ID: LoadRulePresetButton",
+          "55 button (disabled) Rename ID: RenameRulePresetButton",
+          "56 button (disabled) Delete preset… ID: DeleteRulePresetButton",
+          "58 text Saved as a new preset. Current rules and plans are unchanged. ID: RulePresetStatusText",
+          "63 edit (settable, string) Audio language codes (comma separated) Description: en, rus, de-DE Value: en ID: AudioRuleLanguagesTextBox",
+          "65 edit (settable, string) Audio title contains (literal text) Value: Matching audio ID: AudioTitleContainsTextBox",
+          "67 edit (settable, string) Subtitle language codes (comma separated) Description: ru, en-US, sr-Latn Value: en ID: SubtitleRuleLanguagesTextBox",
+          "69 edit (settable, string) Subtitle title contains (literal text) Value: Temporary editor change [literal].* ID: SubtitleTitleContainsTextBox",
+          "70 check box Keep only forced subtitles ID: SubtitleForcedOnlyCheckBox",
+          "74 button (disabled) Preview language choices ID: PreviewLanguageRulesButton",
+          "75 button (disabled) Apply proposed choices ID: ApplyLanguageRulesButton",
+          "77 text ID: LanguageRuleStatusText",
+          "0 files · 0 included · 0 finished"
+        ]
+      },
+      {
+        "label": "same-isolated-copy-restarted",
+        "observedUtc": "2026-10-21T19:37:48.675Z",
+        "focusedElement": "0 window TrackTrim Secondary Actions: Raise",
+        "text": [
+          "0 window TrackTrim Secondary Actions: Raise",
+          "14 tab item (selectable) One file",
+          "15 tab item (selectable) Several files / folder",
+          "16 text Ready ID: StatusText",
+          "The focused UI element is 0 window TrackTrim Secondary Actions: Raise."
+        ]
+      }
+    ],
+    "limits": [
+      "UIA does not expose checkbox ToggleState; captured configuration is corroborated by stored JSON, not caption alone.",
+      "Observation timestamps are API/readback times, not physical input-event times.",
+      "Screenshots, appearance, scaling, cancellation, warning and clean target-platform scenarios were not repeated.",
+      "Task-local files retain the full captured checkpoint states; public excerpts omit unchanged chrome and unrelated controls. Navigation actions remain in the tool transcript. Paths are task-relative; no binaries or raw logs are committed."
+    ]
   },
   "remainingLimits": [
     "No native visual/scaling claim or clean Windows 11/Ubuntu Desktop acceptance.",
     "Historical Phase 2B3 accidental aggregate Review remains recorded in its original evidence.",
     "Existing warning-fixture/cancellation and licensing/redistribution gaps remain open.",
     "No preset overwrite/update, import/export, automatic loading/application, persistent queue or new media filter."
-  ]
+  ],
+  "codeCi": {
+    "run": "https://github.com/Nexusov/TrackTrim/actions/runs/39661495778",
+    "head": "e301fc2a01891c56a6c286ffe62b67a01bdcba91",
+    "status": "passed",
+    "checkout": "ff87de6433c3b1e1e075c8665d172930b947d2a9",
+    "parents": [
+      "5cc5fcf37522eeec2fbce74d9c5795d7e5998d6e",
+      "e301fc2a01891c56a6c286ffe62b67a01bdcba91"
+    ],
+    "tree": "06af6ba79d043e0ad89efb3fcc027b95d17806fb",
+    "treeEqualsHead": true,
+    "requiredChecks": [
+      {
+        "name": "Required media checks and win-x64 package",
+        "passed": 679,
+        "linuxOnlySkipped": 13,
+        "shippedFiles": 531
+      },
+      {
+        "name": "Required media checks and linux-x64 package",
+        "passed": 692,
+        "skipped": 0,
+        "shippedFiles": 509
+      }
+    ],
+    "requiredStages": "Both jobs passed locked restore, formatting, warning-free Release build, 16 Python checks, mandatory media/headless tests, packaging/inventory and relocation. Linux special-file tests and the no-SDK/no-installed-media-tools container passed.",
+    "latestEvidenceOnlyCi": "See draft PR #6 for the final evidence-only revision checks; this entry identifies the actual production source used by the native package."
+  }
 }
