@@ -5,6 +5,7 @@ using TrackTrim.Application.Batches;
 using TrackTrim.Application.Inspection;
 using TrackTrim.Application.Jobs;
 using TrackTrim.Application.Ports;
+using TrackTrim.Application.Presets;
 using TrackTrim.Core.Failures;
 using TrackTrim.Core.Media;
 using TrackTrim.Desktop.Interaction;
@@ -21,6 +22,7 @@ internal sealed class BatchViewModelFixture
     public BatchSession Session { get; } = new();
     public FakeOutputStore Outputs { get; } = new();
     public FakeSettingsStore Settings { get; } = new();
+    public BatchUiPresetStore PresetStore { get; } = new();
     public LocalizationService Localization { get; } = new();
     public BatchUiBackend Backend { get; } = new();
     public BatchUiDialogs Dialogs { get; }
@@ -38,7 +40,7 @@ internal sealed class BatchViewModelFixture
         var jobs = new JobCoordinator(Backend, sourceAccess, Outputs);
         Coordinator = new(Session, new InspectionService(Backend, sourceAccess), jobs, sourceAccess);
         var logger = new LoggerConfiguration().CreateLogger();
-        Batch = new(new(Session, Coordinator, Discovery, Dialogs, Localization, true, logger));
+        Batch = new(new(Session, Coordinator, Discovery, Dialogs, Localization, true, logger, new(PresetStore)));
         Main = new(new(new InspectionService(Backend, sourceAccess), jobs, Settings, Outputs, Dialogs,
             Localization, true, logger, Batch));
     }

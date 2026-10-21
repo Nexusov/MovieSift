@@ -1,0 +1,140 @@
+{
+  "schemaVersion": 1,
+  "feature": "Phase 2C1 named portable rule presets",
+  "comparisonBase": "5cc5fcf37522eeec2fbce74d9c5795d7e5998d6e",
+  "scope": "Save as new, explicit Load, Rename, confirmed Delete; rule configuration only; no automatic selection/loading/application or queue persistence.",
+  "localVerification": {
+    "platform": "Windows 10 Home Single Language 22H2 x64",
+    "sourceState": "Final Phase 2C1 working tree before committing the Desktop changes; no runtime/test edits after this run.",
+    "sdk": "10.0.402",
+    "backend": "MKVToolNix 102.0",
+    "mandatoryMediaEnvironment": true,
+    "lockedRestore": "passed",
+    "formatVerification": "passed",
+    "releaseBuild": {
+      "status": "passed",
+      "warnings": 0,
+      "errors": 0
+    },
+    "tests": {
+      "passed": 679,
+      "linuxOnlySkipped": 13,
+      "failed": 0,
+      "projects": {
+        "Core": {
+          "passed": 148
+        },
+        "Application": {
+          "passed": 233,
+          "linuxOnlySkipped": 4
+        },
+        "Infrastructure": {
+          "passed": 201,
+          "linuxOnlySkipped": 9
+        },
+        "DesktopHeadless": {
+          "passed": 97
+        }
+      }
+    },
+    "pythonDistributionChecks": {
+      "passed": 16,
+      "failed": 0
+    },
+    "focusedFeatureCases": {
+      "Core": 18,
+      "ApplicationControlled": 41,
+      "InfrastructureIncludingOneRealMediaCase": 66,
+      "InfrastructureLinuxOnly": 6,
+      "DesktopHeadless": 11
+    },
+    "limits": "Controlled write failure hooks are not real disk-failure evidence. Cross-process exclusion uses an actual separate lock holder. Linux special-file cases require the Linux job."
+  },
+  "realPersistenceAndMedia": {
+    "status": "passed",
+    "method": "Fresh production store/service load followed by production Preview/Apply for two independently inspected ForcedSubtitleFixture inputs. Retained subtitle payload identities use pinned mkvextract comparisons across source permutations.",
+    "files": [
+      {
+        "kind": "real-portable-rule-preset-preview-apply",
+        "catalogHash": "F1783391CD136D786785BC66EF2B63F210D3CDD2A69A97214D8CFC87291510FC",
+        "freshInstances": true,
+        "exactInactiveConfigurationPreserved": true,
+        "templateHash": "055C7F3EBDC3C579DD6D7740C78A1E8EE0E2525F23542B5C6AF9A0869CE4A0F8",
+        "backend": {
+          "Name": "MKVToolNix",
+          "Version": "102.0",
+          "IdentificationFormatVersion": 20
+        },
+        "fixture": "ForcedSubtitleFixture",
+        "source": "A forced субтитры.mkv",
+        "sourceHashBefore": "3C64CB693136664B9FBC6C17743DF7B18E6C7C62E93F2FD8CAFD90221F197CDB",
+        "sourceHashAfter": "3C64CB693136664B9FBC6C17743DF7B18E6C7C62E93F2FD8CAFD90221F197CDB",
+        "appliedIds": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "retainedSubtitleId": 3,
+        "retainedSubtitleUid": "10803935449919660822",
+        "retainedSubtitleIsForced": true,
+        "subtitlePayload": {
+          "SourceSha256": "1DDE3885B740CE1C19FF31E13CBA5E64C9A2C26A90BA7EBD1170277854876EAC",
+          "OutputSha256": "1DDE3885B740CE1C19FF31E13CBA5E64C9A2C26A90BA7EBD1170277854876EAC",
+          "Bytes": 69
+        },
+        "remuxStarts": 0,
+        "approvedPlan": false,
+        "scratchEntriesRemaining": 0
+      },
+      {
+        "kind": "real-portable-rule-preset-preview-apply",
+        "catalogHash": "F1783391CD136D786785BC66EF2B63F210D3CDD2A69A97214D8CFC87291510FC",
+        "freshInstances": true,
+        "exactInactiveConfigurationPreserved": true,
+        "templateHash": "055C7F3EBDC3C579DD6D7740C78A1E8EE0E2525F23542B5C6AF9A0869CE4A0F8",
+        "backend": {
+          "Name": "MKVToolNix",
+          "Version": "102.0",
+          "IdentificationFormatVersion": 20
+        },
+        "fixture": "ForcedSubtitleFixture",
+        "source": "B forced перестановка.mkv",
+        "sourceHashBefore": "D0ADA23FE5C1F5F12F307DC0DFE8C5FACAD476F0C0BE4D6DB60A131A9D4209A1",
+        "sourceHashAfter": "D0ADA23FE5C1F5F12F307DC0DFE8C5FACAD476F0C0BE4D6DB60A131A9D4209A1",
+        "appliedIds": [
+          0,
+          1,
+          3,
+          4
+        ],
+        "retainedSubtitleId": 0,
+        "retainedSubtitleUid": "10541649192131568173",
+        "retainedSubtitleIsForced": true,
+        "subtitlePayload": {
+          "SourceSha256": "6DE3F8A6533B8AA1498A2EB68013806E54E90DA4FF2B46EF8E7F6E6986688D72",
+          "OutputSha256": "6DE3F8A6533B8AA1498A2EB68013806E54E90DA4FF2B46EF8E7F6E6986688D72",
+          "Bytes": 79
+        },
+        "remuxStarts": 0,
+        "approvedPlan": false,
+        "scratchEntriesRemaining": 0
+      }
+    ],
+    "remuxInNewPresetCase": false,
+    "limits": "No new remux is claimed for preset CRUD. The unchanged mandatory real-backend suite separately exercises retained payloads, preservation verification and publication."
+  },
+  "portable": {
+    "status": "not run"
+  },
+  "native": {
+    "status": "not run",
+    "scope": "One isolated persistence-focused native scenario; no media processing."
+  },
+  "remainingLimits": [
+    "No native visual/scaling claim or clean Windows 11/Ubuntu Desktop acceptance.",
+    "Historical Phase 2B3 accidental aggregate Review remains recorded in its original evidence.",
+    "Existing warning-fixture/cancellation and licensing/redistribution gaps remain open.",
+    "No preset overwrite/update, import/export, automatic loading/application, persistent queue or new media filter."
+  ]
+}

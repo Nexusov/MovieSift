@@ -1,6 +1,7 @@
 using Serilog;
 using TrackTrim.Application.Batches;
 using TrackTrim.Application.Ports;
+using TrackTrim.Application.Presets;
 using TrackTrim.Desktop.Interaction;
 using TrackTrim.Desktop.Localization;
 
@@ -13,4 +14,5 @@ public sealed record BatchViewModelServices(
     IFileDialogs Dialogs,
     LocalizationService Localization,
     bool DataWritable,
-    ILogger Log);
+    ILogger Log,
+    RulePresetService Presets);

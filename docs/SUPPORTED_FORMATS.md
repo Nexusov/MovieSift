@@ -56,6 +56,10 @@ Normalization is comparison-only: no tags, titles, ordering, flags or original m
 
 Phase 2B3 optionally adds **Keep only forced subtitles** to subtitle KeepMatching: language AND optional literal title AND (`forced-only` off OR inspected `IsForced`). It defaults off and is ignored when subtitles are unchanged; audio/video are unaffected. The existing adapter uses Matroska's `false` default only when `forced_track` is absent; malformed values still fail inspection. Every targeted subtitle language is validated, even on non-forced or title-nonmatching tracks. No valid combined matches explicitly proposes none. Every matching whole track is retained in original relative order with its original flags/metadata; titles, default flags, filenames and subtitle text/events never establish forced status. The filter does not extract forced events from a mixed track or promise how players display it. Configuration edits clear only the proposal; existing explicit application, approval and ownership rules remain in force.
 
+## Portable rule presets
+
+Phase 2C1 stores only the existing language/title/forced-subtitle configuration, including inactive values. Presets do not expand supported containers, matching modes or preservation guarantees. Selection alone does not load; explicit Load changes only configuration and requires a fresh Preview if values differ. Manual selections, approvals and aggregate Review are preserved until actual Apply changes choices. Names and original rule values are not translated or canonicalized for storage. The [bounded catalog contract](ARCHITECTURE.md#phase-2c1-portable-rule-presets) defines validation, portable location and failure behavior. No source/destination, track ID, queue, ownership or UI-language state is serialized.
+
 ## Platform and native requirements
 
 Archives target Windows 11 x64 25H2 and Ubuntu 24.04 x64 Desktop with X11/XWayland. Tested hosts/builds and missing acceptance are listed in `PLAN.md`. Avalonia classifies Ubuntu 24.x as Tier 2; upstream support is not this application's acceptance evidence. [Avalonia platform requirements](https://docs.avaloniaui.net/docs/supported-platforms).

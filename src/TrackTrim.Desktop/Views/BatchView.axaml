@@ -42,6 +42,7 @@
           <TextBlock Text="{Binding OutputFolder}" TextWrapping="Wrap" VerticalAlignment="Center" />
         </WrapPanel>
         <TextBlock Text="{Binding SummaryText}" TextWrapping="Wrap" />
+        <views:RulePresetsView DataContext="{Binding Presets}" />
         <views:BatchLanguageRulesView DataContext="{Binding LanguageRules}" />
         <TextBlock Text="{Binding Localization[BatchInclusionHint]}" TextWrapping="Wrap" Opacity="0.8" />
         <ListBox x:Name="BatchFileList" ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem, Mode=TwoWay}"

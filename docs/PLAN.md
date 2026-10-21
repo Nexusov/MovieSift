@@ -1,6 +1,20 @@
 # Phase 0/1 foundation and Phase 2 acceptance
 
-Phase 2A and the separately authorized Phase 2B1/2B2/2B3 rule slices use dependent review branches. Scope stops after independent plans, sequential in-memory processing and explicit language-plus-optional-title/forced-subtitle preview/application. Implemented code, an executed test, and acceptance on a clean desktop are different evidence. Historical evidence below belongs to its recorded revisions; native target-desktop and licensing acceptance remain open.
+Phase 2A, Phase 2B rule slices and Phase 2C1 named portable presets use dependent review branches. Scope stops after independent plans, sequential in-memory processing, explicit language/title/forced-subtitle rules and Save as new / Load / Rename / confirmed Delete of rule configuration. Implemented code, an executed test, and acceptance on a clean desktop are different evidence. Historical evidence below belongs to its recorded revisions; native target-desktop and licensing acceptance remain open.
+
+## Phase 2C1 — named portable rule presets
+
+Comparison base: `5cc5fcf37522eeec2fbce74d9c5795d7e5998d6e`, exactly matching the fetched clean `review/phase-2b-forced-subtitles`, with no newer upstream commits. Isolated `review/phase-2c-rule-presets` targets that branch and depends on draft PR #5. Earlier drafts, main/protection, pins, preservation policy and required CI contexts are unchanged.
+
+Save as new captures all active/inactive rule values under a stable ID and unique user name. Selection alone never loads. Explicit Load replaces only configuration: changed values clear Preview, identical content preserves it; actual selections, destinations, approvals and Review remain untouched. Rename and confirmed Delete affect only the catalog. Startup restores the list without selecting/loading; New batch retains catalog/configuration. EN/RU preserves user values and valid workflow state.
+
+The [architecture contract](ARCHITECTURE.md#phase-2c1-portable-rule-presets) documents schema version 1, `data/rule-presets.json`, byte/depth/count/field bounds, strict validation and fail-fast interprocess exclusion. Mutations reread the latest catalog before an ID-based edit and flushed sibling-file replacement. Invalid data remains untouched with visible errors; manual rules remain available. No preset stores paths, backend IDs, media choices, approvals, queues/jobs or UI language. Update/overwrite, import/export and automatic loading/application remain out of scope.
+
+Local Windows verification passed locked restore, formatting verification, Release build (**0 warnings / 0 errors**), **679 C# tests + 13 Linux-only skips** and **16 Python checks**. Groups: Core **148**, Application **233 + 4 skips**, Infrastructure **201 + 9 skips**, Desktop headless **97**. The new feature contributes **18 pure**, **41 controlled Application**, **65 filesystem/controlled plus one real-media**, **6 Linux-only special-file**, and **11 headless** cases. Cross-process exclusion uses an actual separate lock-holder process; injected write/cleanup faults remain labelled controlled.
+
+The real preset case saves nontrivial active/inactive settings, loads them through fresh production instances and derives **A Keep 0/1/2/3**, **B Keep 0/1/3/4** through Preview/Apply. The retained forced subtitles have different source payloads (**69 / 79 bytes**) and file-local IDs **3 / 0**; both source hashes remain unchanged. No approval or remux is created by this preset test. Existing mandatory backend tests separately ran preservation verification, payload checks, sequential remux/publication and cleanup.
+
+Executed verification and the bounded native result are recorded in the [single feature evidence record](verification/phase-2c-rule-presets-evidence.json). Historical records below retain their original binaries/platforms, including the Phase 2B3 automation protocol deviation. Visual/scaling, clean target desktops, warning/cancellation gaps and licensing/redistribution obligations are unchanged.
 
 ## Phase 2B3 — optional forced-subtitle constraint
 

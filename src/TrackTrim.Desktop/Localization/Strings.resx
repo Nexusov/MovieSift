@@ -239,4 +239,39 @@
   <data name="RuleIssueConflictingLanguage" xml:space="preserve"><value>Legacy and IETF language fields conflict. Review this file manually.</value></data>
   <data name="RuleIssueNoAudioMatches" xml:space="preserve"><value>No audio track matches this rule. This file is unchanged; choose audio manually. Removing all audio still requires per-file confirmation.</value></data>
   <data name="RuleIssueInvalidCurrentSelection" xml:space="preserve"><value>The current track selection requires manual correction.</value></data>
+  <data name="PresetHeading" xml:space="preserve"><value>Named rule presets</value></data>
+  <data name="PresetHint" xml:space="preserve"><value>Selection alone does not load a preset. Load restores only rule settings; Preview, Apply and plan approval remain explicit.</value></data>
+  <data name="PresetChoose" xml:space="preserve"><value>Saved rule preset</value></data>
+  <data name="PresetName" xml:space="preserve"><value>Name for Save as new or Rename</value></data>
+  <data name="PresetNameHelp" xml:space="preserve"><value>1–80 characters; surrounding spaces are trimmed. Names must be unique, ignoring case.</value></data>
+  <data name="PresetSaveNew" xml:space="preserve"><value>Save as new</value></data>
+  <data name="PresetLoad" xml:space="preserve"><value>Load</value></data>
+  <data name="PresetRename" xml:space="preserve"><value>Rename</value></data>
+  <data name="PresetDelete" xml:space="preserve"><value>Delete preset…</value></data>
+  <data name="PresetRefresh" xml:space="preserve"><value>Reload catalog</value></data>
+  <data name="PresetDeleteConfirmation" xml:space="preserve"><value>Delete preset “{0}”? Current rule settings and existing files will remain unchanged.</value></data>
+  <data name="PresetDeleteConfirm" xml:space="preserve"><value>Delete preset</value></data>
+  <data name="PresetDeleteDecline" xml:space="preserve"><value>Keep preset</value></data>
+  <data name="PresetWorking" xml:space="preserve"><value>Reading or saving presets…</value></data>
+  <data name="PresetSaved" xml:space="preserve"><value>Saved as a new preset. Current rules and plans are unchanged.</value></data>
+  <data name="PresetRenamed" xml:space="preserve"><value>Preset renamed. Current rules and plans are unchanged.</value></data>
+  <data name="PresetDeleted" xml:space="preserve"><value>Preset deleted. Loaded rule values remain in the editor.</value></data>
+  <data name="PresetLoaded" xml:space="preserve"><value>Rule settings loaded. Create a fresh Preview before applying choices.</value></data>
+  <data name="PresetAlreadyLoaded" xml:space="preserve"><value>These rule settings are already in the editor. The current Preview is preserved.</value></data>
+  <data name="PresetLoadStale" xml:space="preserve"><value>The editor, selection or batch changed while loading. No rule settings were replaced; load again if needed.</value></data>
+  <data name="PresetCommittedCleanupIssue" xml:space="preserve"><value>The catalog was saved, but temporary-file cleanup reported a problem. See details.</value></data>
+  <data name="PresetErrorBusy" xml:space="preserve"><value>Another application instance is using the preset catalog. Try again after it finishes.</value></data>
+  <data name="PresetErrorInvalidName" xml:space="preserve"><value>Enter a name with 1–80 characters and no control characters.</value></data>
+  <data name="PresetErrorDuplicateName" xml:space="preserve"><value>A preset with this name already exists. Choose another name.</value></data>
+  <data name="PresetErrorInvalidConfiguration" xml:space="preserve"><value>Correct the active rule configuration before saving this preset.</value></data>
+  <data name="PresetErrorInvalidCatalog" xml:space="preserve"><value>The preset catalog is invalid and was preserved. Correct the file, then reload the catalog. Manual rules remain available.</value></data>
+  <data name="PresetErrorUnsupportedVersion" xml:space="preserve"><value>This catalog version is unsupported and was preserved. Use a compatible application; manual rules remain available.</value></data>
+  <data name="PresetErrorLimitExceeded" xml:space="preserve"><value>The preset catalog or configuration exceeds a documented limit. Reduce its size or number of entries.</value></data>
+  <data name="PresetErrorNotFound" xml:space="preserve"><value>The selected preset no longer exists. Reload the catalog.</value></data>
+  <data name="PresetErrorPersistenceUnavailable" xml:space="preserve"><value>The preset catalog could not be safely read or saved. See details, resolve the problem and reload; manual rules remain available.</value></data>
+  <data name="PresetErrorCancelled" xml:space="preserve"><value>The preset operation was cancelled.</value></data>
+  <data name="PresetIssueEmptyLanguageSelection" xml:space="preserve"><value>Enter at least one language code for the active category.</value></data>
+  <data name="PresetIssueEmptyTitleFilter" xml:space="preserve"><value>Enter non-blank title text or disable the title filter.</value></data>
+  <data name="PresetIssueInvalidRuleLanguage" xml:space="preserve"><value>Correct the unknown or unsupported rule language code.</value></data>
+  <data name="PresetCleanupIssue" xml:space="preserve"><value>Preset temporary-file cleanup reported a problem. See details.</value></data>
 </root>

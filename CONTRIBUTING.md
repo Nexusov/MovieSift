@@ -79,13 +79,17 @@ The [applied protection record](docs/verification/main-protection.md) links the 
 
 ## Changes and licensing
 
-Follow `AGENTS.md` and the project dependency boundaries. Prefer small changes with a specific user-visible behavior or safety invariant. Update the relevant preservation matrix and tests when support expands. Current scope is Phase 2A independent plans/bounded discovery/sequential dispatch plus Phase 2B explicit language-rule preview/application, optional literal titles and subtitle forced flags. Matching uses Core policy and file-local inspections, never another file's IDs. Preview must not mutate approvals, Apply must reject stale state, and only real choice changes invalidate plans. Title-only/regex rules, other forced-filter modes, presets, recursion, persistent queues and MP4 require another task. Do not claim unsupported container fidelity.
+Phase 2C1 adds `LanguageRuleConfigurationTests`, Application `Presets` tests, `PortableRulePresetStoreTests` / `RulePresetSpecialFileTests`, Desktop `RulePresetsTests`, and `RulePresetMediaIntegrationTests`. Keep pure validation, controlled write failures, real filesystem/cross-process locking, headless bindings and native functional evidence distinct. The media case must save/load through fresh production persistence instances before deriving different file-local choices through Preview/Apply; existing mandatory backend cases still cover remux/publication. Never serialize media/workflow/settings state into presets or silently repair a bad catalog. Linux FIFO/symlink cases must run in the required Linux job.
+
+Follow `AGENTS.md` and the project dependency boundaries. Prefer small changes with a specific user-visible behavior or safety invariant. Update the relevant preservation matrix and tests when support expands. Current scope is Phase 2A independent plans/bounded discovery/sequential dispatch, Phase 2B explicit language/title/forced rules, and Phase 2C1 named portable presets with separate explicit Load. Matching uses Core policy and file-local inspections, never another file's IDs. Preview must not mutate approvals, Apply must reject stale state, and only real choice changes invalidate plans. Preset update/import/export, automatic loading, title-only/regex rules, other forced-filter modes, recursion, persistent queues and MP4 require another task. Do not claim unsupported container fidelity.
 
 The Phase 2A review branch targets `review/phase-0-1` and depends on draft PR #1. Keep both reviews unmerged until separately authorized; the unfiltered `pull_request` workflow runs the same complete platform jobs on dependent PRs. Do not change required contexts or protected-main policy to deliver a feature.
 
 The Phase 2B1 branch `review/phase-2b-language-rules` targets `review/phase-2a-batch` and depends on draft PR #2. Preserve both existing draft PRs. The same unfiltered workflow must run both exact platform contexts, including packaging/inventory/relocation and the applicable Linux container check.
 
 The Phase 2B2 branch `review/phase-2b-title-filter` targets `review/phase-2b-language-rules` and depends on draft PR #3. The Phase 2B3 branch `review/phase-2b-forced-subtitles` targets `review/phase-2b-title-filter` and depends on draft PR #4. Preserve all earlier draft reviews; no branch merges or dependency changes are part of these slices.
+
+The Phase 2C1 branch `review/phase-2c-rule-presets` targets `review/phase-2b-forced-subtitles` and depends on draft PR #5. It uses the unchanged complete Windows/Linux pull-request workflow.
 
 Keep code, documentation, and commit messages in English. Keep English/Russian resource keys and formatting arguments aligned. Never log full media probe XML/JSON or collect remote telemetry.
 
