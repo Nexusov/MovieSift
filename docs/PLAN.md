@@ -1,6 +1,20 @@
 # Phase 0/1 foundation and Phase 2 acceptance
 
-Phase 2A and the separately authorized Phase 2B1/2B2 rule slices use dependent review branches. Scope stops after independent plans, sequential in-memory processing and explicit language-plus-optional-literal-title preview/application. Implemented code, an executed test, and acceptance on a clean desktop are different evidence. Historical evidence below belongs to its recorded revisions; native target-desktop and licensing acceptance remain open.
+Phase 2A and the separately authorized Phase 2B1/2B2/2B3 rule slices use dependent review branches. Scope stops after independent plans, sequential in-memory processing and explicit language-plus-optional-title/forced-subtitle preview/application. Implemented code, an executed test, and acceptance on a clean desktop are different evidence. Historical evidence below belongs to its recorded revisions; native target-desktop and licensing acceptance remain open.
+
+## Phase 2B3 — optional forced-subtitle constraint
+
+Comparison base: `8fc2e103f9bfbfa1a3e2bd148b80e33a0e0dc10c`, exactly matching the fetched clean `review/phase-2b-title-filter`; there was no advance beyond the reviewed checkpoint. Isolated `review/phase-2b-forced-subtitles` targets that branch and depends on draft PR #4. Main/protection, all earlier draft reviews, required workflow contexts and pins are unchanged.
+
+Subtitle KeepMatching optionally requires the actual inspected `IsForced` flag in addition to exact language and optional literal title. It defaults off; unchanged mode ignores the stored preference. Every match is retained in original order, and every targeted language is validated even on non-forced tracks. Uncertain language preserves the whole file for manual review; no combined subtitle matches explicitly proposes none. This selects whole tracks without interpreting titles, default flags, filenames, subtitle text/events or player behavior. Audio/video and preservation policy are unchanged. See the [matching contract](SUPPORTED_FORMATS.md#language-selection-rules).
+
+Core extends the existing immutable rule configuration and matcher locally. The existing Application issued-preview/revision/inspection/selection and ownership guards need no production changes. Desktop adds one compiled bilingual checkbox/help using the subtitle/workspace gate; edits discard only proposals, explicit Apply invalidates only actually changed approvals, and EN/RU preserves valid proposals. New batch retains configuration and clears proposals. No rule engine or second lifecycle is introduced.
+
+Local Windows checks passed locked restore, formatting verification, Release build (**0 warnings / 0 errors**), **543 C# tests + 7 existing Linux-only skips**, and **16 Python checks**. Groups: Core **130**, Application **192 + 4 skips**, Infrastructure **135 + 3 skips**, Desktop **86**. The **40 new cases** are **16 pure Core**, **13 controlled Application**, **5 headless UI**, **5 controlled JSON parsing** and **one real-media** case. Mandatory tools/fixtures remain required; no gate was softened.
+
+The real case creates two small original subtitle variants with matching English/Captions metadata but different subtitle payloads. A retains forced subtitle ID **3**; B permutes the order and flips flags, retaining the other payload at ID **0**. Production Preview/Apply derives Keep **A 0/1/2/3**, **B 0/1/3/4** before independent approval/Review and sequential dispatch. Both outputs pass backend metadata/flags/XML/timestamp verification; all **8 retained track payloads** and **2 attachment payloads** match their source extractions. Both full source hashes remain unchanged; candidate/journal/scratch storage is empty and both retained owned remux handles have exited. The reproducible recipe and compact hashes are recorded in TRX and the [feature evidence](verification/phase-2b-forced-subtitles-evidence.json), separately from native/package results.
+
+Presets, other forced-filter modes, title-only/regex rules, persistent queues, recursion, MP4, parallel remuxing and source replacement remain outside this slice. Historical visual/scaling, clean Windows 11/Ubuntu Desktop, W13 input correlation, repeated/verification close, real warning fixture/native warning review and licensing/distribution gaps remain open.
 
 ## Phase 2B2 — optional literal title constraints
 
@@ -198,4 +212,4 @@ Restart cleanup is deliberately conservative: if a recovered candidate still exi
 
 Malformed or insufficient ownership JSON remains visible for manual review and never authorizes cleanup. Its original record, marker and candidate are retained. Headless warning-close and invalid-record regressions do not replace a real desktop shutdown test.
 
-Public release readiness is blocked by the unresolved licensing/source-distribution review and any unmet platform/safety acceptance above. The current bounded slice is Phase 2B1 language-rule preview/application; remaining matching features and MP4 require separate authorization.
+Public release readiness is blocked by the unresolved licensing/source-distribution review and any unmet platform/safety acceptance above. The current bounded slice ends at Phase 2B3 optional forced-subtitle preview/application; presets, further matching features and MP4 require separate authorization.

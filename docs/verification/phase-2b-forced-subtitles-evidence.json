@@ -1,0 +1,263 @@
+{
+  "schemaVersion": 1,
+  "scope": "Phase 2B3 optional whole-track forced-subtitle constraint; historical acceptance retains its original binary/platform.",
+  "comparisonBase": "8fc2e103f9bfbfa1a3e2bd148b80e33a0e0dc10c",
+  "branch": "review/phase-2b-forced-subtitles",
+  "pullRequestBase": "review/phase-2b-title-filter",
+  "dependsOn": "https://github.com/Nexusov/TrackTrim/pull/4",
+  "matching": {
+    "default": "KeepOnlyForcedSubtitles=false; subtitle Unchanged ignores stored preference; audio/video unchanged.",
+    "predicate": "Known exact canonical subtitle language AND optional literal title AND (forced-only disabled OR inspected MediaTrack.IsForced). Keep every match in original order.",
+    "flagSource": "Existing adapter: absent Matroska forced_track defaults false; malformed non-booleans reject inspection. No title/default-flag/filename/text/event inference.",
+    "languageSafety": "Every targeted language is validated even for non-forced/title-nonmatching tracks; uncertainty preserves the whole file for manual review. No valid subtitle matches explicitly proposes none.",
+    "workflow": "Configuration clears only displayed Preview; fresh read-only Preview and explicit Apply use existing issued identity/revision/inspection/selection/ownership checks. Only changed approvals are invalidated; no-op preserves Review. EN/RU preserves valid proposals; New batch retains configuration and clears proposals.",
+    "limit": "Selects whole tracks; no forced-event extraction or player-selection/display guarantee."
+  },
+  "localChecks": {
+    "status": "passed",
+    "sourceState": "Feature diff against comparisonBase; same production/test tree is committed before portable packaging.",
+    "platform": "Windows 10 Home Single Language 22H2 x64 19045.6456",
+    "sdk": "10.0.402",
+    "runtime": "10.0.13",
+    "backend": "MKVToolNix 102.0",
+    "requiredMediaTools": true,
+    "commands": [
+      "dotnet restore --locked-mode",
+      "dotnet format --verify-no-changes --no-restore",
+      "dotnet build -c Release --no-restore",
+      "dotnet test -c Release --no-build --no-restore --filter FullyQualifiedName~ForcedSubtitle|FullyQualifiedName~MkvForcedFlag --logger trx",
+      "dotnet test -c Release --no-build --no-restore --logger trx",
+      "python -m unittest discover -s build/tests -v"
+    ],
+    "buildWarnings": 0,
+    "buildErrors": 0,
+    "focusedPassed": 40,
+    "csharpPassed": 543,
+    "documentedLinuxOnlySkips": 7,
+    "pythonPassed": 16,
+    "groups": {
+      "Core": {
+        "passed": 130,
+        "skipped": 0
+      },
+      "Application": {
+        "passed": 192,
+        "skipped": 4
+      },
+      "Infrastructure": {
+        "passed": 135,
+        "skipped": 3
+      },
+      "Desktop": {
+        "passed": 86,
+        "skipped": 0
+      }
+    },
+    "newCoverage": {
+      "pureCore": 16,
+      "controlledApplication": 13,
+      "headlessUi": 5,
+      "controlledJsonParsing": 5,
+      "realBackend": 1
+    }
+  },
+  "realBackend": {
+    "status": "passed",
+    "test": "BatchForcedSubtitleIntegrationTests.ForcedSubtitlePreviewKeepsDifferentPayloadsAcrossReorderedInputs",
+    "fixtureRecipe": "ForcedSubtitleFixture.CreateAsync uses ordinary.mkv plus original added SRT; both subtitles eng/en + Captions. A order 0:0,0:1,0:2,0:3,1:0 sets original3 forced=true, added4=false. B order 0:4,0:2,0:3,0:0,0:1 flips original3=false, added4=true; actual forced subtitle becomes B0. Both calls disable statistics tags and IETF normalization. Generated UIDs/container hashes vary; actual identities are recorded, never inferred from filenames.",
+    "method": "Production Preview/Apply derives selections; explicit per-file approval/aggregate Review dispatches existing sequential queue. Production Verify checks mapping/order/flags/metadata/XML/timestamps/attachments. Pinned mkvextract tracks/attachments produces nonempty representations compared by complete SHA256.",
+    "retainedTrackPayloadComparisons": 8,
+    "attachmentPayloadComparisons": 2,
+    "files": [
+      {
+        "kind": "real-forced-subtitle-rule",
+        "source": "A forced субтитры.mkv",
+        "sourceHashBefore": "33CD0C5B8D989D1B6CACB6B97CD59638AA0224D57ECBE3C73AE5996723A8648C",
+        "sourceHashAfter": "33CD0C5B8D989D1B6CACB6B97CD59638AA0224D57ECBE3C73AE5996723A8648C",
+        "output": "A forced субтитры.trimmed.mkv",
+        "outputHash": "BC076704D2C86F5CCA407492F98FB26AAE03D8A52363577215774D17EED8125D",
+        "previewId": "c0cd6b76-3915-4b92-8a79-cdfa52a35c10",
+        "appliedIds": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "subtitleInputs": [
+          {
+            "Id": 3,
+            "uid": "10803935449919660822",
+            "Language": "eng",
+            "LanguageIetf": "en",
+            "Title": "Captions",
+            "IsForced": true
+          },
+          {
+            "Id": 4,
+            "uid": "16954043611544595761",
+            "Language": "eng",
+            "LanguageIetf": "en",
+            "Title": "Captions",
+            "IsForced": false
+          }
+        ],
+        "payloads": [
+          {
+            "SourceId": 0,
+            "OutputId": 0,
+            "Uid": "12774094189724925210",
+            "Kind": "Video",
+            "Payload": {
+              "SourceSha256": "6A290A6583F3B4269AC0C3EB32B27285DD7511ABB6A632AFEEAA7BE61399D8DD",
+              "OutputSha256": "6A290A6583F3B4269AC0C3EB32B27285DD7511ABB6A632AFEEAA7BE61399D8DD",
+              "Bytes": 1312
+            }
+          },
+          {
+            "SourceId": 1,
+            "OutputId": 1,
+            "Uid": "13675876335307270593",
+            "Kind": "Audio",
+            "Payload": {
+              "SourceSha256": "E8B9FC1D9B4A3AAB833DF3AB8F5532B367AB6BF215120ECA773024B1947DD427",
+              "OutputSha256": "E8B9FC1D9B4A3AAB833DF3AB8F5532B367AB6BF215120ECA773024B1947DD427",
+              "Bytes": 192104
+            }
+          },
+          {
+            "SourceId": 2,
+            "OutputId": 2,
+            "Uid": "15985661122095681775",
+            "Kind": "Audio",
+            "Payload": {
+              "SourceSha256": "DF961853F7276107B6162929061318B051FECBBEFA5263C548906BF286B69A8B",
+              "OutputSha256": "DF961853F7276107B6162929061318B051FECBBEFA5263C548906BF286B69A8B",
+              "Bytes": 192104
+            }
+          },
+          {
+            "SourceId": 3,
+            "OutputId": 3,
+            "Uid": "10803935449919660822",
+            "Kind": "Subtitles",
+            "Payload": {
+              "SourceSha256": "1DDE3885B740CE1C19FF31E13CBA5E64C9A2C26A90BA7EBD1170277854876EAC",
+              "OutputSha256": "1DDE3885B740CE1C19FF31E13CBA5E64C9A2C26A90BA7EBD1170277854876EAC",
+              "Bytes": 69
+            }
+          }
+        ],
+        "attachments": [
+          {
+            "SourceSha256": "0363BB41BAC06B4A38868ABE4C72666E022773F7D0CE436D77C0832BFAE1C601",
+            "OutputSha256": "0363BB41BAC06B4A38868ABE4C72666E022773F7D0CE436D77C0832BFAE1C601",
+            "Bytes": 40
+          }
+        ],
+        "metadataAndTimestampsVerified": true,
+        "cleanupIssues": 0
+      },
+      {
+        "kind": "real-forced-subtitle-rule",
+        "source": "B forced перестановка.mkv",
+        "sourceHashBefore": "1B054D8B8FBF9C4BE11FB9AF887CB5102EFF89408CA59061369C0007358BE18C",
+        "sourceHashAfter": "1B054D8B8FBF9C4BE11FB9AF887CB5102EFF89408CA59061369C0007358BE18C",
+        "output": "B forced перестановка.trimmed.mkv",
+        "outputHash": "18C6009475620CF5CB288BD0661A12EDF215C373EA3B2EAC639A8B8C6E1FCECE",
+        "previewId": "c0cd6b76-3915-4b92-8a79-cdfa52a35c10",
+        "appliedIds": [
+          0,
+          1,
+          3,
+          4
+        ],
+        "subtitleInputs": [
+          {
+            "Id": 0,
+            "uid": "16954043611544595761",
+            "Language": "eng",
+            "LanguageIetf": "en",
+            "Title": "Captions",
+            "IsForced": true
+          },
+          {
+            "Id": 2,
+            "uid": "10803935449919660822",
+            "Language": "eng",
+            "LanguageIetf": "en",
+            "Title": "Captions",
+            "IsForced": false
+          }
+        ],
+        "payloads": [
+          {
+            "SourceId": 0,
+            "OutputId": 0,
+            "Uid": "16954043611544595761",
+            "Kind": "Subtitles",
+            "Payload": {
+              "SourceSha256": "6DE3F8A6533B8AA1498A2EB68013806E54E90DA4FF2B46EF8E7F6E6986688D72",
+              "OutputSha256": "6DE3F8A6533B8AA1498A2EB68013806E54E90DA4FF2B46EF8E7F6E6986688D72",
+              "Bytes": 79
+            }
+          },
+          {
+            "SourceId": 1,
+            "OutputId": 1,
+            "Uid": "15985661122095681775",
+            "Kind": "Audio",
+            "Payload": {
+              "SourceSha256": "DF961853F7276107B6162929061318B051FECBBEFA5263C548906BF286B69A8B",
+              "OutputSha256": "DF961853F7276107B6162929061318B051FECBBEFA5263C548906BF286B69A8B",
+              "Bytes": 192104
+            }
+          },
+          {
+            "SourceId": 3,
+            "OutputId": 2,
+            "Uid": "12774094189724925210",
+            "Kind": "Video",
+            "Payload": {
+              "SourceSha256": "6A290A6583F3B4269AC0C3EB32B27285DD7511ABB6A632AFEEAA7BE61399D8DD",
+              "OutputSha256": "6A290A6583F3B4269AC0C3EB32B27285DD7511ABB6A632AFEEAA7BE61399D8DD",
+              "Bytes": 1312
+            }
+          },
+          {
+            "SourceId": 4,
+            "OutputId": 3,
+            "Uid": "13675876335307270593",
+            "Kind": "Audio",
+            "Payload": {
+              "SourceSha256": "E8B9FC1D9B4A3AAB833DF3AB8F5532B367AB6BF215120ECA773024B1947DD427",
+              "OutputSha256": "E8B9FC1D9B4A3AAB833DF3AB8F5532B367AB6BF215120ECA773024B1947DD427",
+              "Bytes": 192104
+            }
+          }
+        ],
+        "attachments": [
+          {
+            "SourceSha256": "0363BB41BAC06B4A38868ABE4C72666E022773F7D0CE436D77C0832BFAE1C601",
+            "OutputSha256": "0363BB41BAC06B4A38868ABE4C72666E022773F7D0CE436D77C0832BFAE1C601",
+            "Bytes": 40
+          }
+        ],
+        "metadataAndTimestampsVerified": true,
+        "cleanupIssues": 0
+      }
+    ],
+    "cleanup": "Both outputs exist at reviewed destinations; no candidate directories, ownership entries or backend scratch entries. Both retained owned remux process handles report HasExited. Test-only extracted comparison files are removed with the owned test workspace on disposal.",
+    "nativeGui": false
+  },
+  "native": {
+    "status": "not run",
+    "reason": "New clean source package and bounded GUI check are prepared after the implementation commit."
+  },
+  "remaining": [
+    "Native visual layout/focus appearance/scaling and clean Windows 11 / Ubuntu Desktop acceptance",
+    "W13 active-remux input correlation; repeated/verification close",
+    "Real warning-remux fixture and native warning review",
+    "Original application license and corresponding-source/redistribution obligations",
+    "No presets, persistence, recursion, title-only/regex, additional forced modes, MP4, parallel jobs or source replacement"
+  ]
+}
