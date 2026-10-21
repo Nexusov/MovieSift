@@ -35,7 +35,7 @@ public sealed partial class RulePresetsViewModel : ObservableObject
         LoadCommand = new AsyncRelayCommand(LoadAsync, () => CanLoad);
         RenameCommand = new AsyncRelayCommand(RenameAsync, () => CanWrite && SelectedPreset is not null);
         DeleteCommand = new RelayCommand(RequestDelete, () => CanWrite && SelectedPreset is not null);
-        ConfirmDeleteCommand = new AsyncRelayCommand(ConfirmDeleteAsync, () => HasDeleteConfirmation && !IsBusy && options.CanEdit());
+        ConfirmDeleteCommand = new AsyncRelayCommand(ConfirmDeleteAsync, () => CanConfirmDelete);
         KeepPresetCommand = new RelayCommand(KeepPreset, () => HasDeleteConfirmation && !IsBusy);
         options.Localization.PropertyChanged += (_, _) => Refresh();
     }
@@ -49,6 +49,8 @@ public sealed partial class RulePresetsViewModel : ObservableObject
     public bool CanRead => !IsBusy && !HasDeleteConfirmation && options.CanEdit();
     public bool CanWrite => CanRead && catalogAvailable && options.CanWrite();
     public bool CanLoad => CanRead && catalogAvailable && SelectedPreset is not null;
+    private bool CanConfirmDelete => HasDeleteConfirmation && !IsBusy && options.CanEdit() && options.CanWrite() &&
+        SelectedPreset?.Id == deletionId;
     public string StatusText => IsBusy ? Localization["PresetWorking"] : statusKey is null ? string.Empty : Localization[statusKey];
     public string DeleteConfirmationText => Localization.Format(new("PresetDeleteConfirmation", [deletionName]));
     public string ErrorText => failure is { } current ? Localization[$"PresetError{current.Code}"] :
@@ -186,9 +188,7 @@ public sealed partial class RulePresetsViewModel : ObservableObject
     /// <summary>Deletes only the confirmed identity and leaves even previously loaded editor values in place.</summary>
     private Task ConfirmDeleteAsync()
     {
-        var canDelete = !IsBusy && options.CanEdit() && deletionId is { } && SelectedPreset?.Id == deletionId;
-
-        if (!canDelete)
+        if (!CanConfirmDelete)
         {
             return Task.CompletedTask;
         }
