@@ -1,6 +1,20 @@
 # Phase 0/1 foundation and Phase 2 acceptance
 
-Phase 2A and the separately authorized Phase 2B1 language-rule slice use dependent review branches. Scope stops after independent plans, sequential in-memory processing and explicit language-rule preview/application. Implemented code, an executed test, and acceptance on a clean desktop are different evidence. Historical evidence below belongs to its recorded revisions; native target-desktop and licensing acceptance remain open.
+Phase 2A and the separately authorized Phase 2B1/2B2 rule slices use dependent review branches. Scope stops after independent plans, sequential in-memory processing and explicit language-plus-optional-literal-title preview/application. Implemented code, an executed test, and acceptance on a clean desktop are different evidence. Historical evidence below belongs to its recorded revisions; native target-desktop and licensing acceptance remain open.
+
+## Phase 2B2 — optional literal title constraints
+
+Comparison base: `3cd6845169913ebec1b21afacda8e03f04680f3b`, exactly matching the fetched clean `review/phase-2b-language-rules` at task start; no newer changes were present. Isolated branch `review/phase-2b-title-filter` targets that branch and depends on draft PR #3. Earlier PRs, main/protection, workflow contexts and dependency/tool pins are unchanged.
+
+Audio/subtitle KeepMatching rules each have an optional, default-off title constraint. Every retained match must satisfy both language and a trimmed, literal `OrdinalIgnoreCase` substring of the actual inspected title. Blank/missing titles do not match; enabled blank searches are invalid. Filename/display fallbacks, regexes, wildcards and preferred-match ranking are excluded. Every targeted language is validated even when its title does not match; ambiguous metadata or no combined audio matches preserves the whole file for manual review. No combined subtitle matches explicitly proposes none. The [matching contract](SUPPORTED_FORMATS.md#language-selection-rules) defines the exact boundaries.
+
+Core adds one immutable optional constraint and the conjunction; Application's issued-preview/revision/inspection/selection guards and existing job lifecycle require no production change. Desktop extends the existing rule component with compiled bilingual controls. Configuration edits clear only the transient preview. Explicit Apply invalidates only changed approvals and aggregate Review; EN/RU preserves valid proposals, and New batch clears them without automatically applying to later inputs.
+
+Local Windows verification passed locked restore, formatting verification, Release build (**0 warnings / 0 errors**), **503 C# tests + 7 existing Linux-only skips**, and **16 Python checks**. Groups: Core **114**, Application **179 + 4 skips**, Infrastructure **129 + 3 skips**, Desktop **81**. The **56 new cases** comprise **30 pure Core**, **15 controlled Application**, **10 headless UI** and **one real-media** case. Required tool/fixture settings were enabled; no test gate was softened.
+
+The new real-backend case generates two small variants of the original fixture. A has two English audio tracks with different titles; B reorders tracks and has an English and a French audio track whose titles both contain the literal punctuation. Audio `eng` AND `main [cut].*`, plus subtitle `eng`, produces file-local Keep **A 0/2**, **B 2/3** through production Preview/Apply. Explicit independent approval/Review dispatches the existing queue. Both outputs pass preservation checks; all **four retained VP8/PCM payloads** compare, both full source hashes remain unchanged, and owned candidate/journal/scratch storage is empty. TRX records the actual titles, IDs, UIDs and hashes. This is real integration evidence, separate from native GUI execution.
+
+Native verification of the new title controls is not yet recorded for this binary. Historical Phase 2B1 native results below retain their original binary/platform. Visual/scaling, target-desktop, W13 input correlation, repeated/verification close, native warning/real warning fixture and application-license/distribution gaps remain unchanged. Title-only rules, forced-only filters, presets, recursion, persistent queues, MP4 and parallel processing remain outside this slice.
 
 ## Phase 2B1 — explicit batch language rules
 

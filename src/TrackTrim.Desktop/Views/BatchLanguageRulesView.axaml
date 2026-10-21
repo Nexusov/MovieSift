@@ -12,12 +12,21 @@
       <TextBox x:Name="AudioRuleLanguagesTextBox" Text="{Binding AudioLanguages, Mode=TwoWay}"
                IsEnabled="{Binding CanEditAudioLanguages}" PlaceholderText="en, rus, de-DE"
                AutomationProperties.Name="{Binding Localization[RuleAudioCodes]}" />
+      <CheckBox x:Name="AudioTitleFilterCheckBox" Content="{Binding Localization[RuleAudioTitleFilter]}"
+                IsChecked="{Binding AudioTitleFilterEnabled, Mode=TwoWay}" IsEnabled="{Binding CanEditAudioLanguages}" />
+      <TextBox x:Name="AudioTitleContainsTextBox" Text="{Binding AudioTitleContains, Mode=TwoWay}"
+               IsEnabled="{Binding CanEditAudioTitle}" AutomationProperties.Name="{Binding Localization[RuleAudioTitleContains]}" />
       <CheckBox x:Name="SubtitleLanguageRuleCheckBox" Content="{Binding Localization[RuleSubtitles]}"
                 IsChecked="{Binding SubtitleRuleEnabled, Mode=TwoWay}" IsEnabled="{Binding CanConfigure}" />
       <TextBox x:Name="SubtitleRuleLanguagesTextBox" Text="{Binding SubtitleLanguages, Mode=TwoWay}"
                IsEnabled="{Binding CanEditSubtitleLanguages}" PlaceholderText="ru, en-US, sr-Latn"
                AutomationProperties.Name="{Binding Localization[RuleSubtitleCodes]}" />
+      <CheckBox x:Name="SubtitleTitleFilterCheckBox" Content="{Binding Localization[RuleSubtitleTitleFilter]}"
+                IsChecked="{Binding SubtitleTitleFilterEnabled, Mode=TwoWay}" IsEnabled="{Binding CanEditSubtitleLanguages}" />
+      <TextBox x:Name="SubtitleTitleContainsTextBox" Text="{Binding SubtitleTitleContains, Mode=TwoWay}"
+               IsEnabled="{Binding CanEditSubtitleTitle}" AutomationProperties.Name="{Binding Localization[RuleSubtitleTitleContains]}" />
       <TextBlock Text="{Binding Localization[RuleTagHelp]}" TextWrapping="Wrap" Opacity="0.8" />
+      <TextBlock Text="{Binding Localization[RuleTitleHelp]}" TextWrapping="Wrap" Opacity="0.8" />
       <WrapPanel>
         <Button x:Name="PreviewLanguageRulesButton" Content="{Binding Localization[RulePreview]}" Command="{Binding PreviewCommand}" Margin="0,0,8,8" />
         <Button x:Name="ApplyLanguageRulesButton" Content="{Binding Localization[RuleApply]}" Command="{Binding ApplyCommand}" Margin="0,0,8,8" />
