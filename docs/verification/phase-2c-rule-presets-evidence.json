@@ -146,8 +146,8 @@
     "limits": "CLI package/relocation checks are separate from the bounded native preset scenario and clean target-desktop acceptance."
   },
   "native": {
-    "status": "blocked",
-    "executionMethod": "Installed Computer Use @oai/sky native keyboard and editable UIA controls; owner opened the Batch tab once.",
+    "status": "passed",
+    "executionMethod": "Installed Computer Use @oai/sky native keyboard and editable UIA controls. Owner assistance: open the Batch tab before and after restart, and select the prepared source in the native picker; final Delete was authorized at action-time and activated by Computer Use.",
     "platform": {
       "os": "Windows 10 Home Single Language",
       "edition": "CoreSingleLanguage",
@@ -169,7 +169,7 @@
       "path": "{task-kit}/Тестовые источники с пробелами/серия forced preset.mkv",
       "bytes": 392628,
       "sha256": "2ef4572e1c94124a2088eb6cb3ddf9d97785230c0dcaef5ae443720f49dcf3a5",
-      "provenance": "Byte-identical task-owned copy of the previous original ForcedSubtitleFixture A; actual bundled mkvmerge 102.0 JSON probe verified IDs 0(video),1/2(audio),3(forced subtitle),4(non-forced subtitle). Not yet opened in this native session."
+      "provenance": "Byte-identical task-owned copy of the previous original ForcedSubtitleFixture A; bundled mkvmerge 102.0 JSON probe verified IDs 0(video),1/2(audio),3(forced subtitle),4(non-forced subtitle). The owner opened this exact source in the native multiple-file picker; the application displayed its actual tracks."
     },
     "checks": [
       {
@@ -193,9 +193,44 @@
         "observed": "Native Alt+F4 closed the task window; list_windows returned none for that exact executable path. The same executable was relaunched with a different returned window ID. Ready/English and empty source were observed; catalog bytes remained unchanged."
       },
       {
-        "name": "Restored catalog visible without automatic loading; explicit selection/Load; source Preview; EN/RU; Rename; Delete decline/confirm",
-        "status": "not run",
-        "reason": "After restart the app starts on One file. The requested owner-assisted Batch-tab click is pending; no repeated unsupported click or keyboard-tab-switch route was attempted."
+        "name": "Catalog restored without automatic selection or loading",
+        "status": "passed",
+        "observed": "After the owner opened the restarted Batch tab, the saved name was visible in the expanded catalog. No preset was selected, Load was unavailable, both rule categories had disabled empty inputs, and the batch was empty."
+      },
+      {
+        "name": "Selecting an entry does not load",
+        "status": "passed",
+        "observed": "Computer Use selected the saved entry with Down in the collapsed combo. Its stable ID/name became observable and Load/Rename/Delete became available; rule inputs stayed disabled and empty, with Preview/Run unavailable."
+      },
+      {
+        "name": "Separate explicit Load",
+        "status": "passed",
+        "observed": "Computer Use activated the focused Load button. The native success text and restored en/en, Matching audio/Captions inputs were observed. Read-only catalog values corroborate enabled title constraints and forced-only true. No file or plan was created by Load."
+      },
+      {
+        "name": "Prepared source and explicit read-only Preview",
+        "status": "passed",
+        "observed": "After owner-assisted source selection, Computer Use activated Preview once. The application proposed Keep 0/1/2/3 and Remove 4, with one changed entry and zero manual-review entries. Apply became available; Nothing has been applied, Needs an independent approved plan and disabled Run remained visible. The source path was correct and destination remained empty."
+      },
+      {
+        "name": "EN to RU to EN preserves loaded values and valid Preview",
+        "status": "passed",
+        "observed": "Without another Preview, Computer Use switched the actual language buttons EN -> RU -> EN. The selected preset ID/name, en/en, literal titles, source, empty destination, absent approval and same proposed file-local choices remained observable; labels/help/status translated while original media titles/language metadata remained original. Apply stayed available and Run disabled."
+      },
+      {
+        "name": "Rename changes catalog name while preserving identity and editor",
+        "status": "passed",
+        "observed": "Computer Use renamed the entry to Сериал — English + forced — renamed. Native success and read-only JSON confirmed the same stable ID and unchanged rule values. The existing Preview and editor values remained visible."
+      },
+      {
+        "name": "Decline Delete",
+        "status": "passed",
+        "observed": "Computer Use opened the localized confirmation and activated the observed Keep preset button. The catalog hash stayed identical to the post-Rename hash; selected identity, editor values and unapplied Preview remained unchanged."
+      },
+      {
+        "name": "Confirm Delete leaves loaded values and Preview",
+        "status": "passed",
+        "observed": "After explicit owner action-time authorization, Computer Use activated the observed ConfirmDeleteRulePresetButton. The native success text stated that loaded values remain; catalog version 1 contained zero presets, selection was empty and Load/Rename/Delete disabled. The en/en and Matching audio/Captions inputs, same unapplied Keep 0/1/2/3 Remove 4 Preview, source and empty destination remained; Run stayed disabled."
       }
     ],
     "savedCatalog": {
@@ -227,11 +262,6 @@
         "keepOnlyForcedSubtitles": true
       }
     },
-    "blocker": {
-      "action": "Open Several files / folder after restarting the isolated copy",
-      "cause": "Previously demonstrated Computer Use coordinate-input geometry limitation and unavailable keyboard switching of this tab; owner assistance was requested. This is an automation/handoff limitation, not an application test failure.",
-      "smallestOwnerAction": "Click only Several files / folder in the restarted isolated Phase 2C1 window. Leave preset selection and Load untouched so their behavior can be observed."
-    },
     "recoveredInfrastructureIssue": {
       "action": "set_value on RulePresetNameTextBox",
       "requestStarted": "2026-10-21T19:30:10.487Z",
@@ -239,17 +269,25 @@
       "recovery": "Separate current-state observation at 2026-10-21T19:30:27.694Z confirmed the complete intended name. No blind input retry."
     },
     "idleReadOnlyCheck": {
-      "observedUtc": "2026-10-21T19:43:43.4284719Z",
-      "sourceSha256": "2ef4572e1c94124a2088eb6cb3ddf9d97785230c0dcaef5ae443720f49dcf3a5",
+      "observedUtc": "2026-10-21T21:22:14.8953237Z",
+      "sourceSha256Before": "2ef4572e1c94124a2088eb6cb3ddf9d97785230c0dcaef5ae443720f49dcf3a5",
+      "sourceSha256After": "2ef4572e1c94124a2088eb6cb3ddf9d97785230c0dcaef5ae443720f49dcf3a5",
+      "sourceUnchanged": true,
+      "archiveSha256": "4b7a6d2f218c0e4719dca65a97244e7431f9beb18096096d03cbfc5cbf7c1a2b",
       "matchingBundledMediaWorkers": 0,
-      "dataEntries": [
-        "data/rule-presets.json",
-        "data/rule-presets.lock"
-      ],
       "fixtureDirectoryEntries": [
         "серия forced preset.mkv"
       ],
-      "limits": "No media was opened or processed in this partial native scenario; this is idle/source/catalog evidence, not remux, cleanup, cancellation or publication evidence."
+      "dataEntries": [
+        "data/inspection",
+        "data/rule-presets.json",
+        "data/rule-presets.lock",
+        "data/settings.json"
+      ],
+      "inspectionDirectoryEmpty": true,
+      "newOutputFiles": 0,
+      "mediaRemuxInvocations": 0,
+      "limits": "Read-only idle/source/catalog checks after native inspection/Preview and preset CRUD. No remux, publication, cancellation or remux-cleanup evidence."
     },
     "observations": [
       {
@@ -380,13 +418,250 @@
           "16 text Ready ID: StatusText",
           "The focused UI element is 0 window TrackTrim Secondary Actions: Raise."
         ]
+      },
+      {
+        "label": "restored-catalog-listed-editor-not-loaded",
+        "observedUtc": "2026-10-21T19:55:09.605Z",
+        "focusedElement": "37 combo box Saved rule preset ID: RulePresetList",
+        "text": [
+          "22 button (disabled) Start / resume reviewed items ID: StartBatchButton",
+          "37 combo box Saved rule preset ID: RulePresetList",
+          "81 text Сериал — English + forced",
+          "41 button (disabled) Load ID: LoadRulePresetButton",
+          "43 button (disabled) Delete preset… ID: DeleteRulePresetButton",
+          "45 text ID: RulePresetStatusText",
+          "50 edit (disabled, settable, string) Audio language codes (comma separated) Description: en, rus, de-DE ID: AudioRuleLanguagesTextBox",
+          "52 edit (disabled, settable, string) Audio title contains (literal text) ID: AudioTitleContainsTextBox",
+          "54 edit (disabled, settable, string) Subtitle language codes (comma separated) Description: ru, en-US, sr-Latn ID: SubtitleRuleLanguagesTextBox",
+          "56 edit (disabled, settable, string) Subtitle title contains (literal text) ID: SubtitleTitleContainsTextBox",
+          "62 button (disabled) Apply proposed choices ID: ApplyLanguageRulesButton",
+          "64 text ID: LanguageRuleStatusText",
+          "42 button (disabled) Rename ID: RenameRulePresetButton"
+        ]
+      },
+      {
+        "label": "preset-selected-without-loading-after-restart",
+        "observedUtc": "2026-10-21T19:56:53.525Z",
+        "focusedElement": "37 combo box Saved rule preset Value: RulePreset { Id = 5f3b6bf8-aaae-41ae-a944-636e5a3470c6, Name = Сериал — English + forced, Rules = LanguageRules { Audio = TrackLanguageRule { Mode = KeepMatching, Languages = System.Collections.Immutable.ImmutableArray`1[System.String], TitleFilter = TrackTitleFilter { Enabled = True, Text = Matching audio } }, Subtitles = TrackLanguageRule { Mode = KeepMatching, Languages = System.Collections.Immutable.ImmutableArray`1[System.String], TitleFilter = TrackTitleFilter { Enabled = True, Text = Captions } }, KeepOnlyForcedSubtitles = True } } ID: RulePresetList",
+        "text": [
+          "22 button (disabled) Start / resume reviewed items ID: StartBatchButton",
+          "37 combo box Saved rule preset Value: RulePreset { Id = 5f3b6bf8-aaae-41ae-a944-636e5a3470c6, Name = Сериал — English + forced, Rules = LanguageRules { Audio = TrackLanguageRule { Mode = KeepMatching, Languages = System.Collections.Immutable.ImmutableArray`1[System.String], TitleFilter = TrackTitleFilter { Enabled = True, Text = Matching audio } }, Subtitles = TrackLanguageRule { Mode = KeepMatching, Languages = System.Collections.Immutable.ImmutableArray`1[System.String], TitleFilter = TrackTitleFilter { Enabled = True, Text = Captions } }, KeepOnlyForcedSubtitles = True } } ID: RulePresetList",
+          "82 text Сериал — English + forced",
+          "41 button Load ID: LoadRulePresetButton",
+          "43 button Delete preset… ID: DeleteRulePresetButton",
+          "45 text ID: RulePresetStatusText",
+          "50 edit (disabled, settable, string) Audio language codes (comma separated) Description: en, rus, de-DE ID: AudioRuleLanguagesTextBox",
+          "52 edit (disabled, settable, string) Audio title contains (literal text) ID: AudioTitleContainsTextBox",
+          "54 edit (disabled, settable, string) Subtitle language codes (comma separated) Description: ru, en-US, sr-Latn ID: SubtitleRuleLanguagesTextBox",
+          "56 edit (disabled, settable, string) Subtitle title contains (literal text) ID: SubtitleTitleContainsTextBox",
+          "62 button (disabled) Apply proposed choices ID: ApplyLanguageRulesButton",
+          "64 text ID: LanguageRuleStatusText",
+          "42 button Rename ID: RenameRulePresetButton"
+        ]
+      },
+      {
+        "label": "explicit-load-restored-rule-editor-only",
+        "observedUtc": "2026-10-21T19:57:55.197Z",
+        "focusedElement": "0 window TrackTrim Secondary Actions: Raise",
+        "text": [
+          "22 button (disabled) Start / resume reviewed items ID: StartBatchButton",
+          "37 combo box Saved rule preset Value: RulePreset { Id = 5f3b6bf8-aaae-41ae-a944-636e5a3470c6, Name = Сериал — English + forced, Rules = LanguageRules { Audio = TrackLanguageRule { Mode = KeepMatching, Languages = System.Collections.Immutable.ImmutableArray`1[System.String], TitleFilter = TrackTitleFilter { Enabled = True, Text = Matching audio } }, Subtitles = TrackLanguageRule { Mode = KeepMatching, Languages = System.Collections.Immutable.ImmutableArray`1[System.String], TitleFilter = TrackTitleFilter { Enabled = True, Text = Captions } }, KeepOnlyForcedSubtitles = True } } ID: RulePresetList",
+          "82 text Сериал — English + forced",
+          "41 button Load ID: LoadRulePresetButton",
+          "43 button Delete preset… ID: DeleteRulePresetButton",
+          "45 text Rule settings loaded. Create a fresh Preview before applying choices. ID: RulePresetStatusText",
+          "50 edit (settable, string) Audio language codes (comma separated) Description: en, rus, de-DE Value: en ID: AudioRuleLanguagesTextBox",
+          "52 edit (settable, string) Audio title contains (literal text) Value: Matching audio ID: AudioTitleContainsTextBox",
+          "54 edit (settable, string) Subtitle language codes (comma separated) Description: ru, en-US, sr-Latn Value: en ID: SubtitleRuleLanguagesTextBox",
+          "56 edit (settable, string) Subtitle title contains (literal text) Value: Captions ID: SubtitleTitleContainsTextBox",
+          "62 button (disabled) Apply proposed choices ID: ApplyLanguageRulesButton",
+          "64 text ID: LanguageRuleStatusText",
+          "42 button Rename ID: RenameRulePresetButton"
+        ]
+      },
+      {
+        "label": "loaded-preset-explicit-preview-english",
+        "observedUtc": "2026-10-21T21:09:59.379Z",
+        "focusedElement": "62 button Preview language choices ID: PreviewLanguageRulesButton",
+        "text": [
+          "22 button (disabled) Start / resume reviewed items ID: StartBatchButton",
+          "37 combo box Saved rule preset Value: RulePreset { Id = 5f3b6bf8-aaae-41ae-a944-636e5a3470c6, Name = Сериал — English + forced, Rules = LanguageRules { Audio = TrackLanguageRule { Mode = KeepMatching, Languages = System.Collections.Immutable.ImmutableArray`1[System.String], TitleFilter = TrackTitleFilter { Enabled = True, Text = Matching audio } }, Subtitles = TrackLanguageRule { Mode = KeepMatching, Languages = System.Collections.Immutable.ImmutableArray`1[System.String], TitleFilter = TrackTitleFilter { Enabled = True, Text = Captions } }, KeepOnlyForcedSubtitles = True } } ID: RulePresetList",
+          "38 text Сериал — English + forced",
+          "42 button Load ID: LoadRulePresetButton",
+          "44 button Delete preset… ID: DeleteRulePresetButton",
+          "46 text Rule settings loaded. Create a fresh Preview before applying choices. ID: RulePresetStatusText",
+          "51 edit (settable, string) Audio language codes (comma separated) Description: en, rus, de-DE Value: en ID: AudioRuleLanguagesTextBox",
+          "53 edit (settable, string) Audio title contains (literal text) Value: Matching audio ID: AudioTitleContainsTextBox",
+          "55 edit (settable, string) Subtitle language codes (comma separated) Description: ru, en-US, sr-Latn Value: en ID: SubtitleRuleLanguagesTextBox",
+          "57 edit (settable, string) Subtitle title contains (literal text) Value: Captions ID: SubtitleTitleContainsTextBox",
+          "63 button Apply proposed choices ID: ApplyLanguageRulesButton",
+          "65 text Entries shown: 1; would change: 1; manual review: 0. Nothing has been applied. ID: LanguageRuleStatusText",
+          "141 text Keep: Video 0 — Untitled (VP8; Legacy language: und; IETF: und; default, enabled) Keep: Audio 1 — Matching audio (PCM; Legacy language: eng; IETF: en; Channels: 1; default, enabled) Keep: Audio 2 — Matching audio (PCM; Legacy language: eng; IETF: en; Channels: 1; enabled, commentary) Keep: Subtitles 3 — Captions (SubRip/SRT; Legacy language: eng; IETF: en; forced, enabled) Remove: Subtitles 4 — Captions (SubRip/SRT; Legacy language: eng; IETF: en; enabled)",
+          "43 button Rename ID: RenameRulePresetButton",
+          "71 text Needs an independent approved plan",
+          "75 text {task-kit}\\Тестовые источники с пробелами\\серия forced preset.mkv ID: BatchSelectedSource",
+          "76 text Needs an independent approved plan",
+          "78 edit (settable, string) Output file"
+        ]
+      },
+      {
+        "label": "loaded-preset-preview-russian",
+        "observedUtc": "2026-10-21T21:12:46.821Z",
+        "focusedElement": "0 window TrackTrim Secondary Actions: Raise",
+        "text": [
+          "22 button (disabled) Запустить / продолжить проверенные планы ID: StartBatchButton",
+          "37 combo box Сохранённый набор правил Value: RulePreset { Id = 5f3b6bf8-aaae-41ae-a944-636e5a3470c6, Name = Сериал — English + forced, Rules = LanguageRules { Audio = TrackLanguageRule { Mode = KeepMatching, Languages = System.Collections.Immutable.ImmutableArray`1[System.String], TitleFilter = TrackTitleFilter { Enabled = True, Text = Matching audio } }, Subtitles = TrackLanguageRule { Mode = KeepMatching, Languages = System.Collections.Immutable.ImmutableArray`1[System.String], TitleFilter = TrackTitleFilter { Enabled = True, Text = Captions } }, KeepOnlyForcedSubtitles = True } } ID: RulePresetList",
+          "38 text Сериал — English + forced",
+          "42 button Загрузить ID: LoadRulePresetButton",
+          "44 button Удалить набор… ID: DeleteRulePresetButton",
+          "46 text Настройки правил загружены. Создайте новый предпросмотр перед применением выбора. ID: RulePresetStatusText",
+          "51 edit (settable, string) Коды языков аудио через запятую Description: en, rus, de-DE Value: en ID: AudioRuleLanguagesTextBox",
+          "53 edit (settable, string) Название аудио содержит (буквальный текст) Value: Matching audio ID: AudioTitleContainsTextBox",
+          "55 edit (settable, string) Коды языков субтитров через запятую Description: ru, en-US, sr-Latn Value: en ID: SubtitleRuleLanguagesTextBox",
+          "57 edit (settable, string) Название субтитров содержит (буквальный текст) Value: Captions ID: SubtitleTitleContainsTextBox",
+          "63 button Применить предложенный выбор ID: ApplyLanguageRulesButton",
+          "65 text Записей: 1; изменится: 1; требуют ручной проверки: 0. Выбор ещё не применён. ID: LanguageRuleStatusText",
+          "141 text Оставить: Видео 0 — Без названия (VP8; Прежний код языка: und; IETF: und; по умолчанию, включена) Оставить: Аудио 1 — Matching audio (PCM; Прежний код языка: eng; IETF: en; Каналы: 1; по умолчанию, включена) Оставить: Аудио 2 — Matching audio (PCM; Прежний код языка: eng; IETF: en; Каналы: 1; включена, комментарий) Оставить: Субтитры 3 — Captions (SubRip/SRT; Прежний код языка: eng; IETF: en; принудительная, включена) Удалить: Субтитры 4 — Captions (SubRip/SRT; Прежний код языка: eng; IETF: en; включена)",
+          "43 button Переименовать ID: RenameRulePresetButton",
+          "71 text Требуется отдельный подтверждённый план",
+          "75 text {task-kit}\\Тестовые источники с пробелами\\серия forced preset.mkv ID: BatchSelectedSource",
+          "76 text Требуется отдельный подтверждённый план",
+          "78 edit (settable, string) Файл результата"
+        ]
+      },
+      {
+        "label": "loaded-preset-preview-returned-english",
+        "observedUtc": "2026-10-21T21:13:07.664Z",
+        "focusedElement": "0 window TrackTrim Secondary Actions: Raise",
+        "text": [
+          "22 button (disabled) Start / resume reviewed items ID: StartBatchButton",
+          "37 combo box Saved rule preset Value: RulePreset { Id = 5f3b6bf8-aaae-41ae-a944-636e5a3470c6, Name = Сериал — English + forced, Rules = LanguageRules { Audio = TrackLanguageRule { Mode = KeepMatching, Languages = System.Collections.Immutable.ImmutableArray`1[System.String], TitleFilter = TrackTitleFilter { Enabled = True, Text = Matching audio } }, Subtitles = TrackLanguageRule { Mode = KeepMatching, Languages = System.Collections.Immutable.ImmutableArray`1[System.String], TitleFilter = TrackTitleFilter { Enabled = True, Text = Captions } }, KeepOnlyForcedSubtitles = True } } ID: RulePresetList",
+          "38 text Сериал — English + forced",
+          "42 button Load ID: LoadRulePresetButton",
+          "44 button Delete preset… ID: DeleteRulePresetButton",
+          "46 text Rule settings loaded. Create a fresh Preview before applying choices. ID: RulePresetStatusText",
+          "51 edit (settable, string) Audio language codes (comma separated) Description: en, rus, de-DE Value: en ID: AudioRuleLanguagesTextBox",
+          "53 edit (settable, string) Audio title contains (literal text) Value: Matching audio ID: AudioTitleContainsTextBox",
+          "55 edit (settable, string) Subtitle language codes (comma separated) Description: ru, en-US, sr-Latn Value: en ID: SubtitleRuleLanguagesTextBox",
+          "57 edit (settable, string) Subtitle title contains (literal text) Value: Captions ID: SubtitleTitleContainsTextBox",
+          "63 button Apply proposed choices ID: ApplyLanguageRulesButton",
+          "65 text Entries shown: 1; would change: 1; manual review: 0. Nothing has been applied. ID: LanguageRuleStatusText",
+          "141 text Keep: Video 0 — Untitled (VP8; Legacy language: und; IETF: und; default, enabled) Keep: Audio 1 — Matching audio (PCM; Legacy language: eng; IETF: en; Channels: 1; default, enabled) Keep: Audio 2 — Matching audio (PCM; Legacy language: eng; IETF: en; Channels: 1; enabled, commentary) Keep: Subtitles 3 — Captions (SubRip/SRT; Legacy language: eng; IETF: en; forced, enabled) Remove: Subtitles 4 — Captions (SubRip/SRT; Legacy language: eng; IETF: en; enabled)",
+          "43 button Rename ID: RenameRulePresetButton",
+          "71 text Needs an independent approved plan",
+          "75 text {task-kit}\\Тестовые источники с пробелами\\серия forced preset.mkv ID: BatchSelectedSource",
+          "76 text Needs an independent approved plan",
+          "78 edit (settable, string) Output file"
+        ]
+      },
+      {
+        "label": "preset-renamed-with-preview-retained",
+        "observedUtc": "2026-10-21T21:14:17.675Z",
+        "focusedElement": "0 window TrackTrim Secondary Actions: Raise",
+        "text": [
+          "22 button (disabled) Start / resume reviewed items ID: StartBatchButton",
+          "37 combo box Saved rule preset Value: RulePreset { Id = 5f3b6bf8-aaae-41ae-a944-636e5a3470c6, Name = Сериал — English + forced — renamed, Rules = LanguageRules { Audio = TrackLanguageRule { Mode = KeepMatching, Languages = System.Collections.Immutable.ImmutableArray`1[System.String], TitleFilter = TrackTitleFilter { Enabled = True, Text = Matching audio } }, Subtitles = TrackLanguageRule { Mode = KeepMatching, Languages = System.Collections.Immutable.ImmutableArray`1[System.String], TitleFilter = TrackTitleFilter { Enabled = True, Text = Captions } }, KeepOnlyForcedSubtitles = True } } ID: RulePresetList",
+          "142 text Сериал — English + forced — renamed",
+          "42 button Load ID: LoadRulePresetButton",
+          "44 button Delete preset… ID: DeleteRulePresetButton",
+          "46 text Preset renamed. Current rules and plans are unchanged. ID: RulePresetStatusText",
+          "51 edit (settable, string) Audio language codes (comma separated) Description: en, rus, de-DE Value: en ID: AudioRuleLanguagesTextBox",
+          "53 edit (settable, string) Audio title contains (literal text) Value: Matching audio ID: AudioTitleContainsTextBox",
+          "55 edit (settable, string) Subtitle language codes (comma separated) Description: ru, en-US, sr-Latn Value: en ID: SubtitleRuleLanguagesTextBox",
+          "57 edit (settable, string) Subtitle title contains (literal text) Value: Captions ID: SubtitleTitleContainsTextBox",
+          "63 button Apply proposed choices ID: ApplyLanguageRulesButton",
+          "65 text Entries shown: 1; would change: 1; manual review: 0. Nothing has been applied. ID: LanguageRuleStatusText",
+          "141 text Keep: Video 0 — Untitled (VP8; Legacy language: und; IETF: und; default, enabled) Keep: Audio 1 — Matching audio (PCM; Legacy language: eng; IETF: en; Channels: 1; default, enabled) Keep: Audio 2 — Matching audio (PCM; Legacy language: eng; IETF: en; Channels: 1; enabled, commentary) Keep: Subtitles 3 — Captions (SubRip/SRT; Legacy language: eng; IETF: en; forced, enabled) Remove: Subtitles 4 — Captions (SubRip/SRT; Legacy language: eng; IETF: en; enabled)",
+          "43 button Rename ID: RenameRulePresetButton",
+          "71 text Needs an independent approved plan",
+          "75 text {task-kit}\\Тестовые источники с пробелами\\серия forced preset.mkv ID: BatchSelectedSource",
+          "76 text Needs an independent approved plan",
+          "78 edit (settable, string) Output file"
+        ]
+      },
+      {
+        "label": "preset-delete-declined-preview-retained",
+        "observedUtc": "2026-10-21T21:17:48.870Z",
+        "focusedElement": "0 window TrackTrim Secondary Actions: Raise",
+        "text": [
+          "22 button (disabled) Start / resume reviewed items ID: StartBatchButton",
+          "37 combo box Saved rule preset Value: RulePreset { Id = 5f3b6bf8-aaae-41ae-a944-636e5a3470c6, Name = Сериал — English + forced — renamed, Rules = LanguageRules { Audio = TrackLanguageRule { Mode = KeepMatching, Languages = System.Collections.Immutable.ImmutableArray`1[System.String], TitleFilter = TrackTitleFilter { Enabled = True, Text = Matching audio } }, Subtitles = TrackLanguageRule { Mode = KeepMatching, Languages = System.Collections.Immutable.ImmutableArray`1[System.String], TitleFilter = TrackTitleFilter { Enabled = True, Text = Captions } }, KeepOnlyForcedSubtitles = True } } ID: RulePresetList",
+          "142 text Сериал — English + forced — renamed",
+          "42 button Load ID: LoadRulePresetButton",
+          "44 button Delete preset… ID: DeleteRulePresetButton",
+          "46 text Preset renamed. Current rules and plans are unchanged. ID: RulePresetStatusText",
+          "51 edit (settable, string) Audio language codes (comma separated) Description: en, rus, de-DE Value: en ID: AudioRuleLanguagesTextBox",
+          "53 edit (settable, string) Audio title contains (literal text) Value: Matching audio ID: AudioTitleContainsTextBox",
+          "55 edit (settable, string) Subtitle language codes (comma separated) Description: ru, en-US, sr-Latn Value: en ID: SubtitleRuleLanguagesTextBox",
+          "57 edit (settable, string) Subtitle title contains (literal text) Value: Captions ID: SubtitleTitleContainsTextBox",
+          "63 button Apply proposed choices ID: ApplyLanguageRulesButton",
+          "65 text Entries shown: 1; would change: 1; manual review: 0. Nothing has been applied. ID: LanguageRuleStatusText",
+          "141 text Keep: Video 0 — Untitled (VP8; Legacy language: und; IETF: und; default, enabled) Keep: Audio 1 — Matching audio (PCM; Legacy language: eng; IETF: en; Channels: 1; default, enabled) Keep: Audio 2 — Matching audio (PCM; Legacy language: eng; IETF: en; Channels: 1; enabled, commentary) Keep: Subtitles 3 — Captions (SubRip/SRT; Legacy language: eng; IETF: en; forced, enabled) Remove: Subtitles 4 — Captions (SubRip/SRT; Legacy language: eng; IETF: en; enabled)",
+          "43 button Rename ID: RenameRulePresetButton",
+          "71 text Needs an independent approved plan",
+          "75 text {task-kit}\\Тестовые источники с пробелами\\серия forced preset.mkv ID: BatchSelectedSource",
+          "76 text Needs an independent approved plan",
+          "78 edit (settable, string) Output file"
+        ]
+      },
+      {
+        "label": "preset-delete-confirmed-loaded-rules-and-preview-retained",
+        "observedUtc": "2026-10-21T21:20:56.153Z",
+        "focusedElement": "0 window TrackTrim Secondary Actions: Raise",
+        "text": [
+          "22 button (disabled) Start / resume reviewed items ID: StartBatchButton",
+          "37 combo box Saved rule preset ID: RulePresetList",
+          "42 button (disabled) Load ID: LoadRulePresetButton",
+          "44 button (disabled) Delete preset… ID: DeleteRulePresetButton",
+          "46 text Preset deleted. Loaded rule values remain in the editor. ID: RulePresetStatusText",
+          "51 edit (settable, string) Audio language codes (comma separated) Description: en, rus, de-DE Value: en ID: AudioRuleLanguagesTextBox",
+          "53 edit (settable, string) Audio title contains (literal text) Value: Matching audio ID: AudioTitleContainsTextBox",
+          "55 edit (settable, string) Subtitle language codes (comma separated) Description: ru, en-US, sr-Latn Value: en ID: SubtitleRuleLanguagesTextBox",
+          "57 edit (settable, string) Subtitle title contains (literal text) Value: Captions ID: SubtitleTitleContainsTextBox",
+          "63 button Apply proposed choices ID: ApplyLanguageRulesButton",
+          "65 text Entries shown: 1; would change: 1; manual review: 0. Nothing has been applied. ID: LanguageRuleStatusText",
+          "141 text Keep: Video 0 — Untitled (VP8; Legacy language: und; IETF: und; default, enabled) Keep: Audio 1 — Matching audio (PCM; Legacy language: eng; IETF: en; Channels: 1; default, enabled) Keep: Audio 2 — Matching audio (PCM; Legacy language: eng; IETF: en; Channels: 1; enabled, commentary) Keep: Subtitles 3 — Captions (SubRip/SRT; Legacy language: eng; IETF: en; forced, enabled) Remove: Subtitles 4 — Captions (SubRip/SRT; Legacy language: eng; IETF: en; enabled)",
+          "43 button (disabled) Rename ID: RenameRulePresetButton",
+          "71 text Needs an independent approved plan",
+          "75 text {task-kit}\\Тестовые источники с пробелами\\серия forced preset.mkv ID: BatchSelectedSource",
+          "76 text Needs an independent approved plan",
+          "78 edit (settable, string) Output file"
+        ]
       }
     ],
     "limits": [
-      "UIA does not expose checkbox ToggleState; captured configuration is corroborated by stored JSON, not caption alone.",
+      "This is bounded owner-assisted native functional evidence on the recorded Windows 10 binary, not visual, scaling or clean target-desktop acceptance.",
+      "UIA does not expose checkbox ToggleState or internal Preview identity. Enabled input values, stored configuration and the forced/non-forced Preview semantics corroborate configuration; matching captions alone do not establish checked state.",
+      "The destination was empty and no individual approval existed. No claim is made about native preservation of a previously approved plan in this scenario; controlled/headless tests cover that behavior.",
+      "Preview was invoked once. Apply, plan approval, aggregate Review and Run were not invoked; no native remux/publication or cancellation evidence is claimed.",
       "Observation timestamps are API/readback times, not physical input-event times.",
-      "Screenshots, appearance, scaling, cancellation, warning and clean target-platform scenarios were not repeated.",
-      "Task-local files retain the full captured checkpoint states; public excerpts omit unchanged chrome and unrelated controls. Navigation actions remain in the tool transcript. Paths are task-relative; no binaries or raw logs are committed."
+      "Task-local files retain full captured states; public excerpts omit unchanged chrome, navigation and unrelated controls. Paths are task-relative; no binaries or large raw logs are committed."
+    ],
+    "evidenceContinuationBase": "160ae1693e83c09e7c8c71c128d32871791d693f",
+    "catalogMutations": [
+      {
+        "operation": "Rename",
+        "presetId": "5f3b6bf8-aaae-41ae-a944-636e5a3470c6",
+        "name": "Сериал — English + forced — renamed",
+        "observedUtc": "2026-10-21T21:14:17.675Z",
+        "sha256AfterRenameAndDeclinedDelete": "1f685ebc0ddc39da17a001e6f67ce56d325fa506beddd1811bdc528d30d56e4a",
+        "rulesUnchanged": true
+      },
+      {
+        "operation": "Confirmed Delete",
+        "presetId": "5f3b6bf8-aaae-41ae-a944-636e5a3470c6",
+        "observedUtc": "2026-10-21T21:20:56.153Z",
+        "version": 1,
+        "presetsRemaining": 0,
+        "sha256": "808d8b95645d9761700eda5523c321a7d7a5d5273c87da653f034b1170dc8837",
+        "loadedValuesAndPreviewRetained": true
+      }
+    ],
+    "infrastructureLimits": [
+      "Native capture/coordinate geometry and system-picker input limitations were not retried; the owner completed only the documented tab/picker handoffs.",
+      "An expanded-combo Down route lost usable focus; the documented collapsed-combo keyboard route selected the entry successfully after fresh observation.",
+      "Some set_value calls reported wait for accessibility set value: timed out waiting on channel even though a later observation confirmed the intended value/focus. No blind retyping or activation followed a timeout.",
+      "Immediate post-key UIA focus sometimes lagged. Separate settled-focus observations preceded Space/type actions; no fixed Tab counts or alternative automation were used."
     ]
   },
   "remainingLimits": [
