@@ -206,6 +206,8 @@
   <data name="RuleAudioTitleContains" xml:space="preserve"><value>Название аудио содержит (буквальный текст)</value></data>
   <data name="RuleSubtitleTitleFilter" xml:space="preserve"><value>Также искать текст в названии субтитров</value></data>
   <data name="RuleSubtitleTitleContains" xml:space="preserve"><value>Название субтитров содержит (буквальный текст)</value></data>
+  <data name="RuleForcedSubtitlesOnly" xml:space="preserve"><value>Оставлять только принудительные субтитры</value></data>
+  <data name="RuleForcedSubtitleHelp" xml:space="preserve"><value>Учитывает флаг принудительной дорожки MKV вместе с языком и необязательным названием. Выбирает целые дорожки; текст субтитров и отдельные события не проверяются.</value></data>
   <data name="RuleTitleHelp" xml:space="preserve"><value>Необязательный текст названия дополняет правило языка. Поиск ведётся только по названию дорожки без учёта регистра; пробелы по краям поискового текста удаляются. Знаки препинания буквальны; пустые названия не совпадают. Регулярные выражения и шаблоны не поддерживаются.</value></data>
   <data name="RuleSubtitleCodes" xml:space="preserve"><value>Коды языков субтитров через запятую</value></data>
   <data name="RuleTagHelp" xml:space="preserve"><value>Коды через запятую, например en, ger, ru-RU, sr-Latn. Теги совпадают точно: ru не совпадает с ru-RU. Поддерживается язык ISO с необязательными письменностью и регионом. Метаданные языка не доказывают язык речи.</value></data>

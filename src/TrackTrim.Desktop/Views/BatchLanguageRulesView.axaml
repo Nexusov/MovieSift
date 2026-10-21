@@ -25,6 +25,9 @@
                 IsChecked="{Binding SubtitleTitleFilterEnabled, Mode=TwoWay}" IsEnabled="{Binding CanEditSubtitleLanguages}" />
       <TextBox x:Name="SubtitleTitleContainsTextBox" Text="{Binding SubtitleTitleContains, Mode=TwoWay}"
                IsEnabled="{Binding CanEditSubtitleTitle}" AutomationProperties.Name="{Binding Localization[RuleSubtitleTitleContains]}" />
+      <CheckBox x:Name="SubtitleForcedOnlyCheckBox" Content="{Binding Localization[RuleForcedSubtitlesOnly]}"
+                IsChecked="{Binding KeepOnlyForcedSubtitles, Mode=TwoWay}" IsEnabled="{Binding CanEditSubtitleLanguages}" />
+      <TextBlock Text="{Binding Localization[RuleForcedSubtitleHelp]}" TextWrapping="Wrap" Opacity="0.8" />
       <TextBlock Text="{Binding Localization[RuleTagHelp]}" TextWrapping="Wrap" Opacity="0.8" />
       <TextBlock Text="{Binding Localization[RuleTitleHelp]}" TextWrapping="Wrap" Opacity="0.8" />
       <WrapPanel>

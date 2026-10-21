@@ -9,7 +9,7 @@ using TrackTrim.Core.Rules;
 
 namespace TrackTrim.Desktop.ViewModels;
 
-/// <summary>Edits language and optional literal-title rules with explicit, revision-bound per-file proposals.</summary>
+/// <summary>Edits language, title and subtitle forced-flag constraints with revision-bound per-file proposals.</summary>
 public sealed partial class BatchLanguageRulesViewModel : ObservableObject
 {
     private readonly BatchLanguageRulesOptions options;
@@ -43,6 +43,9 @@ public sealed partial class BatchLanguageRulesViewModel : ObservableObject
 
     [ObservableProperty]
     private string subtitleTitleContains = string.Empty;
+
+    [ObservableProperty]
+    private bool keepOnlyForcedSubtitles;
 
     /// <summary>Uses the existing batch owner and workspace availability without starting a media operation.</summary>
     public BatchLanguageRulesViewModel(BatchLanguageRulesOptions options)
@@ -131,6 +134,9 @@ public sealed partial class BatchLanguageRulesViewModel : ObservableObject
     /// <summary>Discards a proposal after a subtitle title edit without changing any Keep choice.</summary>
     partial void OnSubtitleTitleContainsChanged(string value) => ClearPreview();
 
+    /// <summary>Requires explicit preview after a forced-flag edit without changing selections or approvals.</summary>
+    partial void OnKeepOnlyForcedSubtitlesChanged(bool value) => ClearPreview();
+
     /// <summary>Computes proposals from immutable live selections without invalidating any approval or review.</summary>
     private void PreviewChoices()
     {
@@ -145,7 +151,7 @@ public sealed partial class BatchLanguageRulesViewModel : ObservableObject
         var subtitles = new TrackLanguageRule(
             SubtitleRuleEnabled ? LanguageRuleMode.KeepMatching : LanguageRuleMode.Unchanged,
             ParseLanguages(SubtitleLanguages), new(SubtitleTitleFilterEnabled, SubtitleTitleContains));
-        var rules = new LanguageRules(audio, subtitles);
+        var rules = new LanguageRules(audio, subtitles, KeepOnlyForcedSubtitles);
         var result = options.Coordinator.PreviewLanguageRules(rules);
         failure = result.Failure;
         preview = result.Preview;

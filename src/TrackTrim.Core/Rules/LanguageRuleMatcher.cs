@@ -7,7 +7,7 @@ namespace TrackTrim.Core.Rules;
 /// <summary>Proposes independent language selections while preserving the whole file on any review issue.</summary>
 public static class LanguageRuleMatcher
 {
-    /// <summary>Matches every targeted track using comparison-only aliases and exact base/script/region tags.</summary>
+    /// <summary>Matches exact language tags with optional literal title and subtitle-forced constraints.</summary>
     public static LanguageSelectionProposal Preview(LanguageSelectionRequest request)
     {
         if (!HasCoherentCurrentSelection(request))
@@ -20,7 +20,7 @@ public static class LanguageRuleMatcher
         var issues = ImmutableArray.CreateBuilder<LanguageRuleIssue>();
         SelectCategory(new(TrackKind.Audio, request.Rules?.Audio, request.Inspection.Tracks, retainedIdentifiers, issues));
         var noSubtitleMatches = SelectCategory(new(TrackKind.Subtitles, request.Rules?.Subtitles,
-            request.Inspection.Tracks, retainedIdentifiers, issues));
+            request.Inspection.Tracks, retainedIdentifiers, issues, request.Rules?.KeepOnlyForcedSubtitles ?? false));
 
         if (issues.Count != 0)
         {
@@ -132,8 +132,10 @@ public static class LanguageRuleMatcher
             var languageMatches = requestedLanguages.Contains(language.Tag!);
             var titleMatches = titleSearch is null || !string.IsNullOrWhiteSpace(track.Title) &&
                 track.Title.Contains(titleSearch, StringComparison.OrdinalIgnoreCase);
+            var forcedMatches = !request.KeepOnlyForcedSubtitles || track.IsForced;
+            var matches = languageMatches && titleMatches && forcedMatches;
 
-            if (languageMatches && titleMatches)
+            if (matches)
             {
                 matchingIdentifiers.Add(track.Id);
             }
