@@ -162,7 +162,7 @@ public sealed class BatchLanguageRuleIntegrationTests(ITestOutputHelper evidence
                 rawInputTracks = plan.Inspection.Tracks.Select(track => new
                 {
                     track.Id,
-                    uid = track.Uid.ToString(CultureInfo.InvariantCulture),
+                    uid = track.Uid!.Value.ToString(CultureInfo.InvariantCulture),
                     kind = track.Kind.ToString(),
                     track.Language,
                     track.LanguageIetf
@@ -171,7 +171,7 @@ public sealed class BatchLanguageRuleIntegrationTests(ITestOutputHelper evidence
                 {
                     sourceTrackId = track.Id,
                     outputTrackId = output.Tracks.Single(candidate => candidate.Uid == track.Uid).Id,
-                    uid = track.Uid.ToString(CultureInfo.InvariantCulture),
+                    uid = track.Uid!.Value.ToString(CultureInfo.InvariantCulture),
                     payloadCompared = true
                 }),
                 metadataAndTimestampsVerified = verification.Passed,

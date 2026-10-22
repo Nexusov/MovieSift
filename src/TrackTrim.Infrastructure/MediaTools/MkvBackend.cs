@@ -59,19 +59,25 @@ public sealed class MkvBackend(MkvBackendOptions options) : IMediaBackend
     /// <summary>Runs only the approved retention command and reports documented machine progress.</summary>
     public async Task<ToolOutcome> RemuxAsync(RemuxRequest request)
     {
-        ValidatePlanBackend(request.Plan.Inspection.Backend);
+        ValidatePlanBackend(request.Plan.Inspection);
         await ValidateToolsAsync(request.CancellationToken).ConfigureAwait(false);
         var result = await RunAsync(new ProcessRequest(options.Tools.MkvMerge, MkvArguments.BuildRemux(request),
             MaximumDiagnosticsCharacters, null,
             line => ReportProgress(new ProgressLine(line, request.Progress)), request.CancellationToken,
             ProcessStarted: options.RemuxProcessStarted)).ConfigureAwait(false);
-        return new ToolOutcome(result.ExitCode, CombineDiagnostics(result));
+        var disposition = result.ExitCode switch
+        {
+            0 => ToolDisposition.Success,
+            1 => ToolDisposition.WarningReview,
+            _ => ToolDisposition.Failure
+        };
+        return new ToolOutcome(result.ExitCode, CombineDiagnostics(result), disposition);
     }
 
     /// <summary>Verifies the approved stream mapping, exact supported metadata, and per-track frame timestamps.</summary>
     public async Task<VerificationOutcome> VerifyAsync(VerifyRequest request)
     {
-        ValidatePlanBackend(request.Plan.Inspection.Backend);
+        ValidatePlanBackend(request.Plan.Inspection);
         await ValidateToolsAsync(request.CancellationToken).ConfigureAwait(false);
         var sourceInspection = request.Plan.Inspection;
         var candidateRevision = await options.SourceAccess.ReadRevisionAsync(new SourceRequest(
@@ -112,7 +118,7 @@ public sealed class MkvBackend(MkvBackendOptions options) : IMediaBackend
             }
 
             var uidMapping = request.Plan.RetainedTracks.Select((track, index) =>
-                KeyValuePair.Create(track.Uid, candidate.Tracks[index].Uid)).ToDictionary();
+                KeyValuePair.Create(track.Uid!.Value, candidate.Tracks[index].Uid!.Value)).ToDictionary();
             var expectedTags = sourceMetadata.Tags is null ? new XDocument(new XElement("Tags"))
                 : MkvMetadataXml.ExpectedTags(new MkvMetadataXml.TagExpectation(sourceMetadata.Tags, uidMapping));
             var actualTags = outputMetadata.Tags ?? new XDocument(new XElement("Tags"));
@@ -251,7 +257,7 @@ public sealed class MkvBackend(MkvBackendOptions options) : IMediaBackend
         {
             MkvMetadataXml.ValidateTags(tags);
             MkvMetadataXml.ValidateTrackTargets(new MkvMetadataXml.TrackTargetValidation(tags,
-                request.Inspection.Tracks.Select(track => track.Uid).ToHashSet()));
+                request.Inspection.Tracks.Select(track => track.Uid!.Value).ToHashSet()));
         }
 
         return new ExtractedMetadata(chapters, tags);
@@ -415,12 +421,12 @@ public sealed class MkvBackend(MkvBackendOptions options) : IMediaBackend
     }
 
     /// <summary>Rejects a plan approved against a different backend version or identification schema.</summary>
-    private static void ValidatePlanBackend(BackendIdentity backend)
+    private static void ValidatePlanBackend(MediaInspection inspection)
     {
         var expected = new BackendIdentity("MKVToolNix", MkvToolPaths.SupportedVersion,
             MkvIdentification.SupportedIdentificationFormat);
 
-        if (backend != expected)
+        if (inspection.Backend != expected || inspection.Container != MediaContainer.Matroska)
         {
             throw Failure(new BackendFailure(ErrorCode.StalePlan, "The approved backend identity no longer matches the pinned implementation."));
         }

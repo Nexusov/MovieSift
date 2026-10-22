@@ -88,7 +88,7 @@ public static class QueueListPolicy
 
         if (relativeValidation.Failure is not null)
         {
-            return Invalid("The folder-relative source must be a safe MKV path.");
+            return Invalid("The folder-relative source must be a safe MKV or MP4 path.");
         }
 
         var reconstructedSource = Path.GetFullPath(Path.Combine(origin.RootPath, origin.RelativePath));

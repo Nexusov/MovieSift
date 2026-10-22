@@ -74,6 +74,29 @@ public sealed class PlanBuilderTests
         Assert.True(result.Plan?.IsNoChange);
     }
 
+    /// <summary>Freezes the actual inspected container and permits no implicit container conversion.</summary>
+    [Theory]
+    [InlineData(MediaContainer.Matroska, "output.mkv", true)]
+    [InlineData(MediaContainer.Matroska, "output.mp4", false)]
+    [InlineData(MediaContainer.Mp4, "output.mp4", true)]
+    [InlineData(MediaContainer.Mp4, "output.mkv", false)]
+    [InlineData((MediaContainer)99, "output.mp4", false)]
+    public void DestinationMustMatchTheInspectedContainer(MediaContainer container, string destination, bool expectedSuccess)
+    {
+        var inspection = Inspection with { Container = container };
+        var result = PlanBuilder.Build(new(inspection, [0, 1], destination, false));
+
+        Assert.Equal(expectedSuccess, result.IsSuccess);
+
+        if (expectedSuccess)
+        {
+            Assert.Equal(container, result.Plan!.Inspection.Container);
+            return;
+        }
+
+        Assert.Equal(ErrorCode.InvalidDestination, result.Failure?.Code);
+    }
+
     /// <summary>Creates a representative track with immutable original properties.</summary>
     private static MediaTrack Track(TrackRequest request) => new(
         request.Id, (ulong)request.Id + 1, request.Kind, "codec", "eng", "en", "title", null,

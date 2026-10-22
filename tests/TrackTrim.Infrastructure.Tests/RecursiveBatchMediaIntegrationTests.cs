@@ -147,7 +147,7 @@ public sealed class RecursiveBatchMediaIntegrationTests(ITestOutputHelper eviden
                 var compared = await MediaPayloadEvidence.AssertIdenticalAsync(new(item.SourcePath, retained.Id,
                     plan.DestinationPath, outputTrack.Id, workspace.Path,
                     FormattableString.Invariant($"recursive-{item.Id:N}-{retained.Id}")));
-                payloads.Add(new(retained.Id, outputTrack.Id, retained.Uid.ToString(CultureInfo.InvariantCulture), retained.Kind.ToString(), compared));
+                payloads.Add(new(retained.Id, outputTrack.Id, retained.Uid!.Value.ToString(CultureInfo.InvariantCulture), retained.Kind.ToString(), compared));
                 comparedTracks++;
 
                 if (retained.Kind == TrackKind.Audio)

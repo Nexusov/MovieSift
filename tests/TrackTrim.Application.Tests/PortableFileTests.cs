@@ -175,6 +175,66 @@ public sealed class PortableFileTests : IDisposable
         Assert.False(Directory.Exists(request.Output.DirectoryPath));
     }
 
+    /// <summary>Reserves an explicitly typed MP4 candidate and leaves the published media intact after cleanup.</summary>
+    [Fact]
+    public async Task Mp4PublicationUsesTypedCandidateAndRecord()
+    {
+        var request = await CreateOutputAsync(MediaContainer.Mp4);
+        var recordPath = Path.Combine(root, "data", "ownership", $"{request.Output.JobId:N}.json");
+        var record = JsonNode.Parse(await File.ReadAllTextAsync(recordPath, TestContext.Current.CancellationToken))!;
+
+        Assert.Equal(MediaContainer.Mp4, request.Output.Container);
+        Assert.Equal("candidate.mp4", Path.GetFileName(request.Output.CandidatePath));
+        Assert.Equal(2, record["Version"]!.GetValue<int>());
+        Assert.Equal((int)MediaContainer.Mp4, record["Container"]!.GetValue<int>());
+        await File.WriteAllTextAsync(request.Output.CandidatePath, "retained mp4", TestContext.Current.CancellationToken);
+        await request.Store.MarkPublishingAsync(new(request.Output));
+        var published = await request.Store.PublishAsync(new(request.Output));
+
+        Assert.Empty(await request.Store.CleanupAsync(new(request.Output)));
+        Assert.Equal("retained mp4", await File.ReadAllTextAsync(published.Path, TestContext.Current.CancellationToken));
+        Assert.Equal("original", await File.ReadAllTextAsync(Path.Combine(root, "source.mp4"), TestContext.Current.CancellationToken));
+        Assert.False(File.Exists(recordPath));
+    }
+
+    /// <summary>Authentic version-one MKV records retain their existing conservative cleanup behavior.</summary>
+    [Fact]
+    public async Task LegacyMkvJournalRemainsReadableWithoutAnExplicitContainer()
+    {
+        var request = await CreateOutputAsync();
+        var recordPath = Path.Combine(root, "data", "ownership", $"{request.Output.JobId:N}.json");
+        var record = JsonNode.Parse(await File.ReadAllTextAsync(recordPath, TestContext.Current.CancellationToken))!.AsObject();
+        record["Version"] = 1;
+        record.Remove("Container");
+        record["Output"]!.AsObject().Remove("Container");
+        await File.WriteAllTextAsync(recordPath, record.ToJsonString(), TestContext.Current.CancellationToken);
+
+        var interrupted = Assert.Single(await request.Store.FindInterruptedAsync(TestContext.Current.CancellationToken));
+        Assert.Equal("Reserved", interrupted.Stage);
+        Assert.Equal(request.Output, interrupted.Output);
+        Assert.False(interrupted.CanClean);
+        Assert.Empty(await request.Store.CleanupAsync(new(request.Output)));
+        Assert.Equal("original", await File.ReadAllTextAsync(Path.Combine(root, "source.mkv"), TestContext.Current.CancellationToken));
+    }
+
+    /// <summary>A legacy version number cannot authorize a new MP4 ownership layout.</summary>
+    [Fact]
+    public async Task LegacyRecordCannotAuthorizeMp4CandidateCleanup()
+    {
+        var request = await CreateOutputAsync(MediaContainer.Mp4);
+        var recordPath = Path.Combine(root, "data", "ownership", $"{request.Output.JobId:N}.json");
+        var record = JsonNode.Parse(await File.ReadAllTextAsync(recordPath, TestContext.Current.CancellationToken))!.AsObject();
+        record["Version"] = 1;
+        record.Remove("Container");
+        await File.WriteAllTextAsync(recordPath, record.ToJsonString(), TestContext.Current.CancellationToken);
+        await File.WriteAllTextAsync(request.Output.CandidatePath, "candidate evidence", TestContext.Current.CancellationToken);
+
+        Assert.Equal("InvalidRecord", Assert.Single(await request.Store.FindInterruptedAsync(TestContext.Current.CancellationToken)).Stage);
+        Assert.Single(await request.Store.CleanupAsync(new(request.Output)));
+        Assert.Equal("candidate evidence", await File.ReadAllTextAsync(request.Output.CandidatePath, TestContext.Current.CancellationToken));
+        Assert.True(File.Exists(recordPath));
+    }
+
     /// <summary>Refuses cleanup when unknown contents appear in a private job directory.</summary>
     [Fact]
     public async Task UnexpectedFilesPreventCleanup()
@@ -207,7 +267,13 @@ public sealed class PortableFileTests : IDisposable
     [InlineData("$", "{bad json")]
     [InlineData("$", "null")]
     [InlineData("Version", null)]
-    [InlineData("Version", "2")]
+    [InlineData("Version", "3")]
+    [InlineData("Container", null)]
+    [InlineData("Container", "null")]
+    [InlineData("Container", "99")]
+    [InlineData("Container", "1")]
+    [InlineData("Output.Container", "99")]
+    [InlineData("Output.Container", "1")]
     [InlineData("Output", null)]
     [InlineData("Output", "null")]
     [InlineData("Output.JobId", null)]
@@ -377,15 +443,16 @@ public sealed class PortableFileTests : IDisposable
     }
 
     /// <summary>Creates one real owned output adjacent to its final destination.</summary>
-    private async Task<OutputFixture> CreateOutputAsync()
+    private async Task<OutputFixture> CreateOutputAsync(MediaContainer container = MediaContainer.Matroska)
     {
-        var source = Path.Combine(root, "source.mkv");
+        var extension = MediaContainerPolicy.Extension(container);
+        var source = Path.Combine(root, "source" + extension);
         await File.WriteAllTextAsync(source, "original", TestContext.Current.CancellationToken);
         var revision = await new FileSourceAccess().ReadRevisionAsync(new(source));
         var tracks = ImmutableArray.Create(new MediaTrack(0, 1, TrackKind.Video, "video", "und", null, "", null,
             true, false, true, ImmutableDictionary<string, string>.Empty));
-        var inspection = new MediaInspection(revision, new("mkvmerge", "102.0", 20), tracks, [], "", false, false);
-        var plan = new RemuxPlan(Guid.NewGuid(), inspection, tracks, Path.Combine(root, "output.mkv"), true);
+        var inspection = new MediaInspection(revision, new("mkvmerge", "102.0", 20), tracks, [], "", false, false, container);
+        var plan = new RemuxPlan(Guid.NewGuid(), inspection, tracks, Path.Combine(root, "output" + extension), true);
         var store = new OwnedOutputStore(Path.Combine(root, "data"));
         return new(store, await store.ReserveAsync(new(plan)));
     }

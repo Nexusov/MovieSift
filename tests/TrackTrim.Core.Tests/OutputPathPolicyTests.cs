@@ -30,7 +30,7 @@ public sealed class OutputPathPolicyTests
     [InlineData("/episode.mkv")]
     [InlineData("Season//episode.mkv")]
     [InlineData("Season/./episode.mkv")]
-    [InlineData("episode.mp4")]
+    [InlineData("episode.mov")]
     public void InvalidRelativeSourceIsRejected(string relative)
     {
         var result = OutputPathPolicy.DeriveFolderDestination(new(Root, relative));

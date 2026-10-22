@@ -5,6 +5,7 @@ using System.Text.Json;
 using TrackTrim.Application;
 using TrackTrim.Application.Ports;
 using TrackTrim.Core.Failures;
+using TrackTrim.Core.Media;
 using TrackTrim.Infrastructure.Persistence;
 
 namespace TrackTrim.Infrastructure.Files;
@@ -12,10 +13,11 @@ namespace TrackTrim.Infrastructure.Files;
 /// <summary>Publishes only uniquely owned candidates and never overwrites a destination.</summary>
 public sealed class OwnedOutputStore(string dataDirectory) : IOutputStore
 {
-    private const int RecordVersion = 1;
+    private const int LegacyMatroskaRecordVersion = 1;
+    private const int RecordVersion = 2;
     private const int OwnershipTokenBytes = 32;
     private const int OwnershipTokenCharacters = OwnershipTokenBytes * 2;
-    private const string CandidateName = "candidate.mkv";
+    private const string CandidateStem = "candidate";
     private const string MarkerName = "owner.json";
     private const string ReservedStage = "Reserved";
     private const string PublishingStage = "Publishing";
@@ -29,7 +31,15 @@ public sealed class OwnedOutputStore(string dataDirectory) : IOutputStore
         var parent = Path.GetDirectoryName(destination)!;
         var directory = Path.Combine(parent, $".tracktrim-{request.Plan.Id:N}");
         var token = Convert.ToHexString(RandomNumberGenerator.GetBytes(OwnershipTokenBytes));
-        var output = new OwnedOutput(request.Plan.Id, directory, Path.Combine(directory, CandidateName), destination, token);
+        var container = request.Plan.Inspection.Container;
+
+        if (!Enum.IsDefined(container))
+        {
+            throw InvalidOwnership("The approved plan has an unsupported container.");
+        }
+
+        var candidateName = CandidateStem + MediaContainerPolicy.Extension(container);
+        var output = ValidateOutput(new(request.Plan.Id, directory, Path.Combine(directory, candidateName), destination, token, container));
 
         try
         {
@@ -220,7 +230,8 @@ public sealed class OwnedOutputStore(string dataDirectory) : IOutputStore
 
         var validOwnerIdentity = record.OwnerProcessId > 0 && record.OwnerStartedUtcTicks > 0 &&
             record.OwnerStartedUtcTicks <= DateTime.MaxValue.Ticks;
-        var validHeader = record.Version == RecordVersion && validOwnerIdentity;
+        var validVersion = record.Version is LegacyMatroskaRecordVersion or RecordVersion;
+        var validHeader = validVersion && validOwnerIdentity;
 
         if (!validHeader)
         {
@@ -234,6 +245,14 @@ public sealed class OwnedOutputStore(string dataDirectory) : IOutputStore
             _ => throw InvalidOwnership("The ownership record has an invalid stage.")
         };
         var output = ValidateOutput(record.Output);
+        var validContainerHeader = record.Version == LegacyMatroskaRecordVersion
+            ? record.Container is null && output.Container == MediaContainer.Matroska
+            : record.Container is not null && Enum.IsDefined(record.Container.Value) && record.Container == output.Container;
+
+        if (!validContainerHeader)
+        {
+            throw InvalidOwnership("The record container is missing, unsupported or inconsistent with its output.");
+        }
 
         if (path != RecordPath(output.JobId))
         {
@@ -251,7 +270,7 @@ public sealed class OwnedOutputStore(string dataDirectory) : IOutputStore
             throw InvalidOwnership("The ownership record has no output description.");
         }
 
-        var validIdentity = output.JobId != Guid.Empty && IsOwnershipToken(output.OwnershipToken);
+        var validIdentity = output.JobId != Guid.Empty && IsOwnershipToken(output.OwnershipToken) && Enum.IsDefined(output.Container);
         var validPaths = IsCanonicalAbsolutePath(output.DirectoryPath) && IsCanonicalAbsolutePath(output.CandidatePath) &&
             IsCanonicalAbsolutePath(output.DestinationPath);
 
@@ -268,9 +287,9 @@ public sealed class OwnedOutputStore(string dataDirectory) : IOutputStore
         }
 
         var expectedDirectory = Path.Combine(parent, $".tracktrim-{output.JobId:N}");
-        var expectedCandidate = Path.Combine(expectedDirectory, CandidateName);
+        var expectedCandidate = Path.Combine(expectedDirectory, CandidateStem + MediaContainerPolicy.Extension(output.Container));
         var validLayout = output.DirectoryPath == expectedDirectory && output.CandidatePath == expectedCandidate &&
-            string.Equals(Path.GetExtension(output.DestinationPath), ".mkv", StringComparison.OrdinalIgnoreCase);
+            MediaContainerPolicy.FromExtension(output.DestinationPath) == output.Container;
 
         if (!validLayout)
         {
@@ -344,7 +363,8 @@ public sealed class OwnedOutputStore(string dataDirectory) : IOutputStore
     private Task WriteRecordAsync(RecordWriteRequest request)
     {
         using var process = Process.GetCurrentProcess();
-        var record = new OwnershipRecord(RecordVersion, request.Output, request.Stage, process.Id, process.StartTime.ToUniversalTime().Ticks);
+        var record = new OwnershipRecord(RecordVersion, request.Output, request.Stage, process.Id, process.StartTime.ToUniversalTime().Ticks,
+            request.Output.Container);
         return BoundedJson.WriteAsync(new JsonWriteRequest<OwnershipRecord>(RecordPath(request.Output.JobId), record));
     }
 

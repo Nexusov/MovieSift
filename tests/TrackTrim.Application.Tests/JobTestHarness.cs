@@ -26,6 +26,7 @@ internal sealed class JobTestHarness : IMediaBackend, ISourceAccess, IOutputStor
     public int RevisionCalls { get; private set; }
     public long AvailableFreeSpace { get; set; } = long.MaxValue;
     public int ExitCode { get; set; }
+    public ToolDisposition? Disposition { get; set; }
     public bool VerificationPasses { get; set; } = true;
     public bool FailCleanup { get; set; }
     public bool SourceChanges { get; set; }
@@ -57,7 +58,7 @@ internal sealed class JobTestHarness : IMediaBackend, ISourceAccess, IOutputStor
         }
 
         request.CancellationToken.ThrowIfCancellationRequested();
-        return Task.FromResult(new ToolOutcome(ExitCode, ExitCode == 1 ? "simulated warning" : ""));
+        return Task.FromResult(new ToolOutcome(ExitCode, ExitCode == 1 ? "simulated warning" : "", Disposition));
     }
 
     /// <summary>Exposes required verification success or failure independently of tool exit status.</summary>
