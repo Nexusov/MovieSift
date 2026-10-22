@@ -103,7 +103,7 @@ def write_chapter_reference_fixture(source: Path, destination: Path, distinct: b
         sample_sizes = struct.unpack_from(">II", clone, sizes[1] + 20)
         payload = bytearray(original[chunk_offset:chunk_offset + sum(sample_sizes)])
         cursor = 0
-        for sample_size, title in zip(sample_sizes, alternate_titles, strict=True):
+        for sample_size, title in zip(sample_sizes, alternate_titles):
             title_bytes = title.encode("utf-8")
             title_length = struct.unpack_from(">H", payload, cursor)[0]
             if title_length != len(title_bytes):
