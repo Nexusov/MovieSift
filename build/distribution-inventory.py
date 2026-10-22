@@ -238,6 +238,18 @@ def classify(records, origins, components, tool_lock, profile):
         if name.startswith("tools/"):
             record.update(category="bundled-tool-material", origin=f"MKVToolNix upstream {tool_lock['version']} acquisition")
 
+            ffmpeg_material = name.startswith("tools/licenses/ffmpeg/") or name == "tools/ffmpeg-provenance.json"
+
+            if ffmpeg_material:
+                record.update(origin="Pinned FFmpeg source/build/binary acquisition; see ffmpegProvenance")
+
+            if name.endswith((".tar.xz", ".tar.gz")):
+                record["category"] = "included-source-archive"
+
+            if name in ("tools/ffmpeg.exe", "tools/ffprobe.exe", "tools/ffmpeg", "tools/ffprobe"):
+                record.update(category="bundled-executable", component="FFmpeg", origin="Unchanged selected member of pinned static LGPL binary artifact", staticComponentStatus="Actual build configuration and pinned dependency recipes recorded; source/build reconciliation remains explicit")
+                continue
+
             if "/app-root/usr/lib/" in name:
                 record["category"] = "bundled-native-library"
                 record["versionStatus"] = "unresolved unless separately evidenced in nativeComponentEvidence"
@@ -259,7 +271,7 @@ def classify(records, origins, components, tool_lock, profile):
 
         original = name.startswith("TrackTrim") or name.startswith("docs/") or name == "ru/TrackTrim.resources.dll" or name in {
             "README.md", "CONTRIBUTING.md", "THIRD_PARTY_NOTICES.md", "portable.flag", "SHA256SUMS",
-            "build-provenance.json", "tool-provenance.json", "native-dependencies.txt", "licenses/APPLICATION-LICENSE-PENDING.txt",
+            "build-provenance.json", "tool-provenance.json", "ffmpeg-provenance.json", "native-dependencies.txt", "licenses/APPLICATION-LICENSE-PENDING.txt",
         }
 
         if original:
@@ -276,11 +288,12 @@ def classify(records, origins, components, tool_lock, profile):
 
 
 
-def tool_origins(root, records, tool_lock, runtime_identifier):
+def tool_origins(root, records, tool_lock, runtime_identifier, ffmpeg_lock):
     """Bind every acquired tool/material payload to the hash-checked acquisition."""
     provenance = read_json(root / "tools/file-provenance.json")
     supplemental = read_json(root / "tools/licenses/upstream-materials.json")
     permitted_hashes = {tool_lock["source"]["sha256"], tool_lock[runtime_identifier]["sha256"]}
+    permitted_hashes.update(ffmpeg_lock[key]["sha256"] for key in (runtime_identifier, "source", "buildRecipes", "checksums"))
     for material in supplemental:
         name = "tools/licenses/upstream-terms/" + relative_path(material["path"])
 
@@ -307,6 +320,59 @@ def tool_origins(root, records, tool_lock, runtime_identifier):
 
     if observed != expected:
         raise ValueError("Tool acquisition evidence does not cover all retained payloads")
+
+
+def ffmpeg_evidence(root, records, runtime_identifier):
+    """Require actual binaries and exact source/build/configuration material for this RID."""
+    lock = read_json(root / "ffmpeg-provenance.json")
+
+    if lock != read_json(root / "tools/ffmpeg-provenance.json"):
+        raise ValueError("FFmpeg package and acquisition provenance differ")
+
+    extension = ".exe" if runtime_identifier == "win-x64" else ""
+
+    if any(PurePosixPath(name).name in ("ffplay", "ffplay.exe") for name in records):
+        raise ValueError("Unneeded ffplay must not be distributed")
+
+    for key in ("source", "buildRecipes"):
+        name = "tools/licenses/ffmpeg/" + relative_path(lock[key]["fileName"])
+
+        if name not in records or records[name]["sha256"] != lock[key]["sha256"]:
+            raise ValueError("Pinned FFmpeg source/build archive missing or changed")
+
+    checksum_name = "tools/licenses/ffmpeg/checksums.sha256"
+
+    if checksum_name not in records or records[checksum_name]["sha256"] != lock["checksums"]["sha256"]:
+        raise ValueError("Pinned FFmpeg publisher checksum list missing or changed")
+
+    for tool in ("ffmpeg", "ffprobe"):
+        name = "tools/" + tool + extension
+
+        if name not in records:
+            raise ValueError("A required pinned FFmpeg executable is missing")
+
+        version = (root / "tools/licenses/ffmpeg" / (tool + "-version.txt")).read_text(encoding="utf-8-sig")
+        configuration = (root / "tools/licenses/ffmpeg" / (tool + "-buildconf.txt")).read_text(encoding="utf-8-sig")
+        invalid_configuration = "--enable-nonfree" in configuration or "--enable-gpl" in configuration or "--enable-version3" not in configuration
+
+        if not version.startswith(tool + " version " + lock["version"] + " ") or invalid_configuration:
+            raise ValueError("FFmpeg actual version/configuration is outside the pinned LGPL build")
+
+        records[name]["componentVersion"] = lock["version"]
+
+    dependencies = read_json(root / "tools/licenses/ffmpeg/runtime-dependencies.json")
+    expected_workers = {tool + extension for tool in ("ffmpeg", "ffprobe")}
+    workers = dependencies["workers"]
+
+    if dependencies["runtimeIdentifier"] != runtime_identifier or len(workers) != 2 or {worker["path"] for worker in workers} != expected_workers:
+        raise ValueError("FFmpeg runtime dependency evidence is for a different worker/platform")
+
+    for worker in workers:
+
+        if worker["sha256"] != records["tools/" + worker["path"]]["sha256"]:
+            raise ValueError("FFmpeg runtime dependency evidence does not match the actual worker")
+
+    return lock
 
 
 def native_evidence(profile, records, tool_lock, runtime_identifier, components):
@@ -367,21 +433,22 @@ def generate(package_root, archive, assets_file, output, profile_file):
     origins, components = nuget_origins(read_json(assets_file), packages, records)
     profile = read_json(profile_file)
     classify(records, origins, components, tool_lock, profile)
-    tool_origins(root, records, tool_lock, build["runtimeIdentifier"])
+    ffmpeg_lock = ffmpeg_evidence(root, records, build["runtimeIdentifier"])
+    tool_origins(root, records, tool_lock, build["runtimeIdentifier"], ffmpeg_lock)
     observations = native_evidence(profile, records, tool_lock, build["runtimeIdentifier"], components)
     unknowns = [name for name, record in records.items() if record["category"] == "unresolved-origin"]
     report = {
         "schemaVersion": 1, "purpose": "Distribution inventory and unresolved licensing preparation; not legal approval",
         "redistributionReady": False, "build": build,
         "archive": {"name": archive.name, "size": archive.stat().st_size, "sha256": file_hash(archive)},
-        "manifest": records["SHA256SUMS"], "toolProvenance": tool_lock,
+        "manifest": records["SHA256SUMS"], "toolProvenance": tool_lock, "ffmpegProvenance": ffmpeg_lock,
         "inventoryGeneratorSha256": file_hash(Path(__file__)),
-        "mechanicalChecks": {"manifestCoverage": "passed", "archiveMatchesStaging": "passed", "includedMaterialReferences": "passed", "pinnedMkvSourceHash": "passed"},
+        "mechanicalChecks": {"manifestCoverage": "passed", "archiveMatchesStaging": "passed", "includedMaterialReferences": "passed", "pinnedMkvSourceHash": "passed", "pinnedFfmpegSourceBuildAndVersion": "passed"},
         "counts": dict(Counter(record["category"] for record in records.values())),
         "files": list(records.values()), "nugetComponents": components,
-        "buildOnlyDependencies": [".NET SDK (version in build provenance)", "xUnit, Microsoft.NET.Test.Sdk, test runner and Avalonia.Headless (test projects only)", "Python, PowerShell, archive utilities and Linux build/container tools", "Development-only FFmpeg fixture encoder; no FFmpeg shipped"],
+        "buildOnlyDependencies": [".NET SDK (version in build provenance)", "xUnit, Microsoft.NET.Test.Sdk, test runner and Avalonia.Headless (test projects only)", "Python, PowerShell, archive utilities and Linux build/container tools"],
         "nativeComponentEvidence": observations,
-        "unresolved": profile["unresolved"] + [{"component": name, "missing": "Exact origin/version and applicable materials", "nextAction": "Inspect the unmatched actual payload before release"} for name in unknowns],
+        "unresolved": profile["unresolved"] + [{"component": "FFmpeg static third-party closure", "missing": "Reconcile actual linked optional components and their complete notices/source/build material against the exact included recipe tree; recipe source declarations alone are not binary/source attestations", "nextAction": "Use included actual buildconf, dependency-recipes.json and complete pinned recipe/patch archive before public redistribution"}] + [{"component": name, "missing": "Exact origin/version and applicable materials", "nextAction": "Inspect the unmatched actual payload before release"} for name in unknowns],
         "limits": [
             "NuGet match proves byte identity to a signed archive member, not complete source or legal compliance.",
             "No payload is omitted because a CLI does not load it; retained AppImage libraries and static archives remain distributed.",
@@ -395,10 +462,13 @@ def generate(package_root, archive, assets_file, output, profile_file):
     for source, destination in {
         "SHA256SUMS": "package-SHA256SUMS.txt", "build-provenance.json": "build-provenance.json",
         "tool-provenance.json": "tool-provenance.json", "licenses/nuget/inventory.json": "nuget-inventory.json",
+        "ffmpeg-provenance.json": "ffmpeg-provenance.json",
         "tools/file-provenance.json": "tool-file-provenance.json",
         "tools/licenses/upstream-materials.json": "upstream-materials.json",
     }.items():
         shutil.copyfile(root / source, output / destination)
+    for name in ("ffmpeg-version.txt", "ffprobe-version.txt", "ffmpeg-buildconf.txt", "ffprobe-buildconf.txt", "dependency-recipes.json", "runtime-dependencies.json"):
+        shutil.copyfile(root / "tools/licenses/ffmpeg" / name, output / name)
     print(f"Distribution inventory: {report_path.name}; {len(records)} shipped files; {len(unknowns)} unmatched origins; redistribution remains pending")
     return report
 

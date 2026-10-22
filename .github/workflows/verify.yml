@@ -47,12 +47,17 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y squashfs-tools file libx11-6 libice6 libsm6 libfontconfig1 libicu74 libssl3t64 libgssapi-krb5-2 libbrotli1 libgmp10 libgl1 libegl1 libxrandr2 libxcursor1 libxi6 libxinerama1
-      - name: Acquire the pinned backend (mandatory)
+      - name: Acquire the pinned MKV and MP4 backends (mandatory)
         run: ./build/acquire-tools.ps1 -RuntimeIdentifier '${{ matrix.runtime }}' -Destination '${{ github.workspace }}/tools'
       - name: Generate original real-media fixtures
         run: |
           python ./build/generate-fixtures.py --tool-directory '${{ github.workspace }}/tools' --destination '${{ github.workspace }}/artifacts/fixtures'
           if ($LASTEXITCODE -ne 0) { throw 'Real fixture generation failed.' }
+          $ffmpegName = 'ffmpeg'
+          if ($IsWindows) { $ffmpegName += '.exe' }
+          $ffmpegPath = Join-Path '${{ github.workspace }}/tools' $ffmpegName
+          python ./build/generate-mp4-fixtures.py --ffmpeg $ffmpegPath --destination '${{ github.workspace }}/artifacts/fixtures/mp4'
+          if ($LASTEXITCODE -ne 0) { throw 'Required MP4 fixture generation failed.' }
       - name: Restore locked dependencies
         run: dotnet restore --locked-mode
       - name: Verify formatting
@@ -66,13 +71,13 @@ jobs:
       - name: Unit, headless UI and required real-backend tests
         run: dotnet test --configuration Release --no-build --no-restore --logger trx --results-directory ./TestResults
       - name: Build self-contained archive and run packaged workflow
-        run: ./build/package.ps1 -RuntimeIdentifier '${{ matrix.runtime }}' -FixturePath '${{ github.workspace }}/artifacts/fixtures/ordinary.mkv'
+        run: ./build/package.ps1 -RuntimeIdentifier '${{ matrix.runtime }}' -FixturePath '${{ github.workspace }}/artifacts/fixtures/ordinary.mkv' -Mp4FixturePath '${{ github.workspace }}/artifacts/fixtures/mp4/ordinary.mp4'
       - name: Relocate archive and run the actual application workflow
-        run: ./build/verify-package.ps1 -ArchivePath './artifacts/${{ matrix.archive }}' -FixturePath '${{ github.workspace }}/artifacts/fixtures/ordinary.mkv'
+        run: ./build/verify-package.ps1 -ArchivePath './artifacts/${{ matrix.archive }}' -FixturePath '${{ github.workspace }}/artifacts/fixtures/ordinary.mkv' -Mp4FixturePath '${{ github.workspace }}/artifacts/fixtures/mp4/ordinary.mp4'
       - name: Verify Linux CLI archive without installed SDK or media tools
         if: runner.os == 'Linux'
         shell: bash
-        run: bash ./build/verify-clean-linux.sh ./artifacts/TrackTrim-linux-x64.tar.gz ./artifacts/fixtures/ordinary.mkv
+        run: bash ./build/verify-clean-linux.sh ./artifacts/TrackTrim-linux-x64.tar.gz ./artifacts/fixtures/ordinary.mkv ./artifacts/fixtures/mp4/ordinary.mp4
       - name: Upload test evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

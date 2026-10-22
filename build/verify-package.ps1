@@ -4,7 +4,8 @@ param(
     [string] $PackageDirectory,
     [Parameter(Mandatory, ParameterSetName = 'Archive')]
     [string] $ArchivePath,
-    [string] $FixturePath
+    [string] $FixturePath,
+    [string] $Mp4FixturePath
 )
 
 $ErrorActionPreference = 'Stop'
@@ -109,7 +110,7 @@ if ($IsLinux) {
     $runtimeFiles = @('System.Private.CoreLib.dll', 'libhostfxr.so', 'libcoreclr.so')
 }
 
-foreach ($requiredPath in @($executablePath, (Join-Path $PackageDirectory 'portable.flag'), (Join-Path $PackageDirectory 'TrackTrim.runtimeconfig.json'), (Join-Path $PackageDirectory 'tool-provenance.json'), (Join-Path $PackageDirectory 'licenses/nuget/inventory.json')) + @($runtimeFiles | ForEach-Object { Join-Path $PackageDirectory $_ })) {
+foreach ($requiredPath in @($executablePath, (Join-Path $PackageDirectory 'portable.flag'), (Join-Path $PackageDirectory 'TrackTrim.runtimeconfig.json'), (Join-Path $PackageDirectory 'tool-provenance.json'), (Join-Path $PackageDirectory 'ffmpeg-provenance.json'), (Join-Path $PackageDirectory 'licenses/nuget/inventory.json')) + @($runtimeFiles | ForEach-Object { Join-Path $PackageDirectory $_ })) {
 
     if (-not (Test-Path -LiteralPath $requiredPath -PathType Leaf)) {
         throw "Required packaged file is missing: $requiredPath"
@@ -158,15 +159,20 @@ if ($PSCmdlet.ParameterSetName -eq 'Archive') {
 
 Invoke-PackagedApplication -Options @{ Executable = $executablePath; Arguments = @('--verify-tools') }
 
-if ($FixturePath) {
-    $FixturePath = [IO.Path]::GetFullPath($FixturePath)
+foreach ($mediaFixture in @($FixturePath, $Mp4FixturePath) | Where-Object { $_ }) {
+    $mediaFixture = [IO.Path]::GetFullPath($mediaFixture)
+    $containerExtension = [IO.Path]::GetExtension($mediaFixture).ToLowerInvariant()
+
+    if ($containerExtension -notin @('.mkv', '.mp4')) {
+        throw 'Portable workflow fixtures must use a supported container extension.'
+    }
     $checkRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../artifacts'))
     New-Item -ItemType Directory -Path $checkRoot -Force | Out-Null
     $smokeRoot = Join-Path $checkRoot ('media smoke Кириллица ' + [Guid]::NewGuid().ToString('N'))
     New-Item -ItemType Directory -Path $smokeRoot | Out-Null
-    $sourcePath = Join-Path $smokeRoot '--source with spaces; & Кириллица.mkv'
-    $destinationPath = Join-Path $smokeRoot 'output with spaces; & Кириллица.mkv'
-    Copy-Item -LiteralPath $FixturePath -Destination $sourcePath
+    $sourcePath = Join-Path $smokeRoot ('--source with spaces; & Кириллица' + $containerExtension)
+    $destinationPath = Join-Path $smokeRoot ('output with spaces; & Кириллица' + $containerExtension)
+    Copy-Item -LiteralPath $mediaFixture -Destination $sourcePath
     $originalHash = (Get-FileHash -LiteralPath $sourcePath -Algorithm SHA256).Hash
     Invoke-PackagedApplication -Options @{ Executable = $executablePath; Arguments = @('--verify-portable', $sourcePath, $destinationPath) }
 
@@ -178,7 +184,7 @@ if ($FixturePath) {
         throw 'The full packaged workflow modified the source.'
     }
 
-    Write-Output "Full packaged workflow passed; original SHA256 $originalHash."
+    Write-Output "Full packaged $containerExtension workflow passed; original SHA256 $originalHash."
 }
 
 Write-Output "Packaged application checks passed: $PackageDirectory"

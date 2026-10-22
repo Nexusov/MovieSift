@@ -60,6 +60,19 @@ class DistributionInventoryTests(unittest.TestCase):
             "repositoryUrl": "https://example.invalid/sample", "repositoryCommit": "3" * 40,
             "includedLicenseFiles": ["LICENSE"], "specificationFile": "sample.nuspec", "supplementalMaterials": [],
         }])
+        self.write("tools/ffmpeg.exe", b"tiny ffmpeg stand-in")
+        self.write("tools/ffprobe.exe", b"tiny ffprobe stand-in")
+        ffmpeg_lock = {"version": "test-pinned", "win-x64": {"sha256": "4" * 64}}
+        for key, name in (("source", "source.tar.gz"), ("buildRecipes", "recipes.tar.gz"), ("checksums", "checksums.sha256")):
+            self.write("tools/licenses/ffmpeg/" + name, ("small " + key + " stand-in").encode())
+            ffmpeg_lock[key] = {"fileName": name, "sha256": INVENTORY.file_hash(self.root / "tools/licenses/ffmpeg" / name)}
+        self.json("ffmpeg-provenance.json", ffmpeg_lock)
+        self.json("tools/ffmpeg-provenance.json", ffmpeg_lock)
+        for tool in ("ffmpeg", "ffprobe"):
+            self.write("tools/licenses/ffmpeg/" + tool + "-version.txt", (tool + " version test-pinned Copyright fixture\n").encode())
+            self.write("tools/licenses/ffmpeg/" + tool + "-buildconf.txt", b"configuration: --enable-version3 --disable-libx264\n")
+        self.json("tools/licenses/ffmpeg/dependency-recipes.json", {"recipes": []})
+        self.json("tools/licenses/ffmpeg/runtime-dependencies.json", {"runtimeIdentifier": "win-x64", "workers": [{"path": name, "sha256": INVENTORY.file_hash(self.root / "tools" / name)} for name in ("ffmpeg.exe", "ffprobe.exe")]})
         tool_records = []
         for path in (self.root / "tools").rglob("*"):
 
@@ -210,6 +223,50 @@ class DistributionInventoryTests(unittest.TestCase):
         self.json("build-provenance.json", {"runtimeIdentifier": "win-x64", "sourceRevision": ""})
         self.pack()
         with self.assertRaisesRegex(ValueError, "exact build revision"):
+            self.generate()
+
+    def test_ffmpeg_materials_and_actual_executables_are_accounted_for(self):
+        """Keep both backends and their exact-source evidence in the full inventory."""
+        report = self.generate()
+        self.assertEqual(report["mechanicalChecks"]["pinnedFfmpegSourceBuildAndVersion"], "passed")
+        ffmpeg = next(row for row in report["files"] if row["path"] == "tools/ffmpeg.exe")
+        self.assertEqual(ffmpeg["componentVersion"], "test-pinned")
+        self.assertEqual(ffmpeg["category"], "bundled-executable")
+        self.assertTrue(any(row["component"] == "FFmpeg static third-party closure" for row in report["unresolved"]))
+
+    def test_ffmpeg_source_or_recipe_hash_must_match(self):
+        """A similarly named source/build archive cannot satisfy the new tool evidence."""
+        self.write("tools/licenses/ffmpeg/recipes.tar.gz", b"wrong recipes")
+        self.pack()
+        with self.assertRaisesRegex(ValueError, "FFmpeg source/build archive"):
+            self.generate()
+
+    def test_nonfree_or_gpl_configuration_is_not_the_selected_build(self):
+        """Fail packaging on accidental substitution of another FFmpeg variant."""
+        self.write("tools/licenses/ffmpeg/ffmpeg-buildconf.txt", b"configuration: --enable-version3 --enable-nonfree\n")
+        self.pack()
+        with self.assertRaisesRegex(ValueError, "outside the pinned LGPL build"):
+            self.generate()
+
+    def test_unneeded_ffplay_is_rejected(self):
+        """Do not ship a development player without a production runtime purpose."""
+        self.write("tools/ffplay.exe", b"unneeded player")
+        self.pack()
+        with self.assertRaisesRegex(ValueError, "ffplay must not be distributed"):
+            self.generate()
+
+    def test_missing_ffprobe_cannot_silently_produce_inventory(self):
+        """Both required executables must be actual package payloads."""
+        (self.root / "tools/ffprobe.exe").unlink()
+        self.pack()
+        with self.assertRaisesRegex(ValueError, "executable is missing"):
+            self.generate()
+
+    def test_dependency_observation_must_match_actual_ffmpeg_worker(self):
+        """Do not carry a native-dependency receipt across different binary builds."""
+        self.write("tools/ffmpeg.exe", b"substituted worker")
+        self.pack()
+        with self.assertRaisesRegex(ValueError, "does not match the actual worker"):
             self.generate()
 
 
