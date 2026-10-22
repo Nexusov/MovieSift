@@ -25,6 +25,29 @@
       "evidence": "Every listed restored 12.1.4 package records this Avalonia repository commit in its nuspec. Each supplies shipped assemblies but no collected license text. The commit-pinned upstream MIT text includes the AvaloniaUI OÜ copyright notice; preserve its original UTF-8 bytes. This record does not cover Avalonia.BuildServices or Avalonia.Angle.Windows.Natives."
     },
     {
+      "id": "avalonia-12.1.4-notice",
+      "packageIds": [
+        "Avalonia",
+        "Avalonia.Desktop",
+        "Avalonia.FreeDesktop",
+        "Avalonia.FreeDesktop.AtSpi",
+        "Avalonia.HarfBuzz",
+        "Avalonia.Native",
+        "Avalonia.Remote.Protocol",
+        "Avalonia.Skia",
+        "Avalonia.Themes.Fluent",
+        "Avalonia.Win32",
+        "Avalonia.X11"
+      ],
+      "version": "12.1.4",
+      "repositoryCommit": "2d79ba55fae1b1e71c69f93a668080c9029e6a31",
+      "url": "https://raw.githubusercontent.com/AvaloniaUI/Avalonia/2d79ba55fae1b1e71c69f93a668080c9029e6a31/NOTICE.md",
+      "sha256": "dd6f80852d16320c865a2e403ffd1a8b07a0e34c5b37122c0bc2343639ff68e6",
+      "fileName": "upstream/NOTICE.md",
+      "kind": "notice",
+      "evidence": "The restored Avalonia 12.1.4 packages declare this exact source commit. Its NOTICE.md includes third-party conditions absent from the root MIT licence. In particular, the shipped Avalonia.Remote.Protocol.dll contains Metsys.Bson, whose Karl Seguin BSD notice requires reproduction with binary distributions. Preserve the complete upstream notice alongside the existing licence.md."
+    },
+    {
       "id": "microcom-runtime-0.11.6-license",
       "packageIds": [
         "MicroCom.Runtime"
@@ -75,6 +98,20 @@
       "fileName": "upstream/LICENSE",
       "kind": "license",
       "evidence": "The restored Serilog.Sinks.File 7.0.0 nuspec records this repository and commit and declares Apache-2.0. Its collected package directory contains the nuspec but no license text. This is the exact upstream LICENSE from that commit; it does not establish that all other attribution duties are complete."
+    },
+    {
+      "id": "harfbuzz-native-8.3.1.3-copying",
+      "packageIds": [
+        "HarfBuzzSharp.NativeAssets.Win32",
+        "HarfBuzzSharp.NativeAssets.Linux"
+      ],
+      "version": "8.3.1.3",
+      "repositoryCommit": "2888c737ad016d584c74525e2d35db5097ea8576",
+      "url": "https://raw.githubusercontent.com/harfbuzz/harfbuzz/2b3631a866b3077d9d675caa4ec9010b342b5a7c/COPYING",
+      "sha256": "ba8f810f2455c2f08e2d56bb49b72f37fcf68f1f4fade38977cfd7372050ad64",
+      "fileName": "upstream/harfbuzz-COPYING",
+      "kind": "license",
+      "evidence": "Both shipped native packages declare SkiaSharp source commit 2888c737ad016d584c74525e2d35db5097ea8576. Its externals/skia submodule 927041a58f130e0dd0562ba86cb4170989ad39e9 DEPS pins HarfBuzz 2b3631a866b3077d9d675caa4ec9010b342b5a7c; the shipped Windows native library reports HarfBuzz 8.3.1. The original package THIRD-PARTY-NOTICES contains an older copyright list. This exact COPYING preserves the additional required holders and Old MIT permission/disclaimer; retain both materials."
     }
   ]
 }
