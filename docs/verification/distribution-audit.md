@@ -15,6 +15,7 @@ Each `test-evidence-<RID>` CI artifact includes `distribution-reports/<RID>/`:
 | `build-provenance.json`, `tool-provenance.json` | Actual SDK/runtime/build platform and pinned tool/source URLs/hashes. |
 | `nuget-inventory.json` | Restored metadata, publisher repository commits, copied notice files, and exact supplemental text provenance. This is not a substitute for actual file inventory. |
 | `tool-file-provenance.json`, `upstream-materials.json` | Every retained tool/material's actual hash and acquisition origin; exact supplemental terms/header URLs and hashes. |
+| `ffmpeg-provenance.json`, `ffmpeg-version.txt`, `ffprobe-version.txt`, `*-buildconf.txt`, `dependency-recipes.json`, `runtime-dependencies.json` | Phase 3's exact FFmpeg artifact/source/recipe identities, actual executed build configurations and native dependencies. No binaries or source archives are uploaded. |
 
 No executable, portable archive, large source tarball, original NuGet archive or private-path `project.assets.json` is uploaded. Reports use package-relative paths. The final archive is retained only on its builder; its identity is recorded in the report. CI artifacts expire after seven days under the existing policy; the scripts, pinned evidence profiles and this gap record remain in Git.
 
@@ -36,6 +37,24 @@ Downloaded [Windows evidence](https://github.com/Nexusov/TrackTrim/actions/runs/
 Each job passed 16 small archive/evidence regressions, locked restore, formatting, Release build (zero warnings/errors), actual packaged workflow and relocation. The C# suites passed **Windows 222 + five documented Linux-only skips; Linux 227 with no skips**, including 14 real-media cases and 32 headless Desktop tests per platform. The Linux no-SDK/no-separately-installed-media-tools container workflow also passed. These are builder/CLI/headless results, not native desktop acceptance.
 
 These archive identities belong to this checkpoint; later packages emit their own identities. Build provenance now reads stored Git commit parent headers because history traversal hid parents at CI's shallow boundary. A controlled depth-one fetch reproduced the empty traversal result and confirmed the exact two stored parents above; later CI reports must retain them directly. Complete path accounting does not resolve the source/version/licensing unknowns below.
+
+## Phase 3 FFmpeg additions
+
+The earlier counts and hashes above remain historical observations. Current packages also include the required FFmpeg/ffprobe MP4 workers. `build/ffmpeg.lock.json` pins BtbN's monthly-retained `autobuild-2026-09-30-13-08` static LGPL/version3 artifacts. The [official FFmpeg download page](https://ffmpeg.org/download.html) lists this binary provider; [the fixed release](https://github.com/BtbN/FFmpeg-Builds/releases/tag/autobuild-2026-09-30-13-08) supplies the checked checksum list. No mutable `latest` URL or GPL/nonfree variant is accepted.
+
+| Material | Exact identity / included evidence |
+| --- | --- |
+| Windows binary archive | `ffmpeg-n9.0.2-17-g2a571b6068-win64-lgpl-9.0.zip`, SHA256 `6b264b9e6019103f601d98c292bd332fd87acf1c5e941ddff4fb71760fe63432` |
+| Linux binary archive | `ffmpeg-n9.0.2-17-g2a571b6068-linux64-lgpl-9.0.tar.xz`, SHA256 `2d41cbea0ca1a15029b638330740f78d6f5aeb062355bf425433fc938705350a` |
+| Executed version | Both tools: `n9.0.2-17-g2a571b6068-20260930`, compiler GCC 16.2.0 / crosstool-NG 1.29.0.7; actual configuration is captured separately on each matching platform. |
+| Complete FFmpeg source snapshot | Official GitHub mirror commit `2a571b606854520cf89804d8030c8b328e621689`, archive SHA256 `f02fc0809a13f37e3d4e1f74254d07e035a5ef01a6d91e727b915b1764d97540`; matches the source identity embedded in executed versions. |
+| Complete build/patch recipe snapshot | Fixed release tag resolves to BtbN commit `6c9aec5fc9a72ec3abedd1fa84db141fa18cf52b`, archive SHA256 `81da4f7c878dc0f60e6b8d0049a112e32178e20f025d468fe4e99e77b2dfe0ec`. Includes Docker/platform files, dependency recipes and patches; exact declaration extraction is available in the compact report. |
+| Included notices | Actual binary `LICENSE.txt` (LGPL v3), source `COPYING.*`/`LICENSE.md`, recipe license and selected FFmpeg/ffprobe/format documentation. Actual configure evidence rejects `--enable-gpl` or `--enable-nonfree`. |
+| Runtime closure | Windows bounded ordinary PE import inspection plus actual execution; Linux actual `ldd` plus matching-OS packaged/relocation/container checks. Static third-party contents are a different question from dynamic runtime dependencies. |
+
+Only the runtime CLI pair is selected from these upstream distributions; neither `ffplay` nor encoder presets ship. Source/recipe archives remain local package materials; public CI evidence contains only compact identities, manifests and configuration/dependency reports. Inventory requires both executables, exact source/build archive and checksum-list hashes, complete acquisition coverage, expected actual version/configuration and no `ffplay`.
+
+**Remaining new material gap:** reconcile the actually linked optional static dependency closure with complete applicable notices/source/patch/build inputs. The included dependency recipes provide primary locations and mostly exact commits, but declarations alone do not prove the complete link closure or recursively pin submodules/package inputs. Next action before redistribution: map actual per-platform enabled libraries to those pinned recipes, obtain their recursive source/notices and reconcile toolchain/build receipts. Do not substitute current upstream releases, generic homepages or the FFmpeg source alone. Existing MKVToolNix/Qt/native NuGet material gaps and the owner-selected application license remain separate.
 
 ## Findings and concrete collection corrections
 
