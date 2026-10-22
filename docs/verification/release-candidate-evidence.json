@@ -148,31 +148,247 @@
   },
   "candidate": {
     "branch": "review/release-candidate",
-    "sourceRevision": null,
-    "archives": [],
-    "automatedChecks": {
-      "localWindowsPython": {
-        "passed": 51,
-        "failed": 0,
-        "skipped": 0
+    "pullRequest": "https://github.com/Nexusov/TrackTrim/pull/10",
+    "proposedVersion": "0.1.0-rc.1",
+    "sourceRevision": "5ccb75afb24dd3b561d67d67c4010946d98aefb2",
+    "sourceTree": "9024359401b833c966d6f375e246cbd9c0f484ac",
+    "worktreeDirty": false,
+    "archives": [
+      {
+        "runtimeIdentifier": "win-x64",
+        "name": "TrackTrim-win-x64.zip",
+        "size": 130317548,
+        "sha256": "76fd0d4b4e25126151e8781741957a906b77fb84bc848b1b5233154d3778f990",
+        "localReviewDirectory": "work/release-review-5ccb75a/win-x64",
+        "sourceRevision": "5ccb75afb24dd3b561d67d67c4010946d98aefb2",
+        "sourceTree": "9024359401b833c966d6f375e246cbd9c0f484ac",
+        "worktreeDirty": false,
+        "actualFileCountIncludingManifest": 590,
+        "unmatchedOrigins": 0,
+        "packagedMkvAndMp4Workflow": "passed",
+        "relocation": "passed"
       },
-      "fullApplicationAndPackageChecks": "pending candidate build"
+      {
+        "runtimeIdentifier": "linux-x64",
+        "name": "TrackTrim-linux-x64.tar.gz",
+        "size": 179640788,
+        "sha256": "91e004779bd5d065db26346c456682bc27dacda75aadcd589c9273f14a506d70",
+        "localReviewDirectory": "work/phase3-linux-development/package-5ccb75a",
+        "sourceRevision": "5ccb75afb24dd3b561d67d67c4010946d98aefb2",
+        "sourceTree": "9024359401b833c966d6f375e246cbd9c0f484ac",
+        "worktreeDirty": false,
+        "actualFileCountIncludingManifest": 523,
+        "unmatchedOrigins": 0,
+        "packagedMkvAndMp4Workflow": "passed",
+        "relocation": "passed"
+      }
+    ],
+    "privateMaterialBundle": {
+      "name": "TrackTrim-review-materials-5ccb75afb24d.tar.gz",
+      "size": 138435938,
+      "sha256": "966f1c1eee40d005490b49d4d0f82d8fdefc5e76ded0957eff733e6bb3a5249c",
+      "localReviewDirectory": "work/release-local-materials-20261023/materials-5ccb75a",
+      "sourceRevision": "5ccb75afb24dd3b561d67d67c4010946d98aefb2",
+      "originalCodeSourceArchiveSha256": "80a92ac2461dd06c13dada59bf067aeb9684f2e291bd11b60609a9aaa2870871",
+      "copiedInventoriedMaterialFiles": {
+        "win-x64": 320,
+        "linux-x64": 231
+      },
+      "method": "Copy only inventoried source/notice/build materials from both actual local archives, verify each hash, add git archive of the exact source revision and a complete material manifest",
+      "completeRedistributionAssurance": false,
+      "publiclyUploaded": false,
+      "verifiedManifestedFiles": 556,
+      "memberHashVerification": "passed; every outer material/source member verified against SHA256SUMS"
+    },
+    "automatedChecks": {
+      "localWindows": {
+        "fullSuiteRevision": "f5434587093922ab10033a63f8c860886fbcbdc9",
+        "laterDifference": "Only a Linux material-provenance optional-property guard; final candidate CI reruns the full suite",
+        "lockedRestore": "passed",
+        "formatting": "passed",
+        "releaseBuildWarnings": 0,
+        "releaseBuildErrors": 0,
+        "csharpPassed": 983,
+        "documentedLinuxOnlySkipped": 23,
+        "failed": 0,
+        "pythonPassed": 52,
+        "finalArchiveRevision": "5ccb75afb24dd3b561d67d67c4010946d98aefb2",
+        "finalPackageAndRelocation": "passed"
+      },
+      "localLinuxContainer": {
+        "sourceRevision": "5ccb75afb24dd3b561d67d67c4010946d98aefb2",
+        "platform": "Ubuntu 24.04.5 x64 development container on WSL2; not a desktop",
+        "lockedRestore": "passed",
+        "formatting": "passed",
+        "releaseBuildWarnings": 0,
+        "releaseBuildErrors": 0,
+        "csharpPassed": 1006,
+        "skipped": 0,
+        "failed": 0,
+        "pythonPassed": 52,
+        "packageAndRelocation": "passed",
+        "earlierLocalFailure": "One child PowerShell 30-second timeout on f543; other 51 Python tests passed. Original stalled internal stage was not observable. A normal readiness check passed in 1.6357 seconds; the unchanged complete 52-test suite passed on the final checkout in 48.670 seconds. No timeout or gate was weakened.",
+        "separateLocalCleanContainerAttempt": "Image provisioning stopped before application execution to preserve scarce system-disk space. This is not an application test result. The hosted required Linux clean-container check passed for this candidate."
+      },
+      "candidateCi": {
+        "head": "5ccb75afb24dd3b561d67d67c4010946d98aefb2",
+        "run": "https://github.com/Nexusov/TrackTrim/actions/runs/39867722616",
+        "result": "success",
+        "actualCheckout": {
+          "parents": [
+            "88b5da788e77f3b6490e2dc418fbf5c129661e61",
+            "5ccb75afb24dd3b561d67d67c4010946d98aefb2"
+          ],
+          "sha": "4e81a29f7c6f97fb5ecb7a8a01d84d342ea12c6f",
+          "tree": "9024359401b833c966d6f375e246cbd9c0f484ac"
+        },
+        "treeEqualsBranchHead": true,
+        "requiredContexts": [
+          {
+            "name": "Required media checks and linux-x64 package",
+            "url": "https://github.com/Nexusov/TrackTrim/actions/runs/39867722616/job/120134213993",
+            "passed": 1006,
+            "failed": 0,
+            "skipped": 0,
+            "total": 1006,
+            "pythonPassed": 52,
+            "producerId": 15368,
+            "conclusion": "success"
+          },
+          {
+            "name": "Required media checks and win-x64 package",
+            "url": "https://github.com/Nexusov/TrackTrim/actions/runs/39867722616/job/120134213807",
+            "passed": 983,
+            "failed": 0,
+            "skipped": 23,
+            "total": 1006,
+            "pythonPassed": 52,
+            "producerId": 15368,
+            "conclusion": "success"
+          }
+        ],
+        "includedGates": "Mandatory acquisition, locked restore, formatting, warning-free Release build, unit/headless/controlled/real MKV and MP4 suites, inventory, actual packaged workflows, relocation and Linux nonroot/no-SDK/no-installed-media/no-network container",
+        "uploads": "Only compact text/config evidence; both evidence ZIPs inspected. CI portable/source archives were not uploaded. Their builder-specific identities differ from these local artifacts."
+      },
+      "correctedBuildFailures": [
+        "The actual source-build helper could discover an enclosing TrackTrim Git revision. A controlled real-helper regression failed before the Git ceiling and passed afterward; strict source/version/configuration checks remain.",
+        "Inherited PowerShell StrictMode exposed optional correspondsTo/url accesses in collected materials. Final Windows/Linux package inventories and workflows pass with guarded optional fields and unchanged hash/relationship checks.",
+        "The redirected MSYS2 mirror failed; the authoritative primary repository supplied the exact pinned Make archive. A formatted PowerShell exception assertion was corrected to check the actual exception message, refusal code and absent writes on both OSes.",
+        "Both runners rejected a zlib.net response with a mismatched hash; its actual bytes were not recorded. The authoritative GitHub release asset is independently byte-identical to the pinned zlib source. Invalid cached bytes still fail and remain preserved; diagnostics now include actual hash and size."
+      ]
     },
     "native": {
       "status": "not run",
-      "reason": "The identified candidate portable build is not prepared yet",
-      "availablePlatform": "Windows 10 Home Single Language 22H2 x64, build 19045.6456",
+      "reason": "Owner stopped the new session with physical Escape, then explicitly requested no Computer Use",
+      "artifactSourceRevision": "5ccb75afb24dd3b561d67d67c4010946d98aefb2",
+      "archiveSha256": "76fd0d4b4e25126151e8781741957a906b77fb84bc848b1b5233154d3778f990",
+      "actualPlatform": "Windows 10 Home Single Language 22H2 x64, 19045.6456",
+      "displayReportedByVideoController": "1280x1024 at 60 Hz, NVIDIA GeForce RTX 3050",
+      "effectiveScale": "Not observed; no scale changes made",
+      "installedRuntimeContext": "A separate dotnet is present on PATH; no separate media-tool command was found. Packaged execution is self-contained but this host is not a clean Windows installation.",
+      "method": "Fresh @oai/sky Computer Use session; a verified fresh extraction with spaces/Cyrillic and zero initial app-local data entries",
+      "directlyObserved": "Computer Use initialized and launched the exact packaged executable. Discovery cross-listed the candidate and old copy, yielding duplicate candidate entries; the unique-target guard prevented app input. A fresh window-list call was stopped by the owner before any application state baseline.",
+      "actionsNotPerformed": "No file/folder selection, language switch, rule/preset change, approval, Review, Run, Cancel, close or display change was sent. No further Computer Use call after the stop.",
+      "sourceAndSentinelChecks": [
+        {
+          "path": "Collision sentinel/Обычный MKV.trimmed.mkv",
+          "size": 4,
+          "sha256Before": "1f7f4e9ca14183cbb880978405f22e7c4178d5886754ff074c6c050f4b53b059",
+          "sha256After": "1f7f4e9ca14183cbb880978405f22e7c4178d5886754ff074c6c050f4b53b059",
+          "unchanged": true
+        },
+        {
+          "path": "Series Кириллица/Season 1/episode.mkv",
+          "size": 392464,
+          "sha256Before": "055c7f3ebdc3c579dd6d7740c78a1e8ee0e2525f23542b5c6af9a0869ce4a0f8",
+          "sha256After": "055c7f3ebdc3c579dd6d7740c78a1e8ee0e2525f23542b5c6af9a0869ce4a0f8",
+          "unchanged": true
+        },
+        {
+          "path": "Series Кириллица/Season 2/episode.mp4",
+          "size": 34046,
+          "sha256Before": "b5a94767353d2e895ea04f5f1650df1f561fc507b4cb2db277f556c6b9a77112",
+          "sha256After": "b5a94767353d2e895ea04f5f1650df1f561fc507b4cb2db277f556c6b9a77112",
+          "unchanged": true
+        },
+        {
+          "path": "Источники с пробелами/Обычный MKV.mkv",
+          "size": 392464,
+          "sha256Before": "055c7f3ebdc3c579dd6d7740c78a1e8ee0e2525f23542b5c6af9a0869ce4a0f8",
+          "sha256After": "055c7f3ebdc3c579dd6d7740c78a1e8ee0e2525f23542b5c6af9a0869ce4a0f8",
+          "unchanged": true
+        },
+        {
+          "path": "Источники с пробелами/Обычный MP4.mp4",
+          "size": 34046,
+          "sha256Before": "b5a94767353d2e895ea04f5f1650df1f561fc507b4cb2db277f556c6b9a77112",
+          "sha256After": "b5a94767353d2e895ea04f5f1650df1f561fc507b4cb2db277f556c6b9a77112",
+          "unchanged": true
+        }
+      ],
+      "newOutputCount": 0,
+      "matchingPackagedMediaWorkers": 0,
+      "candidateOrOwnershipRecordCreated": false,
+      "readOnlyCheckLimit": "No-new-work/source-hash observations only; not a remux, cleanup, cancellation or native workflow pass",
+      "consolidatedMatrix": [
+        {
+          "case": "English-first and EN/RU state",
+          "status": "not run",
+          "reason": "Owner deferred Computer Use before the first UI baseline"
+        },
+        {
+          "case": "Actual native file/folder selection",
+          "status": "not run",
+          "reason": "Owner deferred Computer Use before the first UI baseline"
+        },
+        {
+          "case": "Single MKV and MP4",
+          "status": "not run",
+          "reason": "Owner deferred Computer Use before the first UI baseline"
+        },
+        {
+          "case": "Mixed recursive queue and independent plans",
+          "status": "not run",
+          "reason": "Owner deferred Computer Use before the first UI baseline"
+        },
+        {
+          "case": "Rules/presets and explicit approval/Review",
+          "status": "not run",
+          "reason": "Owner deferred Computer Use before the first UI baseline"
+        },
+        {
+          "case": "Restart and explicit Restore",
+          "status": "not run",
+          "reason": "Owner deferred Computer Use before the first UI baseline"
+        },
+        {
+          "case": "Existing-destination refusal",
+          "status": "not run",
+          "reason": "Owner deferred Computer Use before the first UI baseline"
+        },
+        {
+          "case": "Live-worker-correlated Cancel and close",
+          "status": "not run",
+          "reason": "Owner deferred Computer Use before the first UI baseline"
+        },
+        {
+          "case": "Resize/scroll/keyboard/visible focus and 100/150/200 percent layout",
+          "status": "not run",
+          "reason": "Owner deferred Computer Use before the first UI baseline"
+        }
+      ],
       "missingTargets": [
         "Windows 11 x64 25H2",
         "Ubuntu 24.04 x64 Desktop/X11-XWayland"
       ],
-      "visualCapture": "Known unchanged Computer Use capture/geometry blocker is not retried; UIA would be functional evidence only"
-    }
+      "visualCapture": "Known capture/geometry limitations were not retried; no native screenshot or visual/scaling acceptance"
+    },
+    "resourceState": "Owned Docker container, Docker Desktop and idle WSL VM stopped after Linux work; no Docker/WSL process remained. Approximately 9.7 GiB physical RAM was free. No Docker restart is needed for remaining evidence/CI work."
   },
   "limits": [
     "Historical native receipts retain their original source/package/platform identity",
     "Active-remux Cancel input correlation, repeated close, real warning fixture and visual/scaling requirements are not closed by controlled/headless/media tests",
     "Original application license remains pending; no public binary or source-distribution assurance is made",
-    "Specific Windows MKVToolNix static material and Linux QtCore route remain in release-distribution-closure.md"
+    "Windows MKVToolNix static covered-source/build material remains in release-distribution-closure.md; no additional missing Linux QtCore artifact was identified. Actual public source delivery and original-code license are still required."
   ]
 }

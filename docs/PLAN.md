@@ -6,7 +6,9 @@ The final milestone contains the reproduced chapter correction, the integration'
 
 Both complete required platform jobs remain mandatory, including real MKV/MP4 tests, packaging/inventory, relocation and the no-SDK/no-external-media/no-network Linux container. Native UIA, visual capture, headless tests and CLI/container execution remain distinct. The available host is Windows 10 Home Single Language 22H2 x64 `19045.6456`; Windows 11 25H2 and Ubuntu 24.04 Desktop are unavailable here. Prior native evidence is not relabeled as acceptance of the candidate.
 
-Only the finite [final release checklist](release-checklist.md) remains: actual outstanding covered-worker material/license route, the owner's original-code license decision, declared-target desktop/visual acceptance, and final candidate/publication review. No optional feature or evidence-only product phase is a prerequisite. The release-candidate PR remains draft and unmerged.
+Clean Windows/Linux review archives and a private inventoried source/notice/build-material bundle are prepared from `5ccb75afb24dd3b561d67d67c4010946d98aefb2`. Both complete required CI jobs passed for that candidate. A newly authorized Computer Use session initialized and launched its isolated Windows copy, then the owner stopped it before a UI baseline and requested no further Computer Use. No candidate native workflow or visual pass is claimed; historical results remain unchanged.
+
+Only the finite [final release checklist](release-checklist.md) remains: the specific Windows MKVToolNix static covered-material gap and actual source delivery, the owner's original-code license decision, consolidated declared-target desktop/visual acceptance, and final candidate/publication review. Linux QtCore source/build material is collected; no extra missing relink artifact was identified. No optional feature or evidence-only product phase is a prerequisite. The release-candidate PR remains draft and unmerged.
 
 ## Historical Phase 3 delivery
 
