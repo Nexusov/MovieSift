@@ -30,8 +30,11 @@ function Get-VerifiedSource {
         Invoke-WebRequest -Uri $Artifact.url -OutFile $artifactPath -TimeoutSec 240
     }
 
-    if ((Get-FileHash -LiteralPath $artifactPath -Algorithm SHA256).Hash.ToLowerInvariant() -ne $Artifact.sha256) {
-        throw "Source hash mismatch: $($Artifact.url). Preserve and inspect the incorrect cached file explicitly."
+    $actualHash = (Get-FileHash -LiteralPath $artifactPath -Algorithm SHA256).Hash.ToLowerInvariant()
+
+    if ($actualHash -ne $Artifact.sha256) {
+        $actualSize = (Get-Item -LiteralPath $artifactPath).Length
+        throw "Source hash mismatch: $($Artifact.url); expected=$($Artifact.sha256); actual=$actualHash; bytes=$actualSize. Preserve and inspect the incorrect cached file explicitly."
     }
 
     return $artifactPath
