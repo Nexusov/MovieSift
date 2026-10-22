@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using TrackTrim.Application.QueueLists;
 using TrackTrim.Core.Failures;
 using TrackTrim.Core.Media;
 using TrackTrim.Core.Planning;
@@ -6,7 +7,7 @@ using TrackTrim.Core.Rules;
 
 namespace TrackTrim.Application.Batches;
 
-/// <summary>Stores immutable per-file approvals and results for one non-persistent batch.</summary>
+/// <summary>Stores live per-file authority separately from recoverable source and destination intentions.</summary>
 public sealed class BatchSession
 {
     public const int MaximumItems = BatchDiscoveryLimits.MaximumFiles;
@@ -132,7 +133,35 @@ public sealed class BatchSession
             State = BatchItemState.Ready,
             Result = null,
             Failure = null,
-            RetainedTrackIds = request.Plan.RetainedTracks.Select(track => track.Id).ToImmutableArray()
+            RetainedTrackIds = request.Plan.RetainedTracks.Select(track => track.Id).ToImmutableArray(),
+            IntendedDestinationPath = request.Plan.DestinationPath,
+            IntendedOutputDirectoryRoot = request.Plan.OutputDirectoryRoot
+        }, null);
+    });
+
+    /// <summary>Records destination intent without granting approval or changing an actual Keep selection.</summary>
+    public BatchEditResult SetDestination(BatchDestinationRequest request) => EditItem(request.ItemId, item =>
+    {
+        if (request.OutputDirectoryRoot is not null && item.FolderOrigin is null)
+        {
+            return new(null, new(ErrorCode.InvalidDestination));
+        }
+
+        var unchanged = item.IntendedDestinationPath == request.DestinationPath &&
+            item.IntendedOutputDirectoryRoot == request.OutputDirectoryRoot;
+
+        if (unchanged)
+        {
+            return new(item, null);
+        }
+
+        return new(item with
+        {
+            IntendedDestinationPath = request.DestinationPath,
+            IntendedOutputDirectoryRoot = request.OutputDirectoryRoot,
+            ApprovedPlan = null,
+            State = item.Inspection is null ? item.State : BatchItemState.NeedsReview,
+            Failure = item.Inspection is null ? item.Failure : null
         }, null);
     });
 
@@ -172,6 +201,59 @@ public sealed class BatchSession
         State = item.Inspection is null ? BatchItemState.PendingInspection : BatchItemState.NeedsReview,
         Failure = null
     }, null));
+
+    /// <summary>Captures unfinished listing intentions only; publication facts exclude a row even after cleanup failure.</summary>
+    public QueueList CaptureQueueList()
+    {
+        lock (synchronization)
+        {
+            var entries = snapshot.Items.Where(item =>
+                item.State is not (BatchItemState.Completed or BatchItemState.NoChange) && item.Result?.PublishedPath is null)
+                .Select(item => new QueueListEntry(item.SourcePath, item.IntendedDestinationPath, item.Included,
+                    item.FolderOrigin, item.IntendedOutputDirectoryRoot)).ToImmutableArray();
+            return new(entries);
+        }
+    }
+
+    /// <summary>Restores a complete listing into an empty safe session without trusting old identities or authority.</summary>
+    internal BatchEditResult RestoreQueueList(QueueList list, long? expectedRevision)
+    {
+        BatchSnapshot updated;
+
+        lock (synchronization)
+        {
+            var failure = EditFailure();
+
+            if (failure is not null)
+            {
+                return new(false, DescribeResetFailure(failure));
+            }
+
+            var incompatibleSession = !snapshot.Items.IsEmpty ||
+                expectedRevision is { } revision && revision != snapshot.Revision;
+
+            if (incompatibleSession)
+            {
+                return new(false, new(ErrorCode.StalePlan));
+            }
+
+            var validation = QueueListPolicy.Validate(list);
+
+            if (validation is not null)
+            {
+                return new(false, new(ErrorCode.InvalidSelection, validation.Detail));
+            }
+
+            var items = list.Entries.Select(entry => new BatchItem(Guid.NewGuid(), entry.SourcePath, null,
+                Included: entry.Included, FolderOrigin: entry.FolderOrigin,
+                IntendedDestinationPath: entry.DestinationPath,
+                IntendedOutputDirectoryRoot: entry.OutputDirectoryRoot)).ToImmutableArray();
+            updated = snapshot = new(snapshot.Revision + 1, BatchPhase.Preparing, items);
+        }
+
+        Changed?.Invoke(updated);
+        return new(true);
+    }
 
     /// <summary>Atomically clears safe in-memory state after the coordinator has acquired its operation gate.</summary>
     internal BatchEditResult Reset(long? expectedRevision)

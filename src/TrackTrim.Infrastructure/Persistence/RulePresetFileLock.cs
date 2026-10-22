@@ -1,137 +1,26 @@
-using System.Runtime.InteropServices;
-using Microsoft.Win32.SafeHandles;
 using TrackTrim.Application.Presets;
-using TrackTrim.Infrastructure.Files;
 
 namespace TrackTrim.Infrastructure.Persistence;
 
-/// <summary>Owns an exclusive nonblocking process lock on a permanent regular sibling file.</summary>
-internal sealed class RulePresetFileLock(SafeFileHandle handle) : IDisposable
+/// <summary>Maps the portable record lock into the existing preset-specific outcomes.</summary>
+internal sealed class RulePresetFileLock(PortableRecordFileLock ownedLock) : IDisposable
 {
-    private const uint WindowsReadWrite = 0xC0000000;
-    private const uint WindowsOpenAlways = 4;
-    private const uint WindowsOpenReparsePoint = 0x00200000;
-    private const uint WindowsDiskFile = 1;
-    private const uint WindowsReparsePoint = 0x400;
-    private const int WindowsSharingViolation = 32;
-    private const int LinuxReadWrite = 2;
-    private const int LinuxCreate = 0x40;
-    private const int LinuxNonBlocking = 0x800;
-    private const int LinuxNoFollow = 0x20000;
-    private const int LinuxCloseOnExec = 0x80000;
-    private const uint LinuxOwnerReadWrite = 0x180;
-    private const uint LinuxTypeMask = 0xF000;
-    private const uint LinuxRegularFile = 0x8000;
-    private const int LinuxExclusiveNonBlockingLock = 2 | 4;
-    private const int LinuxWouldBlock = 11;
-
-    /// <summary>Rejects redirected paths and unsafe handles before acquiring a fail-fast OS lock.</summary>
+    /// <summary>Preserves fail-fast preset lock behavior while sharing its safe OS implementation.</summary>
     internal static RulePresetFileLock Acquire(string path)
     {
-        PathSafety.RejectReparsePoints(Path.GetDirectoryName(path)!);
-
-        if (OperatingSystem.IsWindows())
-        {
-            return AcquireWindows(path);
-        }
-
-        if (OperatingSystem.IsLinux() && RuntimeInformation.ProcessArchitecture == Architecture.X64)
-        {
-            return AcquireLinux(path);
-        }
-
-        throw Unavailable("Preset locking supports only Windows x64 and Linux x64.");
-    }
-
-    /// <summary>Closes only the owned descriptor; the stable lock path remains for the next process.</summary>
-    public void Dispose() => handle.Dispose();
-
-    /// <summary>Uses an exclusive Windows handle while opening the link itself for safe type validation.</summary>
-    private static RulePresetFileLock AcquireWindows(string path)
-    {
-        var opened = CreateFile(path, WindowsReadWrite, 0, IntPtr.Zero, WindowsOpenAlways,
-            WindowsOpenReparsePoint, IntPtr.Zero);
-
-        if (opened.IsInvalid)
-        {
-            var error = Marshal.GetLastPInvokeError();
-            opened.Dispose();
-            throw error == WindowsSharingViolation ? Busy() : Unavailable($"Could not open the preset lock (OS error {error}).");
-        }
-
         try
         {
-            var validInformation = NativeMethods.GetFileInformationByHandle(opened, out var information);
-            var regular = NativeMethods.GetFileType(opened) == WindowsDiskFile && validInformation &&
-                (information.Attributes & (uint)FileAttributes.Directory) == 0 &&
-                (information.Attributes & WindowsReparsePoint) == 0;
-
-            if (!regular)
-            {
-                throw Unavailable("The preset lock must be a regular file without redirection.");
-            }
-
-            return new(opened);
+            return new(PortableRecordFileLock.Acquire(path));
         }
-        catch
+        catch (PortableRecordLockException exception)
         {
-            opened.Dispose();
-            throw;
+            var failure = exception.IsBusy
+                ? new RulePresetFailure(RulePresetErrorCode.Busy, "Another process is updating the rule presets; retry the operation.")
+                : new RulePresetFailure(RulePresetErrorCode.PersistenceUnavailable, exception.Message);
+            throw new RulePresetStorageException(failure);
         }
     }
 
-    /// <summary>Opens without FIFO blocking or final-link traversal and locks the verified regular inode.</summary>
-    private static RulePresetFileLock AcquireLinux(string path)
-    {
-        var descriptor = Open(path, LinuxReadWrite | LinuxCreate | LinuxNonBlocking | LinuxNoFollow | LinuxCloseOnExec,
-            LinuxOwnerReadWrite);
-
-        if (descriptor < 0)
-        {
-            throw Unavailable($"Could not open the preset lock (OS error {Marshal.GetLastPInvokeError()}).");
-        }
-
-        var opened = new SafeFileHandle((IntPtr)descriptor, ownsHandle: true);
-
-        try
-        {
-            var regular = NativeMethods.FStat(descriptor, out var information) == 0 &&
-                (information.Mode & LinuxTypeMask) == LinuxRegularFile;
-
-            if (!regular)
-            {
-                throw Unavailable("The preset lock must be a regular file without redirection.");
-            }
-
-            if (Flock(descriptor, LinuxExclusiveNonBlockingLock) != 0)
-            {
-                var error = Marshal.GetLastPInvokeError();
-                throw error == LinuxWouldBlock ? Busy() : Unavailable($"Could not acquire the preset lock (OS error {error}).");
-            }
-
-            return new(opened);
-        }
-        catch
-        {
-            opened.Dispose();
-            throw;
-        }
-    }
-
-    /// <summary>Identifies contention separately from unsupported or unsafe persistence.</summary>
-    private static RulePresetStorageException Busy() => new(new(RulePresetErrorCode.Busy,
-        "Another process is updating the rule presets; retry the operation."));
-
-    /// <summary>Preserves an actionable operating-system or file-type failure.</summary>
-    private static RulePresetStorageException Unavailable(string detail) => new(new(RulePresetErrorCode.PersistenceUnavailable, detail));
-
-    [DllImport("kernel32.dll", EntryPoint = "CreateFileW", CharSet = CharSet.Unicode, SetLastError = true)]
-    private static extern SafeFileHandle CreateFile(string path, uint access, uint sharing, IntPtr security,
-        uint creation, uint flags, IntPtr template);
-
-    [DllImport("libc", EntryPoint = "open", SetLastError = true)]
-    private static extern int Open([MarshalAs(UnmanagedType.LPUTF8Str)] string path, int flags, uint mode);
-
-    [DllImport("libc", EntryPoint = "flock", SetLastError = true)]
-    private static extern int Flock(int descriptor, int operation);
+    /// <summary>Releases only this operation's owned descriptor.</summary>
+    public void Dispose() => ownedLock.Dispose();
 }
