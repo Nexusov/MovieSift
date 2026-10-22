@@ -12,10 +12,15 @@ public enum LanguageRuleIssueReason
     MalformedLanguage,
     ConflictingLanguage,
     NoAudioMatches,
-    InvalidCurrentSelection
+    InvalidCurrentSelection,
+    EmptyTitleFilter
 }
 
-public sealed record TrackLanguageRule(LanguageRuleMode Mode, ImmutableArray<string> Languages);
+public sealed record TrackTitleFilter(bool Enabled, string Text);
+public sealed record TrackLanguageRule(
+    LanguageRuleMode Mode,
+    ImmutableArray<string> Languages,
+    TrackTitleFilter? TitleFilter = null);
 public sealed record LanguageRules(TrackLanguageRule Audio, TrackLanguageRule Subtitles);
 public sealed record LanguageSelectionRequest(
     MediaInspection Inspection,

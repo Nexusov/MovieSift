@@ -80,6 +80,15 @@ public static class LanguageRuleMatcher
             return false;
         }
 
+        var hasTitleFilter = rule.TitleFilter is { Enabled: true };
+        var titleSearch = hasTitleFilter ? rule.TitleFilter?.Text?.Trim() : null;
+
+        if (hasTitleFilter && string.IsNullOrEmpty(titleSearch))
+        {
+            request.Issues.Add(new(request.Category, null, LanguageRuleIssueReason.EmptyTitleFilter, rule.TitleFilter?.Text));
+            return false;
+        }
+
         if (rule.Languages.IsDefaultOrEmpty)
         {
             request.Issues.Add(new(request.Category, null, LanguageRuleIssueReason.EmptyLanguageSelection));
@@ -120,7 +129,11 @@ public static class LanguageRuleMatcher
                 continue;
             }
 
-            if (requestedLanguages.Contains(language.Tag!))
+            var languageMatches = requestedLanguages.Contains(language.Tag!);
+            var titleMatches = titleSearch is null || !string.IsNullOrWhiteSpace(track.Title) &&
+                track.Title.Contains(titleSearch, StringComparison.OrdinalIgnoreCase);
+
+            if (languageMatches && titleMatches)
             {
                 matchingIdentifiers.Add(track.Id);
             }

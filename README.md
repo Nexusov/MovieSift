@@ -2,7 +2,7 @@
 
 TrackTrim is a portable Windows/Linux desktop application for removing selected embedded audio and subtitle tracks from local MKV files without re-encoding. It writes separate MKVs; originals remain on disk. Creating a trimmed copy does not free the original's space.
 
-This branch adds Phase 2A manual batch processing and Phase 2B1 explicit language-rule preview/application to the Phase 0/1 foundation. It is a review build, not a public release. [Acceptance status and executed checks](docs/PLAN.md) distinguish implemented code from verified behavior and outstanding platform requirements. CI builds and tests archives but uploads only test/provenance evidence while binary redistribution obligations remain unresolved.
+This branch adds Phase 2A manual batch processing and Phase 2B explicit language-rule preview/application with optional literal title constraints to the Phase 0/1 foundation. It is a review build, not a public release. [Acceptance status and executed checks](docs/PLAN.md) distinguish implemented code from verified behavior and outstanding platform requirements. CI builds and tests archives but uploads only test/provenance evidence while binary redistribution obligations remain unresolved.
 
 The application uses C#/.NET 10, Avalonia 12 with Fluent controls, CommunityToolkit.Mvvm, and pinned MKVToolNix executables. English is the initial language, including on a Russian OS. The English / Русский selector changes application text without discarding the current selection; the choice is saved beside the application.
 
@@ -25,17 +25,21 @@ The application uses C#/.NET 10, Avalonia 12 with Fluent controls, CommunityTool
 
 The queue exists only in memory. Closing uses the same owned-job shutdown and warning remain/discard policy; restart does not restore or resume the queue. Ownership journals retain their existing conservative interruption handling.
 
-### Explicit language rules
+### Explicit language and title rules
 
 In Batch, audio and subtitles each default to **leave current choices unchanged**. Enable a category and enter comma-separated language codes, then **Preview choices**. Every file shows its own retained/removed tracks, original metadata and manual-review reasons. Every matching track is retained, including multiple tracks in one language. **Apply preview** changes Keep choices only; inspect/edit each file, approve its plan and perform aggregate Review before Run.
 
 Supported ISO aliases match canonically, while complete script/region tags match exactly: `eng` matches `en`, but `ru` does not match `ru-RU`. Unknown, unsupported or conflicting targeted metadata, or no audio matches, leaves that whole file unchanged for manual review. No subtitle matches may keep no subtitles and is explicitly shown. See the [precise matching contract](docs/SUPPORTED_FORMATS.md#language-selection-rules) for supported tag syntax. Metadata is not proof of the language spoken.
 
+Each enabled category can additionally require **title contains**. This constraint defaults off and keeps every track matching **both** language and literal title text. Surrounding search whitespace is trimmed; comparison is culture-independent and case-insensitive (`OrdinalIgnoreCase`). Only the actual inspected track title is searched: missing/blank titles do not match, and neither filenames nor display fallbacks are used. An enabled blank search is invalid. Punctuation is literal, including `[]`, `.*` and `?`; there are no regexes or wildcards. Language uncertainty and zero-audio safeguards still apply to the whole file.
+
 Preview never edits selections or approvals. Relevant batch edits make it stale; only actual applied changes invalidate affected approvals and aggregate Review. Excluded/completed items remain unchanged. Rules do not approve, exclude or run unresolved files, and never apply automatically to later additions/reinspections. Language switching preserves the configuration and valid proposal; New batch clears transient proposals. Active work and unresolved ownership block preview/application through the existing gates.
 
 [Language-rule verification](docs/verification/phase-2b-language-rules-evidence.json) separates the real two-file backend case, controlled/headless tests, portable checks and the bounded Windows 10 native Preview/Apply/EN-RU functional check. Native source selection was owner-assisted; visual and target-desktop acceptance remain open.
 
-Do not use the application as a universal preservation tool. The [supported MKV matrix](docs/SUPPORTED_FORMATS.md) defines the inspected, verified, and rejected cases. Title/regex/forced-only rules, presets, recursive discovery, persisted queues/retries, MP4, playback and source replacement remain outside this implementation.
+[Literal-title verification](docs/verification/phase-2b-title-filter-evidence.json) records the real two-file conjunction/payload case, 56 focused tests, full platform CI and two bounded checks on the identified Phase 2B2 Windows 10 GUI: English title Preview/Apply, then both-category EN → RU → EN state preservation. After one fresh baseline Preview, the latter retained settings, proposal, paths and existing approval without another Preview, Apply, Review or Run. Source selection for the original check was owner-assisted; subsequent input used Computer Use. Visual and target-desktop acceptance remain open.
+
+Do not use the application as a universal preservation tool. The [supported MKV matrix](docs/SUPPORTED_FORMATS.md) defines the inspected, verified, and rejected cases. Title-only/regex/forced-only rules, presets, recursive discovery, persisted queues/retries, MP4, playback and source replacement remain outside this implementation.
 
 Preflight supplements MKVToolNix identification with bounded, read-only Segment Info inspection. Detected segment families and previous/next links are rejected before processing; layouts that cannot be inspected within those bounds fail explicitly. This check uses no additional media executable.
 

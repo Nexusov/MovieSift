@@ -9,7 +9,7 @@ using TrackTrim.Core.Rules;
 
 namespace TrackTrim.Desktop.ViewModels;
 
-/// <summary>Edits transient language rules and presents explicit, revision-bound per-file proposals.</summary>
+/// <summary>Edits language and optional literal-title rules with explicit, revision-bound per-file proposals.</summary>
 public sealed partial class BatchLanguageRulesViewModel : ObservableObject
 {
     private readonly BatchLanguageRulesOptions options;
@@ -32,6 +32,18 @@ public sealed partial class BatchLanguageRulesViewModel : ObservableObject
     [ObservableProperty]
     private string subtitleLanguages = string.Empty;
 
+    [ObservableProperty]
+    private bool audioTitleFilterEnabled;
+
+    [ObservableProperty]
+    private bool subtitleTitleFilterEnabled;
+
+    [ObservableProperty]
+    private string audioTitleContains = string.Empty;
+
+    [ObservableProperty]
+    private string subtitleTitleContains = string.Empty;
+
     /// <summary>Uses the existing batch owner and workspace availability without starting a media operation.</summary>
     public BatchLanguageRulesViewModel(BatchLanguageRulesOptions options)
     {
@@ -49,6 +61,8 @@ public sealed partial class BatchLanguageRulesViewModel : ObservableObject
     public bool CanConfigure => options.CanEdit();
     public bool CanEditAudioLanguages => CanConfigure && AudioRuleEnabled;
     public bool CanEditSubtitleLanguages => CanConfigure && SubtitleRuleEnabled;
+    public bool CanEditAudioTitle => CanEditAudioLanguages && AudioTitleFilterEnabled;
+    public bool CanEditSubtitleTitle => CanEditSubtitleLanguages && SubtitleTitleFilterEnabled;
     public bool HasPreview => preview is not null;
     public bool HasError => failure is not null;
     public bool IsApplied => applied;
@@ -105,6 +119,18 @@ public sealed partial class BatchLanguageRulesViewModel : ObservableObject
     /// <summary>Requires a new preview after an explicit subtitle language edit.</summary>
     partial void OnSubtitleLanguagesChanged(string value) => ClearPreview();
 
+    /// <summary>Requires a new preview after changing the optional audio title constraint.</summary>
+    partial void OnAudioTitleFilterEnabledChanged(bool value) => ClearPreview();
+
+    /// <summary>Requires a new preview after changing the optional subtitle title constraint.</summary>
+    partial void OnSubtitleTitleFilterEnabledChanged(bool value) => ClearPreview();
+
+    /// <summary>Discards a proposal after an audio title edit without changing any Keep choice.</summary>
+    partial void OnAudioTitleContainsChanged(string value) => ClearPreview();
+
+    /// <summary>Discards a proposal after a subtitle title edit without changing any Keep choice.</summary>
+    partial void OnSubtitleTitleContainsChanged(string value) => ClearPreview();
+
     /// <summary>Computes proposals from immutable live selections without invalidating any approval or review.</summary>
     private void PreviewChoices()
     {
@@ -113,7 +139,13 @@ public sealed partial class BatchLanguageRulesViewModel : ObservableObject
             return;
         }
 
-        var rules = new LanguageRules(CreateRule(AudioRuleEnabled, AudioLanguages), CreateRule(SubtitleRuleEnabled, SubtitleLanguages));
+        var audio = new TrackLanguageRule(
+            AudioRuleEnabled ? LanguageRuleMode.KeepMatching : LanguageRuleMode.Unchanged,
+            ParseLanguages(AudioLanguages), new(AudioTitleFilterEnabled, AudioTitleContains));
+        var subtitles = new TrackLanguageRule(
+            SubtitleRuleEnabled ? LanguageRuleMode.KeepMatching : LanguageRuleMode.Unchanged,
+            ParseLanguages(SubtitleLanguages), new(SubtitleTitleFilterEnabled, SubtitleTitleContains));
+        var rules = new LanguageRules(audio, subtitles);
         var result = options.Coordinator.PreviewLanguageRules(rules);
         failure = result.Failure;
         preview = result.Preview;
@@ -192,7 +224,6 @@ public sealed partial class BatchLanguageRulesViewModel : ObservableObject
     }
 
     /// <summary>Splits an explicit comma-separated list; Core validates and canonicalizes matching copies.</summary>
-    private static TrackLanguageRule CreateRule(bool enabled, string languages) => new(
-        enabled ? LanguageRuleMode.KeepMatching : LanguageRuleMode.Unchanged,
-        languages.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToImmutableArray());
+    private static ImmutableArray<string> ParseLanguages(string languages) =>
+        languages.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToImmutableArray();
 }
