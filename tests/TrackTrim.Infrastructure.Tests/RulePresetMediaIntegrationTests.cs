@@ -166,7 +166,7 @@ public sealed class RulePresetMediaIntegrationTests(ITestOutputHelper evidence)
                 previewId = preview.Id,
                 appliedIds = item.CurrentRetainedTrackIds,
                 retainedSubtitleId = retainedSubtitle.Id,
-                retainedSubtitleUid = retainedSubtitle.Uid.ToString(CultureInfo.InvariantCulture),
+                retainedSubtitleUid = retainedSubtitle.Uid!.Value.ToString(CultureInfo.InvariantCulture),
                 retainedSubtitleIsForced = retainedSubtitle.IsForced,
                 subtitlePayload = item.SourcePath == fixtures.First ? originalPayload : addedPayload,
                 remuxStarts,

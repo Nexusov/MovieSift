@@ -20,8 +20,24 @@ public sealed class OwnedProcessRunnerTests
         var result = await new OwnedProcessRunner().RunAsync(WorkerRequest(new WorkerOptions(["flood"])));
         Assert.Equal(0, result.ExitCode);
         Assert.True(result.OutputTruncated);
+        Assert.True(result.StandardErrorTruncated);
         Assert.Equal(OutputBoundCharacters, result.StandardOutput.Length);
         Assert.Equal(OutputBoundCharacters, result.StandardError.Length);
+    }
+
+    /// <summary>Separates benign retained stdout limits from lost warning diagnostics and structured protocol records.</summary>
+    [Fact]
+    public async Task ReportsProtocolTruncationWithoutConfusingItWithBoundedProgressRetention()
+    {
+        var lines = new List<string>();
+        var protocol = await new OwnedProcessRunner().RunAsync(WorkerRequest(new WorkerOptions(["protocol-lines"], lines.Add)));
+        Assert.True(protocol.ProtocolLineTruncated);
+        Assert.False(protocol.StandardErrorTruncated);
+        Assert.Equal(["complete-record"], lines);
+        var progress = await new OwnedProcessRunner().RunAsync(WorkerRequest(new WorkerOptions(["output-only"])));
+        Assert.True(progress.OutputTruncated);
+        Assert.False(progress.StandardErrorTruncated);
+        Assert.False(progress.ProtocolLineTruncated);
     }
 
     /// <summary>Proves that argument arrays preserve values without shell interpretation.</summary>

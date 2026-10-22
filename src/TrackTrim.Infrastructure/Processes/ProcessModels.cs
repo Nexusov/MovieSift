@@ -14,7 +14,9 @@ internal sealed record ProcessResult(
     int ExitCode,
     string StandardOutput,
     string StandardError,
-    bool OutputTruncated);
+    bool OutputTruncated,
+    bool StandardErrorTruncated = false,
+    bool ProtocolLineTruncated = false);
 
 /// <summary>Signals that safe process termination could not be established.</summary>
 public sealed class ProcessTerminationException(string message, Exception innerException)

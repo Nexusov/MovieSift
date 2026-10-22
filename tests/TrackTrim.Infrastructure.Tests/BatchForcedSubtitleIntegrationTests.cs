@@ -119,7 +119,7 @@ public sealed class BatchForcedSubtitleIntegrationTests(ITestOutputHelper eviden
                 var outputTrack = Assert.Single(output.Tracks, track => track.Uid == retained.Uid);
                 var compared = await MediaPayloadEvidence.AssertIdenticalAsync(new(item.SourcePath, retained.Id, plan.DestinationPath,
                     outputTrack.Id, workspace.Path, FormattableString.Invariant($"forced-{item.Id:N}-{retained.Id}")));
-                payloads.Add(new(retained.Id, outputTrack.Id, retained.Uid.ToString(CultureInfo.InvariantCulture), retained.Kind.ToString(), compared));
+                payloads.Add(new(retained.Id, outputTrack.Id, retained.Uid!.Value.ToString(CultureInfo.InvariantCulture), retained.Kind.ToString(), compared));
                 comparedTrackPayloads++;
 
                 if (retained.Kind == TrackKind.Subtitles)
@@ -153,7 +153,7 @@ public sealed class BatchForcedSubtitleIntegrationTests(ITestOutputHelper eviden
                 subtitleInputs = plan.Inspection.Tracks.Where(track => track.Kind == TrackKind.Subtitles).Select(track => new
                 {
                     track.Id,
-                    uid = track.Uid.ToString(CultureInfo.InvariantCulture),
+                    uid = track.Uid!.Value.ToString(CultureInfo.InvariantCulture),
                     track.Language,
                     track.LanguageIetf,
                     track.Title,

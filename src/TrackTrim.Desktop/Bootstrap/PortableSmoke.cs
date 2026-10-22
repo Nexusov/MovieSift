@@ -17,7 +17,7 @@ internal static class PortableSmoke
     private const int UsageExitCode = 64;
     private const int ExpectedWorkflowArgumentCount = 3;
 
-    /// <summary>Checks relocated bundled tools or executes one real safe MKV operation.</summary>
+    /// <summary>Checks relocated bundled tools or executes one real safe MKV/MP4 operation.</summary>
     public static async Task<int> RunAsync(string[] arguments)
     {
         using var cancellation = new CancellationTokenSource();
@@ -32,9 +32,14 @@ internal static class PortableSmoke
         {
             var sourceAccess = new FileSourceAccess();
             var paths = MkvToolPaths.FromApplicationDirectory();
-            var backend = new MkvBackend(new(sourceAccess, paths));
-            await backend.ValidateToolsAsync(cancellation.Token);
+            var matroska = new MkvBackend(new(sourceAccess, paths));
+            var ffmpegPaths = FfmpegToolPaths.FromApplicationDirectory();
+            var mp4 = new FfmpegBackend(new(sourceAccess, ffmpegPaths));
+            var backend = new ContainerMediaBackend(matroska, mp4);
+            await matroska.ValidateToolsAsync(cancellation.Token);
+            await mp4.ValidateToolsAsync(cancellation.Token);
             Console.WriteLine($"Bundled MKVToolNix {MkvToolPaths.SupportedVersion}: {paths.MkvMerge}; {paths.MkvExtract}");
+            Console.WriteLine($"Bundled FFmpeg {FfmpegToolPaths.SupportedVersion}: {ffmpegPaths.Ffmpeg}; {ffmpegPaths.Ffprobe}");
 
             if (arguments is ["--verify-tools"])
             {
@@ -43,7 +48,7 @@ internal static class PortableSmoke
 
             if (arguments.Length != ExpectedWorkflowArgumentCount || arguments[0] != "--verify-portable")
             {
-                Console.Error.WriteLine("Usage: --verify-tools | --verify-portable <source.mkv> <new-destination.mkv>");
+                Console.Error.WriteLine("Usage: --verify-tools | --verify-portable <source.mkv|mp4> <new-destination.mkv|mp4>");
                 return UsageExitCode;
             }
 

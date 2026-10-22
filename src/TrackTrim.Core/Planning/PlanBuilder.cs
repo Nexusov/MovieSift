@@ -38,7 +38,11 @@ public static class PlanBuilder
             return new(null, new(ErrorCode.ZeroAudioConfirmationRequired));
         }
 
-        if (string.IsNullOrWhiteSpace(request.DestinationPath))
+        var invalidContainerDestination = !Enum.IsDefined(inspection.Container) ||
+            string.IsNullOrWhiteSpace(request.DestinationPath) ||
+            MediaContainerPolicy.FromExtension(request.DestinationPath) != inspection.Container;
+
+        if (invalidContainerDestination)
         {
             return new(null, new(ErrorCode.InvalidDestination));
         }

@@ -103,7 +103,8 @@ internal sealed class OwnedProcessRunner
         var standardError = await standardErrorTask.ConfigureAwait(false);
         request.CancellationToken.ThrowIfCancellationRequested();
         return new ProcessResult(process.ExitCode, standardOutput.Text, standardError.Text,
-            standardOutput.Truncated || standardError.Truncated);
+            standardOutput.Truncated || standardError.Truncated,
+            standardError.Truncated, standardOutput.ProtocolLineTruncated);
     }
 
     /// <summary>Cancels pipe reads and observes both tasks when worker termination cannot be established.</summary>
@@ -150,6 +151,7 @@ internal sealed class OwnedProcessRunner
         var line = new StringBuilder();
         var truncated = false;
         var lineTruncated = false;
+        var protocolLineTruncated = false;
         int charactersRead;
 
         while ((charactersRead = await request.Reader.ReadAsync(buffer, request.CancellationToken).ConfigureAwait(false)) != 0)
@@ -188,6 +190,7 @@ internal sealed class OwnedProcessRunner
                 }
 
                 lineTruncated = true;
+                protocolLineTruncated = true;
             }
         }
 
@@ -196,10 +199,10 @@ internal sealed class OwnedProcessRunner
             request.LineCallback?.Invoke(line.ToString());
         }
 
-        return new DrainResult(retained.ToString(), truncated);
+        return new DrainResult(retained.ToString(), truncated, protocolLineTruncated);
     }
 
     private sealed record DrainRequest(StreamReader Reader, int MaximumCharacters, Action<string>? LineCallback, CancellationToken CancellationToken);
     private sealed record DrainageShutdown(CancellationTokenSource CancellationSource, Task<DrainResult> StandardOutput, Task<DrainResult> StandardError);
-    private sealed record DrainResult(string Text, bool Truncated);
+    private sealed record DrainResult(string Text, bool Truncated, bool ProtocolLineTruncated);
 }

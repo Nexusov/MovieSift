@@ -1,4 +1,5 @@
 using TrackTrim.Core.Failures;
+using TrackTrim.Core.Media;
 
 namespace TrackTrim.Core.Planning;
 
@@ -46,12 +47,12 @@ public static class OutputPathPolicy
             var invalidComponents = components.Any(component => component.Length == 0 ||
                 component is "." or ".." || component.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0);
 
-            if (invalidComponents || !string.Equals(Path.GetExtension(components[^1]), ".mkv", StringComparison.OrdinalIgnoreCase))
+            if (invalidComponents || MediaContainerPolicy.FromExtension(components[^1]) is null)
             {
                 return InvalidDestination();
             }
 
-            var outputName = Path.GetFileNameWithoutExtension(components[^1]) + ".trimmed.mkv";
+            var outputName = MediaContainerPolicy.TrimmedFileName(components[^1]);
             var relativeOutput = Path.Combine([.. components[..^1], outputName]);
             var destination = Path.GetFullPath(Path.Combine(request.OutputRoot, relativeOutput));
 

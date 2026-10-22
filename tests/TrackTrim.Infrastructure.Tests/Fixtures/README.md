@@ -1,6 +1,6 @@
 # Test fixture provenance
 
-All media content is original synthetic project test data: color frames, distinct sine tones, subtitles, chapter text, tags and a text attachment. No external movie, soundtrack or subtitle content was downloaded. Fixture encoders and binaries are development inputs; FFmpeg and all test fixtures are excluded from production archives.
+All media content is original synthetic project test data: color frames, distinct sine tones, subtitles, chapter text, tags and a text attachment. No external movie, soundtrack or subtitle content was downloaded. Test media and fixture generators are excluded from production archives. The pinned FFmpeg/ffprobe pair now ships for MP4 stream copying; fixture encoding remains a development-only operation.
 
 ## Generated MKVToolNix fixtures and captured text
 
@@ -25,4 +25,10 @@ The adjacent [9.0.2 provenance](h264-aac-aliases.provenance.json) and [7.1.1 pro
 
 Separate generated real-tool chapter/tag fixtures keep `ger`/`fre` legacy fields while intentionally omitting IETF fields at creation. The ordinary pinned remux adds equivalent chapter `de`/`fr` IETF fields and leaves tag IETF fields absent; raw chapter/tag legacy fields are retained. Equivalent tag-field addition is checked in its own real metadata case, rather than assuming every remux emits it. Both use the same explicit alias table as track languages and are independent of the negative 9.0.2 timing fixture.
 
-Use `build/generate-ffmpeg-fixture.py` with an explicitly provided matching encoder to regenerate a sample and its JSON provenance. Normal test runs and CI read the checked-in inputs and require no FFmpeg installation. Exact output hashes may depend on the recorded encoder build; inspect any fixture/provenance change independently.
+Use `build/generate-ffmpeg-fixture.py` with an explicitly provided matching encoder to regenerate a sample and its JSON provenance. These MKV regressions read the checked-in inputs. Exact output hashes may depend on the recorded encoder build; inspect any fixture/provenance change independently.
+
+## Generated MP4 fixtures
+
+`build/generate-mp4-fixtures.py` verifies the original 7.1.1 input hash above, copies its encoded H.264/AAC, and creates small original mov_text captions, two chapters and PNG/JPEG covers using the pinned bundled FFmpeg. A separate native AAC encoding exercises priming with B-frame video. Ordinary, reordered, multiple-video, priming and deliberately fragmented files are generated under `artifacts/fixtures/mp4`; `mp4-provenance.json` records every command, actual tool version/configuration and complete file SHA256. They are required CI inputs, not shipped application media.
+
+Production Preview/Apply derives independent language/title/forced selections for the reordered files before approval and mixed MKV/MP4 queue execution. Real tests compare retained encoded packet payloads, exact rational packet timing/skip information, supported metadata/chapters/artwork, complete source hashes and owned cleanup. Controlled box/probe documents separately test rejected structures and malformed output; they are not real-media acceptance.

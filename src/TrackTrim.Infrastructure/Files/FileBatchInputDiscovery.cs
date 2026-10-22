@@ -8,7 +8,7 @@ using TrackTrim.Core.Planning;
 
 namespace TrackTrim.Infrastructure.Files;
 
-/// <summary>Discovers bounded local MKV candidates through explicitly checked folder traversal.</summary>
+/// <summary>Discovers bounded local MKV/MP4 candidates through explicitly checked folder traversal.</summary>
 public sealed class FileBatchInputDiscovery(ISourceAccess sourceAccess, IOutputStore? ownedOutputs = null,
     IReadOnlyList<string>? workingDirectories = null) : IBatchInputDiscovery
 {
@@ -36,7 +36,7 @@ public sealed class FileBatchInputDiscovery(ISourceAccess sourceAccess, IOutputS
         if (!validShape)
         {
             return Task.FromResult(Reject(new Failure(ErrorCode.InvalidSource,
-                "Choose explicit MKV files or exactly one folder.", ErrorReason.InvalidBatchInput)));
+                "Choose explicit MKV/MP4 files or exactly one folder.", ErrorReason.InvalidBatchInput)));
         }
 
         if (request.Paths!.Count > BatchDiscoveryLimits.MaximumExaminedEntries)
@@ -94,10 +94,10 @@ public sealed class FileBatchInputDiscovery(ISourceAccess sourceAccess, IOutputS
                     continue;
                 }
 
-                if (!string.Equals(Path.GetExtension(canonicalPath), ".mkv", StringComparison.OrdinalIgnoreCase))
+                if (MediaContainerPolicy.FromExtension(canonicalPath) is null)
                 {
                     throw new OperationFailureException(new Failure(ErrorCode.UnsupportedContainer,
-                        "Only MKV file candidates are included in this phase."));
+                        "Only MKV and MP4 file candidates are supported."));
                 }
 
                 var source = await sourceAccess.ReadRevisionAsync(new SourceRequest(
@@ -214,7 +214,7 @@ public sealed class FileBatchInputDiscovery(ISourceAccess sourceAccess, IOutputS
                     continue;
                 }
 
-                if (string.Equals(Path.GetExtension(entry), ".mkv", StringComparison.OrdinalIgnoreCase))
+                if (MediaContainerPolicy.FromExtension(entry) is not null)
                 {
                     candidates.Add(entry);
                 }
@@ -300,7 +300,7 @@ public sealed class FileBatchInputDiscovery(ISourceAccess sourceAccess, IOutputS
         if (!Path.IsPathFullyQualified(path))
         {
             throw new OperationFailureException(new Failure(ErrorCode.InvalidSource,
-                "Choose an absolute local MKV file path.", ErrorReason.InvalidBatchInput));
+                "Choose an absolute local MKV or MP4 file path.", ErrorReason.InvalidBatchInput));
         }
 
         return Path.GetFullPath(path);

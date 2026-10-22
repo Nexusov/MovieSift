@@ -40,7 +40,8 @@ public sealed class JobCoordinator(IMediaBackend backend, ISourceAccess sourceAc
             }
 
             var destinationRequest = new ValidateDestinationRequest(request.Plan.Inspection.Source, request.Plan.DestinationPath,
-                request.Plan.Inspection.Source.Length, request.CancellationToken, request.Plan.OutputDirectoryRoot);
+                request.Plan.Inspection.Source.Length, request.CancellationToken, request.Plan.OutputDirectoryRoot,
+                request.Plan.Inspection.Container);
             await sourceAccess.ValidateDestinationAsync(destinationRequest);
 
             if (request.Plan.OutputDirectoryRoot is not null)
@@ -54,7 +55,7 @@ public sealed class JobCoordinator(IMediaBackend backend, ISourceAccess sourceAc
             var tool = await backend.RemuxAsync(new(request.Plan, output.CandidatePath, progress, request.CancellationToken));
             result = result with { Phase = JobPhase.Remuxing, Tool = tool };
 
-            if (tool.ExitCode is not (0 or 1))
+            if (tool.EffectiveDisposition is not (ToolDisposition.Success or ToolDisposition.WarningReview))
             {
                 throw new OperationFailureException(new(ErrorCode.ToolFailed, tool.Diagnostics));
             }
@@ -75,7 +76,7 @@ public sealed class JobCoordinator(IMediaBackend backend, ISourceAccess sourceAc
             await outputStore.ValidateOwnershipAsync(new(output, request.CancellationToken));
             request.CancellationToken.ThrowIfCancellationRequested();
 
-            if (tool.ExitCode == 1)
+            if (tool.EffectiveDisposition == ToolDisposition.WarningReview)
             {
                 result = result with { Phase = JobPhase.AwaitingWarningReview };
                 pendingWarning = new(request.Plan, output, result);
@@ -214,7 +215,7 @@ public sealed class JobCoordinator(IMediaBackend backend, ISourceAccess sourceAc
         await ValidatePlanAsync(new(request.Plan, request.CancellationToken));
         // The adjacent candidate is already allocated; renaming it does not allocate a second media payload.
         await sourceAccess.ValidateDestinationAsync(new(request.Plan.Inspection.Source, request.Plan.DestinationPath,
-            AdditionalAllocationBytes: 0, request.CancellationToken, request.Plan.OutputDirectoryRoot));
+            AdditionalAllocationBytes: 0, request.CancellationToken, request.Plan.OutputDirectoryRoot, request.Plan.Inspection.Container));
         await outputStore.ValidateOwnershipAsync(new(request.Output, request.CancellationToken));
         await ValidateCandidateAsync(new(request.Output.CandidatePath, request.CandidateRevision, request.CancellationToken));
         request.CancellationToken.ThrowIfCancellationRequested();

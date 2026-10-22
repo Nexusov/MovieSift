@@ -4,6 +4,7 @@ namespace TrackTrim.Core.Media;
 
 public enum TrackKind { Video, Audio, Subtitles }
 public enum TrackDisposition { HearingImpaired, VisualImpaired, TextDescriptions, Original, Commentary }
+public enum MediaContainer { Matroska, Mp4 }
 
 public sealed record SourceRevision(string FullPath, string FileIdentity, long Length, long LastWriteUtcTicks);
 
@@ -11,7 +12,7 @@ public sealed record BackendIdentity(string Name, string Version, int Identifica
 
 public sealed record MediaTrack(
     int Id,
-    ulong Uid,
+    ulong? Uid,
     TrackKind Kind,
     string Codec,
     string Language,
@@ -33,4 +34,6 @@ public sealed record MediaInspection(
     ImmutableArray<Attachment> Attachments,
     string Title,
     bool HasChapters,
-    bool HasTags);
+    bool HasTags,
+    MediaContainer Container = MediaContainer.Matroska,
+    ImmutableDictionary<string, string>? ContainerProperties = null);

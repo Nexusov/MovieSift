@@ -153,7 +153,7 @@ public sealed class BatchRepeatSessionIntegrationTests(ITestOutputHelper evidenc
                 previousOutputHashAfter,
                 retained = plan.RetainedTracks.Select(track => new
                 {
-                    uid = track.Uid.ToString(CultureInfo.InvariantCulture),
+                    uid = track.Uid!.Value.ToString(CultureInfo.InvariantCulture),
                     sourceTrackId = track.Id,
                     outputTrackId = output.Tracks.Single(candidate => candidate.Uid == track.Uid).Id,
                     kind = track.Kind.ToString(),

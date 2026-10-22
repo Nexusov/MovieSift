@@ -131,12 +131,12 @@ public sealed class BatchTitleFilterIntegrationTests(ITestOutputHelper evidence)
                 originalTracks = plan.Inspection.Tracks.Select(track => new
                 {
                     track.Id,
-                    uid = track.Uid.ToString(CultureInfo.InvariantCulture),
+                    uid = track.Uid!.Value.ToString(CultureInfo.InvariantCulture),
                     track.Title,
                     track.Language,
                     track.LanguageIetf
                 }),
-                retained = output.Tracks.Select(track => new { outputId = track.Id, uid = track.Uid.ToString(CultureInfo.InvariantCulture), payloadCompared = true }),
+                retained = output.Tracks.Select(track => new { outputId = track.Id, uid = track.Uid!.Value.ToString(CultureInfo.InvariantCulture), payloadCompared = true }),
                 metadataAndTimestampsVerified = verified.Passed,
                 cleanupIssues = result.CleanupIssues.Length
             }));

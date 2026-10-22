@@ -54,6 +54,13 @@ internal static class Program
             case "warning":
                 Console.Error.WriteLine("Controlled warning exit; this is not a real mkvmerge warning fixture.");
                 return 1;
+            case "protocol-lines":
+                Console.WriteLine(new string('x', FloodChunkCharacters * 2));
+                Console.WriteLine("complete-record");
+                return 0;
+            case "output-only":
+                await WriteFloodAsync(Console.Out);
+                return 0;
             case "preset-lock":
                 if (arguments.Length != 2)
                 {

@@ -1,0 +1,479 @@
+{
+  "schemaVersion": 1,
+  "milestone": "Phase 3 MP4",
+  "comparisonBase": "afe537466c7351e896bce875d551badd2b4a29de",
+  "codeRevision": "83cc46aeb97783fbb5421674aac49dd4f3765e9c",
+  "branch": "review/phase-3-mp4",
+  "dependentDraftPr": "https://github.com/Nexusov/TrackTrim/pull/9",
+  "scope": "MP4-to-MP4 stream copy through the existing single/mixed sequential workflow; no conversion or transcoding.",
+  "contract": "../SUPPORTED_FORMATS.md#mp4-preservation-contract",
+  "integrationChapterCorrection": {
+    "reviewBase": "9eb0652c6614df5d526b57e80464c3c86bab3b6c",
+    "platform": "Windows 10 Home Single Language 22H2 x64, 19045.6456",
+    "method": "Real pinned FFmpeg through InspectionService, PlanBuilder, JobCoordinator and OwnedOutputStore; not native GUI",
+    "recipe": "build/mp4_chapter_fixtures.py, invoked by build/generate-mp4-fixtures.py",
+    "distinctFixture": {
+      "sha256": "6e0d1ced7ba07674ab6c30108023c3d3fd8d1984ced1b79f97c955d411b529b4",
+      "chapterTrackIds": [8, 9],
+      "samplesPerTrack": [2, 2],
+      "firstTitles": ["First chapter", "Вторая глава"],
+      "secondTitles": ["Other chapter", "Another chapter variant"],
+      "neroChapterList": false
+    },
+    "beforeCorrection": {
+      "result": "Regression failed: accepted, remux exit 0, verification passed, published Completed",
+      "outputChapterTracks": 1,
+      "outputAggregateTitles": ["Other chapter", "Another chapter variant"],
+      "lostFirstChapterList": true,
+      "sourceUnchanged": true,
+      "localReceipt": "TestResults/phase3-regressions/multiple-qt-chapters-red-valid-header.trx"
+    },
+    "afterCorrection": {
+      "result": "UnsupportedFeature at capability inspection",
+      "remuxWorkers": 0,
+      "outputCandidateAndJournalAbsent": true,
+      "sourceUnchanged": true,
+      "distinctReferencedChapterTrackLimit": 1,
+      "focusedTestsPassed": 40,
+      "failed": 0,
+      "skipped": 0,
+      "localReceipt": "TestResults/phase3-regressions/multiple-qt-chapters-green.trx"
+    },
+    "completeLocalVerification": {
+      "executedBeforeThisCoherentCommit": true,
+      "lockedRestoreAndFormatting": "passed",
+      "releaseBuildWarnings": 0,
+      "releaseBuildErrors": 0,
+      "corePassed": 175,
+      "applicationPassed": 279,
+      "infrastructurePassed": 406,
+      "desktopHeadlessPassed": 123,
+      "totalPassed": 983,
+      "linuxOnlySkippedOnWindows": 23,
+      "failed": 0,
+      "pythonPassed": 22,
+      "receipts": "TestResults/final-chapter-correction/*.trx; required platform CI is reported on PR #9"
+    },
+    "repeatedReferenceControl": {
+      "sha256": "4b93c026377cc0e7a20e51f26688a0cb3bdbd17b3cf192a5d8fd5b068642b5bb",
+      "distinctChapterTrackIds": [8],
+      "result": "Completed with one preserved chapter list; source unchanged; owned cleanup empty"
+    },
+    "scope": "Repeated references to one chapter track, ordinary single-track PNG/JPEG cases and existing Nero consistency checks pass. Raw local TRX paths are receipts, not committed binaries or private machine logs. Historical package and CI observations below retain their original revision."
+  },
+  "verification": {
+    "commands": [
+      "dotnet restore --locked-mode",
+      "dotnet format --verify-no-changes --no-restore",
+      "dotnet build --configuration Release --no-restore",
+      "python -m unittest discover -s build/tests -v",
+      "dotnet test --configuration Release --no-build --no-restore --logger trx",
+      "build/package.ps1 with both FixturePath and Mp4FixturePath",
+      "build/verify-package.ps1 on each final archive with both fixtures",
+      "build/verify-clean-linux.sh with MKV and MP4 fixtures (required Linux CI)"
+    ],
+    "mandatoryEnvironment": {
+      "TRACKTRIM_REQUIRE_MEDIA_TOOLS": "1",
+      "tools": "Pinned MKVToolNix 102.0 and FFmpeg/ffprobe n9.0.2-17-g2a571b6068-20260930",
+      "fixtures": "Original generated MKV and build/generate-mp4-fixtures.py outputs"
+    },
+    "localWindows": {
+      "platform": "Windows 10 Home Single Language 22H2 x64, 19045.6456",
+      "method": "CLI, real filesystem/process/media and Avalonia headless; no native GUI",
+      "sourceContentRevision": "83cc46aeb97783fbb5421674aac49dd4f3765e9c",
+      "testsExecutedBeforeCoherentCommits": true,
+      "lockedRestore": "passed",
+      "formatting": "passed",
+      "releaseBuild": {
+        "warnings": 0,
+        "errors": 0
+      },
+      "groups": {
+        "Core": {
+          "passed": 175
+        },
+        "Application": {
+          "passed": 279,
+          "linuxOnlySkipped": 4
+        },
+        "Infrastructure": {
+          "passed": 404,
+          "linuxOnlySkipped": 19
+        },
+        "DesktopHeadless": {
+          "passed": 123
+        }
+      },
+      "totalPassed": 981,
+      "failed": 0,
+      "linuxOnlySkipped": 23,
+      "pythonPassed": 22
+    },
+    "localLinux": {
+      "platform": "Ubuntu 24.04.5 LTS x64 in an owned development container on the Windows host",
+      "method": "Actual Linux CLI, filesystem/process/media and headless UI; SDK present; no desktop acceptance",
+      "sourceRevision": "83cc46aeb97783fbb5421674aac49dd4f3765e9c",
+      "worktreeDirty": false,
+      "lockedRestore": "passed",
+      "formatting": "passed",
+      "releaseBuild": {
+        "warnings": 0,
+        "errors": 0
+      },
+      "groups": {
+        "Core": 175,
+        "Application": 283,
+        "Infrastructure": 423,
+        "DesktopHeadless": 123
+      },
+      "totalPassed": 1004,
+      "failed": 0,
+      "skipped": 0,
+      "pythonPassed": 22
+    },
+    "codeCi": {
+      "run": "https://github.com/Nexusov/TrackTrim/actions/runs/39790820108",
+      "head": "83cc46aeb97783fbb5421674aac49dd4f3765e9c",
+      "actualCheckout": "7294d485b7cd2dcf19104f84cd6d0268b6ee2248",
+      "parents": [
+        "afe537466c7351e896bce875d551badd2b4a29de",
+        "83cc46aeb97783fbb5421674aac49dd4f3765e9c"
+      ],
+      "checkoutAndHeadTree": "2471a3d7ae30db2963a1fa1f9ad0a2437633cb0e",
+      "worktreeDirty": false,
+      "requiredChecks": {
+        "Required media checks and win-x64 package": "passed",
+        "Required media checks and linux-x64 package": "passed"
+      },
+      "windows": "981 passed + 23 existing Linux-only skips; 22 Python passed",
+      "linux": "1004 passed, no skips; 22 Python passed",
+      "packagingInventoryRelocation": "passed for both containers/platforms",
+      "linuxCleanContainer": "passed: non-root, network disabled, no installed dotnet/mkvmerge/mkvextract/ffmpeg/ffprobe; both actual workflows",
+      "evidenceUpload": "Compact test/provenance reports only; no binaries or source archives",
+      "finalEvidenceHeadCi": "Current final-HEAD links/provenance belong in PR #9 and the final report; this record does not claim a future checkout was tested."
+    }
+  },
+  "artifacts": [
+    {
+      "runtimeIdentifier": "win-x64",
+      "build": {
+        "schemaVersion": 1,
+        "runtimeIdentifier": "win-x64",
+        "sdkVersion": "10.0.402",
+        "runtimeVersion": "10.0.13",
+        "sourceRevision": "83cc46aeb97783fbb5421674aac49dd4f3765e9c",
+        "sourceTree": "2471a3d7ae30db2963a1fa1f9ad0a2437633cb0e",
+        "sourceParents": [
+          "5a45100f8f2b75b8b6e2919aa6d65ef7caaea051"
+        ],
+        "worktreeDirty": false,
+        "configuration": "Release; self-contained; untrimmed; non-single-file; no AOT",
+        "operatingSystem": "Microsoft Windows 10.0.19045",
+        "artifactPurpose": "review and acceptance testing; public-release obligations remain"
+      },
+      "archive": {
+        "name": "TrackTrim-win-x64.zip",
+        "size": 246420740,
+        "sha256": "57c3a9bb513d7b91d4220a0cf9d213715ef3b77fac6eab412f5f93ddd71486ac"
+      },
+      "localReviewLocation": "phase3-review-83cc46a/win-x64/TrackTrim-win-x64.zip",
+      "shippedFiles": 837,
+      "manifestPayloads": 836,
+      "mechanicalChecks": {
+        "manifestCoverage": "passed",
+        "archiveMatchesStaging": "passed",
+        "includedMaterialReferences": "passed",
+        "pinnedMkvSourceHash": "passed",
+        "pinnedFfmpegSourceBuildAndVersion": "passed"
+      },
+      "packagedMkvAndMp4Workflow": "passed",
+      "relocationMkvAndMp4Workflow": "passed"
+    },
+    {
+      "runtimeIdentifier": "linux-x64",
+      "build": {
+        "schemaVersion": 1,
+        "runtimeIdentifier": "linux-x64",
+        "sdkVersion": "10.0.402",
+        "runtimeVersion": "10.0.13",
+        "sourceRevision": "83cc46aeb97783fbb5421674aac49dd4f3765e9c",
+        "sourceTree": "2471a3d7ae30db2963a1fa1f9ad0a2437633cb0e",
+        "sourceParents": [
+          "5a45100f8f2b75b8b6e2919aa6d65ef7caaea051"
+        ],
+        "worktreeDirty": false,
+        "configuration": "Release; self-contained; untrimmed; non-single-file; no AOT",
+        "operatingSystem": "Ubuntu 24.04.5 LTS",
+        "artifactPurpose": "review and acceptance testing; public-release obligations remain"
+      },
+      "archive": {
+        "name": "TrackTrim-linux-x64.tar.gz",
+        "size": 241284021,
+        "sha256": "4521ab8ce809206ed9350d2e2e5f615a9c3737694dc1bdec6fc2c59ea62b16da"
+      },
+      "localReviewLocation": "phase3-linux-development/package-83cc46a/TrackTrim-linux-x64.tar.gz",
+      "shippedFiles": 815,
+      "manifestPayloads": 814,
+      "mechanicalChecks": {
+        "manifestCoverage": "passed",
+        "archiveMatchesStaging": "passed",
+        "includedMaterialReferences": "passed",
+        "pinnedMkvSourceHash": "passed",
+        "pinnedFfmpegSourceBuildAndVersion": "passed"
+      },
+      "packagedMkvAndMp4Workflow": "passed",
+      "relocationMkvAndMp4Workflow": "passed"
+    }
+  ],
+  "fixtures": {
+    "generator": "build/generate-mp4-fixtures.py",
+    "originalInput": "h264-aac-no-default-duration.mkv",
+    "originalInputSha256": "b0b5fc3c0e290fb435be3cc09a1952ccfc343d93c2d6d13e9e8332e55b791000",
+    "generatedFiles": [
+      {
+        "path": "ordinary.mp4",
+        "bytes": 34046,
+        "sha256": "b5a94767353d2e895ea04f5f1650df1f561fc507b4cb2db277f556c6b9a77112"
+      },
+      {
+        "path": "reordered.mp4",
+        "bytes": 34086,
+        "sha256": "28477a32d4a51670aba9dfc2ac14bc74f7c25d66a61cbb5592f7bdd63d0cd6f1"
+      },
+      {
+        "path": "multi-video.mp4",
+        "bytes": 26390,
+        "sha256": "e3072370d91b94c0970c24399046299afc59d5a4e3b84c97c827023a9470cd44"
+      },
+      {
+        "path": "fragmented.mp4",
+        "bytes": 12482,
+        "sha256": "7025a5d7d898e5def6c44e10b47f2427ef3263a0e3a7923fd8f99b5c0121e4e7"
+      },
+      {
+        "path": "priming-bframes.mp4",
+        "bytes": 17085,
+        "sha256": "5ab68691e45160c88c4ced2fc079b5efc435db386b758ac4670b63592130aec9"
+      },
+      {
+        "path": "jpeg-artwork.mp4",
+        "bytes": 34017,
+        "sha256": "2b6873d69f2b915e96089fcd7842af13abdb40cb5890e9783ada94d47519ffae"
+      },
+      {
+        "path": "original artwork.png",
+        "bytes": 132,
+        "sha256": "49396ec227b745c4e493f91db3768fd9b65281e04d4838ec2232e691f6745a5e"
+      },
+      {
+        "path": "original artwork.jpg",
+        "bytes": 234,
+        "sha256": "314c5f43aeedabd70111c5daa249cff37f7a65a6132a7f6d086ccce7df5ac2f8"
+      },
+      {
+        "path": "original forced.srt",
+        "bytes": 79,
+        "sha256": "28032bf958aa3b36fea5595af590c799dc2dd0af29199b00b22a73fcafb586ed"
+      },
+      {
+        "path": "original chapters.ffmetadata",
+        "bytes": 260,
+        "sha256": "dd68e9e7c9a2806fddb3596655c4663f52dc7869c3b9bd681fc5a473cb6e6cac"
+      }
+    ],
+    "provenance": "Generated mp4-provenance.json records exact commands, executable hash and actual version/configuration per platform. Encoding is development-only.",
+    "recordedOn": "Local Windows fixture generation; Linux/CI record their own generated hashes in provenance and TRX."
+  },
+  "realMedia": {
+    "newCasesPassed": 12,
+    "coverage": [
+      "Distinct same-codec/language AAC and deliberately different local stream orders",
+      "Production Restore -> fresh inspection -> language/title/forced Preview/Apply -> explicit independent approvals/Review -> mixed sequential jobs",
+      "All subtitles removed; only default audio removed while two non-default audio remain; confirmed zero audio and no-change",
+      "Multiple H.264 video streams; ordinary chapters/common tags; PNG and JPEG artwork",
+      "AAC priming/skip information, B-frame and simple rate-one edit presentation timing",
+      "Actual fragmented-file rejection; wrong encoded audio rejected despite matching copied metadata",
+      "Real FFmpeg failure and retained-live-handle cancellation/reap; source hashes unchanged",
+      "Destination sentinel created at observed process start preserved; no output overwrite",
+      "Known tkhd preview flag survives publication; separately tampered candidate fails verification"
+    ],
+    "payloadMethod": "Independent streamed ffprobe packet SHA256/size/order/count comparisons for each retained MP4 input/output mapping; MKV uses existing encoded extraction helpers. Production MP4 verification additionally checks exact rational PTS/DTS/duration, packet flags and AAC skip/discard padding.",
+    "mixedWindowsReceipts": [
+      {
+        "kind": "real-mixed-restored-batch",
+        "source": "Season 1/episode.mkv",
+        "destination": "Season 1/episode.trimmed.mkv",
+        "container": "Matroska",
+        "sourceSha256": "055C7F3EBDC3C579DD6D7740C78A1E8EE0E2525F23542B5C6AF9A0869CE4A0F8",
+        "sourceUnchanged": true,
+        "outputSha256": "244063C6D4E3A00465B4ED39944FCBA5981E4C589979602D2357E08BC98182E6",
+        "payloadEvidence": [
+          {
+            "SourceSha256": "6A290A6583F3B4269AC0C3EB32B27285DD7511ABB6A632AFEEAA7BE61399D8DD",
+            "OutputSha256": "6A290A6583F3B4269AC0C3EB32B27285DD7511ABB6A632AFEEAA7BE61399D8DD",
+            "Bytes": 1312
+          },
+          {
+            "SourceSha256": "DF961853F7276107B6162929061318B051FECBBEFA5263C548906BF286B69A8B",
+            "OutputSha256": "DF961853F7276107B6162929061318B051FECBBEFA5263C548906BF286B69A8B",
+            "Bytes": 192104
+          }
+        ],
+        "ownedCleanupIssues": 0,
+        "verificationPassed": true
+      },
+      {
+        "kind": "real-mixed-restored-batch",
+        "source": "Season 2/episode.mp4",
+        "destination": "Season 2/episode.trimmed.mp4",
+        "container": "Mp4",
+        "sourceSha256": "B5A94767353D2E895EA04F5F1650DF1F561FC507B4CB2DB277F556C6B9A77112",
+        "sourceUnchanged": true,
+        "outputSha256": "77DF50906883CF143836285D41D7899A4A442FF80258A3BE08886FD0E983F71A",
+        "payloadEvidence": [
+          {
+            "sourceIndex": 0,
+            "outputIndex": 0,
+            "payload": {
+              "Packets": 50,
+              "Bytes": 1400,
+              "Sha256": "CCE1EEDD2B4E22C2CBD72D3772C08A411280F3258A1659EF1CFB4A0BFF50A9AB"
+            }
+          },
+          {
+            "sourceIndex": 2,
+            "outputIndex": 1,
+            "payload": {
+              "Packets": 95,
+              "Bytes": 8138,
+              "Sha256": "66EAB973B109E2FFD4946F4DC1F96FD424A30A4959FB022985F757FAC2272279"
+            }
+          },
+          {
+            "sourceIndex": 5,
+            "outputIndex": 2,
+            "payload": {
+              "Packets": 2,
+              "Bytes": 47,
+              "Sha256": "CF178FC285D17AAC920EE770DA1A2166A68D98DFD1E944CEBDEC4EF9005A8122"
+            }
+          },
+          {
+            "sourceIndex": 7,
+            "outputIndex": 4,
+            "payload": {
+              "Packets": 1,
+              "Bytes": 132,
+              "Sha256": "EA25C59C866BA2F8541CF96F345598C84B86079E1B365B9E63DA6DCCFBAE6EC6"
+            }
+          }
+        ],
+        "ownedCleanupIssues": 0,
+        "verificationPassed": true
+      },
+      {
+        "kind": "real-mixed-restored-batch",
+        "source": "Season 3/episode.mp4",
+        "destination": "Season 3/episode.trimmed.mp4",
+        "container": "Mp4",
+        "sourceSha256": "28477A32D4A51670ABA9DFC2AC14BC74F7C25D66A61CBB5592F7BDD63D0CD6F1",
+        "sourceUnchanged": true,
+        "outputSha256": "BD08865999FB1A7110D0B5FF5A5E9EA3199271FC6684B33128DC442F636E4967",
+        "payloadEvidence": [
+          {
+            "sourceIndex": 0,
+            "outputIndex": 0,
+            "payload": {
+              "Packets": 2,
+              "Bytes": 47,
+              "Sha256": "CF178FC285D17AAC920EE770DA1A2166A68D98DFD1E944CEBDEC4EF9005A8122"
+            }
+          },
+          {
+            "sourceIndex": 1,
+            "outputIndex": 1,
+            "payload": {
+              "Packets": 95,
+              "Bytes": 8138,
+              "Sha256": "66EAB973B109E2FFD4946F4DC1F96FD424A30A4959FB022985F757FAC2272279"
+            }
+          },
+          {
+            "sourceIndex": 2,
+            "outputIndex": 2,
+            "payload": {
+              "Packets": 50,
+              "Bytes": 1400,
+              "Sha256": "CCE1EEDD2B4E22C2CBD72D3772C08A411280F3258A1659EF1CFB4A0BFF50A9AB"
+            }
+          },
+          {
+            "sourceIndex": 7,
+            "outputIndex": 4,
+            "payload": {
+              "Packets": 1,
+              "Bytes": 132,
+              "Sha256": "EA25C59C866BA2F8541CF96F345598C84B86079E1B365B9E63DA6DCCFBAE6EC6"
+            }
+          }
+        ],
+        "ownedCleanupIssues": 0,
+        "verificationPassed": true
+      }
+    ],
+    "cleanup": "Tests assert published destinations, empty owned candidates/journals/scratch and exited retained remux handles; no external worker termination is used as cancellation evidence.",
+    "successfulWarningPolicy": "Admitted real title/artwork fixtures emit the pinned UDTA/timescale diagnostics with exit 0. Exact structurally justified messages remain in ToolOutcome and still require full verification; unrecognized/truncated diagnostics or any nonzero exit fail without MKV-style override."
+  },
+  "controlledAndHeadless": {
+    "scope": "Pure planning/container policy, bounded box/probe/packet validation, router, normalized outcomes, safe legacy/new journals, mixed discovery/restore, EN/RU compiled bindings and revision/approval preservation.",
+    "regressions": [
+      {
+        "finding": "Unsupported discovery row stored an empty destination and broke queue checkpoint validation",
+        "before": "1 failed",
+        "after": "3 mixed headless cases passed; failure/null intent retained"
+      },
+      {
+        "finding": "Missing/malformed packet fields or unsupported side data could be reduced to weak fingerprints",
+        "before": "34 failed, 2 positive controls passed",
+        "after": "36 strict packet cases passed in the full suite"
+      },
+      {
+        "finding": "Chapter and header coherence needed strict capability validation",
+        "before": "20 failed, 1 positive control passed",
+        "after": "Controlled chapter/Nero/header cases passed; real chapters passed"
+      },
+      {
+        "finding": "Pinned FFmpeg drops tkhd in-preview and promotes a first retained default",
+        "before": "2 header regressions failed; real pinned copy showed flags 7 -> 3 with equal payloads",
+        "after": "Guarded candidate-only approved flag restoration; final comparison strict for mask 7, unsupported modes rejected"
+      },
+      {
+        "finding": "handler_name was incorrectly treated as actual track title",
+        "before": "1 failed, 2 positive controls passed",
+        "after": "Actual title/name only; handler remains preserved metadata; all 3 cases passed"
+      },
+      {
+        "finding": "Reordered fixture had handler names but lacked actual title/name after development remux",
+        "before": "Mixed rule workflow failed to find the intended actual title",
+        "after": "Generator explicitly writes actual title metadata; production matcher policy remains strict"
+      }
+    ],
+    "otherCorrections": "Two old button-label expectations now assert the intentional MKV/MP4 text. One targeted format verification failure was corrected before the green full run."
+  },
+  "native": {
+    "status": "not run",
+    "reason": "Owner explicitly stopped the earlier Computer Use session and deferred consolidated native acceptance to the release milestone. No GUI, screenshots, scaling or native cancellation claims are assigned to this binary."
+  },
+  "releaseReadiness": {
+    "publicRedistributionReady": false,
+    "originalApplicationLicense": "pending owner decision",
+    "materials": "Exact FFmpeg source snapshot and complete pinned recipe/patch archive, actual per-platform configuration and dynamic closure included; static third-party source/notice/build reconciliation remains open alongside inherited MKV/Qt/native dependency gaps.",
+    "externalRequirements": [
+      "Explicit authorization to integrate the unmerged PR stack",
+      "Consolidated packaged Windows 11 x64 25H2 and Ubuntu 24.04 Desktop/X11-XWayland EN/RU acceptance, including recorded visual/scaling/lifecycle gaps",
+      "Rights-holder original-code license selection",
+      "Close exact bundled-component source/notice/build/relink material and final distribution obligations from distribution-audit.md"
+    ],
+    "nextMilestone": "Authorized integration, final desktop acceptance and public-release preparation; no additional optional feature is mandatory."
+  }
+}

@@ -12,7 +12,7 @@ using TrackTrim.Desktop.Localization;
 
 namespace TrackTrim.Desktop.ViewModels;
 
-/// <summary>Presents one inspection, one immutable review, and one owned MKV job.</summary>
+/// <summary>Presents one inspection, one immutable review, and one owned media job.</summary>
 public sealed partial class MainViewModel : ObservableObject
 {
     private readonly MainViewModelServices services;
@@ -302,8 +302,9 @@ public sealed partial class MainViewModel : ObservableObject
             return;
         }
 
-        var sourceName = string.IsNullOrEmpty(SourcePath) ? "output" : Path.GetFileNameWithoutExtension(SourcePath);
-        OutputPath = Path.Combine(directoryPath, $"{sourceName}.trimmed.mkv");
+        var outputName = inspection is null ? "output.trimmed.mkv" :
+            Path.GetFileNameWithoutExtension(SourcePath) + ".trimmed" + MediaContainerPolicy.Extension(inspection.Container);
+        OutputPath = Path.Combine(directoryPath, outputName);
     }
 
     /// <summary>Reports native dialog failures without allowing an unobserved command exception.</summary>
@@ -623,7 +624,7 @@ public sealed partial class MainViewModel : ObservableObject
             return GetPhaseKey(jobResult.Phase);
         }
 
-        return jobResult.Tool?.ExitCode == 1 ? "PublishedWithWarnings" : "Published";
+        return jobResult.Tool?.EffectiveDisposition == ToolDisposition.WarningReview ? "PublishedWithWarnings" : "Published";
     }
 
     /// <summary>Refreshes language-sensitive values and all command predicates.</summary>

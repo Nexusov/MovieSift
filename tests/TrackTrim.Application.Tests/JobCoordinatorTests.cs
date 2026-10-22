@@ -8,6 +8,50 @@ namespace TrackTrim.Application.Tests;
 /// <summary>Verifies publication, warnings, cancellation and cleanup as separate evidence.</summary>
 public sealed class JobCoordinatorTests
 {
+    /// <summary>A nonzero FFmpeg status remains a failure even when its numeric value equals MKVToolNix warnings.</summary>
+    [Fact]
+    public async Task BackendNormalizedFailureDoesNotEnterWarningReview()
+    {
+        var harness = new JobTestHarness { ExitCode = 1, Disposition = Ports.ToolDisposition.Failure };
+        var coordinator = harness.Coordinator;
+        var result = await coordinator.RunAsync(new(harness.CreatePlan()));
+
+        Assert.Equal(JobPhase.Failed, result.Phase);
+        Assert.Equal(ErrorCode.ToolFailed, result.Failure?.Code);
+        Assert.Equal(1, result.Tool?.ExitCode);
+        Assert.Equal("simulated warning", result.Tool?.Diagnostics);
+        Assert.Equal(0, harness.VerifyCalls);
+        Assert.Equal(0, harness.PublishCalls);
+        Assert.Equal(1, harness.CleanupCalls);
+        Assert.Equal(ErrorCode.StalePlan, (await coordinator.PublishWarningsAsync(new(result.JobId))).Failure?.Code);
+    }
+
+    /// <summary>Uses the backend's explicit warning policy independently of raw process status.</summary>
+    [Theory]
+    [InlineData(Ports.ToolDisposition.Success, JobPhase.Completed)]
+    [InlineData(Ports.ToolDisposition.WarningReview, JobPhase.AwaitingWarningReview)]
+    public async Task SuccessfulExitUsesTheBackendNormalizedDisposition(Ports.ToolDisposition disposition, JobPhase expectedPhase)
+    {
+        var harness = new JobTestHarness { ExitCode = 0, Disposition = disposition };
+        var result = await harness.Coordinator.RunAsync(new(harness.CreatePlan()));
+
+        Assert.Equal(expectedPhase, result.Phase);
+        Assert.Equal(0, result.Tool?.ExitCode);
+        Assert.Equal(1, harness.VerifyCalls);
+        Assert.Equal(expectedPhase == JobPhase.Completed ? 1 : 0, harness.PublishCalls);
+    }
+
+    /// <summary>Rejects undefined normalized statuses rather than interpreting them as clean success.</summary>
+    [Fact]
+    public async Task UnknownNormalizedDispositionCannotPublish()
+    {
+        var harness = new JobTestHarness { Disposition = (Ports.ToolDisposition)int.MaxValue };
+        var result = await harness.Coordinator.RunAsync(new(harness.CreatePlan()));
+
+        Assert.Equal(ErrorCode.ToolFailed, result.Failure?.Code);
+        Assert.Equal(0, harness.PublishCalls);
+    }
+
     /// <summary>Rejects an insufficient initial estimate before reserving or starting a media worker.</summary>
     [Fact]
     public async Task InitialCapacityShortageDoesNotStartRemux()

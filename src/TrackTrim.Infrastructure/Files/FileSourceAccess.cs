@@ -115,12 +115,12 @@ public sealed class FileSourceAccess : ISourceAccess
         var path = Path.GetFullPath(request.DestinationPath);
         var parent = Path.GetDirectoryName(path);
         var invalidDestination = request.AdditionalAllocationBytes < 0 || !Path.IsPathFullyQualified(request.DestinationPath) ||
-            !string.Equals(Path.GetExtension(path), ".mkv", StringComparison.OrdinalIgnoreCase) ||
+            MediaContainerPolicy.FromExtension(path) != request.Container || !Enum.IsDefined(request.Container) ||
             path.StartsWith(@"\\", StringComparison.Ordinal) || parent is null;
 
         if (invalidDestination)
         {
-            throw new OperationFailureException(new(ErrorCode.InvalidDestination, "Choose a local .mkv destination."));
+            throw new OperationFailureException(new(ErrorCode.InvalidDestination, "Choose a local destination matching the inspected container."));
         }
 
         var existingParent = ValidateOutputParent(new(request, parent!));

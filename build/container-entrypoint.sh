@@ -14,10 +14,7 @@ for unavailable_tool in dotnet mkvmerge mkvextract ffmpeg ffprobe; do
 done
 
 application='/check/app Кириллица/TrackTrim-linux-x64/TrackTrim'
-source='/check/input Кириллица/--source with spaces; &.mkv'
-destination='/check/output Кириллица/result with spaces; &.mkv'
 evidence='/check/evidence'
-original_hash="$(sha256sum "$source" | cut -d ' ' -f 1)"
 
 mkdir -p "$evidence"
 cp /usr/local/share/tracktrim-smoke/environment.txt "$evidence/container-environment.txt"
@@ -25,24 +22,29 @@ cp /usr/local/share/tracktrim-smoke/environment.txt "$evidence/container-environ
     printf 'Runtime user: %s:%s\n' "$(id -u)" "$(id -g)"
     printf 'Parent LANG: %s\nParent LC_ALL: %s\nParent LC_CTYPE: %s\n' "${LANG-<unset>}" "${LC_ALL-<unset>}" "${LC_CTYPE-<unset>}"
     printf '%s\n' 'Installed SDK/runtime/media commands: absent' 'Container network: disabled by docker run --network none'
-    printf 'Original source SHA256: %s\n' "$original_hash"
 } >> "$evidence/container-environment.txt"
 
 cd /tmp
 "$application" --verify-tools
-"$application" --verify-portable "$source" "$destination"
+for container_extension in mkv mp4; do
+    source="/check/input Кириллица/--source with spaces; &.$container_extension"
+    destination="/check/output Кириллица/result with spaces; &.$container_extension"
+    original_hash="$(sha256sum "$source" | cut -d ' ' -f 1)"
+    "$application" --verify-portable "$source" "$destination"
 
-if [[ ! -f "$destination" ]]; then
-    printf '%s\n' 'The clean-container operation did not publish its output.' >&2
-    exit 1
-fi
+    if [[ ! -f "$destination" ]]; then
+        printf '%s\n' 'The clean-container operation did not publish its output.' >&2
+        exit 1
+    fi
 
-final_hash="$(sha256sum "$source" | cut -d ' ' -f 1)"
+    final_hash="$(sha256sum "$source" | cut -d ' ' -f 1)"
 
-if [[ "$original_hash" != "$final_hash" ]]; then
-    printf '%s\n' 'The clean-container operation changed its source.' >&2
-    exit 1
-fi
+    if [[ "$original_hash" != "$final_hash" ]]; then
+        printf '%s\n' 'The clean-container operation changed its source.' >&2
+        exit 1
+    fi
 
-printf 'Published output: %s\nUnchanged source SHA256: %s\n' "$destination" "$final_hash" >> "$evidence/container-environment.txt"
-printf '%s\n' 'Portable CLI workflow passed without installed .NET/media tools, without network, and without root.'
+    printf 'Published output: %s\nUnchanged source SHA256: %s\n' "$destination" "$final_hash" >> "$evidence/container-environment.txt"
+done
+
+printf '%s\n' 'Portable MKV and MP4 CLI workflows passed without installed .NET/media tools, without network, and without root.'
