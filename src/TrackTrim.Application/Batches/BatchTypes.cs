@@ -20,7 +20,8 @@ public sealed record BatchItem(
     BatchItemState State = BatchItemState.PendingInspection,
     JobResult? Result = null,
     Failure? Failure = null,
-    ImmutableArray<int> RetainedTrackIds = default)
+    ImmutableArray<int> RetainedTrackIds = default,
+    FolderSourceOrigin? FolderOrigin = null)
 {
     public ImmutableArray<int> CurrentRetainedTrackIds => !RetainedTrackIds.IsDefault
         ? RetainedTrackIds

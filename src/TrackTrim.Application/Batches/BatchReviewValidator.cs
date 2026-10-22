@@ -56,7 +56,8 @@ internal static class BatchReviewValidator
                 }
 
                 var allocation = plan.IsNoChange ? 0 : revision.Length;
-                await request.SourceAccess.ValidateDestinationAsync(new(revision, plan.DestinationPath, allocation, request.CancellationToken));
+                await request.SourceAccess.ValidateDestinationAsync(new(revision, plan.DestinationPath, allocation,
+                    request.CancellationToken, plan.OutputDirectoryRoot));
             }
             catch (OperationFailureException exception)
             {

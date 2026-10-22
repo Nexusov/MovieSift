@@ -296,6 +296,9 @@ public sealed class BatchInputDiscoveryTests
             return Task.FromResult(new SourceRevision(request.Path, request.Path, 1, 1));
         }
 
+        /// <summary>Implements the explicit preparation boundary without adding filesystem effects to this controlled port.</summary>
+        public Task PrepareDestinationAsync(ValidateDestinationRequest request) => throw new InvalidOperationException("Discovery must not prepare outputs.");
+
         /// <summary>Fails if discovery crosses into destination validation.</summary>
         public Task ValidateDestinationAsync(ValidateDestinationRequest request) => throw new InvalidOperationException("Discovery must not validate outputs.");
     }
@@ -313,6 +316,9 @@ public sealed class BatchInputDiscoveryTests
             Release.Wait(request.CancellationToken);
             return Task.FromResult(new SourceRevision(request.Path, request.Path, 1, 1));
         }
+
+        /// <summary>Implements the explicit preparation boundary without adding filesystem effects to this controlled port.</summary>
+        public Task PrepareDestinationAsync(ValidateDestinationRequest request) => throw new InvalidOperationException("Discovery must not prepare outputs.");
 
         /// <summary>Fails if discovery crosses into destination validation.</summary>
         public Task ValidateDestinationAsync(ValidateDestinationRequest request) => throw new InvalidOperationException("Discovery must not validate outputs.");

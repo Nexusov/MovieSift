@@ -39,8 +39,15 @@ public sealed class JobCoordinator(IMediaBackend backend, ISourceAccess sourceAc
                 return result with { Phase = JobPhase.NoChange };
             }
 
-            await sourceAccess.ValidateDestinationAsync(new(request.Plan.Inspection.Source, request.Plan.DestinationPath,
-                request.Plan.Inspection.Source.Length, request.CancellationToken));
+            var destinationRequest = new ValidateDestinationRequest(request.Plan.Inspection.Source, request.Plan.DestinationPath,
+                request.Plan.Inspection.Source.Length, request.CancellationToken, request.Plan.OutputDirectoryRoot);
+            await sourceAccess.ValidateDestinationAsync(destinationRequest);
+
+            if (request.Plan.OutputDirectoryRoot is not null)
+            {
+                await sourceAccess.PrepareDestinationAsync(destinationRequest);
+                await sourceAccess.ValidateDestinationAsync(destinationRequest);
+            }
             output = await outputStore.ReserveAsync(new(request.Plan, request.CancellationToken));
             request.Progress?.Report(new(JobPhase.Remuxing));
             var progress = new InlineProgress(request.Progress);
@@ -207,7 +214,7 @@ public sealed class JobCoordinator(IMediaBackend backend, ISourceAccess sourceAc
         await ValidatePlanAsync(new(request.Plan, request.CancellationToken));
         // The adjacent candidate is already allocated; renaming it does not allocate a second media payload.
         await sourceAccess.ValidateDestinationAsync(new(request.Plan.Inspection.Source, request.Plan.DestinationPath,
-            AdditionalAllocationBytes: 0, request.CancellationToken));
+            AdditionalAllocationBytes: 0, request.CancellationToken, request.Plan.OutputDirectoryRoot));
         await outputStore.ValidateOwnershipAsync(new(request.Output, request.CancellationToken));
         await ValidateCandidateAsync(new(request.Output.CandidatePath, request.CandidateRevision, request.CancellationToken));
         request.CancellationToken.ThrowIfCancellationRequested();

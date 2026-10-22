@@ -21,6 +21,7 @@ public sealed partial class BatchViewModel : ObservableObject
     private Failure? failure;
     private long operationRevision;
     private string outputFolder = string.Empty;
+    private bool includeSubfolders;
     private bool externalOperationActive;
     private bool writesBlocked;
     private bool warningCloseRequested;
@@ -77,6 +78,20 @@ public sealed partial class BatchViewModel : ObservableObject
     public RulePresetsViewModel Presets { get; }
     public BatchSnapshot Snapshot { get; private set; }
     public string OutputFolder => outputFolder;
+    public bool IncludeSubfolders
+    {
+        get => includeSubfolders;
+        set
+        {
+            if (!CanEdit)
+            {
+                OnPropertyChanged();
+                return;
+            }
+
+            SetProperty(ref includeSubfolders, value);
+        }
+    }
     public bool CanEdit => IsWorkspaceAvailable && !HasNewBatchConfirmation && !Presets.IsBusy;
     public bool CanRun => CanEdit && !writesBlocked && Snapshot.Review is not null;
     public bool CanRemoveSelected => CanEdit && SelectedItem is { Snapshot.Result: null };
@@ -265,9 +280,17 @@ public sealed partial class BatchViewModel : ObservableObject
         await DiscoverAsync(new(BatchInputKind.ExplicitFiles, paths, cancellationToken));
     });
 
-    /// <summary>Discovers only the selected folder's direct MKV entries.</summary>
+    /// <summary>Captures the folder mode for this addition without reinterpreting previously accepted rows.</summary>
     private Task AddFolderAsync() => ExecuteOwnedAsync(async cancellationToken =>
     {
+        if (IncludeSubfolders && string.IsNullOrWhiteSpace(outputFolder))
+        {
+            failure = new(ErrorCode.InvalidDestination, Reason: ErrorReason.RecursiveOutputRequired);
+            return;
+        }
+
+        var kind = IncludeSubfolders ? BatchInputKind.RecursiveFolder : BatchInputKind.TopLevelFolder;
+        var outputRoot = IncludeSubfolders ? outputFolder : null;
         var folder = await services.Dialogs.SelectInputFolderAsync();
 
         if (folder is null)
@@ -275,13 +298,14 @@ public sealed partial class BatchViewModel : ObservableObject
             return;
         }
 
-        await DiscoverAsync(new(BatchInputKind.TopLevelFolder, [folder], cancellationToken));
+        await DiscoverAsync(new(kind, [folder], cancellationToken, outputRoot));
     });
 
     /// <summary>Accepts a bounded addition, then probes its real files serially by stable item ID.</summary>
     private async Task DiscoverAsync(BatchInputDiscoveryRequest request)
     {
         var discovered = await services.Discovery.DiscoverAsync(request);
+        request.CancellationToken.ThrowIfCancellationRequested();
         var edit = services.Session.AddDiscoveryResult(discovered);
         failure = edit.Failure;
 

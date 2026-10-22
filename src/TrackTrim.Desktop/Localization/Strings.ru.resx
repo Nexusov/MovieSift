@@ -140,12 +140,12 @@
   <data name="ErrorReasonSegmentStructure" xml:space="preserve"><value>Структуру Segment Info невозможно проверить в поддерживаемых пределах. Выберите самостоятельный MKV с конечными размерами элементов; потоковые кластеры и несколько сегментов не поддерживаются.</value></data>
   <data name="SingleWorkflow" xml:space="preserve"><value>Один файл</value></data>
   <data name="BatchWorkflow" xml:space="preserve"><value>Несколько файлов / папка</value></data>
-  <data name="BatchInstructions" xml:space="preserve"><value>Добавьте MKV или одну папку (только её непосредственное содержимое). Проверьте и подтвердите отдельный план каждого файла, выберите пути результатов, затем проверьте очередь.</value></data>
-  <data name="BatchLimits" xml:space="preserve"><value>Ограничения: {0} файлов в очереди; {1} просмотренных записей папки. При превышении добавление отклоняется целиком; вложенные папки не сканируются.</value></data>
+  <data name="BatchInstructions" xml:space="preserve"><value>Добавьте MKV или одну папку. При необходимости включите вложенные папки. Проверьте и подтвердите отдельный план каждого файла, выберите пути результатов, затем проверьте очередь.</value></data>
+  <data name="BatchLimits" xml:space="preserve"><value>Ограничения: {0} файлов в очереди; {1} просмотренных записей за весь обход папки. При превышении добавление отклоняется целиком.</value></data>
   <data name="BatchAddFiles" xml:space="preserve"><value>Добавить MKV…</value></data>
   <data name="BatchAddFolder" xml:space="preserve"><value>Добавить папку…</value></data>
   <data name="BatchFilesDialogTitle" xml:space="preserve"><value>Выберите MKV для отдельных планов</value></data>
-  <data name="BatchFolderDialogTitle" xml:space="preserve"><value>Выберите папку с MKV (без вложенных папок)</value></data>
+  <data name="BatchFolderDialogTitle" xml:space="preserve"><value>Выберите одну папку с MKV</value></data>
   <data name="BatchFiles" xml:space="preserve"><value>Файлы очереди (полные пути)</value></data>
   <data name="BatchInclusionHint" xml:space="preserve"><value>У каждого включённого файла должен быть подтверждённый план. Явно исключите или удалите ненужные и ошибочные записи; исключения показаны в обзоре.</value></data>
   <data name="BatchInclude" xml:space="preserve"><value>Включить файл</value></data>
@@ -166,7 +166,7 @@
   <data name="BatchPauseAfterCurrent" xml:space="preserve"><value>Приостановить после текущего файла</value></data>
   <data name="BatchCancel" xml:space="preserve"><value>Отменить очередь</value></data>
   <data name="BatchExplicitResume" xml:space="preserve"><value>Решение по предупреждению не запускает следующий файл. Проверьте оставшуюся очередь и явно продолжите её.</value></data>
-  <data name="BatchQueuePolicy" xml:space="preserve"><value>Очередь существует только в этом окне и не восстанавливается после перезапуска. Опубликованные результаты сохраняются. Ошибки, предупреждения, отмена и проблемы очистки останавливают очередь; продолжение требует явной проверки и запуска. Языковые правила требуют предпросмотра и применения; вложенные папки не сканируются.</value></data>
+  <data name="BatchQueuePolicy" xml:space="preserve"><value>Очередь существует только в этом окне и не восстанавливается после перезапуска. Опубликованные результаты сохраняются. Ошибки, предупреждения, отмена и проблемы очистки останавливают очередь; продолжение требует явной проверки и запуска. Правила требуют предпросмотра и применения.</value></data>
   <data name="BatchPreparing" xml:space="preserve"><value>Добавьте файлы и подтвердите их отдельные планы.</value></data>
   <data name="BatchInspecting" xml:space="preserve"><value>Проверка каждого файла отдельно…</value></data>
   <data name="BatchReviewing" xml:space="preserve"><value>Проверка всех исходников, назначений и планов…</value></data>
@@ -196,7 +196,7 @@
   <data name="BatchCleanupCloseNotice" xml:space="preserve"><value>Проблема очистки собственных временных файлов не решена. Перед закрытием проверьте диагностику. Данные сохранены; эта очередь не будет восстановлена.</value></data>
   <data name="ErrorReasonBatchFileLimit" xml:space="preserve"><value>Слишком много файлов. Уменьшите выбор или содержимое папки; частичного добавления не было.</value></data>
   <data name="ErrorReasonBatchEntryLimit" xml:space="preserve"><value>Папка содержит слишком много записей для указанного предела поиска. Используйте меньшую папку; частичного добавления не было.</value></data>
-  <data name="ErrorReasonInvalidBatchInput" xml:space="preserve"><value>Выберите несколько локальных MKV или одну локальную папку без ссылок на каталоги и обхода вложенных папок.</value></data>
+  <data name="ErrorReasonInvalidBatchInput" xml:space="preserve"><value>Выберите несколько локальных MKV или одну локальную папку без ссылок на каталоги.</value></data>
   <data name="RuleHeading" xml:space="preserve"><value>Правила языков и названий очереди</value></data>
   <data name="RuleHint" xml:space="preserve"><value>Неотмеченные категории сохраняют текущий выбор. Включите категорию, чтобы оставить все подходящие дорожки отдельно в каждом файле. Сначала создайте предпросмотр; до применения выбор не меняется.</value></data>
   <data name="RuleAudio" xml:space="preserve"><value>Оставить все аудиодорожки с этими кодами языков</value></data>
@@ -274,4 +274,9 @@
   <data name="PresetIssueEmptyTitleFilter" xml:space="preserve"><value>Введите непустой текст названия или отключите этот фильтр.</value></data>
   <data name="PresetIssueInvalidRuleLanguage" xml:space="preserve"><value>Исправьте неизвестный или неподдерживаемый код языка в правиле.</value></data>
   <data name="PresetCleanupIssue" xml:space="preserve"><value>При очистке временного файла набора возникла проблема. См. подробности.</value></data>
+  <data name="BatchIncludeSubfolders" xml:space="preserve"><value>Включать вложенные папки</value></data>
+  <data name="BatchFolderScopeHelp" xml:space="preserve"><value>Выключено: только MKV непосредственно в папке. Включено: сначала выберите существующую папку результатов; структура сезонов сохранится. Настройка действует только на следующее добавление папки. Папка результатов и известные рабочие папки приложения исключаются.</value></data>
+  <data name="ErrorReasonRecursiveOutputRequired" xml:space="preserve"><value>Сначала выберите существующую папку результатов, затем добавьте источник с вложенными папками.</value></data>
+  <data name="ErrorReasonRecursiveRootConflict" xml:space="preserve"><value>Папка результатов не должна совпадать с выбранной исходной папкой или содержать её. Выберите отдельную папку результатов либо вложенную папку, которую можно исключить.</value></data>
+  <data name="ErrorReasonBatchDepthLimit" xml:space="preserve"><value>Глубина дерева превышает допустимые 32 вложенные папки. Ничего не добавлено.</value></data>
 </root>

@@ -84,6 +84,7 @@ internal sealed class BatchUiDialogs(IReadOnlyList<string> sources) : IFileDialo
 {
     public IReadOnlyList<string> Sources { get; set; } = sources;
     public string? OutputFolder { get; set; } = Path.Combine(Path.GetTempPath(), "TrackTrim batch UI output");
+    public int InputFolderRequests { get; private set; }
 
     /// <summary>Returns the single workflow's independent source selection.</summary>
     public Task<string?> SelectSourceAsync() => Task.FromResult(Sources.FirstOrDefault());
@@ -92,7 +93,11 @@ internal sealed class BatchUiDialogs(IReadOnlyList<string> sources) : IFileDialo
     public Task<IReadOnlyList<string>> SelectSourcesAsync() => Task.FromResult(Sources);
 
     /// <summary>Returns a synthetic folder without claiming native dialog coverage.</summary>
-    public Task<string?> SelectInputFolderAsync() => Task.FromResult<string?>(Path.GetTempPath());
+    public Task<string?> SelectInputFolderAsync()
+    {
+        InputFolderRequests++;
+        return Task.FromResult<string?>(Path.GetTempPath());
+    }
 
     /// <summary>Returns the explicitly chosen shared destination folder.</summary>
     public Task<string?> SelectOutputFolderAsync() => Task.FromResult(OutputFolder);
@@ -102,11 +107,20 @@ internal sealed class BatchUiDialogs(IReadOnlyList<string> sources) : IFileDialo
 internal sealed class BatchUiDiscovery(ImmutableArray<SourceRevision> sources) : IBatchInputDiscovery
 {
     public BatchInputDiscoveryResult? Result { get; set; }
+    public BatchInputDiscoveryRequest? LastRequest { get; private set; }
+    public Func<BatchInputDiscoveryRequest, Task<BatchInputDiscoveryResult>>? OnDiscover { get; set; }
 
     /// <summary>Returns discovered rows without accessing the real filesystem.</summary>
     public Task<BatchInputDiscoveryResult> DiscoverAsync(BatchInputDiscoveryRequest request)
     {
         request.CancellationToken.ThrowIfCancellationRequested();
+        LastRequest = request;
+
+        if (OnDiscover is not null)
+        {
+            return OnDiscover(request);
+        }
+
         return Task.FromResult(Result ?? new(sources, []));
     }
 }
@@ -121,6 +135,13 @@ internal sealed class BatchUiSourceAccess(BatchUiBackend backend) : ISourceAcces
         var revision = backend.Inspections.TryGetValue(request.Path, out var inspection)
             ? inspection.Source : new(request.Path, "candidate-identity", 700, 2);
         return Task.FromResult(revision);
+    }
+
+    /// <summary>Implements the explicit preparation boundary without adding filesystem effects to this controlled port.</summary>
+    public Task PrepareDestinationAsync(ValidateDestinationRequest request)
+    {
+        request.CancellationToken.ThrowIfCancellationRequested();
+        return Task.CompletedTask;
     }
 
     /// <summary>Leaves filesystem collision behavior to separate Application and real-media suites.</summary>

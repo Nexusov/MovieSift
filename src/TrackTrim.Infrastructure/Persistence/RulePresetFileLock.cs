@@ -23,7 +23,9 @@ internal sealed class RulePresetFileLock(SafeFileHandle handle) : IDisposable
     private const uint LinuxTypeMask = 0xF000;
     private const uint LinuxRegularFile = 0x8000;
     private const int LinuxExclusiveNonBlockingLock = 2 | 4;
+    private const int LinuxUnlock = 8;
     private const int LinuxWouldBlock = 11;
+    private int disposed;
 
     /// <summary>Rejects redirected paths and unsafe handles before acquiring a fail-fast OS lock.</summary>
     internal static RulePresetFileLock Acquire(string path)
@@ -43,8 +45,26 @@ internal sealed class RulePresetFileLock(SafeFileHandle handle) : IDisposable
         throw Unavailable("Preset locking supports only Windows x64 and Linux x64.");
     }
 
-    /// <summary>Closes only the owned descriptor; the stable lock path remains for the next process.</summary>
-    public void Dispose() => handle.Dispose();
+    /// <summary>Unlocks the owned description before close so a forked descriptor cannot retain a completed operation's lock.</summary>
+    public void Dispose()
+    {
+        if (Interlocked.Exchange(ref disposed, 1) != 0)
+        {
+            return;
+        }
+
+        try
+        {
+            if (OperatingSystem.IsLinux())
+            {
+                _ = Flock(handle, LinuxUnlock);
+            }
+        }
+        finally
+        {
+            handle.Dispose();
+        }
+    }
 
     /// <summary>Uses an exclusive Windows handle while opening the link itself for safe type validation.</summary>
     private static RulePresetFileLock AcquireWindows(string path)
@@ -103,7 +123,7 @@ internal sealed class RulePresetFileLock(SafeFileHandle handle) : IDisposable
                 throw Unavailable("The preset lock must be a regular file without redirection.");
             }
 
-            if (Flock(descriptor, LinuxExclusiveNonBlockingLock) != 0)
+            if (Flock(opened, LinuxExclusiveNonBlockingLock) != 0)
             {
                 var error = Marshal.GetLastPInvokeError();
                 throw error == LinuxWouldBlock ? Busy() : Unavailable($"Could not acquire the preset lock (OS error {error}).");
@@ -133,5 +153,5 @@ internal sealed class RulePresetFileLock(SafeFileHandle handle) : IDisposable
     private static extern int Open([MarshalAs(UnmanagedType.LPUTF8Str)] string path, int flags, uint mode);
 
     [DllImport("libc", EntryPoint = "flock", SetLastError = true)]
-    private static extern int Flock(int descriptor, int operation);
+    private static extern int Flock(SafeFileHandle descriptor, int operation);
 }

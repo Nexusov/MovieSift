@@ -103,6 +103,13 @@ internal sealed class FakeSourceAccess(SourceRevision source) : ISourceAccess
     /// <summary>Reports the unchanged synthetic file identity.</summary>
     public Task<SourceRevision> ReadRevisionAsync(SourceRequest request) => Task.FromResult(source);
 
+    /// <summary>Implements the explicit preparation boundary without adding filesystem effects to this controlled port.</summary>
+    public Task PrepareDestinationAsync(ValidateDestinationRequest request)
+    {
+        request.CancellationToken.ThrowIfCancellationRequested();
+        return Task.CompletedTask;
+    }
+
     /// <summary>Allows the synthetic destination without touching disk.</summary>
     public Task ValidateDestinationAsync(ValidateDestinationRequest request) => Task.CompletedTask;
 }

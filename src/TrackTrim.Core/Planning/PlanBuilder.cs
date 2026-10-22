@@ -43,7 +43,17 @@ public static class PlanBuilder
             return new(null, new(ErrorCode.InvalidDestination));
         }
 
-        var plan = new RemuxPlan(Guid.NewGuid(), inspection, retainedTracks, request.DestinationPath, request.ZeroAudioConfirmed);
+        var hasInvalidOutputRoot = request.OutputDirectoryRoot is not null &&
+            (!OutputPathPolicy.IsWithinDirectory(request.OutputDirectoryRoot, request.DestinationPath) ||
+                Path.GetRelativePath(request.OutputDirectoryRoot, request.DestinationPath) == ".");
+
+        if (hasInvalidOutputRoot)
+        {
+            return new(null, new(ErrorCode.InvalidDestination));
+        }
+
+        var plan = new RemuxPlan(Guid.NewGuid(), inspection, retainedTracks, request.DestinationPath,
+            request.ZeroAudioConfirmed, request.OutputDirectoryRoot);
         return new(plan, null);
     }
 }

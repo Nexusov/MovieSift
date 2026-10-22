@@ -8,14 +8,16 @@ public sealed record PlanRequest(
     MediaInspection Inspection,
     IReadOnlyCollection<int> RetainedTrackIds,
     string DestinationPath,
-    bool ZeroAudioConfirmed);
+    bool ZeroAudioConfirmed,
+    string? OutputDirectoryRoot = null);
 
 public sealed record RemuxPlan(
     Guid Id,
     MediaInspection Inspection,
     ImmutableArray<MediaTrack> RetainedTracks,
     string DestinationPath,
-    bool ZeroAudioConfirmed)
+    bool ZeroAudioConfirmed,
+    string? OutputDirectoryRoot = null)
 {
     public bool IsNoChange => RetainedTracks.Length == Inspection.Tracks.Length;
     public bool RemovesDefaultAudio => Inspection.Tracks.Any(track =>

@@ -5,6 +5,7 @@ using TrackTrim.Application;
 using TrackTrim.Application.Ports;
 using TrackTrim.Core.Failures;
 using TrackTrim.Core.Media;
+using TrackTrim.Core.Planning;
 
 namespace TrackTrim.Infrastructure.Files;
 
@@ -122,12 +123,7 @@ public sealed class FileSourceAccess : ISourceAccess
             throw new OperationFailureException(new(ErrorCode.InvalidDestination, "Choose a local .mkv destination."));
         }
 
-        if (!Directory.Exists(parent))
-        {
-            throw new OperationFailureException(new(ErrorCode.InvalidDestination, "The output directory must already exist."));
-        }
-
-        PathSafety.RejectReparsePoints(parent!);
+        var existingParent = ValidateOutputParent(new(request, parent!));
 
         if (File.Exists(path))
         {
@@ -142,7 +138,7 @@ public sealed class FileSourceAccess : ISourceAccess
             throw new OperationFailureException(new(ErrorCode.DestinationExists, path));
         }
 
-        var drive = GetContainingDrive(parent!);
+        var drive = GetContainingDrive(existingParent);
 
         if (drive.DriveType == DriveType.Network)
         {
@@ -153,6 +149,103 @@ public sealed class FileSourceAccess : ISourceAccess
         {
             throw new OperationFailureException(new(ErrorCode.InsufficientSpace, "The additional output allocation exceeds the currently available space."));
         }
+    }
+
+    /// <summary>Creates only validated missing output parents, immediately before ownership reservation.</summary>
+    public async Task PrepareDestinationAsync(ValidateDestinationRequest request)
+    {
+        await ValidateDestinationAsync(request);
+
+        if (request.OutputDirectoryRoot is null)
+        {
+            return;
+        }
+
+        var root = Path.GetFullPath(request.OutputDirectoryRoot);
+        var parent = Path.GetDirectoryName(Path.GetFullPath(request.DestinationPath))!;
+        var current = root;
+        var relative = Path.GetRelativePath(root, parent);
+
+        if (relative == ".")
+        {
+            return;
+        }
+
+        foreach (var component in relative.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar))
+        {
+            request.CancellationToken.ThrowIfCancellationRequested();
+            PathSafety.RejectReparsePoints(current);
+            current = Path.Combine(current, component);
+            Directory.CreateDirectory(current);
+            PathSafety.RejectReparsePoints(current);
+        }
+
+        await ValidateDestinationAsync(request);
+    }
+
+    /// <summary>Allows absent parents only within an explicit existing safe output root, without creating them.</summary>
+    private static string ValidateOutputParent(OutputParentRequest request)
+    {
+        var root = request.Destination.OutputDirectoryRoot;
+
+        if (root is null)
+        {
+            if (!Directory.Exists(request.Parent))
+            {
+                throw new OperationFailureException(new(ErrorCode.InvalidDestination, "The output directory must already exist."));
+            }
+
+            PathSafety.RejectReparsePoints(request.Parent);
+            return request.Parent;
+        }
+
+        var invalidRoot = !Path.IsPathFullyQualified(root) || root.StartsWith(@"\\", StringComparison.Ordinal) ||
+            !OutputPathPolicy.IsWithinDirectory(root, request.Parent) || !Directory.Exists(root);
+
+        if (invalidRoot)
+        {
+            throw new OperationFailureException(new(ErrorCode.InvalidDestination, "Choose an existing output root containing the destination."));
+        }
+
+        root = Path.GetFullPath(root);
+        PathSafety.RejectReparsePoints(root);
+        var relative = Path.GetRelativePath(root, request.Parent);
+
+        if (relative == ".")
+        {
+            return root;
+        }
+
+        var current = root;
+
+        foreach (var component in relative.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar))
+        {
+            var child = Path.Combine(current, component);
+            FileAttributes attributes;
+
+            try
+            {
+                attributes = File.GetAttributes(child);
+            }
+            catch (Exception exception) when (exception is FileNotFoundException or DirectoryNotFoundException)
+            {
+                return current;
+            }
+
+            if (attributes.HasFlag(FileAttributes.ReparsePoint))
+            {
+                throw new OperationFailureException(new(ErrorCode.InvalidDestination, "Symlink and junction paths are not supported.", ErrorReason.RedirectedPath));
+            }
+
+            if (!attributes.HasFlag(FileAttributes.Directory))
+            {
+                throw new OperationFailureException(new(ErrorCode.InvalidDestination, "Every existing output parent must be a directory."));
+            }
+
+            current = child;
+        }
+
+        return current;
     }
 
     /// <summary>Uses the destination's mount rather than assuming every Linux path is on root.</summary>
