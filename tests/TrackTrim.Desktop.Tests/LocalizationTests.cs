@@ -25,7 +25,7 @@ public sealed partial class LocalizationTests
             CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo("ru-RU");
             var localization = new LocalizationService();
             Assert.Equal("en", localization.Language);
-            Assert.Equal("Open MKV…", localization["OpenFile"]);
+            Assert.Equal("Open MKV / MP4…", localization["OpenFile"]);
         }
         finally
         {

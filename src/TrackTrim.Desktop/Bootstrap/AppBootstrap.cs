@@ -35,8 +35,10 @@ internal static class AppBootstrap
 
         var logger = loggerConfiguration.CreateLogger();
         var sourceAccess = new FileSourceAccess();
-        var backend = new MkvBackend(new(sourceAccess, MkvToolPaths.FromApplicationDirectory(),
-            Diagnostic: detail => logger.Warning("{MediaCleanupDiagnostic}", detail)));
+        var backend = new ContainerMediaBackend(
+            new MkvBackend(new(sourceAccess, MkvToolPaths.FromApplicationDirectory(),
+                Diagnostic: detail => logger.Warning("{MediaCleanupDiagnostic}", detail))),
+            new FfmpegBackend(new(sourceAccess, FfmpegToolPaths.FromApplicationDirectory())));
         var outputs = new OwnedOutputStore(dataDirectory);
         var settings = new PortableSettingsStore(dataDirectory);
         var localization = new LocalizationService();

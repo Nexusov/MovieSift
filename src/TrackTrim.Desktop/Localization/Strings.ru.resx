@@ -4,11 +4,11 @@
   <resheader name="version"><value>2.0</value></resheader>
   <data name="AppSubtitle" xml:space="preserve"><value>Оставьте нужные дорожки. Сохраните оригинал.</value></data>
   <data name="Language" xml:space="preserve"><value>Language / Язык</value></data>
-  <data name="OpenFile" xml:space="preserve"><value>Открыть MKV…</value></data>
+  <data name="OpenFile" xml:space="preserve"><value>Открыть MKV / MP4…</value></data>
   <data name="ChooseOutput" xml:space="preserve"><value>Выбрать папку результата…</value></data>
   <data name="Source" xml:space="preserve"><value>Исходный файл</value></data>
   <data name="Output" xml:space="preserve"><value>Файл результата</value></data>
-  <data name="NoSource" xml:space="preserve"><value>Выберите один локальный MKV для просмотра его дорожек.</value></data>
+  <data name="NoSource" xml:space="preserve"><value>Выберите один локальный MKV или MP4 для просмотра его дорожек.</value></data>
   <data name="NoOutput" xml:space="preserve"><value>Выберите отдельную папку для результата.</value></data>
   <data name="Tracks" xml:space="preserve"><value>Дорожки</value></data>
   <data name="Keep" xml:space="preserve"><value>Оставить</value></data>
@@ -36,10 +36,10 @@
   <data name="DispositionOriginal" xml:space="preserve"><value>язык оригинала</value></data>
   <data name="DispositionCommentary" xml:space="preserve"><value>комментарий</value></data>
   <data name="ReviewPlan" xml:space="preserve"><value>Проверить план</value></data>
-  <data name="Run" xml:space="preserve"><value>Создать новый MKV</value></data>
+  <data name="Run" xml:space="preserve"><value>Создать отдельный файл</value></data>
   <data name="Cancel" xml:space="preserve"><value>Отменить</value></data>
   <data name="Plan" xml:space="preserve"><value>Проверка плана обработки</value></data>
-  <data name="PlanInstructions" xml:space="preserve"><value>Проверьте выбранные дорожки и путь результата, затем создайте новый MKV. Изменение выбора или пути отменяет проверку.</value></data>
+  <data name="PlanInstructions" xml:space="preserve"><value>Проверьте выбранные дорожки и путь результата, затем создайте новый файл в том же контейнере. Изменение выбора или пути отменяет проверку.</value></data>
   <data name="ConfirmSilent" xml:space="preserve"><value>Подтверждаю удаление всех аудиодорожек (результат без звука).</value></data>
   <data name="OriginalNotice" xml:space="preserve"><value>Оригинал сохраняется и продолжает занимать место. Создаётся только новый файл.</value></data>
   <data name="VerificationNotice" xml:space="preserve"><value>Каждый результат проверяется по структуре и метаданным. Это не доказывает целостность каждого закодированного пакета.</value></data>
@@ -73,7 +73,7 @@
   <data name="SizeDifference" xml:space="preserve"><value>Новый файл меньше на {0:N0} байт. Оригинал остаётся на диске.</value></data>
   <data name="Backend" xml:space="preserve"><value>Медиаинструмент</value></data>
   <data name="DevelopmentTools" xml:space="preserve"><value>Инструменты для разработки</value></data>
-  <data name="FileDialogTitle" xml:space="preserve"><value>Выберите файл MKV</value></data>
+  <data name="FileDialogTitle" xml:space="preserve"><value>Выберите файл MKV или MP4</value></data>
   <data name="OutputDialogTitle" xml:space="preserve"><value>Выберите папку для нового файла</value></data>
   <data name="DataDialogTitle" xml:space="preserve"><value>Выберите доступную для записи папку данных</value></data>
   <data name="SelectionWarning" xml:space="preserve"><value>Удаление аудиодорожки по умолчанию не назначает новую. Выбор проигрывателя может отличаться.</value></data>
@@ -81,9 +81,9 @@
   <data name="NoAudioConfirmation" xml:space="preserve"><value>Подтвердите создание файла без звука перед проверкой плана.</value></data>
   <data name="Unsupported" xml:space="preserve"><value>В исходном файле обнаружена неподдерживаемая возможность: {0}</value></data>
   <data name="DestinationRequired" xml:space="preserve"><value>Выберите папку результата перед проверкой плана.</value></data>
-  <data name="SourceRequired" xml:space="preserve"><value>Сначала откройте файл MKV.</value></data>
+  <data name="SourceRequired" xml:space="preserve"><value>Сначала откройте файл MKV или MP4.</value></data>
   <data name="CleanupHeading" xml:space="preserve"><value>Временные файлы удалены не полностью. Проверьте техническую диагностику ниже; созданный итоговый файл остаётся на месте.</value></data>
-  <data name="ErrorInvalidSource" xml:space="preserve"><value>Выберите поддерживаемый локальный обычный файл MKV.</value></data>
+  <data name="ErrorInvalidSource" xml:space="preserve"><value>Выберите поддерживаемый локальный обычный файл MKV или MP4.</value></data>
   <data name="ErrorUnsupportedContainer" xml:space="preserve"><value>Обнаруженный контейнер не поддерживается на этом этапе.</value></data>
   <data name="ErrorUnsupportedFeature" xml:space="preserve"><value>Обнаруженную возможность медиа нельзя безопасно сохранить.</value></data>
   <data name="ErrorToolUnavailable" xml:space="preserve"><value>Встроенные медиаинструменты отсутствуют или не запускаются. Распакуйте переносимый архив полностью.</value></data>
@@ -140,12 +140,12 @@
   <data name="ErrorReasonSegmentStructure" xml:space="preserve"><value>Структуру Segment Info невозможно проверить в поддерживаемых пределах. Выберите самостоятельный MKV с конечными размерами элементов; потоковые кластеры и несколько сегментов не поддерживаются.</value></data>
   <data name="SingleWorkflow" xml:space="preserve"><value>Один файл</value></data>
   <data name="BatchWorkflow" xml:space="preserve"><value>Несколько файлов / папка</value></data>
-  <data name="BatchInstructions" xml:space="preserve"><value>Добавьте MKV или одну папку. При необходимости включите вложенные папки. Проверьте и подтвердите отдельный план каждого файла, выберите пути результатов, затем проверьте очередь.</value></data>
+  <data name="BatchInstructions" xml:space="preserve"><value>Добавьте MKV/MP4 или одну папку. При необходимости включите вложенные папки. Проверьте и подтвердите отдельный план каждого файла, выберите пути результатов, затем проверьте очередь.</value></data>
   <data name="BatchLimits" xml:space="preserve"><value>Ограничения: {0} файлов в очереди; {1} просмотренных записей за весь обход папки. При превышении добавление отклоняется целиком.</value></data>
-  <data name="BatchAddFiles" xml:space="preserve"><value>Добавить MKV…</value></data>
+  <data name="BatchAddFiles" xml:space="preserve"><value>Добавить MKV / MP4…</value></data>
   <data name="BatchAddFolder" xml:space="preserve"><value>Добавить папку…</value></data>
-  <data name="BatchFilesDialogTitle" xml:space="preserve"><value>Выберите MKV для отдельных планов</value></data>
-  <data name="BatchFolderDialogTitle" xml:space="preserve"><value>Выберите одну папку с MKV</value></data>
+  <data name="BatchFilesDialogTitle" xml:space="preserve"><value>Выберите MKV/MP4 для отдельных планов</value></data>
+  <data name="BatchFolderDialogTitle" xml:space="preserve"><value>Выберите одну папку с MKV/MP4</value></data>
   <data name="BatchFiles" xml:space="preserve"><value>Файлы очереди (полные пути)</value></data>
   <data name="BatchInclusionHint" xml:space="preserve"><value>У каждого включённого файла должен быть подтверждённый план. Явно исключите или удалите ненужные и ошибочные записи; исключения показаны в обзоре.</value></data>
   <data name="BatchInclude" xml:space="preserve"><value>Включить файл</value></data>
@@ -196,7 +196,7 @@
   <data name="BatchCleanupCloseNotice" xml:space="preserve"><value>Проблема очистки собственных временных файлов не решена. Перед закрытием проверьте диагностику. Данные сохранены; эта очередь не будет восстановлена.</value></data>
   <data name="ErrorReasonBatchFileLimit" xml:space="preserve"><value>Слишком много файлов. Уменьшите выбор или содержимое папки; частичного добавления не было.</value></data>
   <data name="ErrorReasonBatchEntryLimit" xml:space="preserve"><value>Папка содержит слишком много записей для указанного предела поиска. Используйте меньшую папку; частичного добавления не было.</value></data>
-  <data name="ErrorReasonInvalidBatchInput" xml:space="preserve"><value>Выберите несколько локальных MKV или одну локальную папку без ссылок на каталоги.</value></data>
+  <data name="ErrorReasonInvalidBatchInput" xml:space="preserve"><value>Выберите несколько локальных MKV/MP4 или одну локальную папку без ссылок на каталоги.</value></data>
   <data name="RuleHeading" xml:space="preserve"><value>Правила языков и названий очереди</value></data>
   <data name="RuleHint" xml:space="preserve"><value>Неотмеченные категории сохраняют текущий выбор. Включите категорию, чтобы оставить все подходящие дорожки отдельно в каждом файле. Сначала создайте предпросмотр; до применения выбор не меняется.</value></data>
   <data name="RuleAudio" xml:space="preserve"><value>Оставить все аудиодорожки с этими кодами языков</value></data>
@@ -207,7 +207,7 @@
   <data name="RuleSubtitleTitleFilter" xml:space="preserve"><value>Также искать текст в названии субтитров</value></data>
   <data name="RuleSubtitleTitleContains" xml:space="preserve"><value>Название субтитров содержит (буквальный текст)</value></data>
   <data name="RuleForcedSubtitlesOnly" xml:space="preserve"><value>Оставлять только принудительные субтитры</value></data>
-  <data name="RuleForcedSubtitleHelp" xml:space="preserve"><value>Учитывает флаг принудительной дорожки MKV вместе с языком и необязательным названием. Выбирает целые дорожки; текст субтитров и отдельные события не проверяются.</value></data>
+  <data name="RuleForcedSubtitleHelp" xml:space="preserve"><value>Учитывает флаг принудительной дорожки из инспекции вместе с языком и необязательным названием. Выбирает целые дорожки; текст субтитров и отдельные события не проверяются.</value></data>
   <data name="RuleTitleHelp" xml:space="preserve"><value>Необязательный текст названия дополняет правило языка. Поиск ведётся только по названию дорожки без учёта регистра; пробелы по краям поискового текста удаляются. Знаки препинания буквальны; пустые названия не совпадают. Регулярные выражения и шаблоны не поддерживаются.</value></data>
   <data name="RuleSubtitleCodes" xml:space="preserve"><value>Коды языков субтитров через запятую</value></data>
   <data name="RuleTagHelp" xml:space="preserve"><value>Коды через запятую, например en, ger, ru-RU, sr-Latn. Теги совпадают точно: ru не совпадает с ru-RU. Поддерживается язык ISO с необязательными письменностью и регионом. Метаданные языка не доказывают язык речи.</value></data>
@@ -275,7 +275,7 @@
   <data name="PresetIssueInvalidRuleLanguage" xml:space="preserve"><value>Исправьте неизвестный или неподдерживаемый код языка в правиле.</value></data>
   <data name="PresetCleanupIssue" xml:space="preserve"><value>При очистке временного файла набора возникла проблема. См. подробности.</value></data>
   <data name="BatchIncludeSubfolders" xml:space="preserve"><value>Включать вложенные папки</value></data>
-  <data name="BatchFolderScopeHelp" xml:space="preserve"><value>Выключено: только MKV непосредственно в папке. Включено: сначала выберите существующую папку результатов; структура сезонов сохранится. Настройка действует только на следующее добавление папки. Папка результатов и известные рабочие папки приложения исключаются.</value></data>
+  <data name="BatchFolderScopeHelp" xml:space="preserve"><value>Выключено: только MKV/MP4 непосредственно в папке. Включено: сначала выберите существующую папку результатов; структура сезонов сохранится. Настройка действует только на следующее добавление папки. Папка результатов и известные рабочие папки приложения исключаются.</value></data>
   <data name="ErrorReasonRecursiveOutputRequired" xml:space="preserve"><value>Сначала выберите существующую папку результатов, затем добавьте источник с вложенными папками.</value></data>
   <data name="ErrorReasonRecursiveRootConflict" xml:space="preserve"><value>Папка результатов не должна совпадать с выбранной исходной папкой или содержать её. Выберите отдельную папку результатов либо вложенную папку, которую можно исключить.</value></data>
   <data name="ErrorReasonBatchDepthLimit" xml:space="preserve"><value>Глубина дерева превышает допустимые 32 вложенные папки. Ничего не добавлено.</value></data>

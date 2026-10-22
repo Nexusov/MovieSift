@@ -27,7 +27,7 @@ public sealed class BatchInputDiscoveryTests
         await File.WriteAllTextAsync(first, "This is a candidate, not a probed Matroska file.", TestContext.Current.CancellationToken);
         await File.WriteAllTextAsync(last, "candidate two", TestContext.Current.CancellationToken);
         await File.WriteAllTextAsync(Path.Combine(nested, "inside.mkv"), "must not be traversed", TestContext.Current.CancellationToken);
-        await File.WriteAllTextAsync(Path.Combine(workspace.Path, "ignored.mp4"), "not included", TestContext.Current.CancellationToken);
+        await File.WriteAllTextAsync(Path.Combine(workspace.Path, "ignored.mov"), "not included", TestContext.Current.CancellationToken);
         var discovery = new FileBatchInputDiscovery(new FileSourceAccess());
         var request = new BatchInputDiscoveryRequest(BatchInputKind.TopLevelFolder, [workspace.Path], TestContext.Current.CancellationToken);
         var initial = await discovery.DiscoverAsync(request);
@@ -79,7 +79,7 @@ public sealed class BatchInputDiscoveryTests
         using var workspace = new TestWorkspace();
         var valid = Path.Combine(workspace.Path, "valid.mkv");
         var missing = Path.Combine(workspace.Path, "missing.mkv");
-        var otherExtension = Path.Combine(workspace.Path, "not-supported.mp4");
+        var otherExtension = Path.Combine(workspace.Path, "not-supported.mov");
         var directory = Path.Combine(workspace.Path, "folder.mkv");
         Directory.CreateDirectory(directory);
         await File.WriteAllTextAsync(valid, "unprobed candidate", TestContext.Current.CancellationToken);

@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using TrackTrim.Application.Batches;
+using TrackTrim.Application.Ports;
 using TrackTrim.Core.Failures;
 using TrackTrim.Core.Media;
 using TrackTrim.Core.Planning;
@@ -69,7 +70,7 @@ public sealed class BatchItemViewModel : ObservableObject
     /// <summary>Keeps approved-warning publication visibly distinct from a clean result.</summary>
     private string GetStateKey()
     {
-        if (item.Result is { PublishedPath: not null, Tool.ExitCode: 1 })
+        if (item.Result is { PublishedPath: not null, Tool.EffectiveDisposition: ToolDisposition.WarningReview })
         {
             return "BatchItemCompletedWithWarnings";
         }
@@ -250,6 +251,13 @@ public sealed class BatchItemViewModel : ObservableObject
     /// <summary>Retains destination intent below presentation without creating approval authority.</summary>
     private void StoreDestination()
     {
+        // An uninspected failure may have no supported filename convention, so it has no derived destination intent.
+        if (item.Inspection is null && string.IsNullOrEmpty(outputPath))
+        {
+            Refresh();
+            return;
+        }
+
         var changed = options.Session.SetDestination(new(Id, outputPath, outputDirectoryRoot));
         planningFailure = changed.Failure;
         Refresh();
@@ -314,6 +322,7 @@ public sealed class BatchItemViewModel : ObservableObject
             return result.DestinationPath ?? string.Empty;
         }
 
-        return Path.Combine(folder, $"{Path.GetFileNameWithoutExtension(SourcePath)}.trimmed.mkv");
+        return MediaContainerPolicy.FromExtension(SourcePath) is null
+            ? string.Empty : Path.Combine(folder, MediaContainerPolicy.TrimmedFileName(SourcePath));
     }
 }

@@ -4,11 +4,11 @@
   <resheader name="version"><value>2.0</value></resheader>
   <data name="AppSubtitle" xml:space="preserve"><value>Keep the tracks you need. Preserve the original.</value></data>
   <data name="Language" xml:space="preserve"><value>Language / Язык</value></data>
-  <data name="OpenFile" xml:space="preserve"><value>Open MKV…</value></data>
+  <data name="OpenFile" xml:space="preserve"><value>Open MKV / MP4…</value></data>
   <data name="ChooseOutput" xml:space="preserve"><value>Choose output folder…</value></data>
   <data name="Source" xml:space="preserve"><value>Source file</value></data>
   <data name="Output" xml:space="preserve"><value>Output file</value></data>
-  <data name="NoSource" xml:space="preserve"><value>Select one local MKV to inspect its real tracks.</value></data>
+  <data name="NoSource" xml:space="preserve"><value>Select one local MKV or MP4 to inspect its real tracks.</value></data>
   <data name="NoOutput" xml:space="preserve"><value>Choose a separate output folder.</value></data>
   <data name="Tracks" xml:space="preserve"><value>Tracks</value></data>
   <data name="Keep" xml:space="preserve"><value>Keep</value></data>
@@ -36,10 +36,10 @@
   <data name="DispositionOriginal" xml:space="preserve"><value>original language</value></data>
   <data name="DispositionCommentary" xml:space="preserve"><value>commentary</value></data>
   <data name="ReviewPlan" xml:space="preserve"><value>Review output plan</value></data>
-  <data name="Run" xml:space="preserve"><value>Create new MKV</value></data>
+  <data name="Run" xml:space="preserve"><value>Create separate output</value></data>
   <data name="Cancel" xml:space="preserve"><value>Cancel</value></data>
   <data name="Plan" xml:space="preserve"><value>Approved plan review</value></data>
-  <data name="PlanInstructions" xml:space="preserve"><value>Review the selected tracks and output path, then create the new MKV. Changing a selection or destination invalidates this review.</value></data>
+  <data name="PlanInstructions" xml:space="preserve"><value>Review the selected tracks and output path, then create a new file in the same container. Changing a selection or destination invalidates this review.</value></data>
   <data name="ConfirmSilent" xml:space="preserve"><value>I confirm removal of every audio track (silent output).</value></data>
   <data name="OriginalNotice" xml:space="preserve"><value>The original is preserved and still occupies disk space. Only a new file is created.</value></data>
   <data name="VerificationNotice" xml:space="preserve"><value>Every output receives structural and metadata verification. This does not prove every encoded packet is intact.</value></data>
@@ -73,7 +73,7 @@
   <data name="SizeDifference" xml:space="preserve"><value>New file is {0:N0} bytes smaller. The original remains on disk.</value></data>
   <data name="Backend" xml:space="preserve"><value>Media backend</value></data>
   <data name="DevelopmentTools" xml:space="preserve"><value>Development tool override</value></data>
-  <data name="FileDialogTitle" xml:space="preserve"><value>Select an MKV file</value></data>
+  <data name="FileDialogTitle" xml:space="preserve"><value>Select an MKV or MP4 file</value></data>
   <data name="OutputDialogTitle" xml:space="preserve"><value>Choose a folder for the new file</value></data>
   <data name="DataDialogTitle" xml:space="preserve"><value>Choose a writable portable data folder</value></data>
   <data name="SelectionWarning" xml:space="preserve"><value>Removing a default audio track does not assign a new default. Player choices may differ.</value></data>
@@ -81,9 +81,9 @@
   <data name="NoAudioConfirmation" xml:space="preserve"><value>Confirm the silent-output decision before reviewing this plan.</value></data>
   <data name="Unsupported" xml:space="preserve"><value>The source contains a detected unsupported feature: {0}</value></data>
   <data name="DestinationRequired" xml:space="preserve"><value>Choose an output folder before reviewing the plan.</value></data>
-  <data name="SourceRequired" xml:space="preserve"><value>Open an MKV file first.</value></data>
+  <data name="SourceRequired" xml:space="preserve"><value>Open an MKV or MP4 file first.</value></data>
   <data name="CleanupHeading" xml:space="preserve"><value>Temporary cleanup is incomplete. Review the technical diagnostics below; any published output is retained.</value></data>
-  <data name="ErrorInvalidSource" xml:space="preserve"><value>Select a supported local regular MKV file.</value></data>
+  <data name="ErrorInvalidSource" xml:space="preserve"><value>Select a supported local regular MKV or MP4 file.</value></data>
   <data name="ErrorUnsupportedContainer" xml:space="preserve"><value>The detected container is not supported in this phase.</value></data>
   <data name="ErrorUnsupportedFeature" xml:space="preserve"><value>A detected media feature cannot be preserved safely.</value></data>
   <data name="ErrorToolUnavailable" xml:space="preserve"><value>The bundled media tools are missing or cannot run. Re-extract the complete portable archive.</value></data>
@@ -140,12 +140,12 @@
   <data name="ErrorReasonSegmentStructure" xml:space="preserve"><value>The Segment Info cannot be inspected within the supported bounds. Choose a standalone MKV with finite element sizes; streaming clusters and multiple segments are unsupported.</value></data>
   <data name="SingleWorkflow" xml:space="preserve"><value>One file</value></data>
   <data name="BatchWorkflow" xml:space="preserve"><value>Several files / folder</value></data>
-  <data name="BatchInstructions" xml:space="preserve"><value>Add MKV files or one folder. Include subfolders only when requested. Inspect and approve each file independently, choose separate destinations, then review the batch.</value></data>
+  <data name="BatchInstructions" xml:space="preserve"><value>Add MKV/MP4 files or one folder. Include subfolders only when requested. Inspect and approve each file independently, choose separate destinations, then review the batch.</value></data>
   <data name="BatchLimits" xml:space="preserve"><value>Limits: {0} files per queue; {1} examined entries across the whole folder scan. Exceeding a limit rejects the addition in full.</value></data>
-  <data name="BatchAddFiles" xml:space="preserve"><value>Add MKV files…</value></data>
+  <data name="BatchAddFiles" xml:space="preserve"><value>Add MKV / MP4 files…</value></data>
   <data name="BatchAddFolder" xml:space="preserve"><value>Add a folder…</value></data>
-  <data name="BatchFilesDialogTitle" xml:space="preserve"><value>Select MKV files for independent review</value></data>
-  <data name="BatchFolderDialogTitle" xml:space="preserve"><value>Choose one folder with MKV files</value></data>
+  <data name="BatchFilesDialogTitle" xml:space="preserve"><value>Select MKV/MP4 files for independent review</value></data>
+  <data name="BatchFolderDialogTitle" xml:space="preserve"><value>Choose one folder with MKV/MP4 files</value></data>
   <data name="BatchFiles" xml:space="preserve"><value>Batch files (full paths)</value></data>
   <data name="BatchInclusionHint" xml:space="preserve"><value>Included files must have an approved plan. Explicitly exclude or remove unwanted/failed entries; exclusion is shown in review.</value></data>
   <data name="BatchInclude" xml:space="preserve"><value>Include file</value></data>
@@ -196,7 +196,7 @@
   <data name="BatchCleanupCloseNotice" xml:space="preserve"><value>Owned cleanup remains unresolved. Review diagnostics before closing. Remaining evidence is retained; this in-memory queue will not be restored.</value></data>
   <data name="ErrorReasonBatchFileLimit" xml:space="preserve"><value>Too many file entries. Reduce the selection or folder contents; no partial addition was accepted.</value></data>
   <data name="ErrorReasonBatchEntryLimit" xml:space="preserve"><value>The folder contains too many entries to scan within the displayed limit. Use a smaller folder; no partial addition was accepted.</value></data>
-  <data name="ErrorReasonInvalidBatchInput" xml:space="preserve"><value>Choose several local MKV files or exactly one local folder, without directory links.</value></data>
+  <data name="ErrorReasonInvalidBatchInput" xml:space="preserve"><value>Choose several local MKV/MP4 files or exactly one local folder, without directory links.</value></data>
   <data name="RuleHeading" xml:space="preserve"><value>Batch language and title rules</value></data>
   <data name="RuleHint" xml:space="preserve"><value>Unchecked categories leave current choices unchanged. Enable a category to keep every matching track independently in each file. Preview first; nothing changes until you apply.</value></data>
   <data name="RuleAudio" xml:space="preserve"><value>Keep all audio matching these language codes</value></data>
@@ -207,7 +207,7 @@
   <data name="RuleSubtitleTitleFilter" xml:space="preserve"><value>Also require subtitle title to contain text</value></data>
   <data name="RuleSubtitleTitleContains" xml:space="preserve"><value>Subtitle title contains (literal text)</value></data>
   <data name="RuleForcedSubtitlesOnly" xml:space="preserve"><value>Keep only forced subtitles</value></data>
-  <data name="RuleForcedSubtitleHelp" xml:space="preserve"><value>Uses the MKV track's forced flag in addition to language and optional title. Selects whole tracks; subtitle text and individual events are not inspected.</value></data>
+  <data name="RuleForcedSubtitleHelp" xml:space="preserve"><value>Uses the inspected track's forced flag in addition to language and optional title. Selects whole tracks; subtitle text and individual events are not inspected.</value></data>
   <data name="RuleTitleHelp" xml:space="preserve"><value>Optional title text is combined with the language rule. It matches the actual track title, ignoring case and trimming surrounding search whitespace. Punctuation is literal; blank titles do not match. No regular expressions or wildcards.</value></data>
   <data name="RuleSubtitleCodes" xml:space="preserve"><value>Subtitle language codes (comma separated)</value></data>
   <data name="RuleTagHelp" xml:space="preserve"><value>Comma-separated codes, e.g. en, ger, ru-RU, sr-Latn. Tags match exactly: ru does not match ru-RU. Supported tags have an ISO language plus optional script/region. Language metadata is not proof of the language spoken.</value></data>
@@ -275,7 +275,7 @@
   <data name="PresetIssueInvalidRuleLanguage" xml:space="preserve"><value>Correct the unknown or unsupported rule language code.</value></data>
   <data name="PresetCleanupIssue" xml:space="preserve"><value>Preset temporary-file cleanup reported a problem. See details.</value></data>
   <data name="BatchIncludeSubfolders" xml:space="preserve"><value>Include subfolders</value></data>
-  <data name="BatchFolderScopeHelp" xml:space="preserve"><value>Off: immediate MKVs only. On: choose an existing output folder first; relative season folders are preserved. This setting affects only the next folder addition. Output and known application working folders are excluded.</value></data>
+  <data name="BatchFolderScopeHelp" xml:space="preserve"><value>Off: immediate MKV/MP4 files only. On: choose an existing output folder first; relative season folders are preserved. This setting affects only the next folder addition. Output and known application working folders are excluded.</value></data>
   <data name="ErrorReasonRecursiveOutputRequired" xml:space="preserve"><value>Choose an existing output folder before adding a folder with subfolders.</value></data>
   <data name="ErrorReasonRecursiveRootConflict" xml:space="preserve"><value>The output folder cannot equal or contain the selected source folder. Choose a separate output root or a child that can be excluded.</value></data>
   <data name="ErrorReasonBatchDepthLimit" xml:space="preserve"><value>The folder tree exceeds the supported depth of 32 subfolders. Nothing was added.</value></data>

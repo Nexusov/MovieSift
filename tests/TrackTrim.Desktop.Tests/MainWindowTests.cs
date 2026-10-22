@@ -136,7 +136,7 @@ public sealed class MainWindowTests
         var selectedTrack = viewModel.Tracks[2];
         await viewModel.ChangeLanguageCommand.ExecuteAsync("ru");
         Dispatcher.UIThread.RunJobs();
-        Assert.Equal("Открыть MKV…", window.FindControl<Button>("OpenButton")!.Content);
+        Assert.Equal("Открыть MKV / MP4…", window.FindControl<Button>("OpenButton")!.Content);
         Assert.Equal("ru", fixture.Settings.Language);
         Assert.False(viewModel.Tracks[1].Keep);
         Assert.Same(selectedTrack, viewModel.Tracks[2]);
