@@ -1,4 +1,5 @@
 using Serilog;
+using TrackTrim.Application.Batches;
 using TrackTrim.Application.Inspection;
 using TrackTrim.Application.Jobs;
 using TrackTrim.Desktop.Interaction;
@@ -40,8 +41,13 @@ internal static class AppBootstrap
         var localization = new LocalizationService();
         var window = new MainWindow();
         var dialogs = new WindowFileDialogs(new(window, localization));
+        var jobs = new JobCoordinator(backend, sourceAccess, outputs);
+        var batch = new BatchSession();
+        var batchViewModel = new BatchViewModel(new(batch,
+            new BatchCoordinator(batch, new InspectionService(backend, sourceAccess), jobs, sourceAccess),
+            new FileBatchInputDiscovery(sourceAccess), dialogs, localization, dataWritable, logger));
         window.DataContext = new MainViewModel(new(new InspectionService(backend, sourceAccess),
-            new JobCoordinator(backend, sourceAccess, outputs), settings, outputs, dialogs, localization, dataWritable, logger));
+            jobs, settings, outputs, dialogs, localization, dataWritable, logger, batchViewModel));
         window.Closed += (_, _) => logger.Dispose();
         return window;
     }

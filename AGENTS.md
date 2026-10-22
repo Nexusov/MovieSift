@@ -1,6 +1,6 @@
 # Repository instructions
 
-Read `PROJECT_BRIEF.md` before changing behavior. Work only on the explicitly authorized phase. Phase 1 covers one MKV workflow; batch processing, folders, presets, MP4 production support, playback, source replacement, and speculative frameworks belong to later tasks.
+Read `PROJECT_BRIEF.md` before changing behavior. Work only on the explicitly authorized phase. Phase 2A adds bounded explicit-file/top-level-folder discovery, independent manual plans and a sequential in-memory queue over the existing single-job lifecycle. Automatic cross-file matching, presets, recursion, persisted queues, MP4, playback, source replacement and speculative frameworks remain outside this task.
 
 ## Architecture
 
@@ -17,6 +17,7 @@ Read `PROJECT_BRIEF.md` before changing behavior. Work only on the explicitly au
 - Tool paths are absolute and app-relative in production. Use `ArgumentList` and `UseShellExecute=false`; never interpolate media paths into a shell.
 - Drain both streams, bound retained diagnostics and structured data, and reject truncated/malformed JSON/XML. XML resolution/DTDs stay disabled.
 - One owner controls process, candidate, verification, publication, and cleanup. Cancellation must reap the process; uncertain termination prohibits candidate deletion.
+- Batch orchestration must reuse that owner, run at most one job, retain file-local identities and immutable approvals, and pause on warning, failure, cancellation or cleanup uncertainty. Never infer a selection from another file's IDs or resume automatically after warning review.
 - Reserve private adjacent temporary storage and persist ownership before media writing. Publish only a verified candidate with a same-filesystem no-overwrite operation.
 - Exit 1 is warnings, never automatic publication. Approval revalidates the existing candidate; it never remuxes again. Failed verification cannot be overridden.
 - Closing warning review requires an explicit remain/discard choice and awaits one owned cleanup; repeated close requests must not race it.

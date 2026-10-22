@@ -20,7 +20,7 @@ The supported subset is ordinary self-contained Matroska with video/audio/subtit
 
 Whole-container byte equality is not expected. Remuxing changes file layout, indexes, writing application, track numbers, and index-entry counts. The adapter permits track UID remapping only for a source identified as written by MakeMKV; other sources retain UIDs. Its retained input/output mapping is explicit by approved order, known codec properties, metadata, effective flags, and timing, rather than a language/codec pair alone. Tag TrackUID references use that map; unsupported chapter references are rejected.
 
-`--track-order`, explicit retention/flags, `--normalize-language-ietf off`, and `--disable-track-statistics-tags` define the command policy. Existing statistics tags remain part of checked tag XML; new statistics are not generated. SegmentUID/container layout are not a retained-content identity oracle.
+`--track-order`, explicit retention/flags, `--normalize-language-ietf off`, and `--disable-track-statistics-tags` define the command policy. Existing statistics tags remain part of checked tag XML; new statistics are not generated. Some MKVToolNix-generated statistics properties disappear under that policy: an input with such properties can fail strict verification and remain unpublished. The Phase 2A fixture permutation disables creation of those tags, matching the original fixture generator; batch processing does not relax their checks. SegmentUID/container layout are not a retained-content identity oracle.
 
 Track, chapter and tag comparisons share a platform-independent table of registered ISO 639-2 bibliographic/terminologic and ISO 639-1 aliases from the [Library of Congress registry](https://www.loc.gov/standards/iso639-2/ISO-639-2_utf-8.txt). For example, `ger`/`deu`/`de` and `fre`/`fra`/`fr` are equivalent in comparison copies. Original metadata is not rewritten by a culture lookup. An absent IETF field may be added only as an equivalent registered plain code. Existing regional/script/private suffixes and unknown language values remain exact; no base-language collapse or `CultureInfo` inference is used.
 
@@ -36,7 +36,11 @@ Pinned identification JSON does not expose `SegmentFamily`, so a narrow BCL-only
 
 Unknown optional fields can be ignored only if they cannot weaken a required capability check. The current probe cannot enumerate every unknown/private Matroska element or prove that all Dolby Vision/HDR metadata is detectable; no universal container fidelity claim is made. Ordinary SDR fixture coverage does not prove HDR preservation.
 
-MP4, playlists, URLs, external subtitle editing, transcoding, playback, source replacement, batch input, and folders are outside Phase 1. Native Wayland and arbitrary Linux distributions are separate acceptance targets.
+## Phase 2A input scope
+
+The desktop accepts several explicitly selected MKV files or one local folder's immediate MKV entries. Folder discovery is nonrecursive, bounded to 10,000 examined entries and a 100-entry session/addition limit including visible failures, and never traverses directory symlinks/reparse points. Duplicate canonical paths/file identities are collapsed; missing/unreadable/nonregular inputs are reported. An exceeded limit rejects the addition without silent truncation. Each discovered file still requires real inspection and its own manual selection/approval; a suffix is not container evidence. Inputs and destinations containing spaces and Unicode use the same local-path safety policy as single jobs.
+
+MP4, playlists, URLs, external subtitle editing, transcoding, playback, source replacement, automatic batch matching/presets, recursive folders and persisted queues remain outside this implementation. Native Wayland and arbitrary Linux distributions are separate acceptance targets.
 
 ## Platform and native requirements
 

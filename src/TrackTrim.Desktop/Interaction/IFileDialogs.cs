@@ -4,5 +4,7 @@ namespace TrackTrim.Desktop.Interaction;
 public interface IFileDialogs
 {
     Task<string?> SelectSourceAsync();
+    Task<IReadOnlyList<string>> SelectSourcesAsync();
+    Task<string?> SelectInputFolderAsync();
     Task<string?> SelectOutputFolderAsync();
 }

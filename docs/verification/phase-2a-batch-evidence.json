@@ -1,0 +1,307 @@
+{
+  "schemaVersion": 1,
+  "scope": "Phase 2A delivery checkpoint; real Application integration is separate from headless and native desktop checks.",
+  "comparisonBase": "19cb79ab0542addaec264e11c14f829526bc2066",
+  "reviewHead": "78a5b170184d01f3e3a348e8bbc4a81ab933c533",
+  "pullRequest": "https://github.com/Nexusov/TrackTrim/pull/2",
+  "ciRun": "https://github.com/Nexusov/TrackTrim/actions/runs/39338206303",
+  "platforms": [
+    {
+      "runtimeIdentifier": "win-x64",
+      "actualBuildOS": "Microsoft Windows 10.0.26100",
+      "ciCheckout": "77023d177ed5d0d3b4377cd09195656c32ec2c72",
+      "sourceTree": "47b547b27e8f26dbed559fd845d43c431eab5a7e",
+      "worktreeDirty": false,
+      "tests": [
+        {
+          "project": "Application",
+          "passed": 104,
+          "failed": 0,
+          "osSkips": 4
+        },
+        {
+          "project": "Core",
+          "passed": 8,
+          "failed": 0,
+          "osSkips": 0
+        },
+        {
+          "project": "Desktop",
+          "passed": 50,
+          "failed": 0,
+          "osSkips": 0
+        },
+        {
+          "project": "Infrastructure",
+          "passed": 126,
+          "failed": 0,
+          "osSkips": 3
+        }
+      ],
+      "archive": {
+        "name": "TrackTrim-win-x64.zip",
+        "size": 113184759,
+        "sha256": "ae81c32f4c875258cbeecac3390b8da0073971547bdcf9ddba2748eecb29afd7"
+      },
+      "shippedFiles": 524,
+      "manifestSha256": "4e927763b661f1d3a106025250d2b80f9620da2c90786530e365d565c0767ae0",
+      "mechanicalChecks": {
+        "manifestCoverage": "passed",
+        "archiveMatchesStaging": "passed",
+        "includedMaterialReferences": "passed",
+        "pinnedMkvSourceHash": "passed"
+      },
+      "realBatch": {
+        "test": "TrackTrim.Infrastructure.Tests.BatchMediaIntegrationTests.ReorderedInputsPublishTheirOwnSelectionsAndCleanEveryOwnedCandidate",
+        "outcome": "Passed",
+        "files": [
+          {
+            "kind": "real-batch-file",
+            "source": "a исходник.mkv",
+            "sourceHashBefore": "055C7F3EBDC3C579DD6D7740C78A1E8EE0E2525F23542B5C6AF9A0869CE4A0F8",
+            "sourceHashAfter": "055C7F3EBDC3C579DD6D7740C78A1E8EE0E2525F23542B5C6AF9A0869CE4A0F8",
+            "output": "a исходник.trimmed.mkv",
+            "outputHash": "74F95ED26D2DD3BD37331B07BC7DE37DDFBC17787391CBF83BC0749B288846F1",
+            "retained": [
+              {
+                "sourceTrackId": 0,
+                "outputTrackId": 0,
+                "kind": "Video",
+                "payloadCompared": true
+              },
+              {
+                "sourceTrackId": 2,
+                "outputTrackId": 1,
+                "kind": "Audio",
+                "payloadCompared": true
+              },
+              {
+                "sourceTrackId": 3,
+                "outputTrackId": 2,
+                "kind": "Subtitles",
+                "payloadCompared": true
+              }
+            ],
+            "state": "Completed",
+            "toolExitCode": 0,
+            "cleanupIssues": 0
+          },
+          {
+            "kind": "real-batch-file",
+            "source": "b reordered.mkv",
+            "sourceHashBefore": "3B9B63FAF88969358B04F4CD8C0ADBF3C337233C952837D05F4F05853C8FA751",
+            "sourceHashAfter": "3B9B63FAF88969358B04F4CD8C0ADBF3C337233C952837D05F4F05853C8FA751",
+            "output": "b reordered.trimmed.mkv",
+            "outputHash": "050179C899DA2F1B1959FB0A548555A691F9E02147899A03E2518576CCBA82D3",
+            "retained": [
+              {
+                "sourceTrackId": 2,
+                "outputTrackId": 0,
+                "kind": "Video",
+                "payloadCompared": true
+              },
+              {
+                "sourceTrackId": 3,
+                "outputTrackId": 1,
+                "kind": "Audio",
+                "payloadCompared": true
+              }
+            ],
+            "state": "Completed",
+            "toolExitCode": 0,
+            "cleanupIssues": 0
+          }
+        ],
+        "cleanupAssertion": "Both outputs present; adjacent candidate directories, ownership and scratch entries absent.",
+        "payloadEvidence": "Five complete extracted payload SHA256 equality assertions passed. Individual payload digest values are not emitted by the helper."
+      }
+    },
+    {
+      "runtimeIdentifier": "linux-x64",
+      "actualBuildOS": "Ubuntu 24.04.5 LTS",
+      "ciCheckout": "77023d177ed5d0d3b4377cd09195656c32ec2c72",
+      "sourceTree": "47b547b27e8f26dbed559fd845d43c431eab5a7e",
+      "worktreeDirty": false,
+      "tests": [
+        {
+          "project": "Application",
+          "passed": 108,
+          "failed": 0,
+          "osSkips": 0
+        },
+        {
+          "project": "Core",
+          "passed": 8,
+          "failed": 0,
+          "osSkips": 0
+        },
+        {
+          "project": "Desktop",
+          "passed": 50,
+          "failed": 0,
+          "osSkips": 0
+        },
+        {
+          "project": "Infrastructure",
+          "passed": 129,
+          "failed": 0,
+          "osSkips": 0
+        }
+      ],
+      "archive": {
+        "name": "TrackTrim-linux-x64.tar.gz",
+        "size": 104118698,
+        "sha256": "8d5484f3f99e8b1d8b069148886ba1b0b5576cf5e50b6f7a0f670a7549389e8b"
+      },
+      "shippedFiles": 502,
+      "manifestSha256": "3c8a0eb6ba03cb98a0b4d0925abe583319aebd46c471f17581cc4707e9d56266",
+      "mechanicalChecks": {
+        "manifestCoverage": "passed",
+        "archiveMatchesStaging": "passed",
+        "includedMaterialReferences": "passed",
+        "pinnedMkvSourceHash": "passed"
+      },
+      "realBatch": {
+        "test": "TrackTrim.Infrastructure.Tests.BatchMediaIntegrationTests.ReorderedInputsPublishTheirOwnSelectionsAndCleanEveryOwnedCandidate",
+        "outcome": "Passed",
+        "files": [
+          {
+            "kind": "real-batch-file",
+            "source": "a исходник.mkv",
+            "sourceHashBefore": "CF883642CF19082D99F0682AFD3F9B54FCEE14C7DAEF90CEB2EDC6B6CD955378",
+            "sourceHashAfter": "CF883642CF19082D99F0682AFD3F9B54FCEE14C7DAEF90CEB2EDC6B6CD955378",
+            "output": "a исходник.trimmed.mkv",
+            "outputHash": "8CAEA5CE20BD64B5A3BCEBC19EFC79215EDD59DD5231811967BF1C03FBBDAF87",
+            "retained": [
+              {
+                "sourceTrackId": 0,
+                "outputTrackId": 0,
+                "kind": "Video",
+                "payloadCompared": true
+              },
+              {
+                "sourceTrackId": 2,
+                "outputTrackId": 1,
+                "kind": "Audio",
+                "payloadCompared": true
+              },
+              {
+                "sourceTrackId": 3,
+                "outputTrackId": 2,
+                "kind": "Subtitles",
+                "payloadCompared": true
+              }
+            ],
+            "state": "Completed",
+            "toolExitCode": 0,
+            "cleanupIssues": 0
+          },
+          {
+            "kind": "real-batch-file",
+            "source": "b reordered.mkv",
+            "sourceHashBefore": "3E927433C62F57F27D362DA26C0CEADD9A32936634409550CA6CE20368F1037D",
+            "sourceHashAfter": "3E927433C62F57F27D362DA26C0CEADD9A32936634409550CA6CE20368F1037D",
+            "output": "b reordered.trimmed.mkv",
+            "outputHash": "9AE9D9C55F4DB48BDBB16B591F980B0330256758DEECBEA00235C3993F999FE6",
+            "retained": [
+              {
+                "sourceTrackId": 2,
+                "outputTrackId": 0,
+                "kind": "Video",
+                "payloadCompared": true
+              },
+              {
+                "sourceTrackId": 3,
+                "outputTrackId": 1,
+                "kind": "Audio",
+                "payloadCompared": true
+              }
+            ],
+            "state": "Completed",
+            "toolExitCode": 0,
+            "cleanupIssues": 0
+          }
+        ],
+        "cleanupAssertion": "Both outputs present; adjacent candidate directories, ownership and scratch entries absent.",
+        "payloadEvidence": "Five complete extracted payload SHA256 equality assertions passed. Individual payload digest values are not emitted by the helper."
+      }
+    }
+  ],
+  "localPortable": {
+    "sourceRevision": "78a5b170184d01f3e3a348e8bbc4a81ab933c533",
+    "worktreeDirty": false,
+    "archive": {
+      "name": "TrackTrim-win-x64.zip",
+      "size": 113185284,
+      "sha256": "4031cf21f291585ffcf0ed2d3caa3f04f0f615a2cc447fa6833a565f15e1ad48"
+    },
+    "shippedFiles": 524,
+    "relocatedManifestPayloadsVerified": 523,
+    "packagedAndRelocatedWorkflow": "Passed with source SHA256 unchanged; this is CLI execution, not GUI batch acceptance."
+  },
+  "limitedNativeStartup": {
+    "sourceRevision": "78a5b170184d01f3e3a348e8bbc4a81ab933c533",
+    "archiveSha256": "4031cf21f291585ffcf0ed2d3caa3f04f0f615a2cc447fa6833a565f15e1ad48",
+    "actualOS": "Windows 10 Home Single Language 22H2 x64, build 19045.6456",
+    "method": "Computer Use @oai/sky: launch_app, native UIA get_window_state(include_screenshot=false, include_text=true), press_key.",
+    "actions": [
+      "Fresh isolated ZIP extraction with spaces/Cyrillic and empty data; native launch used that exact executable.",
+      "Observed English first launch; Tab to the tab header, Right to Batch; Shift+Tab to RussianButton, Space to change language.",
+      "Observed settled Russian empty Batch text and controls; Alt+F4 closed only the empty test window."
+    ],
+    "observations": [
+      {
+        "recordedAtUtc": "2026-10-19T22:58:51.938Z",
+        "observation": "English empty Batch tab",
+        "applicationText": "Add files and approve their independent plans.\nAdd MKV files or one folder (direct contents only). Inspect and approve each file independently, choose separate destinations, then review the batch.\nLimits: 100 files per queue; 10000 examined folder entries. An excessive addition is rejected in full; subfolders are never scanned.\n0 files · 0 included · 0 finished\nIncluded files must have an approved plan. Explicitly exclude or remove unwanted/failed entries; exclusion is shown in review.\nThe queue exists only in this window and is not restored after restart. Published outputs remain intact. Failures, warnings, cancellation and cleanup problems pause the queue; remaining plans need explicit review and start. No automatic track matching or recursive discovery.\nThe original is preserved and still occupies disk space. Only a new file is created.",
+        "selectedAccessibilityLines": [
+          "14 tab item (selectable) One file",
+          "15 tab item (selectable) Several files / folder",
+          "31 text Add files and approve their independent plans. ID: BatchStatusText",
+          "35 button (disabled) Start / resume reviewed items ID: StartBatchButton",
+          "37 button (disabled) Cancel batch ID: CancelBatchButton",
+          "41 button Add MKV files… ID: AddBatchFilesButton",
+          "42 button Add a folder… ID: AddBatchFolderButton",
+          "44 button Choose output folder… ID: BatchOutputFolderButton"
+        ]
+      },
+      {
+        "recordedAtUtc": "2026-10-19T22:59:21.989Z",
+        "observation": "Russian empty Batch tab after native Space on RussianButton",
+        "applicationText": "Добавьте файлы и подтвердите их отдельные планы.\nДобавьте MKV или одну папку (только её непосредственное содержимое). Проверьте и подтвердите отдельный план каждого файла, выберите пути результатов, затем проверьте очередь.\nОграничения: 100 файлов в очереди; 10000 просмотренных записей папки. При превышении добавление отклоняется целиком; вложенные папки не сканируются.\nФайлов: 0 · включено: 0 · завершено: 0\nУ каждого включённого файла должен быть подтверждённый план. Явно исключите или удалите ненужные и ошибочные записи; исключения показаны в обзоре.\nОчередь существует только в этом окне и не восстанавливается после перезапуска. Опубликованные результаты сохраняются. Ошибки, предупреждения, отмена и проблемы очистки останавливают очередь; продолжение требует явной проверки и запуска. Автоматического сопоставления дорожек и рекурсивного поиска нет.\nОригинал сохраняется и продолжает занимать место. Создаётся только новый файл.",
+        "selectedAccessibilityLines": [
+          "14 tab item (selectable) Один файл",
+          "15 tab item (selectable) Несколько файлов / папка",
+          "31 text Добавьте файлы и подтвердите их отдельные планы. ID: BatchStatusText",
+          "35 button (disabled) Запустить / продолжить проверенные планы ID: StartBatchButton",
+          "37 button (disabled) Отменить очередь ID: CancelBatchButton",
+          "41 button Добавить MKV… ID: AddBatchFilesButton",
+          "42 button Добавить папку… ID: AddBatchFolderButton",
+          "44 button Выбрать папку результата… ID: BatchOutputFolderButton"
+        ]
+      }
+    ],
+    "emptyWindowClose": {
+      "action": "Alt_L+F4 on empty Phase 2A window",
+      "startedAtUtc": "2026-10-19T22:59:38.568Z",
+      "observedAtUtc": "2026-10-19T22:59:38.717Z",
+      "windowStillListed": true,
+      "settledObservedAtUtc": "2026-10-19T22:59:56.353Z",
+      "windowStillListedAfterSettle": false
+    },
+    "postCloseOwnedGuiProcessCount": 0,
+    "postCloseSettingsLanguage": "ru",
+    "postCloseOwnershipEntries": 0,
+    "limits": [
+      "No MKV was opened or processed in this new native GUI check. Native batch pickers/execution/active cancellation/warning review remain unverified.",
+      "No screenshot requested; unchanged capture blocker not retried. UIA does not establish appearance, visible focus, resizing, scrolling or effective scale.",
+      "No Windows 11 or Ubuntu Desktop acceptance. Earlier Phase 1 native evidence retains its original binary/environment."
+    ]
+  },
+  "redactionsAndOmissions": [
+    "Private workspace paths and runner machine/TRX filenames omitted. Source/output names are generated test filenames.",
+    "Native snapshot timestamps describe evidence retention, not precise input-event correlation.",
+    "No binaries, media, large source archives or full raw logs are included."
+  ],
+  "redistributionReady": false
+}

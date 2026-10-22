@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:viewModels="using:TrackTrim.Desktop.ViewModels"
+        xmlns:views="using:TrackTrim.Desktop.Views"
         x:Class="TrackTrim.Desktop.Views.MainWindow"
         x:DataType="viewModels:MainViewModel"
         Title="TrackTrim" Width="1040" Height="800" MinWidth="640" MinHeight="480">
@@ -23,6 +24,7 @@
             Margin="0,0,0,16" IsVisible="{Binding HasWarningCloseDecision}">
       <StackPanel Spacing="8">
         <TextBlock Text="{Binding Localization[CloseWarningReview]}" TextWrapping="Wrap" />
+        <TextBlock Text="{Binding WarningCloseSource}" TextWrapping="Wrap" />
         <WrapPanel Orientation="Horizontal">
           <Button x:Name="RemainInWarningReviewButton" Content="{Binding Localization[RemainInWarningReview]}"
                   Command="{Binding RemainInWarningReviewCommand}" Margin="0,0,8,8" />
@@ -32,130 +34,141 @@
       </StackPanel>
     </Border>
 
-    <StackPanel DockPanel.Dock="Bottom" Spacing="8" Margin="0,16,0,0">
-      <TextBlock x:Name="StatusText" Text="{Binding StatusText}" TextWrapping="Wrap" FontWeight="SemiBold" />
-      <ProgressBar Minimum="0" Maximum="100" Value="{Binding ProgressValue}" IsIndeterminate="{Binding IsProgressIndeterminate}" IsVisible="{Binding IsBusy}" />
-      <WrapPanel Orientation="Horizontal">
-        <Button x:Name="ReviewButton" Content="{Binding Localization[ReviewPlan]}" Command="{Binding ReviewPlanCommand}" Margin="0,0,8,8" />
-        <Button Content="{Binding Localization[Run]}" Command="{Binding RunCommand}" Margin="0,0,8,8" />
-        <Button Content="{Binding Localization[Cancel]}" Command="{Binding CancelCommand}" Margin="0,0,8,8" />
-      </WrapPanel>
-    </StackPanel>
+    <Border DockPanel.Dock="Top" Margin="0,0,0,12" Padding="12" BorderBrush="Orange" BorderThickness="1" CornerRadius="4" IsVisible="{Binding RequiresCloseDecision}">
+      <StackPanel Spacing="8">
+        <TextBlock Text="{Binding CloseDecisionText}" TextWrapping="Wrap" />
+        <Button x:Name="CloseDespiteUncertaintyButton" Click="OnCloseDespiteUncertainty" Content="{Binding Localization[CloseDespiteUncertainty]}" />
+      </StackPanel>
+    </Border>
 
-    <ScrollViewer x:Name="MainScrollViewer" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-      <StackPanel Spacing="16">
-        <Border Padding="12" BorderBrush="Orange" BorderThickness="1" CornerRadius="4" IsVisible="{Binding PersistenceFailed}">
-          <TextBlock Text="{Binding Localization[PersistenceFailure]}" TextWrapping="Wrap" />
-        </Border>
-
-        <Border Padding="12" BorderBrush="Orange" BorderThickness="1" CornerRadius="4" IsVisible="{Binding HasInterrupted}">
-          <StackPanel Spacing="8">
-            <TextBlock Text="{Binding Localization[Interrupted]}" TextWrapping="Wrap" />
-            <TextBlock Text="{Binding InterruptedDetails}" TextWrapping="Wrap" />
-            <Button Content="{Binding Localization[CleanInterrupted]}" Command="{Binding CleanInterruptedCommand}" IsVisible="{Binding HasCleanableInterrupted}" />
-          </StackPanel>
-        </Border>
-
-        <StackPanel Spacing="6">
-          <TextBlock Text="{Binding Localization[Source]}" FontWeight="SemiBold" />
-          <TextBox Text="{Binding SourcePath}" IsReadOnly="True" PlaceholderText="{Binding Localization[NoSource]}"
-                   TextWrapping="Wrap" AutomationProperties.Name="{Binding Localization[Source]}" />
-          <Button x:Name="OpenButton" Content="{Binding Localization[OpenFile]}" Command="{Binding OpenSourceCommand}" HorizontalAlignment="Left" />
-        </StackPanel>
-
-        <StackPanel Spacing="6">
-          <TextBlock Text="{Binding Localization[Output]}" FontWeight="SemiBold" />
-          <TextBox x:Name="OutputTextBox" Text="{Binding OutputPath, Mode=TwoWay}" IsEnabled="{Binding CanEdit}"
-                   PlaceholderText="{Binding Localization[NoOutput]}" TextWrapping="Wrap" AutomationProperties.Name="{Binding Localization[Output]}" />
-          <Button Content="{Binding Localization[ChooseOutput]}" Command="{Binding ChooseOutputCommand}" HorizontalAlignment="Left" />
-        </StackPanel>
-
-        <StackPanel Spacing="8" IsVisible="{Binding HasTracks}">
-          <TextBlock Classes="heading" Text="{Binding Localization[Tracks]}" />
-          <TextBlock Text="{Binding BackendDescription}" TextWrapping="Wrap" />
-          <TextBlock Text="{Binding MediaFeaturesText}" TextWrapping="Wrap" />
-          <TextBlock Text="{Binding Localization[LanguageTagNotice]}" TextWrapping="Wrap" Opacity="0.8" />
-          <ItemsControl x:Name="TrackList" ItemsSource="{Binding Tracks}" IsEnabled="{Binding CanEdit}">
-            <ItemsControl.ItemTemplate>
-              <DataTemplate x:DataType="viewModels:TrackViewModel">
-                <Border BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="1" CornerRadius="4" Padding="12" Margin="0,0,0,6">
-                  <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
-                    <CheckBox IsChecked="{Binding Keep, Mode=TwoWay}" IsEnabled="{Binding IsSelectable}"
-                              Content="{Binding Localization[Keep]}" AutomationProperties.Name="{Binding KeepAccessibleName}" VerticalAlignment="Top" />
-                    <StackPanel Grid.Column="1" Spacing="4">
-                      <WrapPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding KindText}" FontWeight="SemiBold" Margin="0,0,12,0" />
-                        <TextBlock Text="{Binding Localization[TrackId]}" Margin="0,0,4,0" />
-                        <TextBlock Text="{Binding IdentifierText}" Margin="0,0,12,0" />
-                        <TextBlock Text="{Binding Track.Codec}" />
-                        <TextBlock Text="{Binding Localization[AlwaysKept]}" IsVisible="{Binding IsRequired}" Margin="12,0,0,0" />
-                      </WrapPanel>
-                      <TextBlock Text="{Binding TitleText}" TextWrapping="Wrap" />
-                      <WrapPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding Localization[LanguageMetadata]}" Margin="0,0,4,0" />
-                        <TextBlock Text="{Binding LanguageText}" Margin="0,0,12,0" />
-                        <TextBlock Text="{Binding Localization[Channels]}" Margin="0,0,4,0" IsVisible="{Binding IsAudio}" />
-                        <TextBlock Text="{Binding ChannelsText}" Margin="0,0,12,0" IsVisible="{Binding IsAudio}" />
-                        <TextBlock Text="{Binding FlagsText}" />
-                      </WrapPanel>
-                    </StackPanel>
-                  </Grid>
-                </Border>
-              </DataTemplate>
-            </ItemsControl.ItemTemplate>
-          </ItemsControl>
-          <CheckBox x:Name="ZeroAudioCheckBox" IsChecked="{Binding ZeroAudioConfirmed, Mode=TwoWay}"
-                    IsVisible="{Binding NeedsZeroAudioConfirmation}" IsEnabled="{Binding CanEdit}">
-            <TextBlock Text="{Binding Localization[ConfirmSilent]}" TextWrapping="Wrap" />
-          </CheckBox>
-        </StackPanel>
-
-        <Border Padding="16" CornerRadius="4" BorderBrush="{DynamicResource SystemControlHighlightAccentBrush}" BorderThickness="1" IsVisible="{Binding HasPlan}">
-          <StackPanel Spacing="8">
-            <TextBlock Classes="heading" Text="{Binding Localization[Plan]}" />
-            <TextBlock Text="{Binding PlanDescription}" TextWrapping="Wrap" />
-            <TextBlock Text="{Binding PlanTracksText}" TextWrapping="Wrap" />
-            <TextBlock Text="{Binding PlanDestination}" TextWrapping="Wrap" />
-            <TextBlock Text="{Binding Localization[PreservationSummary]}" TextWrapping="Wrap" />
-            <TextBlock Text="{Binding Localization[PlanInstructions]}" TextWrapping="Wrap" />
-            <TextBlock x:Name="PlanDefaultAudioStatus" Text="{Binding PlanDefaultAudioText}" TextWrapping="Wrap" />
-            <TextBlock x:Name="DefaultAudioDisclaimer" Text="{Binding Localization[SelectionWarning]}" TextWrapping="Wrap" IsVisible="{Binding RemovesDefaultAudio}" />
-          </StackPanel>
-        </Border>
-
-        <Border Padding="16" BorderBrush="Orange" BorderThickness="1" CornerRadius="4" IsVisible="{Binding HasWarningCandidate}">
-          <StackPanel Spacing="8">
-            <TextBlock Text="{Binding Localization[WarningReview]}" TextWrapping="Wrap" />
+    <TabControl>
+      <TabItem Header="{Binding Localization[SingleWorkflow]}">
+        <DockPanel LastChildFill="True">
+          <StackPanel DockPanel.Dock="Bottom" Spacing="8" Margin="0,16,0,0">
+            <TextBlock x:Name="StatusText" Text="{Binding StatusText}" TextWrapping="Wrap" FontWeight="SemiBold" />
+            <ProgressBar Minimum="0" Maximum="100" Value="{Binding ProgressValue}" IsIndeterminate="{Binding IsProgressIndeterminate}" IsVisible="{Binding IsBusy}" />
             <WrapPanel Orientation="Horizontal">
-              <Button Content="{Binding Localization[PublishWarnings]}" Command="{Binding PublishWarningsCommand}" Margin="0,0,8,8" />
-              <Button Content="{Binding Localization[Discard]}" Command="{Binding DiscardWarningsCommand}" Margin="0,0,8,8" />
+              <Button x:Name="ReviewButton" Content="{Binding Localization[ReviewPlan]}" Command="{Binding ReviewPlanCommand}" Margin="0,0,8,8" />
+              <Button Content="{Binding Localization[Run]}" Command="{Binding RunCommand}" Margin="0,0,8,8" />
+              <Button Content="{Binding Localization[Cancel]}" Command="{Binding CancelCommand}" Margin="0,0,8,8" />
             </WrapPanel>
           </StackPanel>
-        </Border>
 
-        <StackPanel Spacing="6" IsVisible="{Binding HasError}">
-          <TextBlock x:Name="ErrorText" Text="{Binding ErrorText}" TextWrapping="Wrap" Foreground="Crimson" FontWeight="SemiBold" />
-          <TextBlock x:Name="ErrorDetailText" Text="{Binding ErrorDetail}" TextWrapping="Wrap" IsVisible="{Binding HasErrorDetail}" />
-        </StackPanel>
+          <ScrollViewer x:Name="MainScrollViewer" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <StackPanel Spacing="16">
+              <Border Padding="12" BorderBrush="Orange" BorderThickness="1" CornerRadius="4" IsVisible="{Binding PersistenceFailed}">
+                <TextBlock Text="{Binding Localization[PersistenceFailure]}" TextWrapping="Wrap" />
+              </Border>
 
-        <Border Padding="12" BorderBrush="Orange" BorderThickness="1" CornerRadius="4" IsVisible="{Binding RequiresCloseDecision}">
-          <StackPanel Spacing="8">
-            <TextBlock Text="{Binding Localization[CloseUnconfirmedNotice]}" TextWrapping="Wrap" />
-            <Button x:Name="CloseDespiteUncertaintyButton" Click="OnCloseDespiteUncertainty" Content="{Binding Localization[CloseDespiteUncertainty]}" />
-          </StackPanel>
-        </Border>
+              <Border Padding="12" BorderBrush="Orange" BorderThickness="1" CornerRadius="4" IsVisible="{Binding HasInterrupted}">
+                <StackPanel Spacing="8">
+                  <TextBlock Text="{Binding Localization[Interrupted]}" TextWrapping="Wrap" />
+                  <TextBlock Text="{Binding InterruptedDetails}" TextWrapping="Wrap" />
+                  <Button Content="{Binding Localization[CleanInterrupted]}" Command="{Binding CleanInterruptedCommand}" IsVisible="{Binding HasCleanableInterrupted}" />
+                </StackPanel>
+              </Border>
 
-        <StackPanel Spacing="6" IsVisible="{Binding HasCleanupIssue}">
-          <TextBlock Text="{Binding Localization[CleanupHeading]}" TextWrapping="Wrap" />
-        </StackPanel>
+              <StackPanel Spacing="6">
+                <TextBlock Text="{Binding Localization[Source]}" FontWeight="SemiBold" />
+                <TextBox Text="{Binding SourcePath}" IsReadOnly="True" PlaceholderText="{Binding Localization[NoSource]}"
+                         TextWrapping="Wrap" AutomationProperties.Name="{Binding Localization[Source]}" />
+                <Button x:Name="OpenButton" Content="{Binding Localization[OpenFile]}" Command="{Binding OpenSourceCommand}" HorizontalAlignment="Left" />
+              </StackPanel>
 
-        <Expander Header="{Binding Localization[Diagnostics]}" IsVisible="{Binding HasDiagnostics}">
-          <TextBox Text="{Binding Diagnostics}" IsReadOnly="True" TextWrapping="Wrap" MaxHeight="240" />
-        </Expander>
-        <TextBlock Text="{Binding SizeDifferenceText}" TextWrapping="Wrap" IsVisible="{Binding HasSizeDifference}" />
-        <TextBlock Text="{Binding Localization[VerificationNotice]}" TextWrapping="Wrap" Opacity="0.8" />
-        <TextBlock Text="{Binding Localization[OriginalNotice]}" TextWrapping="Wrap" Opacity="0.8" />
-      </StackPanel>
-    </ScrollViewer>
+              <StackPanel Spacing="6">
+                <TextBlock Text="{Binding Localization[Output]}" FontWeight="SemiBold" />
+                <TextBox x:Name="OutputTextBox" Text="{Binding OutputPath, Mode=TwoWay}" IsEnabled="{Binding CanEdit}"
+                         PlaceholderText="{Binding Localization[NoOutput]}" TextWrapping="Wrap" AutomationProperties.Name="{Binding Localization[Output]}" />
+                <Button Content="{Binding Localization[ChooseOutput]}" Command="{Binding ChooseOutputCommand}" HorizontalAlignment="Left" />
+              </StackPanel>
+
+              <StackPanel Spacing="8" IsVisible="{Binding HasTracks}">
+                <TextBlock Classes="heading" Text="{Binding Localization[Tracks]}" />
+                <TextBlock Text="{Binding BackendDescription}" TextWrapping="Wrap" />
+                <TextBlock Text="{Binding MediaFeaturesText}" TextWrapping="Wrap" />
+                <TextBlock Text="{Binding Localization[LanguageTagNotice]}" TextWrapping="Wrap" Opacity="0.8" />
+                <ItemsControl x:Name="TrackList" ItemsSource="{Binding Tracks}" IsEnabled="{Binding CanEdit}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="viewModels:TrackViewModel">
+                      <Border BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="1" CornerRadius="4" Padding="12" Margin="0,0,0,6">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                          <CheckBox IsChecked="{Binding Keep, Mode=TwoWay}" IsEnabled="{Binding IsSelectable}"
+                                    Content="{Binding Localization[Keep]}" AutomationProperties.Name="{Binding KeepAccessibleName}" VerticalAlignment="Top" />
+                          <StackPanel Grid.Column="1" Spacing="4">
+                            <WrapPanel Orientation="Horizontal">
+                              <TextBlock Text="{Binding KindText}" FontWeight="SemiBold" Margin="0,0,12,0" />
+                              <TextBlock Text="{Binding Localization[TrackId]}" Margin="0,0,4,0" />
+                              <TextBlock Text="{Binding IdentifierText}" Margin="0,0,12,0" />
+                              <TextBlock Text="{Binding Track.Codec}" />
+                              <TextBlock Text="{Binding Localization[AlwaysKept]}" IsVisible="{Binding IsRequired}" Margin="12,0,0,0" />
+                            </WrapPanel>
+                            <TextBlock Text="{Binding TitleText}" TextWrapping="Wrap" />
+                            <WrapPanel Orientation="Horizontal">
+                              <TextBlock Text="{Binding Localization[LanguageMetadata]}" Margin="0,0,4,0" />
+                              <TextBlock Text="{Binding LanguageText}" Margin="0,0,12,0" />
+                              <TextBlock Text="{Binding Localization[Channels]}" Margin="0,0,4,0" IsVisible="{Binding IsAudio}" />
+                              <TextBlock Text="{Binding ChannelsText}" Margin="0,0,12,0" IsVisible="{Binding IsAudio}" />
+                              <TextBlock Text="{Binding FlagsText}" />
+                            </WrapPanel>
+                          </StackPanel>
+                        </Grid>
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <CheckBox x:Name="ZeroAudioCheckBox" IsChecked="{Binding ZeroAudioConfirmed, Mode=TwoWay}"
+                          IsVisible="{Binding NeedsZeroAudioConfirmation}" IsEnabled="{Binding CanEdit}">
+                  <TextBlock Text="{Binding Localization[ConfirmSilent]}" TextWrapping="Wrap" />
+                </CheckBox>
+              </StackPanel>
+
+              <Border Padding="16" CornerRadius="4" BorderBrush="{DynamicResource SystemControlHighlightAccentBrush}" BorderThickness="1" IsVisible="{Binding HasPlan}">
+                <StackPanel Spacing="8">
+                  <TextBlock Classes="heading" Text="{Binding Localization[Plan]}" />
+                  <TextBlock Text="{Binding PlanDescription}" TextWrapping="Wrap" />
+                  <TextBlock Text="{Binding PlanTracksText}" TextWrapping="Wrap" />
+                  <TextBlock Text="{Binding PlanDestination}" TextWrapping="Wrap" />
+                  <TextBlock Text="{Binding Localization[PreservationSummary]}" TextWrapping="Wrap" />
+                  <TextBlock Text="{Binding Localization[PlanInstructions]}" TextWrapping="Wrap" />
+                  <TextBlock x:Name="PlanDefaultAudioStatus" Text="{Binding PlanDefaultAudioText}" TextWrapping="Wrap" />
+                  <TextBlock x:Name="DefaultAudioDisclaimer" Text="{Binding Localization[SelectionWarning]}" TextWrapping="Wrap" IsVisible="{Binding RemovesDefaultAudio}" />
+                </StackPanel>
+              </Border>
+
+              <Border Padding="16" BorderBrush="Orange" BorderThickness="1" CornerRadius="4" IsVisible="{Binding HasSingleWarningCandidate}">
+                <StackPanel Spacing="8">
+                  <TextBlock Text="{Binding Localization[WarningReview]}" TextWrapping="Wrap" />
+                  <WrapPanel Orientation="Horizontal">
+                    <Button Content="{Binding Localization[PublishWarnings]}" Command="{Binding PublishWarningsCommand}" Margin="0,0,8,8" />
+                    <Button Content="{Binding Localization[Discard]}" Command="{Binding DiscardWarningsCommand}" Margin="0,0,8,8" />
+                  </WrapPanel>
+                </StackPanel>
+              </Border>
+
+              <StackPanel Spacing="6" IsVisible="{Binding HasError}">
+                <TextBlock x:Name="ErrorText" Text="{Binding ErrorText}" TextWrapping="Wrap" Foreground="Crimson" FontWeight="SemiBold" />
+                <TextBlock x:Name="ErrorDetailText" Text="{Binding ErrorDetail}" TextWrapping="Wrap" IsVisible="{Binding HasErrorDetail}" />
+              </StackPanel>
+
+
+
+              <StackPanel Spacing="6" IsVisible="{Binding HasCleanupIssue}">
+                <TextBlock Text="{Binding Localization[CleanupHeading]}" TextWrapping="Wrap" />
+              </StackPanel>
+
+              <Expander Header="{Binding Localization[Diagnostics]}" IsVisible="{Binding HasDiagnostics}">
+                <TextBox Text="{Binding Diagnostics}" IsReadOnly="True" TextWrapping="Wrap" MaxHeight="240" />
+              </Expander>
+              <TextBlock Text="{Binding SizeDifferenceText}" TextWrapping="Wrap" IsVisible="{Binding HasSizeDifference}" />
+              <TextBlock Text="{Binding Localization[VerificationNotice]}" TextWrapping="Wrap" Opacity="0.8" />
+              <TextBlock Text="{Binding Localization[OriginalNotice]}" TextWrapping="Wrap" Opacity="0.8" />
+            </StackPanel>
+          </ScrollViewer>
+        </DockPanel>
+      </TabItem>
+      <TabItem Header="{Binding Localization[BatchWorkflow]}" IsVisible="{Binding HasBatch}">
+        <views:BatchView DataContext="{Binding Batch}" />
+      </TabItem>
+    </TabControl>
   </DockPanel>
 </Window>

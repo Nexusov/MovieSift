@@ -87,6 +87,12 @@ internal sealed class FakeDialogs(string sourcePath) : IFileDialogs
     /// <summary>Returns the test's selected local source without opening native UI.</summary>
     public Task<string?> SelectSourceAsync() => Task.FromResult<string?>(sourcePath);
 
+    /// <summary>Returns selected paths for controlled batch presentation tests.</summary>
+    public Task<IReadOnlyList<string>> SelectSourcesAsync() => Task.FromResult<IReadOnlyList<string>>([sourcePath]);
+
+    /// <summary>Returns a folder without claiming native dialog acceptance.</summary>
+    public Task<string?> SelectInputFolderAsync() => Task.FromResult<string?>(Path.GetTempPath());
+
     /// <summary>Returns a writable test destination folder.</summary>
     public Task<string?> SelectOutputFolderAsync() => Task.FromResult<string?>(Path.GetTempPath());
 }
@@ -150,6 +156,7 @@ internal sealed class FakeMediaBackend(MediaInspection inspection) : IMediaBacke
 /// <summary>Supplies outcome evidence without creating files in presentation tests.</summary>
 internal sealed class FakeOutputStore : IOutputStore
 {
+    public Failure? PublicationFailure { get; set; }
     public ImmutableArray<CleanupIssue> CleanupIssues { get; set; } = [];
     public ImmutableArray<InterruptedOutput> Interrupted { get; set; } = [];
     public TaskCompletionSource CleanupStarted { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -170,7 +177,9 @@ internal sealed class FakeOutputStore : IOutputStore
     public Task MarkPublishingAsync(OutputRequest request) => Task.CompletedTask;
 
     /// <summary>Returns publication evidence without creating a media file.</summary>
-    public Task<PublishedOutput> PublishAsync(OutputRequest request) => Task.FromResult(new PublishedOutput(request.Output.DestinationPath, 700));
+    public Task<PublishedOutput> PublishAsync(OutputRequest request) => PublicationFailure is { } failure
+        ? Task.FromException<PublishedOutput>(new OperationFailureException(failure))
+        : Task.FromResult(new PublishedOutput(request.Output.DestinationPath, 700));
 
     /// <summary>Reports complete cleanup for presentation-only candidates.</summary>
     public async Task<ImmutableArray<CleanupIssue>> CleanupAsync(OutputRequest request)

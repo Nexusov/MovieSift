@@ -15,4 +15,5 @@ public sealed record MainViewModelServices(
     IFileDialogs Dialogs,
     LocalizationService Localization,
     bool DataWritable,
-    ILogger Log);
+    ILogger Log,
+    BatchViewModel? Batch = null);

@@ -40,7 +40,10 @@ public enum ErrorReason
     DanglingTrackTags,
     RedirectedPath,
     NetworkPath,
-    RegularFileRequired
+    RegularFileRequired,
+    BatchFileLimit,
+    BatchEntryLimit,
+    InvalidBatchInput
 }
 
 public sealed record Failure(ErrorCode Code, string Detail = "", ErrorReason Reason = ErrorReason.None);
