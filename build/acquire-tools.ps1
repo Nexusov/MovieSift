@@ -268,8 +268,11 @@ $fileProvenance = @(Get-ChildItem -LiteralPath $destinationPath -File -Recurse -
 
     if ($material) {
         $origin = $material.relationship
-        $originArchive = $material.url
         $originArchiveHash = $material.sha256
+
+        if ($material.PSObject.Properties.Name -contains 'url') {
+            $originArchive = $material.url
+        }
 
         if ($material.PSObject.Properties.Name -contains 'sourceArtifact') {
             $originArchive = $material.sourceArtifact.url
