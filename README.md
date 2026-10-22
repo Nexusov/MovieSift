@@ -2,7 +2,7 @@
 
 TrackTrim is a portable Windows/Linux desktop application for removing selected embedded audio and subtitle tracks from local MKV files without re-encoding. It writes separate MKVs; originals remain on disk. Creating a trimmed copy does not free the original's space.
 
-This branch adds Phase 2A manual batch processing and Phase 2B explicit language-rule preview/application with optional literal title and subtitle forced-flag constraints to the Phase 0/1 foundation. It is a review build, not a public release. [Acceptance status and executed checks](docs/PLAN.md) distinguish implemented code from verified behavior and outstanding platform requirements. CI builds and tests archives but uploads only test/provenance evidence while binary redistribution obligations remain unresolved.
+This branch adds Phase 2A manual batches, Phase 2B language/title/forced-subtitle rules and Phase 2C1 named portable rule presets to the Phase 0/1 foundation. It is a review build, not a public release. [Acceptance status and executed checks](docs/PLAN.md) distinguish implemented code from verified behavior and outstanding platform requirements. CI builds and tests archives but uploads only test/provenance evidence while binary redistribution obligations remain unresolved.
 
 The application uses C#/.NET 10, Avalonia 12 with Fluent controls, CommunityToolkit.Mvvm, and pinned MKVToolNix executables. English is the initial language, including on a Russian OS. The English / Русский selector changes application text without discarding the current selection; the choice is saved beside the application.
 
@@ -43,7 +43,13 @@ For matching subtitles, **Keep only forced subtitles** optionally also requires 
 
 [Literal-title verification](docs/verification/phase-2b-title-filter-evidence.json) records the real two-file conjunction/payload case, 56 focused tests, full platform CI and two bounded checks on the identified Phase 2B2 Windows 10 GUI: English title Preview/Apply, then both-category EN → RU → EN state preservation. After one fresh baseline Preview, the latter retained settings, proposal, paths and existing approval without another Preview, Apply, Review or Run. Source selection for the original check was owner-assisted; subsequent input used Computer Use. Visual and target-desktop acceptance remain open.
 
-Do not use the application as a universal preservation tool. The [supported MKV matrix](docs/SUPPORTED_FORMATS.md) defines the inspected, verified, and rejected cases. Title-only/regex rules, other forced-filter modes, presets, recursive discovery, persisted queues/retries, MP4, playback and source replacement remain outside this implementation.
+### Named portable rule presets
+
+**Save as new** stores the current audio/subtitle rule settings, including inactive language/title values and forced-only. Select a saved name, then explicitly **Load** it; selection alone changes no rules. Loading different values clears only the transient Preview, preserving actual Keep choices, plans, destinations and Review. Identical values preserve a valid Preview. Rename and confirmed Delete affect only the catalog; deleting loaded values leaves them in the editor. Startup restores the list without selecting/loading anything, and New batch keeps the catalog and rule configuration.
+
+Presets live in `data/rule-presets.json` beside the portable application. They contain no media paths, output folder, track IDs, selections, approvals, jobs, queue or interface language. Names are trimmed, unique without case, and limited to 80 characters without control characters. The versioned catalog is bounded by 64 KiB and 100 entries; corrupt/incompatible files remain untouched with a visible error, while manual rules remain usable. Writes use fail-fast interprocess exclusion and complete-file validation. See [storage bounds and failure behavior](docs/ARCHITECTURE.md#phase-2c1-portable-rule-presets) and the [feature evidence](docs/verification/phase-2c-rule-presets-evidence.json). No overwrite/update, import/export or automatic preset application is provided.
+
+Do not use the application as a universal preservation tool. The [supported MKV matrix](docs/SUPPORTED_FORMATS.md) defines the inspected, verified, and rejected cases. Title-only/regex rules, other forced-filter modes, preset update/import/export, recursive discovery, persisted queues/retries, MP4, playback and source replacement remain outside this implementation.
 
 Preflight supplements MKVToolNix identification with bounded, read-only Segment Info inspection. Detected segment families and previous/next links are rejected before processing; layouts that cannot be inspected within those bounds fail explicitly. This check uses no additional media executable.
 

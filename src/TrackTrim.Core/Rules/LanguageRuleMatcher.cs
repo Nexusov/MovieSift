@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using System.Globalization;
 using TrackTrim.Core.Media;
 
 namespace TrackTrim.Core.Rules;
@@ -60,62 +59,22 @@ public static class LanguageRuleMatcher
     /// <summary>Replaces only one targeted category after every language in that category is trustworthy.</summary>
     private static bool SelectCategory(CategoryLanguageSelection request)
     {
-        var rule = request.Rule;
+        var configuration = LanguageRuleConfiguration.ValidateCategory(new(request.Category, request.Rule));
 
-        if (rule is null)
+        if (!configuration.Issues.IsEmpty)
         {
-            request.Issues.Add(new(request.Category, null, LanguageRuleIssueReason.InvalidRuleLanguage));
+            request.Issues.AddRange(configuration.Issues);
             return false;
         }
 
-        if (rule.Mode == LanguageRuleMode.Unchanged)
+        if (request.Rule!.Mode == LanguageRuleMode.Unchanged)
         {
-            return false;
-        }
-
-        if (rule.Mode != LanguageRuleMode.KeepMatching)
-        {
-            request.Issues.Add(new(request.Category, null, LanguageRuleIssueReason.InvalidRuleLanguage,
-                ((int)rule.Mode).ToString(CultureInfo.InvariantCulture)));
-            return false;
-        }
-
-        var hasTitleFilter = rule.TitleFilter is { Enabled: true };
-        var titleSearch = hasTitleFilter ? rule.TitleFilter?.Text?.Trim() : null;
-
-        if (hasTitleFilter && string.IsNullOrEmpty(titleSearch))
-        {
-            request.Issues.Add(new(request.Category, null, LanguageRuleIssueReason.EmptyTitleFilter, rule.TitleFilter?.Text));
-            return false;
-        }
-
-        if (rule.Languages.IsDefaultOrEmpty)
-        {
-            request.Issues.Add(new(request.Category, null, LanguageRuleIssueReason.EmptyLanguageSelection));
             return false;
         }
 
         var previousIssueCount = request.Issues.Count;
-        var requestedLanguages = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-        foreach (var value in rule.Languages)
-        {
-            var parsed = LanguageRuleTagParser.ParseTag(value);
-
-            if (parsed.Issue is not null)
-            {
-                request.Issues.Add(new(request.Category, null, LanguageRuleIssueReason.InvalidRuleLanguage, value));
-                continue;
-            }
-
-            requestedLanguages.Add(parsed.Tag!);
-        }
-
-        if (request.Issues.Count != previousIssueCount)
-        {
-            return false;
-        }
-
+        var requestedLanguages = configuration.CanonicalLanguages.ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var titleSearch = configuration.TitleSearch;
         var tracks = request.Tracks.Where(track => track.Kind == request.Category).ToImmutableArray();
         var matchingIdentifiers = new HashSet<int>();
 

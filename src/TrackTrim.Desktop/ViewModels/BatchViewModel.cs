@@ -47,6 +47,8 @@ public sealed partial class BatchViewModel : ObservableObject
         this.services = services;
         Snapshot = services.Session.Snapshot;
         LanguageRules = new(new(services.Session, services.Coordinator, services.Localization, () => CanEdit, OnEditorChanged));
+        Presets = new(new(services.Presets, LanguageRules, services.Session, services.Localization,
+            () => IsWorkspaceAvailable && !HasNewBatchConfirmation, () => !writesBlocked, Refresh));
         writesBlocked = !services.DataWritable;
         AddFilesCommand = new AsyncRelayCommand(AddFilesAsync, () => CanEdit);
         AddFolderCommand = new AsyncRelayCommand(AddFolderAsync, () => CanEdit);
@@ -72,15 +74,16 @@ public sealed partial class BatchViewModel : ObservableObject
     public Localization.LocalizationService Localization => services.Localization;
     public ObservableCollection<BatchItemViewModel> Items { get; } = [];
     public BatchLanguageRulesViewModel LanguageRules { get; }
+    public RulePresetsViewModel Presets { get; }
     public BatchSnapshot Snapshot { get; private set; }
     public string OutputFolder => outputFolder;
-    public bool CanEdit => IsWorkspaceAvailable && !HasNewBatchConfirmation;
+    public bool CanEdit => IsWorkspaceAvailable && !HasNewBatchConfirmation && !Presets.IsBusy;
     public bool CanRun => CanEdit && !writesBlocked && Snapshot.Review is not null;
     public bool CanRemoveSelected => CanEdit && SelectedItem is { Snapshot.Result: null };
     public bool CanInspectSelected => CanEdit && SelectedItem is { } selected && selected.Snapshot.State is not (BatchItemState.Completed or BatchItemState.NoChange);
     public bool HasSafetyBlock => Snapshot.HasSafetyBlock;
     public bool HasWarningCandidate => WarningOwner is not null;
-    public bool HasBlockingOperation => IsBusy || HasWarningCandidate || HasSafetyBlock || HasNewBatchConfirmation;
+    public bool HasBlockingOperation => IsBusy || Presets.IsBusy || HasWarningCandidate || HasSafetyBlock || HasNewBatchConfirmation;
     public bool HasNewBatchConfirmation => newBatchConfirmationRevision is not null;
     public bool HasCleanupIssue => Snapshot.Items.Any(item => item.Result is { CleanupIssues.IsDefaultOrEmpty: false });
     public bool HasWarningCloseDecision => warningCloseRequested && HasWarningCandidate;
@@ -136,7 +139,7 @@ public sealed partial class BatchViewModel : ObservableObject
     /// <summary>Requests explicit consent before clearing any existing list, plans or results.</summary>
     private void RequestNewBatch()
     {
-        if (!IsWorkspaceAvailable || HasNewBatchConfirmation)
+        if (!CanEdit)
         {
             return;
         }
@@ -154,7 +157,9 @@ public sealed partial class BatchViewModel : ObservableObject
     /// <summary>Clears only the exact reviewed session to which the user consented.</summary>
     private void ConfirmNewBatch()
     {
-        if (newBatchConfirmationRevision is not { } revision || !IsWorkspaceAvailable)
+        var workspaceAvailable = IsWorkspaceAvailable && !Presets.IsBusy;
+
+        if (newBatchConfirmationRevision is not { } revision || !workspaceAvailable)
         {
             return;
         }
@@ -212,6 +217,7 @@ public sealed partial class BatchViewModel : ObservableObject
     {
         Cancel();
         await activeOperation;
+        await Presets.WhenIdleAsync();
     }
 
     /// <summary>Asks about the frozen warning owner even when another row or tab is selected.</summary>
@@ -555,6 +561,7 @@ public sealed partial class BatchViewModel : ObservableObject
 
         OnPropertyChanged(string.Empty);
         LanguageRules?.Refresh();
+        Presets?.Refresh();
         AddFilesCommand?.NotifyCanExecuteChanged();
         AddFolderCommand?.NotifyCanExecuteChanged();
         ChooseOutputCommand?.NotifyCanExecuteChanged();

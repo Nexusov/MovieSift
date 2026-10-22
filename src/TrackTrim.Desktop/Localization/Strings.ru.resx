@@ -239,4 +239,39 @@
   <data name="RuleIssueConflictingLanguage" xml:space="preserve"><value>Прежний код и IETF-тег языка противоречат друг другу. Проверьте файл вручную.</value></data>
   <data name="RuleIssueNoAudioMatches" xml:space="preserve"><value>Ни одна дорожка аудио не подходит под правило. Файл не изменён; выберите аудио вручную. Удаление всего аудио по-прежнему требует отдельного подтверждения для файла.</value></data>
   <data name="RuleIssueInvalidCurrentSelection" xml:space="preserve"><value>Текущий выбор дорожек требует ручного исправления.</value></data>
+  <data name="PresetHeading" xml:space="preserve"><value>Именованные наборы правил</value></data>
+  <data name="PresetHint" xml:space="preserve"><value>Выбор записи не загружает набор. Загрузка восстанавливает только настройки правил; предпросмотр, применение и подтверждение планов выполняются отдельно.</value></data>
+  <data name="PresetChoose" xml:space="preserve"><value>Сохранённый набор правил</value></data>
+  <data name="PresetName" xml:space="preserve"><value>Имя для сохранения или переименования</value></data>
+  <data name="PresetNameHelp" xml:space="preserve"><value>От 1 до 80 символов; пробелы по краям удаляются. Имена должны быть уникальны без учёта регистра.</value></data>
+  <data name="PresetSaveNew" xml:space="preserve"><value>Сохранить как новый</value></data>
+  <data name="PresetLoad" xml:space="preserve"><value>Загрузить</value></data>
+  <data name="PresetRename" xml:space="preserve"><value>Переименовать</value></data>
+  <data name="PresetDelete" xml:space="preserve"><value>Удалить набор…</value></data>
+  <data name="PresetRefresh" xml:space="preserve"><value>Перечитать каталог</value></data>
+  <data name="PresetDeleteConfirmation" xml:space="preserve"><value>Удалить набор «{0}»? Текущие настройки правил и существующие файлы останутся без изменений.</value></data>
+  <data name="PresetDeleteConfirm" xml:space="preserve"><value>Удалить набор</value></data>
+  <data name="PresetDeleteDecline" xml:space="preserve"><value>Оставить набор</value></data>
+  <data name="PresetWorking" xml:space="preserve"><value>Чтение или сохранение наборов…</value></data>
+  <data name="PresetSaved" xml:space="preserve"><value>Новый набор сохранён. Текущие правила и планы не изменены.</value></data>
+  <data name="PresetRenamed" xml:space="preserve"><value>Набор переименован. Текущие правила и планы не изменены.</value></data>
+  <data name="PresetDeleted" xml:space="preserve"><value>Набор удалён. Загруженные значения правил остались в редакторе.</value></data>
+  <data name="PresetLoaded" xml:space="preserve"><value>Настройки правил загружены. Создайте новый предпросмотр перед применением выбора.</value></data>
+  <data name="PresetAlreadyLoaded" xml:space="preserve"><value>Эти настройки правил уже в редакторе. Текущий предпросмотр сохранён.</value></data>
+  <data name="PresetLoadStale" xml:space="preserve"><value>Во время загрузки изменились редактор, выбор или очередь. Настройки не заменены; при необходимости загрузите набор снова.</value></data>
+  <data name="PresetCommittedCleanupIssue" xml:space="preserve"><value>Каталог сохранён, но очистка временного файла сообщила о проблеме. См. подробности.</value></data>
+  <data name="PresetErrorBusy" xml:space="preserve"><value>Другой экземпляр приложения использует каталог наборов. Повторите после завершения его операции.</value></data>
+  <data name="PresetErrorInvalidName" xml:space="preserve"><value>Введите имя длиной от 1 до 80 символов без управляющих символов.</value></data>
+  <data name="PresetErrorDuplicateName" xml:space="preserve"><value>Набор с таким именем уже существует. Выберите другое имя.</value></data>
+  <data name="PresetErrorInvalidConfiguration" xml:space="preserve"><value>Исправьте активные правила перед сохранением набора.</value></data>
+  <data name="PresetErrorInvalidCatalog" xml:space="preserve"><value>Каталог наборов повреждён и сохранён без изменений. Исправьте файл и перечитайте каталог. Правила можно настраивать вручную.</value></data>
+  <data name="PresetErrorUnsupportedVersion" xml:space="preserve"><value>Эта версия каталога не поддерживается; файл сохранён без изменений. Используйте совместимое приложение; ручные правила доступны.</value></data>
+  <data name="PresetErrorLimitExceeded" xml:space="preserve"><value>Каталог или настройки превышают установленный предел. Уменьшите размер или число записей.</value></data>
+  <data name="PresetErrorNotFound" xml:space="preserve"><value>Выбранный набор больше не существует. Перечитайте каталог.</value></data>
+  <data name="PresetErrorPersistenceUnavailable" xml:space="preserve"><value>Не удалось безопасно прочитать или сохранить каталог. См. подробности, устраните проблему и перечитайте каталог; ручные правила доступны.</value></data>
+  <data name="PresetErrorCancelled" xml:space="preserve"><value>Операция с набором отменена.</value></data>
+  <data name="PresetIssueEmptyLanguageSelection" xml:space="preserve"><value>Введите хотя бы один код языка для активной категории.</value></data>
+  <data name="PresetIssueEmptyTitleFilter" xml:space="preserve"><value>Введите непустой текст названия или отключите этот фильтр.</value></data>
+  <data name="PresetIssueInvalidRuleLanguage" xml:space="preserve"><value>Исправьте неизвестный или неподдерживаемый код языка в правиле.</value></data>
+  <data name="PresetCleanupIssue" xml:space="preserve"><value>При очистке временного файла набора возникла проблема. См. подробности.</value></data>
 </root>

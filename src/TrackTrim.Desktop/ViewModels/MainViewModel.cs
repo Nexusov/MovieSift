@@ -92,7 +92,7 @@ public sealed partial class MainViewModel : ObservableObject
     public IAsyncRelayCommand DiscardWarningsCommand { get; }
     public IRelayCommand RemainInWarningReviewCommand { get; }
     public IAsyncRelayCommand CleanInterruptedCommand { get; }
-    public bool HasActiveOperation => IsBusy || Batch?.IsBusy == true;
+    public bool HasActiveOperation => IsBusy || Batch?.IsBusy == true || Batch?.Presets.IsBusy == true;
     public bool HasBlockingOperation => IsBusy || HasWarningCandidate || RequiresCloseDecision || Batch?.HasBlockingOperation == true;
     public bool CanEdit => !HasBlockingOperation;
     public bool CanRun => approvedPlan is not null && CanEdit && !PersistenceFailed;
@@ -162,6 +162,11 @@ public sealed partial class MainViewModel : ObservableObject
         {
             PersistenceFailed = true;
             services.Log.Warning(exception, "Portable ownership records could not be read");
+        }
+
+        if (Batch is not null)
+        {
+            await Batch.Presets.InitializeAsync();
         }
 
         NotifyPresentation();

@@ -1,6 +1,6 @@
 # Repository instructions
 
-Read `PROJECT_BRIEF.md` before changing behavior. Work only on the explicitly authorized phase. Phase 2A adds bounded explicit-file/top-level-folder discovery, independent manual plans and a sequential in-memory queue over the existing single-job lifecycle. Phase 2B1 adds explicit language-rule preview/application before those independent approvals. Phase 2B2 adds an optional literal title-contains constraint to each targeted language category. Phase 2B3 adds an optional forced-flag constraint to matching subtitles. Title-only/regex rules, other forced-filter modes, presets, recursion, persisted queues, MP4, playback, source replacement and speculative frameworks remain outside this task.
+Read `PROJECT_BRIEF.md` before changing behavior. Work only on the explicitly authorized phase. Phase 2A adds bounded explicit-file/top-level-folder discovery, independent manual plans and a sequential in-memory queue over the existing single-job lifecycle. Phase 2B adds explicit language/optional-title/forced-subtitle preview and application before those approvals. Phase 2C1 adds named portable rule presets with Save as new, explicit Load, Rename and confirmed Delete. Preset overwrite/update, import/export, automatic loading, title-only/regex rules, other forced-filter modes, recursion, persisted queues, MP4, playback, source replacement and speculative frameworks remain outside this task.
 
 ## Architecture
 
@@ -38,6 +38,8 @@ Language-selection rules normalize aliases only for matching and compare complet
 Title constraints default off and are ANDed with language matches. Trim search whitespace and use literal `OrdinalIgnoreCase` substring matching against the actual inspected title only. Enabled blank searches are invalid; missing/blank titles do not match. Evaluate every targeted language even when its title does not match. Configuration edits discard only the transient preview, never selections or approvals.
 
 The subtitle-only forced constraint defaults off, is ignored in unchanged mode, and is ANDed with language/optional title using inspected `MediaTrack.IsForced`. Validate every targeted language even on non-forced tracks. Never infer forced status from titles, default flags or subtitle text; this selects whole tracks and does not promise player behavior. No combined subtitle matches explicitly proposes none. Reuse the existing proposal identity, ownership gates and changed-only Apply lifecycle.
+
+Presets contain rule configuration only, including inactive values; never media paths, track IDs, selections, approvals, queue/job state or UI language. Selection alone must not load. Compare configuration content, including ordered language values and literal title text, rather than immutable-array identity. Changed explicit Load clears only transient Preview; identical Load preserves it. Keep catalog errors visible without blocking manual rules or overwriting malformed data. Catalog mutations reread and validate the complete bounded file under fail-fast interprocess exclusion, then flush a uniquely owned sibling temporary file before replacement. Delete only an operation's still-owned temporary path; preserve primary, committed and cleanup outcomes separately.
 
 ## Verification and delivery
 

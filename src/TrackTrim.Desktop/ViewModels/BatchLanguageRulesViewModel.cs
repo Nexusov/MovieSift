@@ -19,6 +19,10 @@ public sealed partial class BatchLanguageRulesViewModel : ObservableObject
     private bool applied;
     private bool stale;
     private int changedCount;
+    private long configurationRevision;
+    private bool restoringConfiguration;
+    private ImmutableArray<string> loadedAudioLanguages;
+    private ImmutableArray<string> loadedSubtitleLanguages;
 
     [ObservableProperty]
     private bool audioRuleEnabled;
@@ -61,6 +65,7 @@ public sealed partial class BatchLanguageRulesViewModel : ObservableObject
     public Localization.LocalizationService Localization => options.Localization;
     public ObservableCollection<LanguageRuleFilePreviewViewModel> Files { get; } = [];
     public BatchLanguagePreview? Preview => preview;
+    public long ConfigurationRevision => configurationRevision;
     public bool CanConfigure => options.CanEdit();
     public bool CanEditAudioLanguages => CanConfigure && AudioRuleEnabled;
     public bool CanEditSubtitleLanguages => CanConfigure && SubtitleRuleEnabled;
@@ -111,31 +116,101 @@ public sealed partial class BatchLanguageRulesViewModel : ObservableObject
     }
 
     /// <summary>Discards a proposal when its audio mode changes, without editing the batch.</summary>
-    partial void OnAudioRuleEnabledChanged(bool value) => ClearPreview();
+    partial void OnAudioRuleEnabledChanged(bool value) => ConfigurationEdited();
 
     /// <summary>Discards a proposal when its subtitle mode changes, without editing the batch.</summary>
-    partial void OnSubtitleRuleEnabledChanged(bool value) => ClearPreview();
+    partial void OnSubtitleRuleEnabledChanged(bool value) => ConfigurationEdited();
 
     /// <summary>Requires a new preview after an explicit audio language edit.</summary>
-    partial void OnAudioLanguagesChanged(string value) => ClearPreview();
+    partial void OnAudioLanguagesChanged(string value)
+    {
+        if (!restoringConfiguration)
+        {
+            loadedAudioLanguages = default;
+        }
+
+        ConfigurationEdited();
+    }
 
     /// <summary>Requires a new preview after an explicit subtitle language edit.</summary>
-    partial void OnSubtitleLanguagesChanged(string value) => ClearPreview();
+    partial void OnSubtitleLanguagesChanged(string value)
+    {
+        if (!restoringConfiguration)
+        {
+            loadedSubtitleLanguages = default;
+        }
+
+        ConfigurationEdited();
+    }
 
     /// <summary>Requires a new preview after changing the optional audio title constraint.</summary>
-    partial void OnAudioTitleFilterEnabledChanged(bool value) => ClearPreview();
+    partial void OnAudioTitleFilterEnabledChanged(bool value) => ConfigurationEdited();
 
     /// <summary>Requires a new preview after changing the optional subtitle title constraint.</summary>
-    partial void OnSubtitleTitleFilterEnabledChanged(bool value) => ClearPreview();
+    partial void OnSubtitleTitleFilterEnabledChanged(bool value) => ConfigurationEdited();
 
     /// <summary>Discards a proposal after an audio title edit without changing any Keep choice.</summary>
-    partial void OnAudioTitleContainsChanged(string value) => ClearPreview();
+    partial void OnAudioTitleContainsChanged(string value) => ConfigurationEdited();
 
     /// <summary>Discards a proposal after a subtitle title edit without changing any Keep choice.</summary>
-    partial void OnSubtitleTitleContainsChanged(string value) => ClearPreview();
+    partial void OnSubtitleTitleContainsChanged(string value) => ConfigurationEdited();
 
     /// <summary>Requires explicit preview after a forced-flag edit without changing selections or approvals.</summary>
-    partial void OnKeepOnlyForcedSubtitlesChanged(bool value) => ClearPreview();
+    partial void OnKeepOnlyForcedSubtitlesChanged(bool value) => ConfigurationEdited();
+
+    /// <summary>Captures all active and inactive editor values without normalizing stored language aliases or title text.</summary>
+    public LanguageRules CaptureConfiguration() => new(
+        new(AudioRuleEnabled ? LanguageRuleMode.KeepMatching : LanguageRuleMode.Unchanged,
+            loadedAudioLanguages.IsDefault ? ParseLanguages(AudioLanguages) : loadedAudioLanguages,
+            new(AudioTitleFilterEnabled, AudioTitleContains)),
+        new(SubtitleRuleEnabled ? LanguageRuleMode.KeepMatching : LanguageRuleMode.Unchanged,
+            loadedSubtitleLanguages.IsDefault ? ParseLanguages(SubtitleLanguages) : loadedSubtitleLanguages,
+            new(SubtitleTitleFilterEnabled, SubtitleTitleContains)), KeepOnlyForcedSubtitles);
+
+    /// <summary>Restores only configuration; an identical load preserves its existing issued proposal.</summary>
+    public bool LoadConfiguration(LanguageRules configuration)
+    {
+        if (LanguageRuleConfiguration.ContentEquals(CaptureConfiguration(), configuration))
+        {
+            return false;
+        }
+
+        restoringConfiguration = true;
+
+        try
+        {
+            AudioRuleEnabled = configuration.Audio.Mode == LanguageRuleMode.KeepMatching;
+            SubtitleRuleEnabled = configuration.Subtitles.Mode == LanguageRuleMode.KeepMatching;
+            AudioLanguages = string.Join(", ", configuration.Audio.Languages);
+            SubtitleLanguages = string.Join(", ", configuration.Subtitles.Languages);
+            AudioTitleFilterEnabled = configuration.Audio.TitleFilter?.Enabled ?? false;
+            SubtitleTitleFilterEnabled = configuration.Subtitles.TitleFilter?.Enabled ?? false;
+            AudioTitleContains = configuration.Audio.TitleFilter?.Text ?? string.Empty;
+            SubtitleTitleContains = configuration.Subtitles.TitleFilter?.Text ?? string.Empty;
+            KeepOnlyForcedSubtitles = configuration.KeepOnlyForcedSubtitles;
+            loadedAudioLanguages = configuration.Audio.Languages;
+            loadedSubtitleLanguages = configuration.Subtitles.Languages;
+        }
+        finally
+        {
+            restoringConfiguration = false;
+        }
+
+        ConfigurationEdited();
+        return true;
+    }
+
+    /// <summary>Invalidates only transient rule presentation after one coherent configuration edit.</summary>
+    private void ConfigurationEdited()
+    {
+        if (restoringConfiguration)
+        {
+            return;
+        }
+
+        configurationRevision++;
+        ClearPreview();
+    }
 
     /// <summary>Computes proposals from immutable live selections without invalidating any approval or review.</summary>
     private void PreviewChoices()
@@ -145,14 +220,7 @@ public sealed partial class BatchLanguageRulesViewModel : ObservableObject
             return;
         }
 
-        var audio = new TrackLanguageRule(
-            AudioRuleEnabled ? LanguageRuleMode.KeepMatching : LanguageRuleMode.Unchanged,
-            ParseLanguages(AudioLanguages), new(AudioTitleFilterEnabled, AudioTitleContains));
-        var subtitles = new TrackLanguageRule(
-            SubtitleRuleEnabled ? LanguageRuleMode.KeepMatching : LanguageRuleMode.Unchanged,
-            ParseLanguages(SubtitleLanguages), new(SubtitleTitleFilterEnabled, SubtitleTitleContains));
-        var rules = new LanguageRules(audio, subtitles, KeepOnlyForcedSubtitles);
-        var result = options.Coordinator.PreviewLanguageRules(rules);
+        var result = options.Coordinator.PreviewLanguageRules(CaptureConfiguration());
         failure = result.Failure;
         preview = result.Preview;
         applied = false;
