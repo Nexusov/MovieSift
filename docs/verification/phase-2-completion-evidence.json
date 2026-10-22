@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "scope": "Phase 2 completion: nested directory policy and explicit unfinished-list recovery; no MP4 or public release",
   "comparisonBase": "bb63a1f8cfb6a425aaff8ea0fd42b8143cc17043",
-  "testedCodeRevision": "d8d839e45025b658c29bc66defb321f97a70dcd6",
-  "testedCodeTree": "63a172d36b8150da42d0953d1e2265a1a81c9207",
+  "testedCodeRevision": "bca78c7f97befb0a67f8f36a03ffbadc2953fab3",
+  "testedCodeTree": "a0dc533af26baa2ba084b2515865a0aa3d138d4e",
   "localChecks": {
     "base": "bb63a1f8cfb6a425aaff8ea0fd42b8143cc17043",
     "platform": "Windows 10 Home Single Language 22H2 x64 19045.6456",
@@ -18,7 +18,7 @@
       "errors": 0
     },
     "passed": 819,
-    "skippedLinuxOnly": 22,
+    "skippedLinuxOnly": 23,
     "failed": 0,
     "suites": [
       {
@@ -38,7 +38,7 @@
         "assembly": "tracktrim.infrastructure.tests.dll",
         "outcomes": {
           "Passed": 277,
-          "NotExecuted": 18
+          "NotExecuted": 19
         }
       },
       {
@@ -49,11 +49,13 @@
       }
     ],
     "pythonChecks": 16,
-    "newCases": 80,
+    "newCases": 81,
     "testCorrections": [
       "Initial new fixture blocked on asynchronous UI-thread storage read; replaced synchronous wait with tracked awaitable initialization.",
-      "Existing failed-discovery-row regression reproduced a destination edit clearing uninspected failure. SetDestination now preserves that state/failure; focused Application regression and full Desktop suite pass."
-    ]
+      "Existing failed-discovery-row regression reproduced a destination edit clearing uninspected failure. SetDestination now preserves that state/failure; focused Application regression and full Desktop suite pass.",
+      "Mandatory Linux CI exposed close-only flock retention. A deterministic real-dup regression failed before and passed after explicit unlock, including repeated disposal without unlocking a later owner."
+    ],
+    "source": "Source changes verified locally, then committed unchanged as bca78c7; clean identified packages and full hosted CI also verify that commit."
   },
   "directoryRegression": {
     "status": "passed",
@@ -69,9 +71,9 @@
         "kind": "real-restored-queue-file",
         "source": "Season 1/episode.mkv",
         "output": "Season 1/episode.trimmed.mkv",
-        "sourceBefore": "D3FA4A85BE9C3902BCD90AD273B14427FC52A8F894982744985FA7E095925712",
-        "sourceAfter": "D3FA4A85BE9C3902BCD90AD273B14427FC52A8F894982744985FA7E095925712",
-        "outputHash": "1651438F1570137D9FC2DB86E578DACAD453EA34E6E631CE87ED7384DBF6DB13",
+        "sourceBefore": "7C87C60EB675929A85F8E060EBA1A259820D7616329D37B7C82C4C055CD1DB30",
+        "sourceAfter": "7C87C60EB675929A85F8E060EBA1A259820D7616329D37B7C82C4C055CD1DB30",
+        "outputHash": "6549DE0F5C7A2248C39B7FA0607638CEEA092C18BB55D8BD1109B4CF3F2F4D59",
         "payloads": [
           {
             "sourceId": 0,
@@ -121,15 +123,15 @@
         "kind": "real-restored-queue-file",
         "source": "Season 2/episode.mkv",
         "output": "Season 2/episode.trimmed.mkv",
-        "sourceBefore": "71CAF2F94F0ABD870887C3AB4F0996C0990BC8C9E846102FD1B1EAA4F3C94842",
-        "sourceAfter": "71CAF2F94F0ABD870887C3AB4F0996C0990BC8C9E846102FD1B1EAA4F3C94842",
-        "outputHash": "FF917E4BFDA9EA9888C00ECD7C6A977A4B13CA1B2191569FA92CB71AA3D28EE1",
+        "sourceBefore": "134573F0809926B9BA750EBE1E48CA130CF36CB81CA7BC7D5875DFBA544113DD",
+        "sourceAfter": "134573F0809926B9BA750EBE1E48CA130CF36CB81CA7BC7D5875DFBA544113DD",
+        "outputHash": "6B9D98FF2540F1E2351E77EC768C771A954EB8E4170E8F3B216A404E9C568997",
         "payloads": [
           {
             "sourceId": 0,
             "outputId": 0,
             "Kind": 2,
-            "Uid": 8869878106480336142,
+            "Uid": 10626704729485719370,
             "compared": {
               "SourceSha256": "6DE3F8A6533B8AA1498A2EB68013806E54E90DA4FF2B46EF8E7F6E6986688D72",
               "OutputSha256": "6DE3F8A6533B8AA1498A2EB68013806E54E90DA4FF2B46EF8E7F6E6986688D72",
@@ -180,8 +182,8 @@
         "unchangedSources": true,
         "absentOutputDirectoriesPreparedAtExecution": true,
         "ownedWorkerIds": [
-          43760,
-          49900
+          4404,
+          7296
         ],
         "allOwnedWorkersExited": true,
         "emptyCompletedCheckpoint": true,
@@ -189,22 +191,24 @@
         "scratchEntriesRemaining": 0
       }
     ],
-    "native": false
+    "native": false,
+    "checkedRevision": "34b52c29a083ca09a55adecc5b39eb35feb48606",
+    "provenance": "Actual Windows hosted code-CI TRX at the synthetic merge of bb63a1f and bca78c7, with the same tree as bca78c7. Six complete retained track payloads and two attachments compared."
   },
   "artifacts": {
     "winX64": {
-      "relativePath": "package-win/TrackTrim-win-x64.zip",
-      "bytes": 113408048,
-      "sha256": "8c4cd1a2446f5a29bc5014dd1c265ea51a3fa66412c8d3178bd7717b304341e4",
+      "relativePath": "package-win-bca78c7/TrackTrim-win-x64.zip",
+      "bytes": 113414766,
+      "sha256": "5d24208476e7bc392698677364973a80c526f6db9963fbc777f1f6603c6e12c3",
       "build": {
         "schemaVersion": 1,
         "runtimeIdentifier": "win-x64",
         "sdkVersion": "10.0.402",
         "runtimeVersion": "10.0.13",
-        "sourceRevision": "d8d839e45025b658c29bc66defb321f97a70dcd6",
-        "sourceTree": "63a172d36b8150da42d0953d1e2265a1a81c9207",
+        "sourceRevision": "bca78c7f97befb0a67f8f36a03ffbadc2953fab3",
+        "sourceTree": "a0dc533af26baa2ba084b2515865a0aa3d138d4e",
         "sourceParents": [
-          "944ade4dd0cc9b34ee187f1f0ba6cf898a6fb5df"
+          "0dfaa4b07fd77aba1fc98a6843f70d497d580ffc"
         ],
         "worktreeDirty": false,
         "configuration": "Release; self-contained; untrimmed; non-single-file; no AOT",
@@ -212,37 +216,33 @@
         "artifactPurpose": "review and acceptance testing; public-release obligations remain"
       },
       "packagedWorkflow": "passed",
-      "inventory": "passed: 532 files, zero unmatched origins; not redistribution approval",
+      "inventory": "passed: 533 files, zero unmatched origins; not redistribution approval",
       "relocation": "passed"
     },
     "linuxX64": {
-      "relativePath": "package-linux-native/TrackTrim-linux-x64.tar.gz",
-      "bytes": 104349170,
-      "sha256": "b69f70ec44655f4a99358ae8c1e353db3b581ed8a7766892e7605cf2798e62e2",
+      "relativePath": "package-linux-bca78c7/TrackTrim-linux-x64.tar.gz",
+      "bytes": 104354097,
+      "sha256": "0ffc9673b7fbb12c14e48239b579f8ede7e7d751ce8cad02b05868288248e822",
       "build": {
         "schemaVersion": 1,
         "runtimeIdentifier": "linux-x64",
         "sdkVersion": "10.0.402",
         "runtimeVersion": "10.0.13",
-        "sourceRevision": "d8d839e45025b658c29bc66defb321f97a70dcd6",
-        "sourceTree": "63a172d36b8150da42d0953d1e2265a1a81c9207",
+        "sourceRevision": "bca78c7f97befb0a67f8f36a03ffbadc2953fab3",
+        "sourceTree": "a0dc533af26baa2ba084b2515865a0aa3d138d4e",
         "sourceParents": [
-          "944ade4dd0cc9b34ee187f1f0ba6cf898a6fb5df"
+          "0dfaa4b07fd77aba1fc98a6843f70d497d580ffc"
         ],
         "worktreeDirty": false,
         "configuration": "Release; self-contained; untrimmed; non-single-file; no AOT",
         "operatingSystem": "Ubuntu 24.04.5 LTS",
         "artifactPurpose": "review and acceptance testing; public-release obligations remain"
       },
-      "executionEnvironment": "Ubuntu 24.04.5 LTS linux/amd64 container under Docker Desktop on Windows 10; not a desktop session",
+      "packagedWorkflow": "passed",
+      "inventory": "passed: 511 files, zero unmatched origins; not redistribution approval",
+      "relocation": "passed",
+      "executionEnvironment": "Ubuntu 24.04.5 LTS linux/amd64 container on its internal local filesystem under Docker Desktop; no desktop session",
       "sdkImage": "mcr.microsoft.com/dotnet/sdk@sha256:8dd1a57fe6b7b8b1b357635db67e272c2f9e9d76d1dd0a32711c4c33c57d7b43",
-      "packagedWorkflow": "passed on the internal local Linux filesystem",
-      "inventory": "passed: 510 files, zero unmatched origins; not redistribution approval",
-      "relocation": "passed, including source hash and real no-overwrite remux",
-      "preparationCorrections": [
-        "Minimal SDK image initially lacked the python command; python-is-python3 was installed only in the owned builder.",
-        "Windows bind-mounted smoke paths were correctly rejected as NetworkPath. The unchanged package workflow was rerun on the internal Linux filesystem; only final archives/reports were copied to Windows."
-      ],
       "nativeDesktop": "not run"
     }
   },
@@ -315,19 +315,25 @@
       "Earlier coordinate/screenshot/picker limitations were not retried unchanged.",
       "No native plan approval was created before closing; fresh approval and old-authority rejection are covered by controlled/headless and real-media tests."
     ],
-    "redactions": "Absolute task prefix replaced with <task>; unrelated windows, personal identifiers and raw large logs omitted."
+    "redactions": "Absolute task prefix replaced with <task>; unrelated windows, personal identifiers and raw large logs omitted.",
+    "package": {
+      "sourceRevision": "d8d839e45025b658c29bc66defb321f97a70dcd6",
+      "sha256": "8c4cd1a2446f5a29bc5014dd1c265ea51a3fa66412c8d3178bd7717b304341e4",
+      "bytes": 113408048,
+      "relativeArchive": "package-win/TrackTrim-win-x64.zip"
+    }
   },
   "codeCi": {
-    "run": "https://github.com/Nexusov/TrackTrim/actions/runs/39699995754",
-    "head": "d8d839e45025b658c29bc66defb321f97a70dcd6",
-    "actualCheckout": "3cbb99f3e86a19b7da7a178f816feaf3079a7163",
+    "run": "https://github.com/Nexusov/TrackTrim/actions/runs/39703146820",
+    "head": "bca78c7f97befb0a67f8f36a03ffbadc2953fab3",
+    "actualCheckout": "34b52c29a083ca09a55adecc5b39eb35feb48606",
     "parents": [
       "bb63a1f8cfb6a425aaff8ea0fd42b8143cc17043",
-      "d8d839e45025b658c29bc66defb321f97a70dcd6"
+      "bca78c7f97befb0a67f8f36a03ffbadc2953fab3"
     ],
     "treeEqualsHead": true,
-    "windows": "819 passed, 22 documented Linux-only skips",
-    "linux": "841 passed, 0 skips",
+    "windows": "819 passed, 23 documented Linux-only skips",
+    "linux": "842 passed, 0 skips",
     "python": "16 passed on each platform",
     "requiredJobs": "Both passed, including locked restore, format, zero-warning Release build, mandatory backend tests, package/inventory, relocation and Linux no-SDK/no-separately-installed-media-tools container",
     "finalEvidenceCi": "Current run/checkout links are maintained in PR #8 and the final report without CI-ID-only commits"
@@ -337,5 +343,65 @@
     "Owner/rights-holder original-code license selection; no operative license selected here.",
     "Resolve the exact binary-bound source/build/notice gaps listed in distribution-audit.md; inventories do not authorize redistribution."
   ],
-  "nextMajorMilestone": "Documented MP4 workflow with FFmpeg/ffprobe; not started in this delivery"
+  "nextMajorMilestone": "Documented MP4 workflow with FFmpeg/ffprobe; not started in this delivery",
+  "linuxLockCorrection": {
+    "triggerRun": "https://github.com/Nexusov/TrackTrim/actions/runs/39701971812",
+    "triggerHead": "0dfaa4b07fd77aba1fc98a6843f70d497d580ffc",
+    "failedTest": "PortableRulePresetStoreTests.ActualSerializedByteLimitPreservesThePriorCompleteCatalog",
+    "symptom": "Unexpected Busy between sequential completed writes; Linux 840 passed, 1 failed; Windows passed.",
+    "deterministicReproduction": "Production Acquire, real dup of its uniquely observed procfs descriptor, Dispose, then reacquire while the duplicate remains open. Old close-only disposal failed with Busy; explicit unlock passed, and repeated old Dispose preserved true contention for a later owner.",
+    "before": {
+      "failed": 1,
+      "passed": 0,
+      "source": "0dfaa4b production plus the new regression, before the fix"
+    },
+    "after": {
+      "failed": 0,
+      "passed": 1,
+      "source": "bca78c7f97befb0a67f8f36a03ffbadc2953fab3"
+    },
+    "semantics": "https://man7.org/linux/man-pages/man2/flock.2.html",
+    "limit": "The CI run did not trace an actual fork. Descriptor-retention semantics were reproduced with dup; fork timing is the inferred trigger, not a claimed captured observation.",
+    "fix": "Explicit LOCK_UN with SafeFileHandle lifetime protection, then close; Interlocked idempotence. No retries, skipped checks or weakened exclusion.",
+    "independentReadOnlyReview": "No concrete ABI, ownership or lifecycle issue found."
+  },
+  "localLinuxChecks": {
+    "sourceRevision": "bca78c7f97befb0a67f8f36a03ffbadc2953fab3",
+    "lockedRestore": "passed",
+    "formatVerification": "passed",
+    "releaseBuild": "0 warnings, 0 errors",
+    "python": "16 passed",
+    "passed": 842,
+    "failed": 0,
+    "skipped": 0,
+    "mandatoryMediaEnvironment": true,
+    "environmentCorrections": [
+      "Added the missing python command in the owned builder. Windows bind-mounted smoke media was correctly rejected as NetworkPath; packaging moved to the internal local Linux filesystem.",
+      "An initial SDK-container full run had empty locale and a sleep PID 1: two direct extractor-helper Unicode failures and one unreaped-zombie assertion (839 passed, 3 failed). The unchanged full suite passed after C.UTF-8 and an actual tini subreaper were provisioned in the development container. No assertion or required CI step changed."
+    ],
+    "scope": "Real Linux filesystem/process/media plus headless checks; not Ubuntu Desktop acceptance."
+  },
+  "nativeAfterLockCorrection": {
+    "status": "blocked: user stopped Computer Use",
+    "sourceRevision": "bca78c7f97befb0a67f8f36a03ffbadc2953fab3",
+    "archiveSha256": "5d24208476e7bc392698677364973a80c526f6db9963fbc777f1f6603c6e12c3",
+    "platform": {
+      "caption": "Майкрософт Windows 10 Домашняя для одного языка",
+      "version": "10.0.19045",
+      "build": "19045",
+      "architecture": "64-разрядная",
+      "session": 1,
+      "edition": "CoreSingleLanguage",
+      "ubr": 6456
+    },
+    "setup": "Fresh isolated archive extraction with only the prior genuinely native-saved queue record copied for startup/Restore smoke; no settings, inspections, approvals or ownership journals copied",
+    "attemptedAction": "Computer Use launch_app for the newly extracted portable executable",
+    "exactError": "Computer Use was stopped by the user with the physical Escape key.",
+    "response": "No further Computer Use tools were called. Native window, controls and Restore were not observed on this binary.",
+    "readOnlyAfterInterruption": {
+      "matchingGuiProcesses": 0,
+      "matchingMediaWorkers": 0
+    },
+    "limit": "The earlier complete native scenario remains explicitly tied to its d8d839e package; it is not relabelled as acceptance of the rebuilt binary."
+  }
 }
