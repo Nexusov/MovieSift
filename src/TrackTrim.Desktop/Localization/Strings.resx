@@ -166,7 +166,7 @@
   <data name="BatchPauseAfterCurrent" xml:space="preserve"><value>Pause after current file</value></data>
   <data name="BatchCancel" xml:space="preserve"><value>Cancel batch</value></data>
   <data name="BatchExplicitResume" xml:space="preserve"><value>Resolving this warning does not start the next file. Review the remaining batch and explicitly start it.</value></data>
-  <data name="BatchQueuePolicy" xml:space="preserve"><value>The queue exists only in this window and is not restored after restart. Published outputs remain intact. Failures, warnings, cancellation and cleanup problems pause the queue; remaining plans need explicit review and start. No automatic track matching or recursive discovery.</value></data>
+  <data name="BatchQueuePolicy" xml:space="preserve"><value>The queue exists only in this window and is not restored after restart. Published outputs remain intact. Failures, warnings, cancellation and cleanup problems pause the queue; remaining plans need explicit review and start. Language rules require Preview and Apply; subfolders are never scanned.</value></data>
   <data name="BatchPreparing" xml:space="preserve"><value>Add files and approve their independent plans.</value></data>
   <data name="BatchInspecting" xml:space="preserve"><value>Inspecting each file independently…</value></data>
   <data name="BatchReviewing" xml:space="preserve"><value>Checking all sources, destinations and approvals…</value></data>
@@ -197,4 +197,38 @@
   <data name="ErrorReasonBatchFileLimit" xml:space="preserve"><value>Too many file entries. Reduce the selection or folder contents; no partial addition was accepted.</value></data>
   <data name="ErrorReasonBatchEntryLimit" xml:space="preserve"><value>The folder contains too many entries to scan within the displayed limit. Use a smaller folder; no partial addition was accepted.</value></data>
   <data name="ErrorReasonInvalidBatchInput" xml:space="preserve"><value>Choose several local MKV files or one local folder, without directory links or subfolder traversal.</value></data>
+  <data name="RuleHeading" xml:space="preserve"><value>Batch language rules</value></data>
+  <data name="RuleHint" xml:space="preserve"><value>Unchecked categories leave current choices unchanged. Enable a category to keep every matching track independently in each file. Preview first; nothing changes until you apply.</value></data>
+  <data name="RuleAudio" xml:space="preserve"><value>Keep all audio matching these language codes</value></data>
+  <data name="RuleSubtitles" xml:space="preserve"><value>Keep all subtitles matching these language codes</value></data>
+  <data name="RuleAudioCodes" xml:space="preserve"><value>Audio language codes (comma separated)</value></data>
+  <data name="RuleSubtitleCodes" xml:space="preserve"><value>Subtitle language codes (comma separated)</value></data>
+  <data name="RuleTagHelp" xml:space="preserve"><value>Comma-separated codes, e.g. en, ger, ru-RU, sr-Latn. Tags match exactly: ru does not match ru-RU. Supported tags have an ISO language plus optional script/region. Language metadata is not proof of the language spoken.</value></data>
+  <data name="RulePreview" xml:space="preserve"><value>Preview language choices</value></data>
+  <data name="RuleApply" xml:space="preserve"><value>Apply proposed choices</value></data>
+  <data name="RuleDismiss" xml:space="preserve"><value>Dismiss preview</value></data>
+  <data name="RulePreviewSummary" xml:space="preserve"><value>Entries shown: {0}; would change: {1}; manual review: {2}. Nothing has been applied.</value></data>
+  <data name="RuleAppliedSummary" xml:space="preserve"><value>Files changed: {0}. Files requiring manual review and left unchanged: {1}. Approve changed plans, then explicitly Review and Start.</value></data>
+  <data name="RulePreviewStale" xml:space="preserve"><value>The batch changed. Create a fresh language preview before applying.</value></data>
+  <data name="RuleFileChanged" xml:space="preserve"><value>Proposed choices — not yet applied.</value></data>
+  <data name="RuleFileApplied" xml:space="preserve"><value>Choices applied. Review this file and explicitly approve its plan.</value></data>
+  <data name="RuleFileUnchanged" xml:space="preserve"><value>Current choices already satisfy the rules; approvals remain unchanged.</value></data>
+  <data name="RuleFileManualReview" xml:space="preserve"><value>Manual review required. All current choices for this file remain unchanged.</value></data>
+  <data name="RuleFileExcluded" xml:space="preserve"><value>Excluded entry — rules do not change it.</value></data>
+  <data name="RuleFileCompleted" xml:space="preserve"><value>Completed file — rules do not change it or its published output.</value></data>
+  <data name="RuleFileNoChange" xml:space="preserve"><value>Finished no-change item — rules do not change it.</value></data>
+  <data name="RuleFilePendingInspection" xml:space="preserve"><value>Inspect this entry before using language rules. No proposal or automatic exclusion.</value></data>
+  <data name="RuleFileFailed" xml:space="preserve"><value>Inspect and review this failed entry manually. Rules do not change it.</value></data>
+  <data name="RuleFileCancelled" xml:space="preserve"><value>Inspect and review this cancelled entry manually. Rules do not change it.</value></data>
+  <data name="RuleCurrentChoices" xml:space="preserve"><value>Current choices (unchanged)</value></data>
+  <data name="RuleProposedChoices" xml:space="preserve"><value>Per-file track choices</value></data>
+  <data name="RuleNoSubtitleMatches" xml:space="preserve"><value>No subtitle language matched. This proposal keeps no subtitles.</value></data>
+  <data name="RuleLegacyLanguage" xml:space="preserve"><value>Legacy language</value></data>
+  <data name="RuleIssueEmptyLanguageSelection" xml:space="preserve"><value>Select at least one language code for the enabled rule.</value></data>
+  <data name="RuleIssueInvalidRuleLanguage" xml:space="preserve"><value>The rule contains an unknown or unsupported language tag. Correct the codes and preview again.</value></data>
+  <data name="RuleIssueUnknownLanguage" xml:space="preserve"><value>Unknown or undetermined language metadata requires manual review.</value></data>
+  <data name="RuleIssueMalformedLanguage" xml:space="preserve"><value>Malformed or unsupported language metadata requires manual review.</value></data>
+  <data name="RuleIssueConflictingLanguage" xml:space="preserve"><value>Legacy and IETF language fields conflict. Review this file manually.</value></data>
+  <data name="RuleIssueNoAudioMatches" xml:space="preserve"><value>No audio language matched. This file is unchanged; choose audio manually. Removing all audio still requires per-file confirmation.</value></data>
+  <data name="RuleIssueInvalidCurrentSelection" xml:space="preserve"><value>The current track selection requires manual correction.</value></data>
 </root>

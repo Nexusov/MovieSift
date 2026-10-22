@@ -1,6 +1,6 @@
 # Repository instructions
 
-Read `PROJECT_BRIEF.md` before changing behavior. Work only on the explicitly authorized phase. Phase 2A adds bounded explicit-file/top-level-folder discovery, independent manual plans and a sequential in-memory queue over the existing single-job lifecycle. Automatic cross-file matching, presets, recursion, persisted queues, MP4, playback, source replacement and speculative frameworks remain outside this task.
+Read `PROJECT_BRIEF.md` before changing behavior. Work only on the explicitly authorized phase. Phase 2A adds bounded explicit-file/top-level-folder discovery, independent manual plans and a sequential in-memory queue over the existing single-job lifecycle. Phase 2B1 adds explicit language-rule preview/application before those independent approvals. Title/regex/forced-only matching, presets, recursion, persisted queues, MP4, playback, source replacement and speculative frameworks remain outside this task.
 
 ## Architecture
 
@@ -32,6 +32,8 @@ Read `PROJECT_BRIEF.md` before changing behavior. Work only on the explicitly au
 Use readable names, short cohesive types, early returns, and braces. Keep data type definitions separate from behavior where practical. Explain each function/component briefly in English XML documentation. Avoid nested conditions and unnecessary abstractions. Keep every public-facing application string in aligned English/Russian resources; raw media metadata and tool diagnostics remain original. The initial language is English and persisted values are `en`/`ru`. Plans, CLI values, and serialized data are culture invariant. Language changes must not invalidate a plan or cancel an active job.
 
 Track/chapter/tag language equivalence uses the shared explicit ISO registry table. Preserve regional/script/private/unknown distinctions; do not infer media-language identity through OS cultures.
+
+Language-selection rules normalize aliases only for matching and compare complete supported tags exactly. Preview is read-only and revision-bound; Apply uses each item's actual inspection and current selection. Unknown/conflicting targeted metadata or no audio matches leaves that whole file unchanged for manual review. Only actual choice changes invalidate approvals; no operation implicitly approves, excludes or runs a file. Keep matching policy separate from preservation verification.
 
 ## Verification and delivery
 

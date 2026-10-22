@@ -166,7 +166,7 @@
   <data name="BatchPauseAfterCurrent" xml:space="preserve"><value>Приостановить после текущего файла</value></data>
   <data name="BatchCancel" xml:space="preserve"><value>Отменить очередь</value></data>
   <data name="BatchExplicitResume" xml:space="preserve"><value>Решение по предупреждению не запускает следующий файл. Проверьте оставшуюся очередь и явно продолжите её.</value></data>
-  <data name="BatchQueuePolicy" xml:space="preserve"><value>Очередь существует только в этом окне и не восстанавливается после перезапуска. Опубликованные результаты сохраняются. Ошибки, предупреждения, отмена и проблемы очистки останавливают очередь; продолжение требует явной проверки и запуска. Автоматического сопоставления дорожек и рекурсивного поиска нет.</value></data>
+  <data name="BatchQueuePolicy" xml:space="preserve"><value>Очередь существует только в этом окне и не восстанавливается после перезапуска. Опубликованные результаты сохраняются. Ошибки, предупреждения, отмена и проблемы очистки останавливают очередь; продолжение требует явной проверки и запуска. Языковые правила требуют предпросмотра и применения; вложенные папки не сканируются.</value></data>
   <data name="BatchPreparing" xml:space="preserve"><value>Добавьте файлы и подтвердите их отдельные планы.</value></data>
   <data name="BatchInspecting" xml:space="preserve"><value>Проверка каждого файла отдельно…</value></data>
   <data name="BatchReviewing" xml:space="preserve"><value>Проверка всех исходников, назначений и планов…</value></data>
@@ -197,4 +197,38 @@
   <data name="ErrorReasonBatchFileLimit" xml:space="preserve"><value>Слишком много файлов. Уменьшите выбор или содержимое папки; частичного добавления не было.</value></data>
   <data name="ErrorReasonBatchEntryLimit" xml:space="preserve"><value>Папка содержит слишком много записей для указанного предела поиска. Используйте меньшую папку; частичного добавления не было.</value></data>
   <data name="ErrorReasonInvalidBatchInput" xml:space="preserve"><value>Выберите несколько локальных MKV или одну локальную папку без ссылок на каталоги и обхода вложенных папок.</value></data>
+  <data name="RuleHeading" xml:space="preserve"><value>Языковые правила очереди</value></data>
+  <data name="RuleHint" xml:space="preserve"><value>Неотмеченные категории сохраняют текущий выбор. Включите категорию, чтобы оставить все подходящие дорожки отдельно в каждом файле. Сначала создайте предпросмотр; до применения выбор не меняется.</value></data>
+  <data name="RuleAudio" xml:space="preserve"><value>Оставить все аудиодорожки с этими кодами языков</value></data>
+  <data name="RuleSubtitles" xml:space="preserve"><value>Оставить все субтитры с этими кодами языков</value></data>
+  <data name="RuleAudioCodes" xml:space="preserve"><value>Коды языков аудио через запятую</value></data>
+  <data name="RuleSubtitleCodes" xml:space="preserve"><value>Коды языков субтитров через запятую</value></data>
+  <data name="RuleTagHelp" xml:space="preserve"><value>Коды через запятую, например en, ger, ru-RU, sr-Latn. Теги совпадают точно: ru не совпадает с ru-RU. Поддерживается язык ISO с необязательными письменностью и регионом. Метаданные языка не доказывают язык речи.</value></data>
+  <data name="RulePreview" xml:space="preserve"><value>Предпросмотр языкового выбора</value></data>
+  <data name="RuleApply" xml:space="preserve"><value>Применить предложенный выбор</value></data>
+  <data name="RuleDismiss" xml:space="preserve"><value>Закрыть предпросмотр</value></data>
+  <data name="RulePreviewSummary" xml:space="preserve"><value>Записей: {0}; изменится: {1}; требуют ручной проверки: {2}. Выбор ещё не применён.</value></data>
+  <data name="RuleAppliedSummary" xml:space="preserve"><value>Изменено файлов: {0}. Требуют ручной проверки и оставлены без изменений: {1}. Подтвердите изменённые планы, затем явно проверьте и запустите очередь.</value></data>
+  <data name="RulePreviewStale" xml:space="preserve"><value>Очередь изменилась. Перед применением создайте новый языковой предпросмотр.</value></data>
+  <data name="RuleFileChanged" xml:space="preserve"><value>Предложенный выбор ещё не применён.</value></data>
+  <data name="RuleFileApplied" xml:space="preserve"><value>Выбор применён. Проверьте файл и явно подтвердите его план.</value></data>
+  <data name="RuleFileUnchanged" xml:space="preserve"><value>Текущий выбор уже соответствует правилам; подтверждения сохранены.</value></data>
+  <data name="RuleFileManualReview" xml:space="preserve"><value>Нужна ручная проверка. Весь текущий выбор этого файла сохранён.</value></data>
+  <data name="RuleFileExcluded" xml:space="preserve"><value>Исключённая запись — правила её не меняют.</value></data>
+  <data name="RuleFileCompleted" xml:space="preserve"><value>Обработка завершена — правила не меняют файл и опубликованный результат.</value></data>
+  <data name="RuleFileNoChange" xml:space="preserve"><value>Завершённая запись без изменений — правила её не меняют.</value></data>
+  <data name="RuleFilePendingInspection" xml:space="preserve"><value>Проверьте запись перед языковыми правилами. Выбор не предложен; автоматического исключения нет.</value></data>
+  <data name="RuleFileFailed" xml:space="preserve"><value>Повторно проверьте эту ошибочную запись вручную. Правила её не меняют.</value></data>
+  <data name="RuleFileCancelled" xml:space="preserve"><value>Повторно проверьте эту отменённую запись вручную. Правила её не меняют.</value></data>
+  <data name="RuleCurrentChoices" xml:space="preserve"><value>Текущий выбор без изменений</value></data>
+  <data name="RuleProposedChoices" xml:space="preserve"><value>Выбор дорожек этого файла</value></data>
+  <data name="RuleNoSubtitleMatches" xml:space="preserve"><value>Язык ни одних субтитров не совпал. Этот выбор не сохраняет субтитры.</value></data>
+  <data name="RuleLegacyLanguage" xml:space="preserve"><value>Прежний код языка</value></data>
+  <data name="RuleIssueEmptyLanguageSelection" xml:space="preserve"><value>Укажите хотя бы один код языка для включённого правила.</value></data>
+  <data name="RuleIssueInvalidRuleLanguage" xml:space="preserve"><value>В правиле неизвестный или неподдерживаемый языковой тег. Исправьте коды и повторите предпросмотр.</value></data>
+  <data name="RuleIssueUnknownLanguage" xml:space="preserve"><value>Неизвестные или неопределённые метаданные языка требуют ручной проверки.</value></data>
+  <data name="RuleIssueMalformedLanguage" xml:space="preserve"><value>Некорректные или неподдерживаемые метаданные языка требуют ручной проверки.</value></data>
+  <data name="RuleIssueConflictingLanguage" xml:space="preserve"><value>Прежний код и IETF-тег языка противоречат друг другу. Проверьте файл вручную.</value></data>
+  <data name="RuleIssueNoAudioMatches" xml:space="preserve"><value>Ни один язык аудио не совпал. Файл не изменён; выберите аудио вручную. Удаление всего аудио по-прежнему требует отдельного подтверждения для файла.</value></data>
+  <data name="RuleIssueInvalidCurrentSelection" xml:space="preserve"><value>Текущий выбор дорожек требует ручного исправления.</value></data>
 </root>

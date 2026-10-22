@@ -40,7 +40,17 @@ Unknown optional fields can be ignored only if they cannot weaken a required cap
 
 The desktop accepts several explicitly selected MKV files or one local folder's immediate MKV entries. Folder discovery is nonrecursive, bounded to 10,000 examined entries and a 100-entry session/addition limit including visible failures, and never traverses directory symlinks/reparse points. Duplicate canonical paths/file identities are collapsed; missing/unreadable/nonregular inputs are reported. An exceeded limit rejects the addition without silent truncation. Each discovered file still requires real inspection and its own manual selection/approval; a suffix is not container evidence. Inputs and destinations containing spaces and Unicode use the same local-path safety policy as single jobs.
 
-MP4, playlists, URLs, external subtitle editing, transcoding, playback, source replacement, automatic batch matching/presets, recursive folders and persisted queues remain outside this implementation. Native Wayland and arbitrary Linux distributions are separate acceptance targets.
+MP4, playlists, URLs, external subtitle editing, transcoding, playback, source replacement, title/regex/forced-only matching, presets, recursive folders and persisted queues remain outside this implementation. Native Wayland and arbitrary Linux distributions are separate acceptance targets.
+
+## Language-selection rules
+
+Phase 2B1 optionally proposes Keep choices for independently inspected batch files. Audio and subtitles each default to unchanged. A targeted category keeps **every** exact match; it never prefers the first/default/highest-channel track. All video and the existing attachment/metadata contract are retained. Apply changes selections only; plans still require explicit per-file approval and aggregate Review.
+
+Matching supports registered ISO 639-1 / 639-2/B / 639-2/T aliases from the shared frozen table. Supported tags have the narrow grammar `primary[-Script][-REGION]`: a known two/three-letter primary, optional four-ASCII-letter script, then optional two-ASCII-letter or three-digit region. Script/region shapes are validated, not their IANA registration. Matching is case-insensitive after primary alias normalization and compares the **entire** tag: `ger` = `de`, `fre` = `fr`, `ru` differs from `ru-RU`, and `sr-Latn` differs from `sr-Cyrl`. Other BCP 47 variants/extensions are outside this slice and require manual selection.
+
+A targeted track needs a known plain legacy language. When IETF metadata exists, its supported full tag is authoritative only if its primary agrees with that legacy alias. Missing/unregistered/private-use languages, `und`, `mul`, `mis`, `zxx`, malformed/unsupported tags and conflicting fields produce visible manual-review reasons. Any such issue, or zero audio matches in an input containing audio, leaves **all choices for that file** unchanged. Already silent inputs remain valid. No subtitle matches may propose keeping none and is explicitly reported. Untargeted categories are preserved without interpreting their language metadata.
+
+Normalization is comparison-only: no tags, titles, ordering, flags or original metadata are rewritten, and preservation verification is not relaxed. Language metadata does not prove the language actually spoken. Preview is read-only and bound to the live list, inspection, selection and destination revision; only explicit Apply can edit choices. Excluded/completed items remain untouched. New additions/reinspections require another preview/application, and New batch clears transient proposals.
 
 ## Platform and native requirements
 

@@ -46,6 +46,7 @@ public sealed partial class BatchViewModel : ObservableObject
     {
         this.services = services;
         Snapshot = services.Session.Snapshot;
+        LanguageRules = new(new(services.Session, services.Coordinator, services.Localization, () => CanEdit, OnEditorChanged));
         writesBlocked = !services.DataWritable;
         AddFilesCommand = new AsyncRelayCommand(AddFilesAsync, () => CanEdit);
         AddFolderCommand = new AsyncRelayCommand(AddFolderAsync, () => CanEdit);
@@ -70,6 +71,7 @@ public sealed partial class BatchViewModel : ObservableObject
 
     public Localization.LocalizationService Localization => services.Localization;
     public ObservableCollection<BatchItemViewModel> Items { get; } = [];
+    public BatchLanguageRulesViewModel LanguageRules { get; }
     public BatchSnapshot Snapshot { get; private set; }
     public string OutputFolder => outputFolder;
     public bool CanEdit => IsWorkspaceAvailable && !HasNewBatchConfirmation;
@@ -181,6 +183,7 @@ public sealed partial class BatchViewModel : ObservableObject
         }
 
         operationRevision++;
+        LanguageRules.ClearPreview();
         failure = null;
         reviewFailures = [];
         activeProgress = null;
@@ -551,6 +554,7 @@ public sealed partial class BatchViewModel : ObservableObject
         }
 
         OnPropertyChanged(string.Empty);
+        LanguageRules?.Refresh();
         AddFilesCommand?.NotifyCanExecuteChanged();
         AddFolderCommand?.NotifyCanExecuteChanged();
         ChooseOutputCommand?.NotifyCanExecuteChanged();

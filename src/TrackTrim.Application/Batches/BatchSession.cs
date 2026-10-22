@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using TrackTrim.Core.Failures;
 using TrackTrim.Core.Media;
 using TrackTrim.Core.Planning;
+using TrackTrim.Core.Rules;
 
 namespace TrackTrim.Application.Batches;
 
@@ -122,7 +123,43 @@ public sealed class BatchSession
             return new(null, new(ErrorCode.InvalidSelection));
         }
 
-        return new(item with { ApprovedPlan = request.Plan, State = BatchItemState.Ready, Result = null, Failure = null }, null);
+        return new(item with
+        {
+            ApprovedPlan = request.Plan,
+            State = BatchItemState.Ready,
+            Result = null,
+            Failure = null,
+            RetainedTrackIds = request.Plan.RetainedTracks.Select(track => track.Id).ToImmutableArray()
+        }, null);
+    });
+
+    /// <summary>Stores a file-local Keep selection while preserving exact state for a selection no-op.</summary>
+    public BatchEditResult SetSelection(BatchSelectionRequest request) => EditItem(request.ItemId, item =>
+    {
+        if (item.Inspection is null)
+        {
+            return new(null, new(ErrorCode.StalePlan));
+        }
+
+        var identifiers = NormalizeSelection(request.RetainedTrackIds, item.Inspection);
+
+        if (identifiers.IsDefault)
+        {
+            return new(null, new(ErrorCode.InvalidSelection));
+        }
+
+        if (item.CurrentRetainedTrackIds.SequenceEqual(identifiers))
+        {
+            return new(item, null);
+        }
+
+        return new(item with
+        {
+            RetainedTrackIds = identifiers,
+            ApprovedPlan = null,
+            State = BatchItemState.NeedsReview,
+            Failure = null
+        }, null);
     });
 
     /// <summary>Invalidates only the affected selection or destination approval.</summary>
@@ -157,6 +194,81 @@ public sealed class BatchSession
 
         Changed?.Invoke(updated);
         return new(true);
+    }
+
+    /// <summary>Checks edit availability and captures a pure rule preview under the current session lock.</summary>
+    internal BatchLanguagePreviewResult PreviewLanguageRules(LanguageRules rules)
+    {
+        lock (synchronization)
+        {
+            var failure = EditFailure();
+
+            if (failure is not null)
+            {
+                return new(null, DescribeResetFailure(failure));
+            }
+
+            if (rules is null)
+            {
+                return new(null, new(ErrorCode.InvalidSelection));
+            }
+
+            return new(BatchLanguagePreviewBuilder.Build(new(snapshot, rules)));
+        }
+    }
+
+    /// <summary>Atomically applies reliable changed rows after checking the issued preview and every captured input.</summary>
+    internal BatchLanguageApplyResult ApplyLanguageRules(BatchLanguageApplyRequest request)
+    {
+        BatchSnapshot updated;
+        ImmutableArray<Guid> changedItems;
+
+        lock (synchronization)
+        {
+            var failure = EditFailure();
+
+            if (failure is not null)
+            {
+                return new(false, [], DescribeResetFailure(failure));
+            }
+
+            if (!request.IsIssued)
+            {
+                return new(false, [], new(ErrorCode.StalePlan));
+            }
+
+            var preview = request.Preview;
+            var stale = preview.Revision != snapshot.Revision || preview.Items.Length != snapshot.Items.Length ||
+                !preview.Items.Zip(snapshot.Items).All(pair => MatchesPreviewItem(pair.First, pair.Second));
+
+            if (stale)
+            {
+                return new(false, [], new(ErrorCode.StalePlan));
+            }
+
+            changedItems = preview.Items.Where(item => item.State == BatchLanguagePreviewState.Changed)
+                .Select(item => item.ItemId).ToImmutableArray();
+
+            if (changedItems.IsEmpty)
+            {
+                return new(true, []);
+            }
+
+            var proposals = preview.Items.Where(item => item.State == BatchLanguagePreviewState.Changed)
+                .ToDictionary(item => item.ItemId);
+            var items = snapshot.Items.Select(item => proposals.TryGetValue(item.Id, out var proposal)
+                ? item with
+                {
+                    RetainedTrackIds = proposal.ProposedRetainedTrackIds,
+                    ApprovedPlan = null,
+                    State = BatchItemState.NeedsReview,
+                    Failure = null
+                } : item).ToImmutableArray();
+            updated = Edited(items);
+        }
+
+        Changed?.Invoke(updated);
+        return new(true, changedItems);
     }
 
     /// <summary>Claims an inspection or review operation while preventing conflicting edits.</summary>
@@ -341,6 +453,11 @@ public sealed class BatchSession
                 return new(false, result.Failure ?? new(ErrorCode.InvalidSelection));
             }
 
+            if (ReferenceEquals(result.Item, item))
+            {
+                return new(true);
+            }
+
             updated = Edited(snapshot.Items.Replace(item, result.Item));
         }
 
@@ -357,6 +474,36 @@ public sealed class BatchSession
         Failure = null,
         Phase = snapshot.Phase == BatchPhase.Paused ? BatchPhase.Paused : BatchPhase.Preparing
     };
+
+    /// <summary>Checks preview bindings without treating equal metadata from another inspection as the same snapshot.</summary>
+    private static bool MatchesPreviewItem(BatchLanguagePreviewItem preview, BatchItem item)
+    {
+        var matches = preview.ItemId == item.Id && preview.SourcePath == item.SourcePath &&
+            ReferenceEquals(preview.Inspection, item.Inspection) &&
+            preview.BeforeRetainedTrackIds.SequenceEqual(item.CurrentRetainedTrackIds);
+        return matches;
+    }
+
+    /// <summary>Validates actual file-local IDs and every required video while preserving inspected track order.</summary>
+    private static ImmutableArray<int> NormalizeSelection(ImmutableArray<int> identifiers, MediaInspection inspection)
+    {
+        if (identifiers.IsDefault)
+        {
+            return default;
+        }
+
+        var selected = identifiers.ToHashSet();
+        var available = inspection.Tracks.Select(track => track.Id).ToHashSet();
+        var invalid = selected.Count != identifiers.Length || selected.Any(identifier => !available.Contains(identifier)) ||
+            inspection.Tracks.Any(track => track.Kind == TrackKind.Video && !selected.Contains(track.Id));
+
+        if (invalid)
+        {
+            return default;
+        }
+
+        return inspection.Tracks.Where(track => selected.Contains(track.Id)).Select(track => track.Id).ToImmutableArray();
+    }
 
     /// <summary>Compares local paths using the platform's ordinary path casing policy.</summary>
     internal static StringComparer PathComparer => OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
