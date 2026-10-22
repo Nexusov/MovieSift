@@ -147,7 +147,8 @@ def main():
         "scope": "Development-only encoding of mov_text and generated artwork; production always stream-copies.",
     }
     (destination / "mp4-provenance.json").write_text(json.dumps(provenance, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(json.dumps(provenance, ensure_ascii=False, indent=2))
+    # Console encodings on Windows runners may not support original Unicode chapter titles.
+    print(json.dumps(provenance, ensure_ascii=True, indent=2))
 
 
 if __name__ == "__main__":
