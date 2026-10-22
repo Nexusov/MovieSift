@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "materials": [
+    {
+      "component": "Qt Core",
+      "version": "6.10.2",
+      "runtimeIdentifier": "win-x64",
+      "url": "https://raw.githubusercontent.com/qt/qtbase/v6.10.2/src/corelib/global/qglobal.h",
+      "sha256": "a4bd70f677623e167c418eea14ee77792f78d04622e90b2bc62079341b119447",
+      "path": "Qt-Core/6.10.2/src/corelib/global/qglobal.h",
+      "kind": "source-build-evidence",
+      "relationship": "Official version-tag terms/header evidence for an observed component version; exact downstream patches, selected licensing path and complete corresponding source remain unverified."
+    },
+    {
+      "component": "Qt Core",
+      "version": "6.10.2",
+      "runtimeIdentifier": "win-x64",
+      "url": "https://raw.githubusercontent.com/qt/qtbase/v6.10.2/LICENSES/LGPL-3.0-only.txt",
+      "sha256": "da7eabb7bafdf7d3ae5e9f223aa5bdc1eece45ac569dc21b3b037520b4464768",
+      "path": "Qt-Core/6.10.2/LICENSES/LGPL-3.0-only.txt",
+      "kind": "license",
+      "relationship": "Official version-tag terms/header evidence for an observed component version; exact downstream patches, selected licensing path and complete corresponding source remain unverified."
+    },
+    {
+      "component": "Qt Core",
+      "version": "6.10.2",
+      "runtimeIdentifier": "win-x64",
+      "url": "https://raw.githubusercontent.com/qt/qtbase/v6.10.2/LICENSES/GPL-2.0-only.txt",
+      "sha256": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643",
+      "path": "Qt-Core/6.10.2/LICENSES/GPL-2.0-only.txt",
+      "kind": "license",
+      "relationship": "Official version-tag terms/header evidence for an observed component version; exact downstream patches, selected licensing path and complete corresponding source remain unverified."
+    },
+    {
+      "component": "Qt Core",
+      "version": "6.10.2",
+      "runtimeIdentifier": "win-x64",
+      "url": "https://raw.githubusercontent.com/qt/qtbase/v6.10.2/LICENSES/GPL-3.0-only.txt",
+      "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+      "path": "Qt-Core/6.10.2/LICENSES/GPL-3.0-only.txt",
+      "kind": "license",
+      "relationship": "Official version-tag terms/header evidence for an observed component version; exact downstream patches, selected licensing path and complete corresponding source remain unverified."
+    },
+    {
+      "component": "Qt Core",
+      "version": "6.6.1",
+      "runtimeIdentifier": "linux-x64",
+      "url": "https://raw.githubusercontent.com/qt/qtbase/v6.6.1/src/corelib/global/qglobal.h",
+      "sha256": "8f47961e0e118e0bc86dec895d86c525653e7ee76353739d8069bcf7c78a2ffe",
+      "path": "Qt-Core/6.6.1/src/corelib/global/qglobal.h",
+      "kind": "source-build-evidence",
+      "relationship": "Official version-tag terms/header evidence for an observed component version; exact downstream patches, selected licensing path and complete corresponding source remain unverified."
+    },
+    {
+      "component": "Qt Core",
+      "version": "6.6.1",
+      "runtimeIdentifier": "linux-x64",
+      "url": "https://raw.githubusercontent.com/qt/qtbase/v6.6.1/LICENSES/LGPL-3.0-only.txt",
+      "sha256": "da7eabb7bafdf7d3ae5e9f223aa5bdc1eece45ac569dc21b3b037520b4464768",
+      "path": "Qt-Core/6.6.1/LICENSES/LGPL-3.0-only.txt",
+      "kind": "license",
+      "relationship": "Official version-tag terms/header evidence for an observed component version; exact downstream patches, selected licensing path and complete corresponding source remain unverified."
+    },
+    {
+      "component": "Qt Core",
+      "version": "6.6.1",
+      "runtimeIdentifier": "linux-x64",
+      "url": "https://raw.githubusercontent.com/qt/qtbase/v6.6.1/LICENSES/GPL-2.0-only.txt",
+      "sha256": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643",
+      "path": "Qt-Core/6.6.1/LICENSES/GPL-2.0-only.txt",
+      "kind": "license",
+      "relationship": "Official version-tag terms/header evidence for an observed component version; exact downstream patches, selected licensing path and complete corresponding source remain unverified."
+    },
+    {
+      "component": "Qt VirtualKeyboard",
+      "version": "6.6.1",
+      "runtimeIdentifier": "linux-x64",
+      "url": "https://raw.githubusercontent.com/qt/qtvirtualkeyboard/v6.6.1/src/virtualkeyboard/qvirtualkeyboardinputengine.cpp",
+      "sha256": "1720b5a64679c6cc996faa84543717417383903f37ff9837fae44aa152e28874",
+      "path": "Qt-VirtualKeyboard/6.6.1/src/virtualkeyboard/qvirtualkeyboardinputengine.cpp",
+      "kind": "source-build-evidence",
+      "relationship": "Official version-tag terms/header evidence for an observed component version; exact downstream patches, selected licensing path and complete corresponding source remain unverified."
+    },
+    {
+      "component": "Qt VirtualKeyboard",
+      "version": "6.6.1",
+      "runtimeIdentifier": "linux-x64",
+      "url": "https://raw.githubusercontent.com/qt/qtvirtualkeyboard/v6.6.1/LICENSES/GPL-3.0-only.txt",
+      "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+      "path": "Qt-VirtualKeyboard/6.6.1/LICENSES/GPL-3.0-only.txt",
+      "kind": "license",
+      "relationship": "Official version-tag terms/header evidence for an observed component version; exact downstream patches, selected licensing path and complete corresponding source remain unverified."
+    },
+    {
+      "component": "Qt VirtualKeyboard",
+      "version": "6.6.1",
+      "runtimeIdentifier": "linux-x64",
+      "url": "https://raw.githubusercontent.com/qt/qtvirtualkeyboard/v6.6.1/.cmake.conf",
+      "sha256": "ef2142d3f0960408cee4f67a69eb6d9332d769a73a3c807b427d2756fd2b97f1",
+      "path": "Qt-VirtualKeyboard/6.6.1/.cmake.conf",
+      "kind": "source-build-evidence",
+      "relationship": "Official version-tag terms/header evidence for an observed component version; exact downstream patches, selected licensing path and complete corresponding source remain unverified."
+    },
+    {
+      "component": "OpenSSL",
+      "version": "1.1.1k",
+      "runtimeIdentifier": "linux-x64",
+      "url": "https://raw.githubusercontent.com/openssl/openssl/OpenSSL_1_1_1k/LICENSE",
+      "sha256": "c32913b33252e71190af2066f08115c69bc9fddadf3bf29296e20c835389841c",
+      "path": "OpenSSL/1.1.1k/LICENSE",
+      "kind": "license",
+      "relationship": "Official version-tag terms/header evidence for an observed component version; exact downstream patches, selected licensing path and complete corresponding source remain unverified."
+    },
+    {
+      "component": "FLAC library",
+      "version": "1.5.0",
+      "runtimeIdentifier": "win-x64",
+      "url": "https://raw.githubusercontent.com/xiph/flac/1.5.0/COPYING.Xiph",
+      "sha256": "7866ee98760fc1f0156b4fe6bf530257e02be487ab3fd94e2b63799dd32d6b2c",
+      "path": "FLAC/1.5.0/COPYING.Xiph",
+      "kind": "license",
+      "relationship": "Official release-tag FLAC library terms for the observed embedded version; exact downstream patches/build inputs and broader binary closure remain unverified."
+    },
+    {
+      "component": "FLAC library",
+      "version": "1.3.2",
+      "runtimeIdentifier": "linux-x64",
+      "url": "https://raw.githubusercontent.com/xiph/flac/1.3.2/COPYING.Xiph",
+      "sha256": "fa27cb11f13f97b0c5f3ff363b1e2610c6efe87ed175779cb2a78e44eb19d34c",
+      "path": "FLAC/1.3.2/COPYING.Xiph",
+      "kind": "license",
+      "relationship": "Official release-tag FLAC library terms for the observed embedded version; exact downstream patches/build inputs and broader binary closure remain unverified."
+    }
+  ]
+}

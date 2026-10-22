@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <data name="AppSubtitle" xml:space="preserve"><value>Оставьте нужные дорожки. Сохраните оригинал.</value></data>
+  <data name="Language" xml:space="preserve"><value>Language / Язык</value></data>
+  <data name="OpenFile" xml:space="preserve"><value>Открыть MKV…</value></data>
+  <data name="ChooseOutput" xml:space="preserve"><value>Выбрать папку результата…</value></data>
+  <data name="Source" xml:space="preserve"><value>Исходный файл</value></data>
+  <data name="Output" xml:space="preserve"><value>Файл результата</value></data>
+  <data name="NoSource" xml:space="preserve"><value>Выберите один локальный MKV для просмотра его дорожек.</value></data>
+  <data name="NoOutput" xml:space="preserve"><value>Выберите отдельную папку для результата.</value></data>
+  <data name="Tracks" xml:space="preserve"><value>Дорожки</value></data>
+  <data name="Keep" xml:space="preserve"><value>Оставить</value></data>
+  <data name="TrackId" xml:space="preserve"><value>ID инструмента</value></data>
+  <data name="Type" xml:space="preserve"><value>Тип</value></data>
+  <data name="Codec" xml:space="preserve"><value>Кодек</value></data>
+  <data name="LanguageMetadata" xml:space="preserve"><value>Языковой тег</value></data>
+  <data name="Title" xml:space="preserve"><value>Название</value></data>
+  <data name="Channels" xml:space="preserve"><value>Каналы</value></data>
+  <data name="Flags" xml:space="preserve"><value>Действующие флаги</value></data>
+  <data name="Unknown" xml:space="preserve"><value>Неизвестно</value></data>
+  <data name="Untitled" xml:space="preserve"><value>Без названия</value></data>
+  <data name="Video" xml:space="preserve"><value>Видео</value></data>
+  <data name="Audio" xml:space="preserve"><value>Аудио</value></data>
+  <data name="Subtitles" xml:space="preserve"><value>Субтитры</value></data>
+  <data name="Other" xml:space="preserve"><value>Прочее</value></data>
+  <data name="AlwaysKept" xml:space="preserve"><value>Всегда сохраняется</value></data>
+  <data name="Default" xml:space="preserve"><value>по умолчанию</value></data>
+  <data name="Forced" xml:space="preserve"><value>принудительная</value></data>
+  <data name="Enabled" xml:space="preserve"><value>включена</value></data>
+  <data name="Disabled" xml:space="preserve"><value>отключена</value></data>
+  <data name="DispositionHearingImpaired" xml:space="preserve"><value>для слабослышащих</value></data>
+  <data name="DispositionVisualImpaired" xml:space="preserve"><value>для слабовидящих</value></data>
+  <data name="DispositionTextDescriptions" xml:space="preserve"><value>текстовые описания</value></data>
+  <data name="DispositionOriginal" xml:space="preserve"><value>язык оригинала</value></data>
+  <data name="DispositionCommentary" xml:space="preserve"><value>комментарий</value></data>
+  <data name="ReviewPlan" xml:space="preserve"><value>Проверить план</value></data>
+  <data name="Run" xml:space="preserve"><value>Создать новый MKV</value></data>
+  <data name="Cancel" xml:space="preserve"><value>Отменить</value></data>
+  <data name="Plan" xml:space="preserve"><value>Проверка плана обработки</value></data>
+  <data name="PlanInstructions" xml:space="preserve"><value>Проверьте выбранные дорожки и путь результата, затем создайте новый MKV. Изменение выбора или пути отменяет проверку.</value></data>
+  <data name="ConfirmSilent" xml:space="preserve"><value>Подтверждаю удаление всех аудиодорожек (результат без звука).</value></data>
+  <data name="OriginalNotice" xml:space="preserve"><value>Оригинал сохраняется и продолжает занимать место. Создаётся только новый файл.</value></data>
+  <data name="VerificationNotice" xml:space="preserve"><value>Каждый результат проверяется по структуре и метаданным. Это не доказывает целостность каждого закодированного пакета.</value></data>
+  <data name="Idle" xml:space="preserve"><value>Готово</value></data>
+  <data name="Inspecting" xml:space="preserve"><value>Проверка исходного файла…</value></data>
+  <data name="InspectionReady" xml:space="preserve"><value>Дорожки загружены. Выберите аудио и субтитры для сохранения.</value></data>
+  <data name="PlanReady" xml:space="preserve"><value>План готов к выполнению.</value></data>
+  <data name="PlanInvalidated" xml:space="preserve"><value>План изменился. Проверьте его повторно перед обработкой.</value></data>
+  <data name="NoChange" xml:space="preserve"><value>Дорожки не удаляются. Новый файл не требуется; обработка не запускалась.</value></data>
+  <data name="Checking" xml:space="preserve"><value>Проверка исходного файла и пути результата…</value></data>
+  <data name="Remuxing" xml:space="preserve"><value>Копирование выбранных потоков…</value></data>
+  <data name="Verifying" xml:space="preserve"><value>Проверка временного результата…</value></data>
+  <data name="Publishing" xml:space="preserve"><value>Сохранение нового файла…</value></data>
+  <data name="Published" xml:space="preserve"><value>Создан новый файл: {0}</value></data>
+  <data name="Cancelled" xml:space="preserve"><value>Операция отменена. Оригинал сохранён.</value></data>
+  <data name="Failed" xml:space="preserve"><value>Операция завершилась ошибкой.</value></data>
+  <data name="WarningReview" xml:space="preserve"><value>Инструмент сообщил предупреждения. Проверенный результат ожидает вашего решения.</value></data>
+  <data name="PublishWarnings" xml:space="preserve"><value>Сохранить с предупреждениями</value></data>
+  <data name="Discard" xml:space="preserve"><value>Удалить временный результат</value></data>
+  <data name="Discarded" xml:space="preserve"><value>Временный результат удалён.</value></data>
+  <data name="Diagnostics" xml:space="preserve"><value>Техническая диагностика (исходный язык)</value></data>
+  <data name="Error" xml:space="preserve"><value>Ошибка: {0}</value></data>
+  <data name="Details" xml:space="preserve"><value>Подробности</value></data>
+  <data name="PersistenceFailure" xml:space="preserve"><value>Переносимые данные недоступны. В режиме без сохранения настроек запись медиа отключена. Для обработки переместите приложение в доступную для записи папку.</value></data>
+  <data name="ChooseData" xml:space="preserve"><value>Выбрать папку данных…</value></data>
+  <data name="Interrupted" xml:space="preserve"><value>Обнаружены временные файлы прерванной работы. Автоматического сохранения результата не будет.</value></data>
+  <data name="CleanInterrupted" xml:space="preserve"><value>Удалить принадлежащие приложению временные файлы</value></data>
+  <data name="CleanupIssue" xml:space="preserve"><value>Требуется проверка удаления временных файлов: {0}</value></data>
+  <data name="CloseDuringWork" xml:space="preserve"><value>Безопасная остановка текущей операции перед закрытием…</value></data>
+  <data name="TracksSummary" xml:space="preserve"><value>Сохранить дорожек: {0}; удалить: {1}.</value></data>
+  <data name="SizeDifference" xml:space="preserve"><value>Новый файл меньше на {0:N0} байт. Оригинал остаётся на диске.</value></data>
+  <data name="Backend" xml:space="preserve"><value>Медиаинструмент</value></data>
+  <data name="DevelopmentTools" xml:space="preserve"><value>Инструменты для разработки</value></data>
+  <data name="FileDialogTitle" xml:space="preserve"><value>Выберите файл MKV</value></data>
+  <data name="OutputDialogTitle" xml:space="preserve"><value>Выберите папку для нового файла</value></data>
+  <data name="DataDialogTitle" xml:space="preserve"><value>Выберите доступную для записи папку данных</value></data>
+  <data name="SelectionWarning" xml:space="preserve"><value>Удаление аудиодорожки по умолчанию не назначает новую. Выбор проигрывателя может отличаться.</value></data>
+  <data name="LanguageTagNotice" xml:space="preserve"><value>Языковые теги являются метаданными и не доказывают язык речи.</value></data>
+  <data name="NoAudioConfirmation" xml:space="preserve"><value>Подтвердите создание файла без звука перед проверкой плана.</value></data>
+  <data name="Unsupported" xml:space="preserve"><value>В исходном файле обнаружена неподдерживаемая возможность: {0}</value></data>
+  <data name="DestinationRequired" xml:space="preserve"><value>Выберите папку результата перед проверкой плана.</value></data>
+  <data name="SourceRequired" xml:space="preserve"><value>Сначала откройте файл MKV.</value></data>
+  <data name="CleanupHeading" xml:space="preserve"><value>Временные файлы удалены не полностью. Проверьте техническую диагностику ниже; созданный итоговый файл остаётся на месте.</value></data>
+  <data name="ErrorInvalidSource" xml:space="preserve"><value>Выберите поддерживаемый локальный обычный файл MKV.</value></data>
+  <data name="ErrorUnsupportedContainer" xml:space="preserve"><value>Обнаруженный контейнер не поддерживается на этом этапе.</value></data>
+  <data name="ErrorUnsupportedFeature" xml:space="preserve"><value>Обнаруженную возможность медиа нельзя безопасно сохранить.</value></data>
+  <data name="ErrorToolUnavailable" xml:space="preserve"><value>Встроенные медиаинструменты отсутствуют или не запускаются. Распакуйте переносимый архив полностью.</value></data>
+  <data name="ErrorToolVersionMismatch" xml:space="preserve"><value>Версии медиаинструментов не соответствуют закреплённому поддерживаемому выпуску.</value></data>
+  <data name="ErrorInvalidToolOutput" xml:space="preserve"><value>Медиаинструмент вернул некорректные, неполные или слишком большие структурированные данные.</value></data>
+  <data name="ErrorToolFailed" xml:space="preserve"><value>Медиаинструмент завершился ошибкой. Проверьте его исходную диагностику ниже.</value></data>
+  <data name="ErrorSourceChanged" xml:space="preserve"><value>Исходный файл изменился после проверки. Откройте и проверьте его повторно.</value></data>
+  <data name="ErrorInvalidSelection" xml:space="preserve"><value>Выбор дорожек некорректен. Все видеодорожки должны сохраняться.</value></data>
+  <data name="ErrorZeroAudioConfirmationRequired" xml:space="preserve"><value>Подтвердите создание результата без звука перед проверкой плана.</value></data>
+  <data name="ErrorInvalidDestination" xml:space="preserve"><value>Выберите корректный отдельный путь результата в доступной для записи папке.</value></data>
+  <data name="ErrorDestinationExists" xml:space="preserve"><value>Файл результата уже существует. Выберите другое имя.</value></data>
+  <data name="ErrorInsufficientSpace" xml:space="preserve"><value>Места может не хватить для полного нового файла рядом с оригиналом.</value></data>
+  <data name="ErrorPersistenceUnavailable" xml:space="preserve"><value>Невозможно безопасно сохранить переносимые записи владения. Запись медиа отключена.</value></data>
+  <data name="ErrorVerificationFailed" xml:space="preserve"><value>Обязательная проверка не пройдена. Этот временный результат нельзя сохранить.</value></data>
+  <data name="ErrorPublicationFailed" xml:space="preserve"><value>Проверенный временный результат не удалось сохранить. Оригинал сохранён.</value></data>
+  <data name="ErrorPublicationUncertain" xml:space="preserve"><value>Сохранение результата не подтверждено. Проверьте папку результата; успех не установлен.</value></data>
+  <data name="ErrorOwnershipInvalid" xml:space="preserve"><value>Владение временными файлами не подтверждено. Автоматическое удаление запрещено.</value></data>
+  <data name="ErrorProcessTerminationFailed" xml:space="preserve"><value>Завершение рабочего процесса не подтверждено. Временный результат оставлен для безопасности.</value></data>
+  <data name="ErrorBusy" xml:space="preserve"><value>Другая операция ещё выполняется.</value></data>
+  <data name="ErrorStalePlan" xml:space="preserve"><value>Утверждённый план устарел. Заново откройте и проверьте исходный файл.</value></data>
+  <data name="ErrorCancelled" xml:space="preserve"><value>Операция отменена.</value></data>
+  <data name="ErrorIoFailure" xml:space="preserve"><value>Ошибка локальной файловой операции. Проверьте сведения ниже.</value></data>
+  <data name="Remove" xml:space="preserve"><value>Удалить</value></data>
+  <data name="InterruptedCleanable" xml:space="preserve"><value>Владение подтверждено; пустую временную папку можно удалить.</value></data>
+  <data name="InterruptedUnresolved" xml:space="preserve"><value>Автоматическое удаление недоступно. Перед ручным удалением проверьте владение и состояние процессов. Начните новую операцию с исходного файла; этот временный результат нельзя сохранить после перезапуска.</value></data>
+  <data name="CloseUnconfirmedNotice" xml:space="preserve"><value>Завершение рабочего процесса не подтверждено. Оставьте окно открытым для просмотра диагностики или явно закройте приложение с сохранением временных файлов.</value></data>
+  <data name="CloseDespiteUncertainty" xml:space="preserve"><value>Закрыть приложение; оставить временные файлы</value></data>
+  <data name="Finishing" xml:space="preserve"><value>Завершение операции…</value></data>
+  <data name="DiscardCleanupIncomplete" xml:space="preserve"><value>Запрошено удаление результата, но временные файлы удалены не полностью. Проверьте сведения об удалении.</value></data>
+  <data name="PublishedWithWarnings" xml:space="preserve"><value>После явного подтверждения сохранён новый файл с предупреждениями: {0}</value></data>
+  <data name="SizeIncrease" xml:space="preserve"><value>Новый файл больше на {0:N0} байт. Оригинал остаётся на диске.</value></data>
+  <data name="Yes" xml:space="preserve"><value>да</value></data>
+  <data name="No" xml:space="preserve"><value>нет</value></data>
+  <data name="MediaFeatures" xml:space="preserve"><value>Вложения: {0}. Главы: {1}. Пользовательские теги: {2}.</value></data>
+  <data name="PreservationSummary" xml:space="preserve"><value>Сохранить все видеодорожки и поддерживаемые вложения, обычные главы и поддерживаемые пользовательские теги. Порядок оставленных потоков и действующие флаги сохраняются.</value></data>
+  <data name="InterruptedPaths" xml:space="preserve"><value>Временный результат: {0}&#10;Планируемый файл (сохранение не подтверждено): {1}</value></data>
+  <data name="ErrorReasonLinkedSegments" xml:space="preserve"><value>Связанные сегменты Matroska не поддерживаются. Выберите самостоятельный MKV без связей с другими сегментами.</value></data>
+  <data name="ErrorReasonTrackType" xml:space="preserve"><value>Файл содержит неподдерживаемый тип дорожки. Обрабатываются только видео, аудио и субтитры.</value></data>
+  <data name="ErrorReasonHdrMetadata" xml:space="preserve"><value>Обнаруженные расширенные метаданные HDR или Dolby Vision выходят за пределы поддерживаемых гарантий сохранения.</value></data>
+  <data name="ErrorReasonChapterReferences" xml:space="preserve"><value>Ссылки в главах нельзя безопасно сохранить для этого файла или выбора. Оставьте связанные дорожки или выберите файл без таких ссылок.</value></data>
+  <data name="ErrorReasonOrderedChapters" xml:space="preserve"><value>Упорядоченные главы не поддерживаются. Выберите файл с обычными самостоятельными главами.</value></data>
+  <data name="ErrorReasonTagTargets" xml:space="preserve"><value>Пользовательские теги ссылаются на неподдерживаемые элементы контейнера. Этот файл нельзя безопасно обработать.</value></data>
+  <data name="ErrorReasonDanglingTrackTags" xml:space="preserve"><value>Пользовательские теги содержат ссылки на отсутствующие дорожки. Этот файл нельзя безопасно обработать.</value></data>
+  <data name="ErrorReasonRedirectedPath" xml:space="preserve"><value>Обнаружена символическая ссылка, точка соединения или другая точка перенаправления. Выберите прямые пути к локальному файлу и папке.</value></data>
+  <data name="ErrorReasonNetworkPath" xml:space="preserve"><value>Сетевые пути в этом режиме не поддерживаются. Выберите локальные исходный файл и путь результата.</value></data>
+  <data name="ErrorReasonRegularFileRequired" xml:space="preserve"><value>Выберите обычный локальный файл. Папки и специальные файлы не поддерживаются.</value></data>
+  <data name="PlanDefaultAudioRetained" xml:space="preserve"><value>Аудио по умолчанию в результате: у сохранённых дорожек с ID {0} остаются действующие флаги по умолчанию.</value></data>
+  <data name="PlanNoDefaultAudio" xml:space="preserve"><value>Аудио по умолчанию в результате: ни одна из сохранённых аудиодорожек не имеет флага по умолчанию. Новая дорожка по умолчанию не назначается.</value></data>
+  <data name="PlanNoAudio" xml:space="preserve"><value>В результате не останется аудиодорожек.</value></data>
+  <data name="CloseWarningReview" xml:space="preserve"><value>Этот результат ещё не сохранён. Продолжите проверку предупреждений или удалите временный результат и закройте приложение после очистки. При ошибке удаления окно останется открытым.</value></data>
+  <data name="RemainInWarningReview" xml:space="preserve"><value>Продолжить проверку</value></data>
+  <data name="DiscardWarningsAndClose" xml:space="preserve"><value>Удалить результат и закрыть</value></data>
+  <data name="InterruptedInvalidRecord" xml:space="preserve"><value>Запись владения повреждена или неполна и требует ручной проверки. Автоматическая очистка и удаление для этой записи недоступны.</value></data>
+  <data name="ErrorReasonSegmentStructure" xml:space="preserve"><value>Структуру Segment Info невозможно проверить в поддерживаемых пределах. Выберите самостоятельный MKV с конечными размерами элементов; потоковые кластеры и несколько сегментов не поддерживаются.</value></data>
+</root>

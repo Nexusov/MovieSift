@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "materials": [
+    {
+      "id": "avalonia-12.1.4-license",
+      "packageIds": [
+        "Avalonia",
+        "Avalonia.Desktop",
+        "Avalonia.FreeDesktop",
+        "Avalonia.FreeDesktop.AtSpi",
+        "Avalonia.HarfBuzz",
+        "Avalonia.Native",
+        "Avalonia.Remote.Protocol",
+        "Avalonia.Skia",
+        "Avalonia.Themes.Fluent",
+        "Avalonia.Win32",
+        "Avalonia.X11"
+      ],
+      "version": "12.1.4",
+      "repositoryCommit": "2d79ba55fae1b1e71c69f93a668080c9029e6a31",
+      "url": "https://raw.githubusercontent.com/AvaloniaUI/Avalonia/2d79ba55fae1b1e71c69f93a668080c9029e6a31/licence.md",
+      "sha256": "213814d306090074d234d760239ff0f67eb9b8d20eefb4d5631bb39dbe0b769b",
+      "fileName": "upstream/licence.md",
+      "kind": "license",
+      "evidence": "Every listed restored 12.1.4 package records this Avalonia repository commit in its nuspec. Each supplies shipped assemblies but no collected license text. The commit-pinned upstream MIT text includes the AvaloniaUI OÜ copyright notice; preserve its original UTF-8 bytes. This record does not cover Avalonia.BuildServices or Avalonia.Angle.Windows.Natives."
+    },
+    {
+      "id": "microcom-runtime-0.11.6-license",
+      "packageIds": [
+        "MicroCom.Runtime"
+      ],
+      "version": "0.11.6",
+      "repositoryCommit": "76785efcafd91b5902fd19dd11145f6dd655b7b4",
+      "url": "https://raw.githubusercontent.com/kekekeks/MicroCom/76785efcafd91b5902fd19dd11145f6dd655b7b4/LICENSE",
+      "sha256": "6ee769c9ac4dac9abb16b98b1341e9528ff9f4ab685481410d3376d14148f3a9",
+      "fileName": "upstream/LICENSE",
+      "kind": "license",
+      "evidence": "The restored MicroCom.Runtime 0.11.6 nuspec records this repository and commit, declares MIT and supplies no license text. The commit-pinned LICENSE includes the 2021 Nikita Tsukanov copyright notice."
+    },
+    {
+      "id": "tmds-dbus-protocol-0.94.1-license",
+      "packageIds": [
+        "Tmds.DBus.Protocol"
+      ],
+      "version": "0.94.1",
+      "repositoryCommit": "b4a7fed0b878f74cb54f7cca84d2889af4e596ba",
+      "url": "https://raw.githubusercontent.com/tmds/Tmds.DBus/b4a7fed0b878f74cb54f7cca84d2889af4e596ba/COPYING",
+      "sha256": "aca3b49277abcc7886ccb2f115603a9f5b15fc3f96019a10c00f2974098b210c",
+      "fileName": "upstream/COPYING",
+      "kind": "license",
+      "evidence": "The restored Tmds.DBus.Protocol 0.94.1 nuspec records this repository and commit, declares MIT and supplies no license text. Upstream names the text COPYING, outside the collector's original filename pattern; it includes Alp Toker, Other Contributors and Tom Deseyn copyright notices."
+    },
+    {
+      "id": "serilog-4.3.1-license",
+      "packageIds": [
+        "Serilog"
+      ],
+      "version": "4.3.1",
+      "repositoryCommit": "5625030e8f8fceca2e3180575aba174751ef7add",
+      "url": "https://raw.githubusercontent.com/serilog/serilog/5625030e8f8fceca2e3180575aba174751ef7add/LICENSE",
+      "sha256": "73ba74dfaa520b49a401b5d21459a8523a146f3b7518a833eea5efa85130bf68",
+      "fileName": "upstream/LICENSE",
+      "kind": "license",
+      "evidence": "The restored Serilog 4.3.1 nuspec records this repository and commit and declares Apache-2.0. Its collected package directory contains the nuspec but no license text. This is the exact upstream LICENSE from that commit; it does not establish that all other attribution duties are complete."
+    },
+    {
+      "id": "serilog-sinks-file-7.0.0-license",
+      "packageIds": [
+        "Serilog.Sinks.File"
+      ],
+      "version": "7.0.0",
+      "repositoryCommit": "23c732a8658a0df2a5434fe69b0011800b14f0da",
+      "url": "https://raw.githubusercontent.com/serilog/serilog-sinks-file/23c732a8658a0df2a5434fe69b0011800b14f0da/LICENSE",
+      "sha256": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+      "fileName": "upstream/LICENSE",
+      "kind": "license",
+      "evidence": "The restored Serilog.Sinks.File 7.0.0 nuspec records this repository and commit and declares Apache-2.0. Its collected package directory contains the nuspec but no license text. This is the exact upstream LICENSE from that commit; it does not establish that all other attribution duties are complete."
+    }
+  ]
+}

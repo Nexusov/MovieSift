@@ -1,0 +1,147 @@
+{
+  "attachments": [
+    {
+      "content_type": "text/plain",
+      "description": "Original attachment description / Описание",
+      "file_name": "untrusted attachment.txt",
+      "id": 1,
+      "properties": {
+        "uid": 11257959064039487625
+      },
+      "size": 40
+    }
+  ],
+  "chapters": [
+    {
+      "num_entries": 2
+    }
+  ],
+  "container": {
+    "properties": {
+      "container_type": 17,
+      "duration": 2000000000,
+      "is_providing_timestamps": true,
+      "muxing_application": "libebml v1.4.7 + libmatroska v1.7.2",
+      "segment_uid": "a885d5f0df44e245265a59568ae6f9c9",
+      "timestamp_scale": 1000000,
+      "title": "TrackTrim synthetic / Проверка",
+      "writing_application": "mkvmerge v102.0 ('Little Houses') 64-bit"
+    },
+    "recognized": true,
+    "supported": true,
+    "type": "Matroska"
+  },
+  "errors": [],
+  "file_name": "ordinary.mkv",
+  "global_tags": [
+    {
+      "num_entries": 1
+    }
+  ],
+  "identification_format_version": 20,
+  "track_tags": [
+    {
+      "num_entries": 1,
+      "track_id": 1
+    },
+    {
+      "num_entries": 1,
+      "track_id": 2
+    }
+  ],
+  "tracks": [
+    {
+      "codec": "VP8",
+      "id": 0,
+      "properties": {
+        "codec_id": "V_VP8",
+        "codec_private_length": 0,
+        "default_duration": 100000000,
+        "default_track": true,
+        "display_dimensions": "16x16",
+        "display_unit": 0,
+        "enabled_track": true,
+        "forced_track": false,
+        "language": "und",
+        "language_ietf": "und",
+        "minimum_timestamp": 0,
+        "num_index_entries": 20,
+        "number": 1,
+        "pixel_dimensions": "16x16",
+        "uid": 12774094189724925210
+      },
+      "type": "video"
+    },
+    {
+      "codec": "PCM",
+      "id": 1,
+      "properties": {
+        "audio_bits_per_sample": 16,
+        "audio_channels": 1,
+        "audio_sampling_frequency": 48000,
+        "codec_id": "A_PCM/INT/LIT",
+        "codec_private_length": 0,
+        "default_duration": 40000000,
+        "default_track": true,
+        "enabled_track": true,
+        "forced_track": false,
+        "language": "eng",
+        "language_ietf": "en",
+        "minimum_timestamp": 0,
+        "num_index_entries": 0,
+        "number": 2,
+        "tag_comment": "Low tone",
+        "track_name": "Matching audio",
+        "uid": 13675876335307270593
+      },
+      "type": "audio"
+    },
+    {
+      "codec": "PCM",
+      "id": 2,
+      "properties": {
+        "audio_bits_per_sample": 16,
+        "audio_channels": 1,
+        "audio_sampling_frequency": 48000,
+        "codec_id": "A_PCM/INT/LIT",
+        "codec_private_length": 0,
+        "default_duration": 40000000,
+        "default_track": false,
+        "enabled_track": true,
+        "flag_commentary": true,
+        "forced_track": false,
+        "language": "eng",
+        "language_ietf": "en",
+        "minimum_timestamp": 0,
+        "num_index_entries": 0,
+        "number": 3,
+        "tag_comment": "High tone",
+        "track_name": "Matching audio",
+        "uid": 15985661122095681775
+      },
+      "type": "audio"
+    },
+    {
+      "codec": "SubRip/SRT",
+      "id": 3,
+      "properties": {
+        "codec_id": "S_TEXT/UTF8",
+        "codec_private_length": 0,
+        "default_track": false,
+        "enabled_track": true,
+        "encoding": "UTF-8",
+        "forced_track": true,
+        "language": "rus",
+        "language_ietf": "ru",
+        "minimum_timestamp": 0,
+        "num_index_entries": 1,
+        "number": 4,
+        "text_subtitles": true,
+        "track_name": "Captions",
+        "uid": 10803935449919660822
+      },
+      "type": "subtitles"
+    }
+  ],
+  "warnings": []
+}

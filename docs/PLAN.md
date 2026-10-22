@@ -1,0 +1,103 @@
+# Phase 0 and Phase 1 acceptance
+
+Scope stops before Phase 2. Implemented code, an executed test, and acceptance on a clean desktop are different evidence. The review corrections passed final locked restore, format verification, Release build and complete platform CI: **Windows 222 passed + 5 Linux-only skips; Linux 227/227 passed**. Both archives, relocated workflows and the no-SDK Linux container passed. Native target-desktop and licensing acceptance remain open.
+
+## Current review corrections
+
+| Finding | Implemented behavior | Current evidence |
+| --- | --- | --- |
+| 1. Capacity after allocation | Initial advice requests source length; publication requests zero additional media bytes while rechecking paths, aliases and collisions. Actual allocation/tool failures still fail. | Controlled coordinator and real-filesystem regressions pass in the current Application suite. |
+| 2. AAC timing | Only unchanged bounded AAC-LC ASC/rate can justify a new 1024-sample DefaultDuration within 1 ns integer rounding. All actual frame counts/timestamps and known terminal boundaries remain checked. Only the matching duplicate-last-frame synthetic end sentinel can use the inferred duration. | Direct FFmpeg 7.1.1 positives, shifted-AAC negative and FFmpeg 9.0.2 known-final-duration negatives passed on both runners. |
+| 3. Language aliases | One explicit ISO 639 B/T/alpha-2 table serves tracks, chapters and tags; regional/script/private/unknown distinctions remain exact. Ordinary chapter additions and independent tag additions are separate cases. | Pure alias/XML and real-tool chapter/tag metadata regressions passed on both runners. |
+| 4. Close during warning review | Explicit remain/discard-and-close choice, one awaited cleanup, repeated close requests gated; failure keeps the window open. | Current Desktop suite **32/32 passed**; native OS window acceptance remains pending. |
+| 5. Invalid ownership records | Validate nullable shape, version, stage, owner identity, GUID/token, canonical adjacent paths, exact record filename and marker. JSON uses regular-file handles before size/read operations. InvalidRecord notice retains evidence and authorizes no cleanup; settings failure does not hide the scan. | Initial red reproduction produced 18 failures. Corrected Application suite: Windows **69 + 4 OS skips**, Linux **73/73**; EN/RU headless notices and real record/marker/settings FIFO cases pass. |
+| 6. SegmentFamily | Bounded Segment/Info traversal rejects actual family/previous/next linkage before planning. Ambiguous boundaries/unknown-sized children fail closed; regular-file handles prevent FIFO blocking. No extra production tool. | Actual family input/ordinary publish control and bounded reader cases passed on both runners; the direct reader FIFO case passed on Linux. |
+| 7. Evidence quality | Retained SRT bytes including zero audio; observed live cancellation worker with retained handle and awaited exit; untouched direct FFmpeg-origin fixture provenance. | All **14 actual-media cases** passed on both runners. FFmpeg and fixtures are excluded from production archives. |
+
+Final local Windows verification and Windows CI passed: Core **8**, Application **69 + 4 Linux-only skips**, Infrastructure **113 + 1 Linux-only skip**, Desktop **32**. Linux CI passed Core **8**, Application **73**, Infrastructure **114**, Desktop **32**, with no skips. All five FIFO cases ran there: source inspection, Segment Info and JSON record/marker/settings. Controlled filesystem/process, actual media, headless UI and native desktop evidence remain distinct.
+
+## Status vocabulary
+
+- **Implemented**: code/script exists and is reviewable; execution is not implied.
+- **Verified**: the exact relevant check ran successfully; evidence records its limits.
+- **Pending**: implemented or planned work still needs execution/evidence.
+- **Blocked**: a concrete unavailable requirement prevents the stated acceptance.
+
+## Phase 0 — foundation
+
+| Acceptance | State | Evidence / remaining work |
+| --- | --- | --- |
+| Four-project dependency graph; .NET 10; stable aligned Avalonia; explicit composition | Verified by build/tests | Final locked restore, format verification, and Release build completed with 0 warnings and 0 errors. |
+| Pinned SDK, runtime, package versions, lockfiles | Verified on Windows and Linux runners | SDK 10.0.402 and runtime 10.0.13 are separate pins. Locked restore and self-contained publishing completed successfully on both platforms. |
+| English-first and live English/Russian switching/persistence | Headless and limited native functional checks verified; target desktops pending | Current Desktop suite **32/32**; real-backend headless renders. Native Windows 10 UIA confirmed English first launch, EN/RU approved-plan preservation and Russian after restart; screenshots/scaling and clean target desktops remain open. |
+| Pinned MKVToolNix acquisition/version/identification | Verified on Windows and Linux runners | 102.0 executables ran; both pinned archive hashes matched; real fixture identification reported format 20. |
+| Portable Windows proof | Verified on Windows CI; target desktop pending | Self-contained ZIP/actual workflow and all **443** relocated manifest payload checks passed. The local deliverable is rebuilt after the evidence/doc commit. Windows 11 25H2 clean desktop remains unverified. |
+| Linux closure without FUSE at runtime | Verified on Ubuntu runner and no-SDK container | Build-time AppImage extraction, native closure, archive/relocation and actual workflow passed; the no-SDK container also passed with ASCII parent locale, non-root user and no network. |
+| CI required media integration and platform archives | Verified | Both jobs passed in run `39090376738` for review head `3b53414647a82eba2490e5298f37fa3bec990643`, using the synthetic merge identified below. Archives remain local to runners; only evidence is uploaded while redistribution obligations remain unresolved. |
+
+## Phase 1 — one MKV workflow
+
+| Checkpoint | State | Required acceptance evidence |
+| --- | --- | --- |
+| 1. Actual inspection, bilingual inspector, Keep semantics | Backend/headless verified; native Windows 10 functional evidence | Real native inspection, changed plan and EN/RU preservation were observed using UIA/keyboard; file opening was owner-assisted. Native picker Cancel preserved the approved plan. Visual and target-platform acceptance remain open. |
+| 2. Immutable plan/review, source/destination validation, actual progress/cancellation | Verified on Windows/Linux runners | Core **8/8**; Application Windows **69 + 4 OS skips**, Linux **73/73**; controlled process and actual MKV cases pass. All five Linux FIFO regressions ran successfully. |
+| 3. Verification, warning review, no-overwrite publication, cleanup/journal | Verified for the documented subset | Infrastructure Windows **113 + 1 OS skip**, Linux **114/114**, including **14 actual-media cases**; controlled warning/race/filesystem tests. Simulated warnings remain separate from a real mkvmerge warning remux. |
+| 4. Relocated archives and factual platform evidence | Runner/container verified; target desktops pending | Both actual packaged workflows/relocations and the no-SDK Linux container passed. Clean target desktop acceptance remains separate. |
+
+## Executed evidence
+
+The final local checks cover review head `3b53414647a82eba2490e5298f37fa3bec990643`. [CI run 39090376738](https://github.com/Nexusov/TrackTrim/actions/runs/39090376738) passed both complete jobs. GitHub checked out synthetic PR merge `5c6fe092db8d523fd62957e5c2293cfaf5c55d31`, with comparison base `69c9babe668c3ba6d0032de3304f793337964c4f` and that review head as parents. This distinguishes the tested review source from the CI checkout SHA; later evidence-only documentation commits do not change production behavior.
+
+| Command/check | Result |
+| --- | --- |
+| `dotnet restore --locked-mode` | Passed on the final production source. |
+| `dotnet format --verify-no-changes --no-restore` | Passed on the final production source. |
+| `dotnet build --configuration Release --no-restore` | Passed: 0 warnings, 0 errors. |
+| `dotnet test --configuration Release --no-build --no-restore` | Windows local/CI: **222 passed, 5 Linux-only skips**, 227 total. Linux CI: **227/227 passed**, no skips. Project counts are listed above. |
+| Actual pinned `mkvmerge`/`mkvextract` integration | **14 actual-media cases passed on both runners**: retained VP8/PCM/SRT and direct FFmpeg-origin H264/AAC/SRT extraction/source hashes; semantic XML and real chapter/tag aliases; attachment payloads; multiple video; observed live-worker cancellation/reap; SegmentFamily rejection/ordinary publish control; shifted/known-end AAC negative verification cases. Controlled warning/failure cases are separate. |
+| Windows packaged/relocated actual workflow | Passed: pinned pair, actual inspection/remux/semantic and timing verification/no-overwrite publication, **443** relocated manifest payload checks, unrelated working directory and spaces/Cyrillic/metacharacters. Source SHA256 remained `055c7f3ebdc3c579dd6d7740c78a1e8ee0e2525f23542b5c6af9a0869ce4a0f8`. The final local ZIP is regenerated after the evidence/doc commit. |
+| Linux packaged/relocated actual workflow | Passed on Ubuntu 24.04.5: self-contained tar.gz, all **418** relocated manifest payload checks and actual workflow. Source SHA256 remained `cf883642cf19082d99f0682afd3f9b54fcee14c7daef90ceb2edc6b6cd955378`. |
+| Linux CLI package in no-SDK/native-libraries-only container | Passed complete actual workflow under `LANG=C`, `LC_ALL=C`, `LC_CTYPE=C`, user `1001:1001`, disabled network and read-only OS. No SDK/runtime/media commands were installed separately. Cyrillic paths and source SHA256 `cf883642cf19082d99f0682afd3f9b54fcee14c7daef90ceb2edc6b6cd955378` were preserved. |
+| Native Windows 10 functional cases | Actual GUI inspection, ordinary-file remux and confirmed zero-audio remux passed with source hashes unchanged; EN/RU plan, Russian restart, picker cancellation, collision and no-change behavior observed. Native Alt+F4 during a retained live remux stopped that worker, removed its candidate and exited without a final output or source change. Repeated close and verification-close remain unrun. See the [case-level native record](verification/native-desktop-acceptance.md). |
+
+The successful CI result includes mandatory acquisition/fixture provisioning, locked restore, formatting/build, all platform tests, both self-contained archives/relocations and the complete no-SDK Linux container. No failing mandatory check was converted to a skip.
+
+## Platform record and remaining acceptance
+
+The separate [distribution audit](verification/distribution-audit.md) now documents actual-file inventory generation, exact supplemental notice collection and concrete remaining binary/source/build gaps. Packaging emits per-RID archive identities, full file hashes, matched NuGet origins and explicit unknowns into compact CI evidence; it preserves the complete MKVToolNix source tarball. The [original-code license proposal](license-decision.md) recommends MIT as a pending rights-holder choice and compares Apache-2.0/GPL-3.0-or-later. No operative license or redistribution approval is inferred. Native cases and the historical e160 artifact below retain their original identity and acceptance limits.
+
+The first distribution checkpoint, [CI 39329854903](https://github.com/Nexusov/TrackTrim/actions/runs/39329854903), passed both complete required jobs for head `84075d1697ba3fbe8770c8921b330a152df0d0c6` / synthetic merge `d1dcd46b03999c18563a00ee0cc7cff9189736cf`. Its actual archives contained **524 Windows files / 502 Linux files**, including their manifests; both full inventories and material references passed. All **16** added mechanical regressions passed on each platform, alongside unchanged **222 + five OS skips / 227** C# results, real-media/packaging/relocation and the Linux container. Archive hashes, actual builder identities and remaining material gaps are recorded in the audit; this does not change native acceptance or establish redistribution readiness.
+
+The available host is **Windows 10 Home Single Language 22H2 x64, build 19045.6456**. Windows acquisition, self-contained publishing, native CLI startup, actual packaged workflow, and relocated archive workflow ran there. The archive includes .NET runtime **10.0.13**, published by SDK **10.0.402**, with the actual version checked in `TrackTrim.runtimeconfig.json`. Developer overrides were removed for packaged tests. No system SDK was found in the current inventory, but a workspace SDK and multiple system runtimes exist; this is not a clean target-machine acceptance.
+
+Executed CI environments were **Windows Server 2025 Datacenter 10.0.26100**, runner image `windows-2025-vs2026` version `20261007.264.1`, and **Ubuntu 24.04.5 LTS**, runner image `ubuntu-24.04` version `20261012.334.1`. The pinned native-libraries-only container also reports Ubuntu 24.04.5 LTS. Its exact base digest, `dpkg-query` versions, user, parent locale and unchanged source hash are retained in [the captured container environment](verification/linux-container-environment.txt), which is byte-for-byte identical to the successful run's evidence artifact (SHA256 `5c59af9d803d1c4c804f581fb941437b9c4183722f5bb90f456a6f50fba81cec`). These are CLI/headless checks, not native desktop sessions.
+
+Local packaging uses the pinned SDK, fixture and verified cache in the workspace's `work` directory (shown with reproducible path resolution). The commands were exercised on the developer host and are repeated after the final evidence/doc commit to deliver a ZIP containing those documents:
+
+```powershell
+$workspaceRoot = (Resolve-Path ../..).Path
+./build/package.ps1 -RuntimeIdentifier win-x64 -Dotnet (Join-Path $workspaceRoot 'work/dotnet/dotnet.exe') -FixturePath (Join-Path $workspaceRoot 'work/fixtures/ordinary.mkv') -ToolCacheDirectory (Join-Path $workspaceRoot 'work/tools') -Overwrite
+./build/verify-package.ps1 -ArchivePath ./artifacts/TrackTrim-win-x64.zip -FixturePath (Join-Path $workspaceRoot 'work/fixtures/ordinary.mkv')
+```
+
+Packaging performs the declared-RID locked restore without a global runtime override, matching the committed multiple-RID lock shape. The ZIP was confirmed to have exactly one application root and no files in its `data` directory. Archive relocation verifies every file against `SHA256SUMS` before launching the application.
+
+The intended first targets remain **Windows 11 x64 25H2** and **Ubuntu 24.04 x64 Desktop using X11/XWayland**. Neither clean target desktop has been exercised locally. The [current native acceptance attempt and manual matrix](verification/native-desktop-acceptance.md) use source/artifact `e16050e7de92ab8ee4ac8f86094b41b2e2583cec`: archive identity, fresh Windows 443-payload/CLI checks and unchanged fixture/source hashes were reconfirmed on **2026-10-19**.
+
+A later Computer Use retry initialized successfully and launched the exact portable GUI on Windows 10. The owner confirmed the window was visible and completed native file selection where plugin input failed. Native UIA/keyboard checks then observed actual ordinary-file inspection, reviewed selections, EN/RU plan preservation, Russian preference after restart, both picker cancellations preserving a valid plan, collision protection, no-change behavior, and explicit zero-audio confirmation followed by real GUI publication. Independent output probes and extracted VP8/PCM/SRT bytes corroborated the intended results and unchanged source/sentinel hashes. The earlier pre-JavaScript OS error 3 no longer blocked this retry; its cause remains unknown.
+
+Native screenshots still timed out (`FrameArrived timed out` / `window capture timed out`); element clicks lacked coordinate geometry and picker fields remained inaccessible to plugin actions. W03/W05/W06/W08/W09/W10 have native functional evidence; the later W04/W07 completion is recorded below. Two 256 MiB-attachment close attempts and a later 1 GiB Cancel attempt missed the active-remux interval; no cancellation input was sent in those attempts. A separate native Alt+F4 during the 1 GiB remux did succeed: retained worker 4780 was alive at 14:13:37.6046439Z, native input ran at 14:13:37.611–37.729Z, the worker exited -1 at 37.8167765Z, and GUI exited 0 at 38.0386043Z. Its final output/candidate/journal were absent and the source SHA256 was unchanged. The [sanitized original W14 extract](verification/native-w14-evidence.json) makes those observations reviewable; no repeat was performed merely for a receipt. This is one actual native active-remux close, not proof of repeated close, verification-close or native warning cases.
+
+A fresh 443-payload extraction of the same e160 archive completed W07's H264/AAC/SRT native workflow on Windows 10. The owner accepted the real output-folder dialog; the application derived the expected Cyrillic destination without textbox edits. Computer Use reviewed Keep 0/2/3 in EN/RU, ran the job and observed Russian completion. Independent payload, metadata, frame-timestamp, source-hash and cleanup checks passed; [the sanitized W04/W07 receipt](verification/native-w07-h-evidence.json) records exact identities and limits. No W13 retry, production change or native artifact rebuild was made. Screenshots, visible focus/resizing/scrolling and effective-scale checks remain blocked; configured DPI alone is not visual evidence.
+
+Two later owner-operated Run/Cancel attempts reached native **Cancelled**, unchanged source and no final/candidate/journal. In the first, retained remux 30236 exited 0 at 18:48:18.3115781Z and candidate-identification worker 34684 exited -1 at 18:48:19.6405468Z. The keyboard attempt's remux 27852 exited 0 at 19:14:14.9074127Z and candidate-identification worker 36056 exited 0 at 19:14:17.3540523Z. Exact input timing was not measured, so active-remux W13 remains unverified; this is not an observed cancellation defect. The owner reported reaching Cancel on the third reverse-Tab, with Source on the second; instructions now require confirming the actual control rather than assuming a fixed count. The [sanitized W13 evidence](verification/native-w13-evidence.json) retains both actual observer/receipt/UIA projections and the observer's orderly stop.
+
+The bounded development-only observer recorded retained path/start identities and actual liveness/exit intervals without driving UI or controlling processes; it stopped by its own marker at 19:16:51.5806007Z, and its session completed with exit 0. It is no longer armed. Production code/tests/workflow/tool pins remain unchanged, and the existing e160 native artifact was not rebuilt. Visual/scaling and target-desktop acceptance remain open. No application defect was demonstrated and no fallback UI automation was used. No usable Ubuntu Desktop/builder or Linux handoff archive/hash is available; owner build/hash prerequisites are recorded in the matrix. Earlier CI/container receipts above remain separate evidence.
+
+Unverified areas remain: a clean Windows 11 target without installed SDK/media tools; native dialogs/scaling/shutdown on both intended desktops; removable/network filesystems and power loss; native Wayland; uncommon/private metadata outside the supported matrix; a real mkvmerge warning-remux fixture (warning approval/discard logic is verified with deterministic simulation); complete corresponding-source distribution and original application license selection. The bounded Segment Info reader rejects detected SegmentFamily/previous/next linkage; it cannot enumerate all unknown/private Matroska semantics.
+
+Restart cleanup is deliberately conservative: if a recovered candidate still exists, worker termination cannot be proved and cleanup is unavailable. The source can be processed again as a fresh operation; old candidates are never automatically published or deleted.
+
+Malformed or insufficient ownership JSON remains visible for manual review and never authorizes cleanup. Its original record, marker and candidate are retained. Headless warning-close and invalid-record regressions do not replace a real desktop shutdown test.
+
+Public release readiness is blocked by the unresolved licensing/source-distribution review and any unmet platform/safety acceptance above. The next bounded task after this implementation is to close the recorded Phase 0/1 acceptance gaps, not to begin batch processing or MP4.

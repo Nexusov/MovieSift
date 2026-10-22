@@ -1,0 +1,1856 @@
+{
+  "schemaVersion": 1,
+  "scope": "Pinned upstream byte/source observations checked on 2026-10-20. Reconcile with actual package inventory; this is not a complete source/build/license attestation.",
+  "pinnedTools": {
+    "win-x64": "c02e918900f6d945d9307b426237e456378b79a200589ac6928de39064409a44",
+    "linux-x64": "c66345b30d6d5fd640ea982ab5e202a99b9f541a20e42aa19edd90f3ddd5dc9b"
+  },
+  "components": [
+    {
+      "component": ".NET runtime",
+      "exactVersion": "10.0.13",
+      "owningPackage": "Microsoft.NETCore.App.Runtime.win-x64/10.0.13",
+      "observationMethod": "Exact SHA256/size match plus runtimeconfig.includedFrameworks and package versions file, not filenames.",
+      "sourceCommit": "4099f83977f4d29604a9aeb971fb0a7bc1d5f699",
+      "sourceUrl": "https://github.com/dotnet/dotnet/tree/4099f83977f4d29604a9aeb971fb0a7bc1d5f699/src/runtime",
+      "availableMaterials": [
+        "licenses/nuget/Microsoft.NETCore.App.Runtime.win-x64/10.0.13/LICENSE.TXT",
+        "licenses/nuget/Microsoft.NETCore.App.Runtime.win-x64/10.0.13/THIRD-PARTY-NOTICES.TXT"
+      ],
+      "gaps": [
+        "Full per-binary attribution of every compiled runtime subcomponent is not established by this audit; the broad runtime notice is retained without treating all listed projects as compiled Windows dependencies."
+      ],
+      "runtimeIdentifier": "win-x64",
+      "kind": "nuget-native-observation"
+    },
+    {
+      "component": "Skia native API",
+      "exactVersion": "119.0",
+      "owningPackage": "SkiaSharp.NativeAssets.Win32/3.119.4",
+      "observationMethod": "DLL exact cache SHA256 match; read PE export function sk_version_get_string (lea rax relative; ret) -> constant119.0 and sk_version_get_milestone (mov eax119; ret). DLL not loaded/executed.",
+      "sourceCommit": "f568ac94dd768ef9a2f593537cfde2dd0d348ef5",
+      "sourceUrl": "https://raw.githubusercontent.com/mono/SkiaSharp/f568ac94dd768ef9a2f593537cfde2dd0d348ef5/native/windows/build.cake",
+      "nativeSourceCommit": "7dbfc07dd33181f84e0958afb7ee805c6c769f0b",
+      "availableMaterials": [
+        "licenses/nuget/SkiaSharp.NativeAssets.Win32/3.119.4/LICENSE.txt",
+        "licenses/nuget/SkiaSharp.NativeAssets.Win32/3.119.4/THIRD-PARTY-NOTICES.txt"
+      ],
+      "gaps": [
+        "NuGet3.119.4 is not the native API version. Exact third-party source/build options are not authenticated by a filename. The checked source build explicitly disables HarfBuzz/ICU/sfntly, enables DNG/piex, uses bundled codec dependencies and /MT; this is source provenance, not a complete build attestation."
+      ],
+      "runtimeIdentifier": "win-x64",
+      "kind": "nuget-native-observation"
+    },
+    {
+      "component": "HarfBuzz native engine",
+      "exactVersion": "8.3.1",
+      "owningPackage": "HarfBuzzSharp.NativeAssets.Win32/8.3.1.3",
+      "observationMethod": "DLL exact cache SHA256 match; read PE hb_version_string function (lea rax relative; ret) ->8.3.1. No DLL loaded/executed.",
+      "sourceCommit": "2888c737ad016d584c74525e2d35db5097ea8576",
+      "sourceUrl": "https://raw.githubusercontent.com/mono/SkiaSharp/2888c737ad016d584c74525e2d35db5097ea8576/native/windows/libHarfBuzzSharp/libHarfBuzzSharp.vcxproj",
+      "nativeSourceCommit": "2b3631a866b3077d9d675caa4ec9010b342b5a7c",
+      "nativeSourceUrl": "https://raw.githubusercontent.com/harfbuzz/harfbuzz/2b3631a866b3077d9d675caa4ec9010b342b5a7c/meson.build",
+      "availableMaterials": [
+        "licenses/nuget/HarfBuzzSharp.NativeAssets.Win32/8.3.1.3/LICENSE.txt",
+        "licenses/nuget/HarfBuzzSharp.NativeAssets.Win32/8.3.1.3/THIRD-PARTY-NOTICES.txt"
+      ],
+      "gaps": [
+        "Package8.3.1.3 is a separate version layer. Exact MSVC static-runtime toolset/build identity is unproved."
+      ],
+      "runtimeIdentifier": "win-x64",
+      "kind": "nuget-native-observation"
+    },
+    {
+      "component": "libjpeg-turbo compiled into Skia",
+      "exactVersion": "2.1.5.1",
+      "owningPackage": "SkiaSharp.NativeAssets.Win32/3.119.4",
+      "observationMethod": "Actual mapped DLL contains the literal native implementation identification libjpeg-turbo version2.1.5.1; static inclusion is corroborated by no external jpeg import and commit-pinned Windows build selecting bundled libjpeg-turbo.",
+      "sourceCommit": "927aabfcd26897abb9776ecf2a6c38ea5bb52ab6",
+      "sourceUrl": "https://raw.githubusercontent.com/mono/skia/7dbfc07dd33181f84e0958afb7ee805c6c769f0b/DEPS",
+      "availableMaterials": [
+        "licenses/nuget/SkiaSharp.NativeAssets.Win32/3.119.4/THIRD-PARTY-NOTICES.txt"
+      ],
+      "gaps": [
+        "The supplied libjpeg-turbo section is a licensing roll-up with IJG acknowledgement and links to source texts. Whether further source-specific material is required for the exact compiled subset needs confirmation; no TurboJPEG API inclusion is inferred."
+      ],
+      "runtimeIdentifier": "win-x64",
+      "kind": "nuget-native-observation"
+    },
+    {
+      "component": "zlib-ng compiled into runtime compression",
+      "exactVersion": "2.2.5",
+      "compatibilityVersion": "1.3.1.zlib-ng",
+      "owningPackage": "Microsoft.NETCore.App.Runtime.win-x64/10.0.13",
+      "observationMethod": "Mapped native DLL contains zlib-ng2.2.5 and1.3.1.zlib-ng constants; source header agrees; direct PE imports contain only OS/CRT DLLs, and source builds the bundled library.",
+      "sourceCommit": "4099f83977f4d29604a9aeb971fb0a7bc1d5f699",
+      "sourceUrl": "https://raw.githubusercontent.com/dotnet/dotnet/4099f83977f4d29604a9aeb971fb0a7bc1d5f699/src/runtime/src/native/external/zlib-ng/zlib.h.in",
+      "availableMaterials": [
+        "licenses/nuget/Microsoft.NETCore.App.Runtime.win-x64/10.0.13/THIRD-PARTY-NOTICES.TXT"
+      ],
+      "gaps": [],
+      "runtimeIdentifier": "win-x64",
+      "kind": "nuget-native-observation"
+    },
+    {
+      "component": "Brotli compiled into runtime compression",
+      "exactVersion": "1.1.0",
+      "owningPackage": "Microsoft.NETCore.App.Runtime.win-x64/10.0.13",
+      "observationMethod": "PE BrotliEncoderVersion and BrotliDecoderVersion both mov eax0x01001000; ret. Pinned header defines encoding major<<24|minor<<12|patch and1.1.0; source includes Brotli static library. No execution.",
+      "sourceCommit": "4099f83977f4d29604a9aeb971fb0a7bc1d5f699",
+      "sourceUrl": "https://raw.githubusercontent.com/dotnet/dotnet/4099f83977f4d29604a9aeb971fb0a7bc1d5f699/src/runtime/src/native/external/brotli/c/common/version.h",
+      "availableMaterials": [
+        "licenses/nuget/Microsoft.NETCore.App.Runtime.win-x64/10.0.13/THIRD-PARTY-NOTICES.TXT"
+      ],
+      "gaps": [],
+      "runtimeIdentifier": "win-x64",
+      "kind": "nuget-native-observation"
+    },
+    {
+      "component": "Avalonia ANGLE native engine",
+      "exactVersion": null,
+      "owningPackage": "Avalonia.Angle.Windows.Natives/2.1.27548.20260419",
+      "observationMethod": "Actual SHA256 maps to exactwin-x64 NuGet asset; nuspec names source commit. Package version is known, native upstream semantic version/build composition not established.",
+      "sourceCommit": "1c89805903c1482166356d3b950d474973180e61",
+      "sourceUrl": "https://raw.githubusercontent.com/AvaloniaUI/angle/1c89805903c1482166356d3b950d474973180e61/.github/workflows/build.yml",
+      "availableMaterials": [
+        "licenses/nuget/Avalonia.Angle.Windows.Natives/2.1.27548.20260419/LICENSE"
+      ],
+      "gaps": [
+        "Only top-level ANGLE LICENSE is in the package. Exact statically compiled third-party source/notice closure needs review of the release build; broad DEPS checkout is not proof of inclusion."
+      ],
+      "runtimeIdentifier": "win-x64",
+      "kind": "nuget-native-observation"
+    },
+    {
+      "component": "Other static native components / MSVC CRT",
+      "exactVersion": null,
+      "owningPackage": null,
+      "observationMethod": "Explicit unresolved scope. Skia/HarfBuzz commit-pinned build recipes request static MSVC CRT; dependency notices list additional libraries, but those lists are not per-binary inclusion evidence.",
+      "sourceUrl": "https://raw.githubusercontent.com/mono/SkiaSharp/f568ac94dd768ef9a2f593537cfde2dd0d348ef5/native/windows/build.cake",
+      "availableMaterials": [
+        "licenses/nuget/SkiaSharp.NativeAssets.Win32/3.119.4/LICENSE.txt",
+        "licenses/nuget/SkiaSharp.NativeAssets.Win32/3.119.4/THIRD-PARTY-NOTICES.txt",
+        "licenses/nuget/HarfBuzzSharp.NativeAssets.Win32/8.3.1.3/LICENSE.txt",
+        "licenses/nuget/HarfBuzzSharp.NativeAssets.Win32/8.3.1.3/THIRD-PARTY-NOTICES.txt",
+        "licenses/nuget/Microsoft.NETCore.App.Runtime.win-x64/10.0.13/LICENSE.TXT",
+        "licenses/nuget/Microsoft.NETCore.App.Runtime.win-x64/10.0.13/THIRD-PARTY-NOTICES.TXT"
+      ],
+      "gaps": [
+        "Exact compiler/static CRT redistribution version and applicable material not established. Do not infer ICU, FreeType,libmicrohttpd,ANGLE,Vulkan or every DEPS item is compiled from the shared notice. Further binary/build evidence is needed for the remaining exact static closure."
+      ],
+      "runtimeIdentifier": "win-x64",
+      "kind": "nuget-native-observation"
+    },
+    {
+      "component": "mkvmerge.exe",
+      "runtimeIdentifier": "win-x64",
+      "kind": "tool-binary-observation",
+      "paths": [
+        "tools/mkvmerge.exe"
+      ],
+      "sha256": "b56ffd0ed62224cf24c640f418e21538026ed444e143ddd5175e3aa7d7539196",
+      "imports": [
+        "ADVAPI32.dll",
+        "AUTHZ.dll",
+        "KERNEL32.dll",
+        "msvcrt.dll",
+        "NETAPI32.dll",
+        "ntdll.dll",
+        "ole32.dll",
+        "SHELL32.dll",
+        "api-ms-win-core-synch-l1-2-0.dll",
+        "USER32.dll",
+        "USERENV.dll",
+        "VERSION.dll",
+        "WINMM.dll",
+        "WS2_32.dll"
+      ],
+      "components": [
+        {
+          "component": "MKVToolNix",
+          "version": "102.0",
+          "license": "GPLv2 project wording; no blanket or-later grant established"
+        },
+        {
+          "component": "Qt Core",
+          "version": "6.10.2",
+          "linkage": "static",
+          "licenseEvidence": "tools/licenses/upstream-terms/Qt-Core/6.10.2/src/corelib/global/qglobal.h offers alternative commercial/LGPL3/GPL2/GPL3 paths; selected distribution path not documented",
+          "versionEvidence": "Explicit embedded static build string; GCC16.2.0",
+          "missing": [
+            "Exact MXE commit, Qt source/patches/configure summary and linked third-party closure",
+            "Chosen licensing path and corresponding-source/relink material as applicable"
+          ]
+        },
+        {
+          "component": "FLAC library",
+          "version": "1.5.0",
+          "versionEvidence": "Embedded reference libFLAC1.5.0 20250211 banner",
+          "licenseFamily": "BSD3 for library; full source/notices/build revision still needed"
+        }
+      ],
+      "unknownStaticDependencies": [
+        "Boost",
+        "gettext/libintl",
+        "libiconv",
+        "zlib",
+        "libogg",
+        "libvorbis",
+        "cmark",
+        "libdvdread",
+        "GMP",
+        "MinGW-w64 and GCC runtime support",
+        "Qt third-party code including PCRE2"
+      ],
+      "sourceFallbackComponents": "See sourceEmbeddedComponents; source tree fallback versions are not automatically the binary versions.",
+      "buildMaterials": {
+        "available": [
+          "source102 Building.for.Windows.md",
+          "source102 packaging/windows/setup_cross_compilation_env.sh",
+          "source102 configure.ac and ac/*.m4"
+        ],
+        "unresolved": [
+          "Exact MXE source commit/settings/compiler patches for the published102 binary",
+          "Complete static dependency source revisions/patches and configuration",
+          "Link/build logs or equivalent binary-bound manifest"
+        ]
+      }
+    },
+    {
+      "component": "mkvextract.exe",
+      "runtimeIdentifier": "win-x64",
+      "kind": "tool-binary-observation",
+      "paths": [
+        "tools/mkvextract.exe"
+      ],
+      "sha256": "bd79d648762787226e8aee23f003c0825b4ff17bc515adaa9d61facceda52346",
+      "imports": [
+        "ADVAPI32.dll",
+        "AUTHZ.dll",
+        "KERNEL32.dll",
+        "msvcrt.dll",
+        "NETAPI32.dll",
+        "ntdll.dll",
+        "ole32.dll",
+        "SHELL32.dll",
+        "api-ms-win-core-synch-l1-2-0.dll",
+        "USER32.dll",
+        "USERENV.dll",
+        "VERSION.dll",
+        "WINMM.dll",
+        "WS2_32.dll"
+      ],
+      "components": [
+        {
+          "component": "MKVToolNix",
+          "version": "102.0",
+          "license": "GPLv2 project wording; no blanket or-later grant established"
+        },
+        {
+          "component": "Qt Core",
+          "version": "6.10.2",
+          "linkage": "static",
+          "licenseEvidence": "tools/licenses/upstream-terms/Qt-Core/6.10.2/src/corelib/global/qglobal.h offers alternative commercial/LGPL3/GPL2/GPL3 paths; selected distribution path not documented",
+          "versionEvidence": "Explicit embedded static build string; GCC16.2.0",
+          "missing": [
+            "Exact MXE commit, Qt source/patches/configure summary and linked third-party closure",
+            "Chosen licensing path and corresponding-source/relink material as applicable"
+          ]
+        }
+      ],
+      "unknownStaticDependencies": [
+        "Boost",
+        "gettext/libintl",
+        "libiconv",
+        "zlib",
+        "libogg",
+        "libvorbis",
+        "cmark",
+        "libdvdread",
+        "GMP",
+        "MinGW-w64 and GCC runtime support",
+        "Qt third-party code including PCRE2"
+      ],
+      "sourceFallbackComponents": "See sourceEmbeddedComponents; source tree fallback versions are not automatically the binary versions.",
+      "buildMaterials": {
+        "available": [
+          "source102 Building.for.Windows.md",
+          "source102 packaging/windows/setup_cross_compilation_env.sh",
+          "source102 configure.ac and ac/*.m4"
+        ],
+        "unresolved": [
+          "Exact MXE source commit/settings/compiler patches for the published102 binary",
+          "Complete static dependency source revisions/patches and configuration",
+          "Link/build logs or equivalent binary-bound manifest"
+        ]
+      }
+    },
+    {
+      "component": "MKVToolNix",
+      "version": "102.0",
+      "versionEvidence": "Pinned102 archive and actual existing runtime verification",
+      "upstreamLicenseFamily": "GPLv2 project wording; component terms separate",
+      "primarySourceUrl": "https://mkvtoolnix.download/sources/mkvtoolnix-102.0.tar.xz",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/bin/mkvextract",
+        "tools/app-root/usr/bin/mkvmerge"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:07.105904+00:00",
+        "httpStatus": null,
+        "result": "not retrieved; resolve exact source/material location before release"
+      },
+      "versionStatus": "Observed upstream/base version; exact downstream patches and build identity remain unresolved"
+    },
+    {
+      "component": "FLAC library",
+      "version": "1.3.2",
+      "versionEvidence": "Embedded reference libFLAC1.3.2 20170101 banner.",
+      "upstreamLicenseFamily": "BSD-3-Clause for libFLAC; other FLAC distribution files have other terms",
+      "primarySourceUrl": "https://github.com/xiph/flac/blob/1.3.2/COPYING.Xiph",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libFLAC.so.8"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:06.180284+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      },
+      "versionStatus": "Observed upstream/base version; exact downstream patches and build identity remain unresolved"
+    },
+    {
+      "component": "libglvnd GLES wrapper",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "MIT and included licenses",
+      "primarySourceUrl": "https://github.com/NVIDIA/libglvnd",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libGLESv2.so.2"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:04.791209+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      }
+    },
+    {
+      "component": "Qt Concurrent",
+      "version": "6.6.1",
+      "versionEvidence": "QtCore's embedded build string identifies6.6.1; retained Qt modules carry .qtversion0x060601. Individual hash/build-ID recorded. This does not identify downstream patches.",
+      "upstreamLicenseFamily": "Module/file-specific Qt commercial / LGPL-3.0-only / GPL-2.0-only / GPL-3.0-only alternatives; verify module",
+      "primarySourceUrl": "https://raw.githubusercontent.com/qt/qtbase/v6.6.1/src/corelib/global/qglobal.h",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libQt6Concurrent.so.6"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build.",
+        "Exact Qt build configure summary/features and Qt third-party attribution/source closure; Qt tag alone is not the binary build receipt."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:07.395885+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      },
+      "versionStatus": "Observed upstream/base version; exact downstream patches and build identity remain unresolved"
+    },
+    {
+      "component": "Qt Core",
+      "version": "6.6.1",
+      "versionEvidence": "QtCore's embedded build string identifies6.6.1; retained Qt modules carry .qtversion0x060601. Individual hash/build-ID recorded. This does not identify downstream patches.",
+      "upstreamLicenseFamily": "Module/file-specific Qt commercial / LGPL-3.0-only / GPL-2.0-only / GPL-3.0-only alternatives; verify module",
+      "primarySourceUrl": "https://raw.githubusercontent.com/qt/qtbase/v6.6.1/src/corelib/global/qglobal.h",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libQt6Core.so.6"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build.",
+        "Exact Qt build configure summary/features and Qt third-party attribution/source closure; Qt tag alone is not the binary build receipt."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:07.395885+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      },
+      "versionStatus": "Observed upstream/base version; exact downstream patches and build identity remain unresolved"
+    },
+    {
+      "component": "Qt DBus",
+      "version": "6.6.1",
+      "versionEvidence": "QtCore's embedded build string identifies6.6.1; retained Qt modules carry .qtversion0x060601. Individual hash/build-ID recorded. This does not identify downstream patches.",
+      "upstreamLicenseFamily": "Module/file-specific Qt commercial / LGPL-3.0-only / GPL-2.0-only / GPL-3.0-only alternatives; verify module",
+      "primarySourceUrl": "https://raw.githubusercontent.com/qt/qtbase/v6.6.1/src/corelib/global/qglobal.h",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libQt6DBus.so.6"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build.",
+        "Exact Qt build configure summary/features and Qt third-party attribution/source closure; Qt tag alone is not the binary build receipt."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:07.395885+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      },
+      "versionStatus": "Observed upstream/base version; exact downstream patches and build identity remain unresolved"
+    },
+    {
+      "component": "Qt Gui",
+      "version": "6.6.1",
+      "versionEvidence": "QtCore's embedded build string identifies6.6.1; retained Qt modules carry .qtversion0x060601. Individual hash/build-ID recorded. This does not identify downstream patches.",
+      "upstreamLicenseFamily": "Module/file-specific Qt commercial / LGPL-3.0-only / GPL-2.0-only / GPL-3.0-only alternatives; verify module",
+      "primarySourceUrl": "https://raw.githubusercontent.com/qt/qtbase/v6.6.1/src/corelib/global/qglobal.h",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libQt6Gui.so.6"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build.",
+        "Exact Qt build configure summary/features and Qt third-party attribution/source closure; Qt tag alone is not the binary build receipt."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:07.395885+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      },
+      "versionStatus": "Observed upstream/base version; exact downstream patches and build identity remain unresolved"
+    },
+    {
+      "component": "Qt Multimedia",
+      "version": "6.6.1",
+      "versionEvidence": "QtCore's embedded build string identifies6.6.1; retained Qt modules carry .qtversion0x060601. Individual hash/build-ID recorded. This does not identify downstream patches.",
+      "upstreamLicenseFamily": "Module/file-specific Qt commercial / LGPL-3.0-only / GPL-2.0-only / GPL-3.0-only alternatives; verify module",
+      "primarySourceUrl": "https://raw.githubusercontent.com/qt/qtbase/v6.6.1/src/corelib/global/qglobal.h",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libQt6Multimedia.so.6"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build.",
+        "Exact Qt build configure summary/features and Qt third-party attribution/source closure; Qt tag alone is not the binary build receipt."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:07.395885+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      },
+      "versionStatus": "Observed upstream/base version; exact downstream patches and build identity remain unresolved"
+    },
+    {
+      "component": "Qt Network",
+      "version": "6.6.1",
+      "versionEvidence": "QtCore's embedded build string identifies6.6.1; retained Qt modules carry .qtversion0x060601. Individual hash/build-ID recorded. This does not identify downstream patches.",
+      "upstreamLicenseFamily": "Module/file-specific Qt commercial / LGPL-3.0-only / GPL-2.0-only / GPL-3.0-only alternatives; verify module",
+      "primarySourceUrl": "https://raw.githubusercontent.com/qt/qtbase/v6.6.1/src/corelib/global/qglobal.h",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libQt6Network.so.6"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build.",
+        "Exact Qt build configure summary/features and Qt third-party attribution/source closure; Qt tag alone is not the binary build receipt."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:07.395885+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      },
+      "versionStatus": "Observed upstream/base version; exact downstream patches and build identity remain unresolved"
+    },
+    {
+      "component": "Qt OpenGL",
+      "version": "6.6.1",
+      "versionEvidence": "QtCore's embedded build string identifies6.6.1; retained Qt modules carry .qtversion0x060601. Individual hash/build-ID recorded. This does not identify downstream patches.",
+      "upstreamLicenseFamily": "Module/file-specific Qt commercial / LGPL-3.0-only / GPL-2.0-only / GPL-3.0-only alternatives; verify module",
+      "primarySourceUrl": "https://raw.githubusercontent.com/qt/qtbase/v6.6.1/src/corelib/global/qglobal.h",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libQt6OpenGL.so.6"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build.",
+        "Exact Qt build configure summary/features and Qt third-party attribution/source closure; Qt tag alone is not the binary build receipt."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:07.395885+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      },
+      "versionStatus": "Observed upstream/base version; exact downstream patches and build identity remain unresolved"
+    },
+    {
+      "component": "Qt Qml",
+      "version": "6.6.1",
+      "versionEvidence": "QtCore's embedded build string identifies6.6.1; retained Qt modules carry .qtversion0x060601. Individual hash/build-ID recorded. This does not identify downstream patches.",
+      "upstreamLicenseFamily": "Module/file-specific Qt commercial / LGPL-3.0-only / GPL-2.0-only / GPL-3.0-only alternatives; verify module",
+      "primarySourceUrl": "https://raw.githubusercontent.com/qt/qtbase/v6.6.1/src/corelib/global/qglobal.h",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libQt6Qml.so.6"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build.",
+        "Exact Qt build configure summary/features and Qt third-party attribution/source closure; Qt tag alone is not the binary build receipt."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:07.395885+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      },
+      "versionStatus": "Observed upstream/base version; exact downstream patches and build identity remain unresolved"
+    },
+    {
+      "component": "Qt QmlModels",
+      "version": "6.6.1",
+      "versionEvidence": "QtCore's embedded build string identifies6.6.1; retained Qt modules carry .qtversion0x060601. Individual hash/build-ID recorded. This does not identify downstream patches.",
+      "upstreamLicenseFamily": "Module/file-specific Qt commercial / LGPL-3.0-only / GPL-2.0-only / GPL-3.0-only alternatives; verify module",
+      "primarySourceUrl": "https://raw.githubusercontent.com/qt/qtbase/v6.6.1/src/corelib/global/qglobal.h",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libQt6QmlModels.so.6"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build.",
+        "Exact Qt build configure summary/features and Qt third-party attribution/source closure; Qt tag alone is not the binary build receipt."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:07.395885+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      },
+      "versionStatus": "Observed upstream/base version; exact downstream patches and build identity remain unresolved"
+    },
+    {
+      "component": "Qt Quick",
+      "version": "6.6.1",
+      "versionEvidence": "QtCore's embedded build string identifies6.6.1; retained Qt modules carry .qtversion0x060601. Individual hash/build-ID recorded. This does not identify downstream patches.",
+      "upstreamLicenseFamily": "Module/file-specific Qt commercial / LGPL-3.0-only / GPL-2.0-only / GPL-3.0-only alternatives; verify module",
+      "primarySourceUrl": "https://raw.githubusercontent.com/qt/qtbase/v6.6.1/src/corelib/global/qglobal.h",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libQt6Quick.so.6"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build.",
+        "Exact Qt build configure summary/features and Qt third-party attribution/source closure; Qt tag alone is not the binary build receipt."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:07.395885+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      },
+      "versionStatus": "Observed upstream/base version; exact downstream patches and build identity remain unresolved"
+    },
+    {
+      "component": "Qt Svg",
+      "version": "6.6.1",
+      "versionEvidence": "QtCore's embedded build string identifies6.6.1; retained Qt modules carry .qtversion0x060601. Individual hash/build-ID recorded. This does not identify downstream patches.",
+      "upstreamLicenseFamily": "Module/file-specific Qt commercial / LGPL-3.0-only / GPL-2.0-only / GPL-3.0-only alternatives; verify module",
+      "primarySourceUrl": "https://raw.githubusercontent.com/qt/qtbase/v6.6.1/src/corelib/global/qglobal.h",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libQt6Svg.so.6"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build.",
+        "Exact Qt build configure summary/features and Qt third-party attribution/source closure; Qt tag alone is not the binary build receipt."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:07.395885+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      },
+      "versionStatus": "Observed upstream/base version; exact downstream patches and build identity remain unresolved"
+    },
+    {
+      "component": "Qt VirtualKeyboard",
+      "version": "6.6.1",
+      "versionEvidence": "QtCore's embedded build string identifies6.6.1; retained Qt modules carry .qtversion0x060601. Individual hash/build-ID recorded. This does not identify downstream patches.",
+      "upstreamLicenseFamily": "Commercial OR GPL-3.0-only",
+      "primarySourceUrl": "https://raw.githubusercontent.com/qt/qtvirtualkeyboard/v6.6.1/src/virtualkeyboard/qvirtualkeyboardinputengine.cpp",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libQt6VirtualKeyboard.so.6"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build.",
+        "Exact Qt build configure summary/features and Qt third-party attribution/source closure; Qt tag alone is not the binary build receipt."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:07.453427+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      },
+      "versionStatus": "Observed upstream/base version; exact downstream patches and build identity remain unresolved"
+    },
+    {
+      "component": "Qt WaylandClient",
+      "version": "6.6.1",
+      "versionEvidence": "QtCore's embedded build string identifies6.6.1; retained Qt modules carry .qtversion0x060601. Individual hash/build-ID recorded. This does not identify downstream patches.",
+      "upstreamLicenseFamily": "Module/file-specific Qt commercial / LGPL-3.0-only / GPL-2.0-only / GPL-3.0-only alternatives; verify module",
+      "primarySourceUrl": "https://raw.githubusercontent.com/qt/qtbase/v6.6.1/src/corelib/global/qglobal.h",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libQt6WaylandClient.so.6"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build.",
+        "Exact Qt build configure summary/features and Qt third-party attribution/source closure; Qt tag alone is not the binary build receipt."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:07.395885+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      },
+      "versionStatus": "Observed upstream/base version; exact downstream patches and build identity remain unresolved"
+    },
+    {
+      "component": "Qt WaylandEglClientHwIntegration",
+      "version": "6.6.1",
+      "versionEvidence": "QtCore's embedded build string identifies6.6.1; retained Qt modules carry .qtversion0x060601. Individual hash/build-ID recorded. This does not identify downstream patches.",
+      "upstreamLicenseFamily": "Module/file-specific Qt commercial / LGPL-3.0-only / GPL-2.0-only / GPL-3.0-only alternatives; verify module",
+      "primarySourceUrl": "https://raw.githubusercontent.com/qt/qtbase/v6.6.1/src/corelib/global/qglobal.h",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libQt6WaylandEglClientHwIntegration.so.6"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build.",
+        "Exact Qt build configure summary/features and Qt third-party attribution/source closure; Qt tag alone is not the binary build receipt."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:07.395885+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      },
+      "versionStatus": "Observed upstream/base version; exact downstream patches and build identity remain unresolved"
+    },
+    {
+      "component": "Qt Widgets",
+      "version": "6.6.1",
+      "versionEvidence": "QtCore's embedded build string identifies6.6.1; retained Qt modules carry .qtversion0x060601. Individual hash/build-ID recorded. This does not identify downstream patches.",
+      "upstreamLicenseFamily": "Module/file-specific Qt commercial / LGPL-3.0-only / GPL-2.0-only / GPL-3.0-only alternatives; verify module",
+      "primarySourceUrl": "https://raw.githubusercontent.com/qt/qtbase/v6.6.1/src/corelib/global/qglobal.h",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libQt6Widgets.so.6"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build.",
+        "Exact Qt build configure summary/features and Qt third-party attribution/source closure; Qt tag alone is not the binary build receipt."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:07.395885+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      },
+      "versionStatus": "Observed upstream/base version; exact downstream patches and build identity remain unresolved"
+    },
+    {
+      "component": "Qt XcbQpa",
+      "version": "6.6.1",
+      "versionEvidence": "QtCore's embedded build string identifies6.6.1; retained Qt modules carry .qtversion0x060601. Individual hash/build-ID recorded. This does not identify downstream patches.",
+      "upstreamLicenseFamily": "Module/file-specific Qt commercial / LGPL-3.0-only / GPL-2.0-only / GPL-3.0-only alternatives; verify module",
+      "primarySourceUrl": "https://raw.githubusercontent.com/qt/qtbase/v6.6.1/src/corelib/global/qglobal.h",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libQt6XcbQpa.so.6"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build.",
+        "Exact Qt build configure summary/features and Qt third-party attribution/source closure; Qt tag alone is not the binary build receipt."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:07.395885+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      },
+      "versionStatus": "Observed upstream/base version; exact downstream patches and build identity remain unresolved"
+    },
+    {
+      "component": "X.Org X11 library",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "MIT/X11 permissive notices vary by library",
+      "primarySourceUrl": "https://www.x.org/releases/current/doc/",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libXau.so.6",
+        "tools/app-root/usr/lib/libXext.so.6",
+        "tools/app-root/usr/lib/libXi.so.6",
+        "tools/app-root/usr/lib/libXtst.so.6"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:13.377599+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      }
+    },
+    {
+      "component": "libasyncns",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "LGPL-2.1-or-later",
+      "primarySourceUrl": "https://0pointer.de/lennart/projects/libasyncns/",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libasyncns.so.0"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:04.556182+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      }
+    },
+    {
+      "component": "util-linux libblkid",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "LGPL-2.1-or-later (library-specific)",
+      "primarySourceUrl": "https://github.com/util-linux/util-linux/blob/master/libblkid/COPYING",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libblkid.so.1"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:05.902358+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      }
+    },
+    {
+      "component": "Boost",
+      "version": null,
+      "versionEvidence": "Companion shared files identify1.85.0; the static archive version/build is not independently established by that filename.",
+      "upstreamLicenseFamily": "BSL-1.0",
+      "primarySourceUrl": "https://www.boost.org/LICENSE_1_0.txt",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libboost_atomic.a",
+        "tools/app-root/usr/lib/libboost_filesystem.a",
+        "tools/app-root/usr/lib/libboost_system.a"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:08.340801+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      }
+    },
+    {
+      "component": "Boost",
+      "version": null,
+      "versionEvidence": "Versioned shared-library basenames1.85.0; unversioned/static companion provenance not independently tied to a source build.",
+      "upstreamLicenseFamily": "BSL-1.0",
+      "primarySourceUrl": "https://www.boost.org/LICENSE_1_0.txt",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libboost_atomic.so",
+        "tools/app-root/usr/lib/libboost_atomic.so.1.85.0",
+        "tools/app-root/usr/lib/libboost_filesystem.so",
+        "tools/app-root/usr/lib/libboost_filesystem.so.1.85.0",
+        "tools/app-root/usr/lib/libboost_system.so",
+        "tools/app-root/usr/lib/libboost_system.so.1.85.0"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:08.340801+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      },
+      "reportedNameVersion": "1.85.0",
+      "versionStatus": "Filename/SONAME candidate only; exact component release is not authenticated"
+    },
+    {
+      "component": "bzip2",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "bzip2-1.0.6-style permissive license; exact version needed",
+      "primarySourceUrl": "https://sourceware.org/bzip2/",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libbz2.so.1"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:07.534294+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      }
+    },
+    {
+      "component": "libcap",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "BSD/GPL alternatives; exact COPYING needed",
+      "primarySourceUrl": "https://git.kernel.org/pub/scm/libs/libcap/libcap.git/tree/License",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libcap.so.2"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:04.593421+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      }
+    },
+    {
+      "component": "cmark",
+      "version": null,
+      "versionEvidence": "Versioned basename libcmark.so.0.28.3.",
+      "upstreamLicenseFamily": "BSD-2-Clause and included-file notices",
+      "primarySourceUrl": "https://github.com/commonmark/cmark/blob/0.28.3/COPYING",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libcmark.so.0.28.3"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:05.048040+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      },
+      "reportedNameVersion": "0.28.3",
+      "versionStatus": "Filename/SONAME candidate only; exact component release is not authenticated"
+    },
+    {
+      "component": "OpenSSL libcrypto",
+      "version": "1.1.1k (FIPS-marked build)",
+      "versionEvidence": "Embedded OpenSSL1.1.1k FIPS25Mar2021; patched distribution revision unknown.",
+      "upstreamLicenseFamily": "OpenSSL / original SSLeay dual legacy license (not Apache2)",
+      "primarySourceUrl": "https://raw.githubusercontent.com/openssl/openssl/OpenSSL_1_1_1k/LICENSE",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libcrypto.so.1.1",
+        "tools/app-root/usr/lib/libcrypto.so.1.1.1k"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:07.337861+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      },
+      "versionStatus": "Observed upstream/base version; exact downstream patches and build identity remain unresolved"
+    },
+    {
+      "component": "D-Bus",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "AFL-2.1 OR GPL-2.0-or-later (file-specific)",
+      "primarySourceUrl": "https://dbus.freedesktop.org/doc/dbus-licensing.html",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libdbus-1.so.3"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:04.557765+00:00",
+        "httpStatus": null,
+        "result": "not retrieved; resolve exact source/material location before release"
+      }
+    },
+    {
+      "component": "libdvdread",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "GPL-2.0-or-later",
+      "primarySourceUrl": "https://code.videolan.org/videolan/libdvdread",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libdvdread.so.4"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:04.557197+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      }
+    },
+    {
+      "component": "libffi",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "MIT",
+      "primarySourceUrl": "https://github.com/libffi/libffi",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libffi.so.6"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:05.140960+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      }
+    },
+    {
+      "component": "Libgcrypt",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "LGPL-2.1-or-later plus separately licensed included code",
+      "primarySourceUrl": "https://gnupg.org/software/libgcrypt/index.html",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libgcrypt.so.20"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:06.791082+00:00",
+        "httpStatus": null,
+        "result": "not retrieved; resolve exact source/material location before release"
+      }
+    },
+    {
+      "component": "GLib",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "LGPL-2.1-or-later",
+      "primarySourceUrl": "https://gitlab.gnome.org/GNOME/glib",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libglib-2.0.so.0"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:06.554182+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      }
+    },
+    {
+      "component": "GLib GModule",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "LGPL-2.1-or-later",
+      "primarySourceUrl": "https://gitlab.gnome.org/GNOME/glib",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libgmodule-2.0.so.0"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:06.554182+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      }
+    },
+    {
+      "component": "GnuTLS",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "LGPL-2.1-or-later library; bundled files can differ",
+      "primarySourceUrl": "https://www.gnutls.org/manual/html_node/Copying.html",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libgnutls.so.30"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:09.107557+00:00",
+        "httpStatus": null,
+        "result": "not retrieved; resolve exact source/material location before release"
+      }
+    },
+    {
+      "component": "GLib GObject",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "LGPL-2.1-or-later",
+      "primarySourceUrl": "https://gitlab.gnome.org/GNOME/glib",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libgobject-2.0.so.0"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:06.554182+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      }
+    },
+    {
+      "component": "GSM codec library",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "GSM permissive notice",
+      "primarySourceUrl": "https://www.quut.com/gsm/",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libgsm.so.1"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:11.739776+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      }
+    },
+    {
+      "component": "MIT Kerberos",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "MIT and included third-party notices",
+      "primarySourceUrl": "https://web.mit.edu/kerberos/krb5-latest/doc/mitK5license.html",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libgssapi_krb5.so.2",
+        "tools/app-root/usr/lib/libk5crypto.so.3",
+        "tools/app-root/usr/lib/libkrb5.so.3",
+        "tools/app-root/usr/lib/libkrb5support.so.0"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:07.940931+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      }
+    },
+    {
+      "component": "GStreamer/core or base library",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "LGPL-2.1-or-later (exact package/file notices required)",
+      "primarySourceUrl": "https://gstreamer.freedesktop.org/documentation/frequently-asked-questions/licensing.html",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libgstallocators-1.0.so.0",
+        "tools/app-root/usr/lib/libgstapp-1.0.so.0",
+        "tools/app-root/usr/lib/libgstaudio-1.0.so.0",
+        "tools/app-root/usr/lib/libgstbase-1.0.so.0",
+        "tools/app-root/usr/lib/libgstgl-1.0.so.0",
+        "tools/app-root/usr/lib/libgstpbutils-1.0.so.0",
+        "tools/app-root/usr/lib/libgstreamer-1.0.so.0",
+        "tools/app-root/usr/lib/libgsttag-1.0.so.0",
+        "tools/app-root/usr/lib/libgstvideo-1.0.so.0"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:06.924180+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      }
+    },
+    {
+      "component": "GLib GThread",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "LGPL-2.1-or-later",
+      "primarySourceUrl": "https://gitlab.gnome.org/GNOME/glib",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libgthread-2.0.so.0"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:06.554182+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      }
+    },
+    {
+      "component": "Nettle Hogweed",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "Version-dependent LGPL/GPL alternatives; exact build version required",
+      "primarySourceUrl": "https://www.lysator.liu.se/~nisse/nettle/",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libhogweed.so.4"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:09.362589+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      }
+    },
+    {
+      "component": "ICU",
+      "version": null,
+      "versionEvidence": "SONAME56 confirms ABI56 only; exact release/patch provenance unresolved.",
+      "upstreamLicenseFamily": "ICU/Unicode permissive license and data notices",
+      "primarySourceUrl": "https://unicode-org.github.io/icu/userguide/icu4c/faq.html",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libicudata.so.56",
+        "tools/app-root/usr/lib/libicui18n.so.56",
+        "tools/app-root/usr/lib/libicuuc.so.56"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:07.916518+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      }
+    },
+    {
+      "component": "libidn2",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "LGPL/GPL alternatives plus Unicode data notices; exact version required",
+      "primarySourceUrl": "https://www.gnu.org/software/libidn/",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libidn2.so.0"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:08.353796+00:00",
+        "httpStatus": null,
+        "result": "not retrieved; resolve exact source/material location before release"
+      }
+    },
+    {
+      "component": "keyutils library",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "LGPL-2.1-or-later library (package tools differ)",
+      "primarySourceUrl": "https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/keyutils.git/",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libkeyutils.so.1"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:04.671416+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      }
+    },
+    {
+      "component": "LZ4 library",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "BSD-2-Clause library (tools differ)",
+      "primarySourceUrl": "https://github.com/lz4/lz4/blob/dev/lib/LICENSE",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/liblz4.so.1"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:05.196642+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      }
+    },
+    {
+      "component": "XZ liblzma",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "Predominantly public-domain/0BSD; exact source/file notices required",
+      "primarySourceUrl": "https://tukaani.org/xz/",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/liblzma.so.5"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:07.557358+00:00",
+        "httpStatus": null,
+        "result": "not retrieved; resolve exact source/material location before release"
+      }
+    },
+    {
+      "component": "util-linux libmount",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "LGPL-2.1-or-later (library-specific)",
+      "primarySourceUrl": "https://github.com/util-linux/util-linux/blob/master/libmount/COPYING",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libmount.so.1"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:06.151579+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      }
+    },
+    {
+      "component": "Nettle",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "Version-dependent LGPL/GPL alternatives; exact build version required",
+      "primarySourceUrl": "https://www.lysator.liu.se/~nisse/nettle/",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libnettle.so.6"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:09.362589+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      }
+    },
+    {
+      "component": "libogg",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "BSD-3-Clause",
+      "primarySourceUrl": "https://github.com/xiph/ogg",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libogg.so.0"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:06.223178+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      }
+    },
+    {
+      "component": "ORC",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "BSD-2-Clause-style",
+      "primarySourceUrl": "https://gitlab.freedesktop.org/gstreamer/orc",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/liborc-0.4.so.0"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:06.369350+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      }
+    },
+    {
+      "component": "p11-kit",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "BSD-3-Clause and file-specific notices",
+      "primarySourceUrl": "https://p11-glue.github.io/p11-glue/p11-kit.html",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libp11-kit.so.0"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:07.266487+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      }
+    },
+    {
+      "component": "PCRE/PCRE2",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "BSD-3-Clause with PCRE exception and JIT notices; exact major/version required",
+      "primarySourceUrl": "https://www.pcre.org/",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libpcre.so.1",
+        "tools/app-root/usr/lib/libpcre2-8.so.0"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:09.776754+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      }
+    },
+    {
+      "component": "libpng",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "Libpng permissive license; exact version required",
+      "primarySourceUrl": "https://www.libpng.org/pub/png/src/libpng-LICENSE.txt",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libpng16.so.16"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:09.108127+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      }
+    },
+    {
+      "component": "PulseAudio",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "LGPL-2.1-or-later (file-specific notices)",
+      "primarySourceUrl": "https://www.freedesktop.org/wiki/Software/PulseAudio/",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libpulse.so.0",
+        "tools/app-root/usr/lib/libpulsecommon-14.0.so"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:08.347172+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      }
+    },
+    {
+      "component": "libselinux",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "Public-domain main library with file-specific notices",
+      "primarySourceUrl": "https://github.com/SELinuxProject/selinux/tree/master/libselinux",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libselinux.so.1"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:04.969535+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      }
+    },
+    {
+      "component": "libsndfile",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "LGPL-2.1-or-later",
+      "primarySourceUrl": "https://libsndfile.github.io/libsndfile/",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libsndfile.so.1"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:07.050046+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      }
+    },
+    {
+      "component": "OpenSSL libssl",
+      "version": null,
+      "versionEvidence": "Versioned companion file libssl.so.1.1.1k; patched distribution revision unknown.",
+      "upstreamLicenseFamily": "OpenSSL / original SSLeay dual legacy license (not Apache2)",
+      "primarySourceUrl": "https://raw.githubusercontent.com/openssl/openssl/OpenSSL_1_1_1k/LICENSE",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libssl.so.1.1",
+        "tools/app-root/usr/lib/libssl.so.1.1.1k"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:07.337861+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      },
+      "reportedNameVersion": "1.1.1k",
+      "versionStatus": "Filename/SONAME candidate only; exact component release is not authenticated"
+    },
+    {
+      "component": "systemd shared library",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "LGPL-2.1-or-later plus file-specific notices",
+      "primarySourceUrl": "https://github.com/systemd/systemd/blob/main/LICENSE.LGPL2.1",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libsystemd.so.0"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:05.436653+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      }
+    },
+    {
+      "component": "libtasn1",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "LGPL-2.1-or-later library",
+      "primarySourceUrl": "https://www.gnu.org/software/libtasn1/",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libtasn1.so.6"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:09.009599+00:00",
+        "httpStatus": null,
+        "result": "not retrieved; resolve exact source/material location before release"
+      }
+    },
+    {
+      "component": "libunistring",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "LGPL-3.0-or-later OR GPL-2.0-or-later (exact version/file proof required)",
+      "primarySourceUrl": "https://www.gnu.org/software/libunistring/",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libunistring.so.2"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:09.022273+00:00",
+        "httpStatus": null,
+        "result": "not retrieved; resolve exact source/material location before release"
+      }
+    },
+    {
+      "component": "libvorbis",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "BSD-3-Clause",
+      "primarySourceUrl": "https://github.com/xiph/vorbis",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libvorbis.so.0",
+        "tools/app-root/usr/lib/libvorbisenc.so.2"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:06.296493+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      }
+    },
+    {
+      "component": "Wayland",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "MIT",
+      "primarySourceUrl": "https://gitlab.freedesktop.org/wayland/wayland",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libwayland-cursor.so.0",
+        "tools/app-root/usr/lib/libwayland-egl.so.1"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:06.540711+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      }
+    },
+    {
+      "component": "XCB libraries/utilities",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "MIT/X11 permissive notices vary by package",
+      "primarySourceUrl": "https://xcb.freedesktop.org/",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libxcb-cursor.so.0",
+        "tools/app-root/usr/lib/libxcb-icccm.so.4",
+        "tools/app-root/usr/lib/libxcb-image.so.0",
+        "tools/app-root/usr/lib/libxcb-keysyms.so.1",
+        "tools/app-root/usr/lib/libxcb-randr.so.0",
+        "tools/app-root/usr/lib/libxcb-render-util.so.0",
+        "tools/app-root/usr/lib/libxcb-render.so.0",
+        "tools/app-root/usr/lib/libxcb-shape.so.0",
+        "tools/app-root/usr/lib/libxcb-shm.so.0",
+        "tools/app-root/usr/lib/libxcb-sync.so.1",
+        "tools/app-root/usr/lib/libxcb-util.so.1",
+        "tools/app-root/usr/lib/libxcb-xfixes.so.0",
+        "tools/app-root/usr/lib/libxcb-xkb.so.1"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:14.012399+00:00",
+        "httpStatus": 200,
+        "result": "retrieved; not proof of exact binary source"
+      }
+    },
+    {
+      "component": "libxkbcommon",
+      "version": null,
+      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "upstreamLicenseFamily": "MIT and included X11/BSD/HPND notices",
+      "primarySourceUrl": "https://xkbcommon.org/doc/current/md_doc_2licensing.html",
+      "runtimeIdentifier": "linux-x64",
+      "kind": "tool-library-observation",
+      "paths": [
+        "tools/app-root/usr/lib/libxkbcommon-x11.so.0",
+        "tools/app-root/usr/lib/libxkbcommon.so.0"
+      ],
+      "missing": [
+        "Exact source package/revision including distribution patches for this binary build.",
+        "Build/configuration material and applicable license/copyright notices for the retained build."
+      ],
+      "primaryLocationCheck": {
+        "checkedUtc": "2026-10-19T21:35:14.024538+00:00",
+        "httpStatus": null,
+        "result": "not retrieved; resolve exact source/material location before release"
+      }
+    },
+    {
+      "component": "MKVToolNix bundled source fallbacks",
+      "kind": "source-evidence-not-binary-version",
+      "sourceArchiveSha256": "9f0a810f17c7df8adb9064a3a41d5784399be412d19704cf080745ad7d45da30",
+      "components": [
+        {
+          "component": "MKVToolNix",
+          "version": "102.0",
+          "license": "Project says GPLv2; no blanket or-later grant established. Imported components have separate terms.",
+          "evidence": [
+            "README.md intro",
+            "src/common/version.cpp header",
+            "COPYING"
+          ],
+          "binaryBuildTie": "Verified binary/source release versions and hashes, not a complete reproducible-build manifest."
+        },
+        {
+          "component": "avilib",
+          "sourceVersion": "0.6.10",
+          "license": "GPL-2.0-or-later",
+          "evidence": [
+            "lib/avilib-0.6.10/avilib.c header"
+          ],
+          "binaryVersion": null
+        },
+        {
+          "component": "libEBML",
+          "sourceVersion": "1.4.7",
+          "license": "LGPL-2.1-or-later",
+          "evidence": [
+            "lib/libebml/CMakeLists.txt",
+            "lib/libebml/ebml/EbmlVersion.h"
+          ],
+          "binaryVersion": null
+        },
+        {
+          "component": "libMatroska",
+          "sourceVersion": "1.7.2",
+          "license": "LGPL-2.1-or-later",
+          "evidence": [
+            "lib/libmatroska/CMakeLists.txt",
+            "lib/libmatroska/matroska/KaxVersion.h"
+          ],
+          "binaryVersion": null
+        },
+        {
+          "component": "librmff",
+          "sourceVersion": "0.6.0",
+          "license": "LGPL-2.1-or-later",
+          "evidence": [
+            "lib/librmff/README",
+            "lib/librmff/librmff.h"
+          ],
+          "binaryVersion": null
+        },
+        {
+          "component": "nlohmann-json",
+          "sourceVersion": "3.11.3",
+          "sourceCommit": "9cca280a4d0ccf0c08f47a99aa71d1b0e52f8d03",
+          "license": "MIT",
+          "evidence": [
+            "lib/nlohmann-json/git-info.txt",
+            "lib/nlohmann-json/include/nlohmann/detail/abi_macros.hpp"
+          ],
+          "binaryVersion": null
+        },
+        {
+          "component": "pugixml",
+          "sourceVersion": "1.12.1",
+          "sourceCommit": "dd50fa5b45ab8d58d6c27566c2eaf04a8b7e5841",
+          "license": "MIT",
+          "evidence": [
+            "lib/pugixml/git-info.txt",
+            "lib/pugixml/src/pugixml.hpp (header reports1.12)"
+          ],
+          "binaryVersion": null
+        },
+        {
+          "component": "utf8-cpp",
+          "sourceVersion": null,
+          "sourceCommit": "b85efd66a76caccbe0c186b00cab34df1e4281fa",
+          "license": "BSL-1.0",
+          "evidence": [
+            "lib/utf8-cpp/git-info.txt",
+            "doc/licenses/Boost-1.0.txt"
+          ],
+          "binaryVersion": null
+        },
+        {
+          "component": "fmt",
+          "sourceVersion": "12.1.0",
+          "license": "Actual lib/fmt/LICENSE is MIT-style with optional compiled-object exception; README/doc filename calls it BSD, so preserve actual text rather than relabel from filename.",
+          "evidence": [
+            "lib/fmt/include/fmt/base.h FMT_VERSION120100",
+            "lib/fmt/LICENSE",
+            "doc/licenses/fmt-BSD.rst"
+          ],
+          "binaryVersion": null
+        }
+      ],
+      "limit": "Versioned source fallbacks are not proof of the actual linked versions or selected build configuration."
+    }
+  ],
+  "unresolved": [
+    {
+      "component": "Original TrackTrim code/assets",
+      "evidence": "No operative original-code license; four original assemblies and project assets are shipped.",
+      "missing": "Rights-holder identity/authority, policy choice and operative terms.",
+      "primaryLocationChecked": "docs/license-decision.md and PROJECT_BRIEF.md",
+      "nextAction": "Owner decides the original-code license after confirming rights; do not infer an owner from account metadata."
+    },
+    {
+      "component": "Windows MKVToolNix static closure",
+      "evidence": "Pinned102.0 tools embed staticQt6.10.2 and compiler string; exact source tar includes generic build recipes.",
+      "missing": "Exact MXE commit, external dependency revisions/patches, configure/build records, selected Qt licensing path and applicable source/relink materials.",
+      "primaryLocationChecked": "https://mkvtoolnix.download/sources/mkvtoolnix-102.0.tar.xz",
+      "nextAction": "Obtain a binary-bound build/dependency/source manifest from upstream; prepare the question without sending it."
+    },
+    {
+      "component": "Retained Linux AppImage libraries and static archives",
+      "evidence": "Every retained file is inventoried, even outside the CLI loaded closure. QtVirtualKeyboard6.6.1 is module-specific GPL3/commercial.",
+      "missing": "Exact distro source package revisions/patches and module notices/build records, including unused libraries and three static Boost archives.",
+      "primaryLocationChecked": "https://mkvtoolnix.download/appimage/MKVToolNix_GUI-102.0-x86_64.AppImage",
+      "nextAction": "Map retained file buildIDs/hashes to the upstream build manifest and obtain exact source packages and applicable notices."
+    },
+    {
+      "component": "NuGet native static subcomponents and generated apphost",
+      "evidence": "Signed nupkg asset hashes, publisher commits, existing notices and selected native constants.",
+      "missing": "Complete actually compiled static closure, exact apphost template/build relationship and any additional attribution/build materials.",
+      "primaryLocationChecked": "NuGet nuspec repositories and commit-pinned native build recipes in component rows.",
+      "nextAction": "Review the binary-bound build configuration and actual static notices; do not treat broad third-party notice lists as proof of inclusion."
+    },
+    {
+      "component": "Combined-work and distribution method",
+      "evidence": "Original .NET dependencies includeApache2 Serilog; worker notices specifyGPL2; actual process/protocol boundary reviewed.",
+      "missing": "Applicable aggregation/derivative-work determination and selected compliant source/material distribution route.",
+      "primaryLocationChecked": "https://www.gnu.org/licenses/gpl-faq.en.html#MereAggregation and https://www.apache.org/licenses/GPL-compatibility.html",
+      "nextAction": "Review the exact combination and obligations separately from original-code license choice; a separate executable alone does not settle this."
+    }
+  ]
+}
