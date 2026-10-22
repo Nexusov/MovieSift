@@ -45,6 +45,8 @@
           <TextBlock Text="{Binding OutputFolder}" TextWrapping="Wrap" VerticalAlignment="Center" />
         </WrapPanel>
         <TextBlock Text="{Binding SummaryText}" TextWrapping="Wrap" />
+        <TextBlock x:Name="QueueCheckpointStatus" Text="{Binding Recovery.StatusText}" TextWrapping="Wrap" />
+        <Button Content="{Binding Localization[QueueReload]}" Command="{Binding Recovery.ReloadCommand}" HorizontalAlignment="Left" />
         <views:RulePresetsView DataContext="{Binding Presets}" />
         <views:BatchLanguageRulesView DataContext="{Binding LanguageRules}" />
         <TextBlock Text="{Binding Localization[BatchInclusionHint]}" TextWrapping="Wrap" Opacity="0.8" />

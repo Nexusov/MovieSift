@@ -1,7 +1,6 @@
 using System.Globalization;
 using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
-using TrackTrim.Application.Presets;
 using TrackTrim.Infrastructure.Persistence;
 using Xunit;
 
@@ -18,7 +17,7 @@ public sealed class PortableRecordFileLockTests
     {
         using var workspace = new TestWorkspace();
         var path = Path.Combine(workspace.Path, "portable-record.lock");
-        using var original = RulePresetFileLock.Acquire(path);
+        using var original = PortableRecordFileLock.Acquire(path);
         var descriptor = FindOwnedDescriptor(path);
         var duplicateDescriptor = Duplicate(descriptor);
         Assert.True(duplicateDescriptor >= 0, $"Could not duplicate the owned descriptor (OS error {Marshal.GetLastPInvokeError()}).");
@@ -26,12 +25,12 @@ public sealed class PortableRecordFileLockTests
 
         // dup and fork retain the same open-file description; close alone does not release its flock.
         original.Dispose();
-        using var next = RulePresetFileLock.Acquire(path);
+        using var next = PortableRecordFileLock.Acquire(path);
         Assert.False(retained.IsClosed);
 
         original.Dispose();
-        var contention = Assert.Throws<RulePresetStorageException>(() => RulePresetFileLock.Acquire(path));
-        Assert.Equal(RulePresetErrorCode.Busy, contention.Failure.Code);
+        var contention = Assert.Throws<PortableRecordLockException>(() => PortableRecordFileLock.Acquire(path));
+        Assert.True(contention.IsBusy);
     }
 
     /// <summary>Reads the actual unique lock descriptor through Linux procfs instead of exposing a production test hook.</summary>

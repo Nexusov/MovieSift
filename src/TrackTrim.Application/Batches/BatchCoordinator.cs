@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using TrackTrim.Application.Inspection;
 using TrackTrim.Application.Jobs;
 using TrackTrim.Application.Ports;
+using TrackTrim.Application.QueueLists;
 using TrackTrim.Core.Failures;
 using TrackTrim.Core.Rules;
 
@@ -30,6 +31,31 @@ public sealed class BatchCoordinator(
         try
         {
             var result = session.Reset(expectedRevision);
+
+            if (result.Applied)
+            {
+                issuedLanguagePreview = null;
+            }
+
+            return result;
+        }
+        finally
+        {
+            gate.Release();
+        }
+    }
+
+    /// <summary>Accepts explicit recovery of listing intentions without inspecting, approving or dispatching media.</summary>
+    public BatchEditResult RestoreQueueList(QueueList list, long? expectedRevision = null)
+    {
+        if (!gate.Wait(0))
+        {
+            return new(false, new(ErrorCode.Busy));
+        }
+
+        try
+        {
+            var result = session.RestoreQueueList(list, expectedRevision);
 
             if (result.Applied)
             {

@@ -46,6 +46,69 @@ public sealed class RecursiveBatchDiscoveryTests
         Assert.All(recursive.Sources, source => Assert.Equal("unprobed candidate", File.ReadAllText(source.FullPath)));
     }
 
+    /// <summary>Models a network mount without privileged mounts and rejects even a child containing no MKV candidates.</summary>
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task ControlledNetworkChildClassificationRejectsTheWholeAddition(bool containsMkv)
+    {
+        using var workspace = new TestWorkspace();
+        var root = CreateDirectory(workspace.Path, "Series");
+        var output = CreateDirectory(workspace.Path, "output");
+        var networkChild = CreateDirectory(CreateDirectory(root, "Season 2"), "controlled network mount");
+        await CreateCandidateAsync(CreateDirectory(root, "Season 1"), "otherwise valid.mkv");
+
+        if (containsMkv)
+        {
+            await CreateCandidateAsync(networkChild, "not eligible.mkv");
+        }
+
+        var classifiedDirectories = new List<string>();
+        var access = new CountingSourceAccess();
+        var discovery = new FileBatchInputDiscovery(access, null, null, path =>
+        {
+            classifiedDirectories.Add(path);
+            return path == networkChild ? DriveType.Network : DriveType.Fixed;
+        });
+        var result = await discovery.DiscoverAsync(RecursiveRequest(root, output));
+
+        Assert.Equal(ErrorCode.InvalidSource, result.Rejection?.Code);
+        Assert.Equal(ErrorReason.NetworkPath, result.Rejection?.Reason);
+        Assert.Contains(networkChild, classifiedDirectories);
+        Assert.Empty(result.Sources);
+        Assert.Empty(result.Issues);
+        Assert.Null(result.FolderOrigins);
+        Assert.Equal(0, access.ReadCalls);
+        Assert.Empty(Directory.EnumerateFileSystemEntries(output));
+    }
+
+    /// <summary>Allows existing local filesystem types across child mount boundaries without requiring actual test mounts.</summary>
+    [Theory]
+    [InlineData(DriveType.Fixed)]
+    [InlineData(DriveType.Removable)]
+    [InlineData(DriveType.Ram)]
+    public async Task ControlledLocalChildClassificationPreservesSupportedDirectoryDiscovery(DriveType childDriveType)
+    {
+        using var workspace = new TestWorkspace();
+        var root = CreateDirectory(workspace.Path, "Series");
+        var output = CreateDirectory(workspace.Path, "output");
+        var child = CreateDirectory(root, "local mounted season");
+        var source = await CreateCandidateAsync(child, "episode.mkv");
+        var classifiedDirectories = new List<string>();
+        var discovery = new FileBatchInputDiscovery(new FileSourceAccess(), null, null, path =>
+        {
+            classifiedDirectories.Add(path);
+            return path == child ? childDriveType : DriveType.Fixed;
+        });
+        var result = await discovery.DiscoverAsync(RecursiveRequest(root, output));
+
+        Assert.Null(result.Rejection);
+        Assert.Empty(result.Issues);
+        Assert.Equal(source, Assert.Single(result.Sources).FullPath);
+        Assert.Equal(new(root, Path.Combine("local mounted season", "episode.mkv")), result.FolderOrigins![source]);
+        Assert.Contains(child, classifiedDirectories);
+    }
+
     /// <summary>Requires an existing output root and rejects equality or ancestry without rejecting sibling prefixes.</summary>
     [Fact]
     public async Task RecursiveOutputPolicyRejectsMissingAndConflictingRoots()
@@ -70,9 +133,9 @@ public sealed class RecursiveBatchDiscoveryTests
         Assert.False(Directory.Exists(Path.Combine(workspace.Path, "not created")));
     }
 
-    /// <summary>Excludes actual output, portable-data and validated ownership locations without a filename heuristic.</summary>
+    /// <summary>Excludes actual output, portable-data and validated ownership before controlled mount classification.</summary>
     [Fact]
-    public async Task RecursiveDiscoveryExcludesOutputAndKnownOwnedWorkingDirectories()
+    public async Task RecursiveDiscoveryExcludesOutputAndKnownOwnedWorkingDirectoriesBeforeMountClassification()
     {
         using var workspace = new TestWorkspace();
         var root = CreateDirectory(workspace.Path, "Series");
@@ -81,6 +144,8 @@ public sealed class RecursiveBatchDiscoveryTests
         var data = CreateDirectory(root, "portable data");
         var source = await CreateCandidateAsync(season, "episode.mkv");
         await CreateCandidateAsync(output, "published.mkv");
+        var outputChild = CreateDirectory(output, "controlled network mount");
+        await CreateCandidateAsync(outputChild, "not a source.mkv");
         await CreateCandidateAsync(data, "inspection.mkv");
         var unowned = await CreateCandidateAsync(CreateDirectory(root, ".tracktrim-unrelated"), "unrelated.mkv");
         var store = new OwnedOutputStore(data);
@@ -89,7 +154,13 @@ public sealed class RecursiveBatchDiscoveryTests
         var plan = new RemuxPlan(Guid.NewGuid(), inspection, [], Path.Combine(season, "reserved.trimmed.mkv"), false);
         var owned = await store.ReserveAsync(new(plan, TestContext.Current.CancellationToken));
         await File.WriteAllTextAsync(owned.CandidatePath, "owned candidate", TestContext.Current.CancellationToken);
-        var discovery = new FileBatchInputDiscovery(new FileSourceAccess(), store, [data]);
+        var classifiedDirectories = new List<string>();
+        var excludedDirectories = new[] { outputChild, data, owned.DirectoryPath };
+        var discovery = new FileBatchInputDiscovery(new FileSourceAccess(), store, [data], path =>
+        {
+            classifiedDirectories.Add(path);
+            return excludedDirectories.Contains(path, StringComparer.Ordinal) ? DriveType.Network : DriveType.Fixed;
+        });
         var result = await discovery.DiscoverAsync(RecursiveRequest(root, output));
 
         Assert.Null(result.Rejection);
@@ -98,6 +169,7 @@ public sealed class RecursiveBatchDiscoveryTests
         Assert.Equal("owned candidate", await File.ReadAllTextAsync(owned.CandidatePath, TestContext.Current.CancellationToken));
         Assert.Single(await store.FindInterruptedAsync(TestContext.Current.CancellationToken));
         Assert.Equal("unprobed candidate", await File.ReadAllTextAsync(Path.Combine(output, "published.mkv"), TestContext.Current.CancellationToken));
+        Assert.All(excludedDirectories, excluded => Assert.DoesNotContain(excluded, classifiedDirectories));
     }
 
     /// <summary>Does not allow a validated application working tree to become the recursive source root.</summary>

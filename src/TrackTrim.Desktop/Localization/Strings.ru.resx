@@ -166,7 +166,7 @@
   <data name="BatchPauseAfterCurrent" xml:space="preserve"><value>Приостановить после текущего файла</value></data>
   <data name="BatchCancel" xml:space="preserve"><value>Отменить очередь</value></data>
   <data name="BatchExplicitResume" xml:space="preserve"><value>Решение по предупреждению не запускает следующий файл. Проверьте оставшуюся очередь и явно продолжите её.</value></data>
-  <data name="BatchQueuePolicy" xml:space="preserve"><value>Очередь существует только в этом окне и не восстанавливается после перезапуска. Опубликованные результаты сохраняются. Ошибки, предупреждения, отмена и проблемы очистки останавливают очередь; продолжение требует явной проверки и запуска. Правила требуют предпросмотра и применения.</value></data>
+  <data name="BatchQueuePolicy" xml:space="preserve"><value>Незавершённый список исходников и назначений сохраняется локально для явного восстановления или отклонения после перезапуска. Нужны новая проверка файлов, выбор дорожек, подтверждение планов и обзор очереди. Автоповторов и продолжения с позиции нет. Готовые файлы сохраняются. Ошибки, предупреждения, отмена и проблемы очистки останавливают очередь; правила требуют предпросмотра и применения.</value></data>
   <data name="BatchPreparing" xml:space="preserve"><value>Добавьте файлы и подтвердите их отдельные планы.</value></data>
   <data name="BatchInspecting" xml:space="preserve"><value>Проверка каждого файла отдельно…</value></data>
   <data name="BatchReviewing" xml:space="preserve"><value>Проверка всех исходников, назначений и планов…</value></data>
@@ -279,4 +279,24 @@
   <data name="ErrorReasonRecursiveOutputRequired" xml:space="preserve"><value>Сначала выберите существующую папку результатов, затем добавьте источник с вложенными папками.</value></data>
   <data name="ErrorReasonRecursiveRootConflict" xml:space="preserve"><value>Папка результатов не должна совпадать с выбранной исходной папкой или содержать её. Выберите отдельную папку результатов либо вложенную папку, которую можно исключить.</value></data>
   <data name="ErrorReasonBatchDepthLimit" xml:space="preserve"><value>Глубина дерева превышает допустимые 32 вложенные папки. Ничего не добавлено.</value></data>
+  <data name="QueueRecoveryHelp" xml:space="preserve"><value>Восстанавливается только список незавершённых файлов. Заново проверьте каждый исходник, подтвердите планы и очередь перед запуском. Отклонение удаляет только сохранённый список; медиа и записи прерывания остаются. Перечитать список можно при пустой текущей очереди.</value></data>
+  <data name="QueueRestore" xml:space="preserve"><value>Восстановить список</value></data>
+  <data name="QueueDiscard" xml:space="preserve"><value>Отклонить сохранённый список</value></data>
+  <data name="QueueReload" xml:space="preserve"><value>Перечитать сохранённый список</value></data>
+  <data name="QueueLoading" xml:space="preserve"><value>Чтение сохранённого списка…</value></data>
+  <data name="QueueRecoveryAvailable" xml:space="preserve"><value>Найден список незавершённой очереди. Восстановите или отклоните его явно.</value></data>
+  <data name="QueueSaving" xml:space="preserve"><value>Сохранение незавершённого списка…</value></data>
+  <data name="QueueCheckpointReady" xml:space="preserve"><value>Восстановление списка доступно. Опубликованные результаты повторно не ставятся в очередь.</value></data>
+  <data name="QueueNotSaved" xml:space="preserve"><value>Проблема сохранения списка. Ручная работа доступна; восстановление после перезапуска не подтверждено.</value></data>
+  <data name="QueueCurrentListInvalid" xml:space="preserve"><value>Текущий черновик пути результата или исходника нельзя сохранить. Исправьте его; предыдущий список сохранён.</value></data>
+  <data name="QueueCleanupIssue" xml:space="preserve"><value>Проблема очистки временного файла списка. См. технические сведения.</value></data>
+  <data name="QueueDestinationNeeded" xml:space="preserve"><value>Выберите назначение перед подтверждением</value></data>
+  <data name="QueueExcluded" xml:space="preserve"><value>исключён</value></data>
+  <data name="QueueErrorBusy" xml:space="preserve"><value>Другой экземпляр меняет сохранённый список. Перезаписи нет. Перечитайте его при пустой текущей очереди.</value></data>
+  <data name="QueueErrorConflict" xml:space="preserve"><value>Список изменён в другом экземпляре и не перезаписан. Перечитайте его при пустой текущей очереди.</value></data>
+  <data name="QueueErrorInvalidRecord" xml:space="preserve"><value>Сохранённый список повреждён и оставлен без изменений. Исправьте файл явно и перечитайте. Ручная работа доступна.</value></data>
+  <data name="QueueErrorUnsupportedVersion" xml:space="preserve"><value>Версия списка не поддерживается. Файл сохранён; используйте совместимое приложение или исправьте его явно.</value></data>
+  <data name="QueueErrorLimitExceeded" xml:space="preserve"><value>Список превышает ограничения хранения. Предыдущий файл сохранён; уменьшите список или длину путей.</value></data>
+  <data name="QueueErrorPersistenceUnavailable" xml:space="preserve"><value>Не удалось сохранить или прочитать список. Существующие данные сохранены; восстановление после перезапуска не подтверждено.</value></data>
+  <data name="QueueErrorCancelled" xml:space="preserve"><value>Операция со списком отменена. Восстановление после перезапуска не подтверждено.</value></data>
 </root>

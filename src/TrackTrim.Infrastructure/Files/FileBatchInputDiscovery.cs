@@ -15,6 +15,15 @@ public sealed class FileBatchInputDiscovery(ISourceAccess sourceAccess, IOutputS
     private static readonly StringComparer PathComparer = OperatingSystem.IsWindows()
         ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
     private readonly string[] workingDirectorySnapshot = workingDirectories?.ToArray() ?? [];
+    private readonly Func<string, DriveType> readDirectoryDriveType = path => FileSourceAccess.GetContainingDrive(path).DriveType;
+
+    /// <summary>Substitutes only mount classification for controlled network-directory policy regressions.</summary>
+    internal FileBatchInputDiscovery(ISourceAccess sourceAccess, IOutputStore? ownedOutputs,
+        IReadOnlyList<string>? workingDirectories, Func<string, DriveType> readDirectoryDriveType)
+        : this(sourceAccess, ownedOutputs, workingDirectories)
+    {
+        this.readDirectoryDriveType = readDirectoryDriveType;
+    }
 
     /// <summary>Snapshots the request and moves synchronous filesystem inspection off the UI thread.</summary>
     public Task<BatchInputDiscoveryResult> DiscoverAsync(BatchInputDiscoveryRequest request)
@@ -162,7 +171,7 @@ public sealed class FileBatchInputDiscovery(ISourceAccess sourceAccess, IOutputS
         while (pending.TryPop(out var current))
         {
             request.CancellationToken.ThrowIfCancellationRequested();
-            PathSafety.RejectReparsePoints(current.Path);
+            ValidateFolder(current.Path);
             var entries = new List<string>();
 
             foreach (var entry in Directory.EnumerateFileSystemEntries(current.Path, "*", enumeration))
@@ -257,7 +266,7 @@ public sealed class FileBatchInputDiscovery(ISourceAccess sourceAccess, IOutputS
     }
 
     /// <summary>Checks the established local, existing-folder and reparse-point policy before descent.</summary>
-    private static string ValidateFolder(string requestedPath)
+    private string ValidateFolder(string requestedPath)
     {
         if (!Path.IsPathFullyQualified(requestedPath))
         {
@@ -268,7 +277,7 @@ public sealed class FileBatchInputDiscovery(ISourceAccess sourceAccess, IOutputS
         var folder = Path.GetFullPath(requestedPath);
 
         if (folder.StartsWith(@"\\", StringComparison.Ordinal)
-            || FileSourceAccess.GetContainingDrive(folder).DriveType == DriveType.Network)
+            || readDirectoryDriveType(folder) == DriveType.Network)
         {
             throw new OperationFailureException(new Failure(ErrorCode.InvalidSource,
                 "Network folders are not supported.", ErrorReason.NetworkPath));

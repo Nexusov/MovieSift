@@ -51,6 +51,8 @@ public sealed partial class BatchViewModel : ObservableObject
         Presets = new(new(services.Presets, LanguageRules, services.Session, services.Localization,
             () => IsWorkspaceAvailable && !HasNewBatchConfirmation, () => !writesBlocked, Refresh));
         writesBlocked = !services.DataWritable;
+        Recovery = new(new(services.Session, services.Coordinator, services.QueueLists, Localization,
+            () => IsWorkspaceAvailable && !HasNewBatchConfirmation && !Presets.IsBusy, services.DataWritable, Refresh, services.Log));
         AddFilesCommand = new AsyncRelayCommand(AddFilesAsync, () => CanEdit);
         AddFolderCommand = new AsyncRelayCommand(AddFolderAsync, () => CanEdit);
         ChooseOutputCommand = new AsyncRelayCommand(ChooseOutputAsync, () => CanEdit);
@@ -76,6 +78,7 @@ public sealed partial class BatchViewModel : ObservableObject
     public ObservableCollection<BatchItemViewModel> Items { get; } = [];
     public BatchLanguageRulesViewModel LanguageRules { get; }
     public RulePresetsViewModel Presets { get; }
+    public QueueRecoveryViewModel Recovery { get; }
     public BatchSnapshot Snapshot { get; private set; }
     public string OutputFolder => outputFolder;
     public bool IncludeSubfolders
@@ -92,13 +95,13 @@ public sealed partial class BatchViewModel : ObservableObject
             SetProperty(ref includeSubfolders, value);
         }
     }
-    public bool CanEdit => IsWorkspaceAvailable && !HasNewBatchConfirmation && !Presets.IsBusy;
+    public bool CanEdit => IsWorkspaceAvailable && !HasNewBatchConfirmation && !Presets.IsBusy && Recovery.CanEditBatch;
     public bool CanRun => CanEdit && !writesBlocked && Snapshot.Review is not null;
     public bool CanRemoveSelected => CanEdit && SelectedItem is { Snapshot.Result: null };
     public bool CanInspectSelected => CanEdit && SelectedItem is { } selected && selected.Snapshot.State is not (BatchItemState.Completed or BatchItemState.NoChange);
     public bool HasSafetyBlock => Snapshot.HasSafetyBlock;
     public bool HasWarningCandidate => WarningOwner is not null;
-    public bool HasBlockingOperation => IsBusy || Presets.IsBusy || HasWarningCandidate || HasSafetyBlock || HasNewBatchConfirmation;
+    public bool HasBlockingOperation => IsBusy || Presets.IsBusy || Recovery.IsBusy || HasWarningCandidate || HasSafetyBlock || HasNewBatchConfirmation;
     public bool HasNewBatchConfirmation => newBatchConfirmationRevision is not null;
     public bool HasCleanupIssue => Snapshot.Items.Any(item => item.Result is { CleanupIssues.IsDefaultOrEmpty: false });
     public bool HasWarningCloseDecision => warningCloseRequested && HasWarningCandidate;
@@ -233,6 +236,7 @@ public sealed partial class BatchViewModel : ObservableObject
         Cancel();
         await activeOperation;
         await Presets.WhenIdleAsync();
+        await Recovery.WhenIdleAsync();
     }
 
     /// <summary>Asks about the frozen warning owner even when another row or tab is selected.</summary>
@@ -312,6 +316,14 @@ public sealed partial class BatchViewModel : ObservableObject
         if (!edit.Applied)
         {
             return;
+        }
+
+        if (!string.IsNullOrEmpty(outputFolder))
+        {
+            foreach (var editor in Items.Where(editor => editor.Snapshot.IntendedDestinationPath is null))
+            {
+                editor.ApplyOutputFolder(outputFolder);
+            }
         }
 
         if (services.Session.Snapshot.Items.Any(item => item.State == BatchItemState.PendingInspection && item.Included))
@@ -399,6 +411,8 @@ public sealed partial class BatchViewModel : ObservableObject
             }
 
             var revision = operationRevision;
+            Recovery.Checkpoint();
+            await Recovery.WhenIdleAsync();
             var progress = new Progress<BatchProgress>(update => UpdateProgress(update, revision));
             var result = await services.Coordinator.RunAsync(new(review.Id, progress, cancellationToken));
             failure = result.Failure;
@@ -551,6 +565,7 @@ public sealed partial class BatchViewModel : ObservableObject
         }
 
         Refresh();
+        Recovery.Checkpoint();
     }
 
     /// <summary>Clears obsolete aggregate validation messages after a deliberate local edit.</summary>
@@ -586,6 +601,7 @@ public sealed partial class BatchViewModel : ObservableObject
         OnPropertyChanged(string.Empty);
         LanguageRules?.Refresh();
         Presets?.Refresh();
+        Recovery?.Refresh();
         AddFilesCommand?.NotifyCanExecuteChanged();
         AddFolderCommand?.NotifyCanExecuteChanged();
         ChooseOutputCommand?.NotifyCanExecuteChanged();

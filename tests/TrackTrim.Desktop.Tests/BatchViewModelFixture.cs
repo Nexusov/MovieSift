@@ -23,6 +23,7 @@ internal sealed class BatchViewModelFixture
     public FakeOutputStore Outputs { get; } = new();
     public FakeSettingsStore Settings { get; } = new();
     public BatchUiPresetStore PresetStore { get; } = new();
+    public BatchUiQueueListStore QueueStore { get; } = new();
     public LocalizationService Localization { get; } = new();
     public BatchUiBackend Backend { get; } = new();
     public BatchUiDialogs Dialogs { get; }
@@ -30,9 +31,10 @@ internal sealed class BatchViewModelFixture
     public BatchCoordinator Coordinator { get; }
     public BatchViewModel Batch { get; }
     public MainViewModel Main { get; }
+    public Task QueueInitialization { get; }
 
     /// <summary>Shares one job coordinator while keeping single and batch inspection revisions independent.</summary>
-    public BatchViewModelFixture(IRulePresetStore? presetStore = null)
+    public BatchViewModelFixture(IRulePresetStore? presetStore = null, IQueueListStore? queueStore = null, bool initializeQueue = true)
     {
         Dialogs = new(Backend.Inspections.Keys.ToArray());
         Discovery = new(Backend.Inspections.Values.Select(inspection => inspection.Source).ToImmutableArray());
@@ -40,14 +42,17 @@ internal sealed class BatchViewModelFixture
         var jobs = new JobCoordinator(Backend, sourceAccess, Outputs);
         Coordinator = new(Session, new InspectionService(Backend, sourceAccess), jobs, sourceAccess);
         var logger = new LoggerConfiguration().CreateLogger();
-        Batch = new(new(Session, Coordinator, Discovery, Dialogs, Localization, true, logger, new(presetStore ?? PresetStore)));
+        Batch = new(new(Session, Coordinator, Discovery, Dialogs, Localization, true, logger, new(presetStore ?? PresetStore), queueStore ?? QueueStore));
         Main = new(new(new InspectionService(Backend, sourceAccess), jobs, Settings, Outputs, Dialogs,
             Localization, true, logger, Batch));
+
+        QueueInitialization = initializeQueue ? Batch.Recovery.InitializeAsync() : Task.CompletedTask;
     }
 
     /// <summary>Uses the real add-files and output-folder commands without invoking native pickers.</summary>
     public async Task LoadAsync()
     {
+        await QueueInitialization;
         await Batch.AddFilesCommand.ExecuteAsync(null);
         await Batch.ChooseOutputCommand.ExecuteAsync(null);
     }

@@ -41,6 +41,9 @@
       </StackPanel>
     </Border>
 
+    <views:QueueRecoveryView DockPanel.Dock="Top" Margin="0,0,0,12"
+                             DataContext="{Binding Batch.Recovery}" IsVisible="{Binding HasNotice}" />
+
     <TabControl>
       <TabItem Header="{Binding Localization[SingleWorkflow]}">
         <DockPanel LastChildFill="True">
