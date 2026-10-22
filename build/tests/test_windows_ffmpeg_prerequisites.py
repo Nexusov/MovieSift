@@ -73,7 +73,7 @@ switch ($Action) {
         self.assertEqual(plan["Make"], "C:/msys64/usr/bin/make.exe")
         self.assertEqual(plan["PreflightArguments"], ["-Q", "bash", "msys2-runtime", "libintl"])
         self.assertEqual(plan["InstallArguments"], ["-U", "--needed", "--noconfirm", str(self.cache / "make-4.4.1-3-x86_64.pkg.tar.zst")])
-        self.assertEqual(plan["MakePackage"]["Url"], "https://mirror.msys2.org/msys/x86_64/make-4.4.1-3-x86_64.pkg.tar.zst")
+        self.assertEqual(plan["MakePackage"]["Url"], "https://repo.msys2.org/msys/x86_64/make-4.4.1-3-x86_64.pkg.tar.zst")
         self.assertEqual(plan["MakePackage"]["Sha256"], "af0bdba17f06fe037f0194069adaa31a8fe45f1a11381501896aea1fae37bd5d")
         self.assertEqual(plan["NasmPackage"]["Url"], "https://www.nasm.us/pub/nasm/releasebuilds/3.01/win64/nasm-3.01-win64.zip")
         self.assertEqual(plan["NasmPackage"]["Sha256"], "e0ba5157007abc7b1a65118a96657a961ddf55f7e3f632ee035366dfce039ca4")

@@ -22,7 +22,7 @@ function Get-WindowsFfmpegPrerequisitePlan {
         InstallArguments = @('-U', '--needed', '--noconfirm', (Join-Path $CacheDirectory 'make-4.4.1-3-x86_64.pkg.tar.zst'))
         MakePackage = [ordered]@{
             FileName = 'make-4.4.1-3-x86_64.pkg.tar.zst'
-            Url = 'https://mirror.msys2.org/msys/x86_64/make-4.4.1-3-x86_64.pkg.tar.zst'
+            Url = 'https://repo.msys2.org/msys/x86_64/make-4.4.1-3-x86_64.pkg.tar.zst'
             Sha256 = 'af0bdba17f06fe037f0194069adaa31a8fe45f1a11381501896aea1fae37bd5d'
         }
         NasmPackage = [ordered]@{

@@ -207,7 +207,13 @@ foreach ($material in $applicableMaterials) {
         throw "Upstream source/notice material hash mismatch: $($material.path)."
     }
 
-    foreach ($payload in $material.correspondsTo) {
+    $correspondingPayloads = @()
+
+    if ($material.PSObject.Properties.Name -contains 'correspondsTo') {
+        $correspondingPayloads = @($material.correspondsTo)
+    }
+
+    foreach ($payload in $correspondingPayloads) {
         $payloadPath = Join-Path $destinationPath $payload.path
         $matchesMaterial = (Test-Path -LiteralPath $payloadPath -PathType Leaf) -and
             (Get-Item -LiteralPath $payloadPath).Length -eq $payload.size -and

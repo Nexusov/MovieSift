@@ -34,6 +34,8 @@ fi
 
 mkdir -p "$build_root/tmp" "$build_root/result" "$build_root/ffmpeg-source" "$build_root/zlib-source" "$build_root/build"
 export TMPDIR="$build_root/tmp" LANG=C.UTF-8 LC_ALL=C.UTF-8
+# A source archive has no Git metadata; do not discover the enclosing application repository.
+export GIT_CEILING_DIRECTORIES="$build_root"
 readonly result_directory="$build_root/result"
 readonly zlib_prefix="$build_root/zlib-install"
 readonly compiler="${cross_prefix}gcc"

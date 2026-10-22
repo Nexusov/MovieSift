@@ -137,14 +137,31 @@ foreach ($tool in @('ffmpeg', 'ffprobe')) {
     }
 
     $versionOutput = @(& $executable -version 2>&1 | ForEach-Object { "$_" })
-    $configuration = $versionOutput | Where-Object { $_.StartsWith('configuration: ', [StringComparison]::Ordinal) }
+    $versionExitCode = $LASTEXITCODE
+    $configurationLines = @($versionOutput | Where-Object { $_.StartsWith('configuration: ', [StringComparison]::Ordinal) })
+    $configuration = ''
+
+    if ($configurationLines.Count -eq 1) {
+        $configuration = $configurationLines[0]
+    }
+
     $invalidConfiguration = $configuration.Contains('--enable-nonfree') -or $configuration.Contains('--enable-gpl') -or
         $configuration.Contains('--enable-version3') -or $configuration.Contains('--enable-lib') -or
         -not $configuration.Contains('--disable-autodetect') -or -not $configuration.Contains('--disable-network') -or
         -not $configuration.Contains('--disable-everything') -or -not $configuration.Contains('--enable-zlib')
 
-    if ($LASTEXITCODE -or -not $versionOutput[0].StartsWith("$tool version $($toolLock.version) ", [StringComparison]::Ordinal) -or $invalidConfiguration) {
-        throw "The source-built $tool failed its exact version/configuration check."
+    $firstVersionLine = '<no version output>'
+
+    if ($versionOutput.Count) {
+        $firstVersionLine = $versionOutput[0]
+    }
+
+    $hasExpectedVersion = $firstVersionLine.StartsWith("$tool version $($toolLock.version) ", [StringComparison]::Ordinal)
+
+    if ($versionExitCode -or -not $hasExpectedVersion -or $invalidConfiguration) {
+        $maximumDiagnosticCharacters = 512
+        $diagnosticLine = $firstVersionLine.Substring(0, [Math]::Min($firstVersionLine.Length, $maximumDiagnosticCharacters))
+        throw "The source-built $tool failed its exact version/configuration check: exit=$versionExitCode; expectedVersion=$hasExpectedVersion; configurationAccepted=$(-not $invalidConfiguration); firstLine='$diagnosticLine'."
     }
 
     $versionOutput | Set-Content -LiteralPath (Join-Path $materialDirectory ($tool + '-version.txt')) -Encoding utf8NoBOM
