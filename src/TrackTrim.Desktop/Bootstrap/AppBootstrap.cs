@@ -47,7 +47,7 @@ internal static class AppBootstrap
         var batchViewModel = new BatchViewModel(new(batch,
             new BatchCoordinator(batch, new InspectionService(backend, sourceAccess), jobs, sourceAccess),
             new FileBatchInputDiscovery(sourceAccess, outputs, [dataDirectory]), dialogs, localization, dataWritable, logger,
-            new RulePresetService(new PortableRulePresetStore(dataDirectory))));
+            new RulePresetService(new PortableRulePresetStore(dataDirectory)), new PortableQueueListStore(dataDirectory)));
         window.DataContext = new MainViewModel(new(new InspectionService(backend, sourceAccess),
             jobs, settings, outputs, dialogs, localization, dataWritable, logger, batchViewModel));
         window.Closed += (_, _) => logger.Dispose();

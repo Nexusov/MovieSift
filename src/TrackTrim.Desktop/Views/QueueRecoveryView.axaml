@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:viewModels="using:TrackTrim.Desktop.ViewModels"
+             x:Class="TrackTrim.Desktop.Views.QueueRecoveryView"
+             x:DataType="viewModels:QueueRecoveryViewModel">
+  <Border Padding="12" BorderThickness="1" BorderBrush="Orange" CornerRadius="4">
+    <StackPanel Spacing="6">
+      <TextBlock x:Name="QueueRecoveryStatus" Text="{Binding StatusText}" TextWrapping="Wrap" FontWeight="SemiBold" />
+      <TextBlock Text="{Binding Localization[QueueRecoveryHelp]}" TextWrapping="Wrap" />
+      <ScrollViewer MaxHeight="96" IsVisible="{Binding HasRecoveryChoice}">
+        <TextBlock Text="{Binding SavedEntriesText}" TextWrapping="Wrap" />
+      </ScrollViewer>
+      <WrapPanel>
+        <Button x:Name="RestoreSavedQueueButton" Content="{Binding Localization[QueueRestore]}" Command="{Binding RestoreCommand}"
+                IsVisible="{Binding HasRecoveryChoice}" Margin="0,0,8,0" />
+        <Button x:Name="DiscardSavedQueueButton" Content="{Binding Localization[QueueDiscard]}" Command="{Binding DiscardCommand}"
+                IsVisible="{Binding HasRecoveryChoice}" Margin="0,0,8,0" />
+        <Button Content="{Binding Localization[QueueReload]}" Command="{Binding ReloadCommand}" />
+      </WrapPanel>
+      <TextBlock x:Name="QueueRecoveryError" Text="{Binding ErrorText}" IsVisible="{Binding HasFailure}" TextWrapping="Wrap" />
+      <Expander Header="{Binding Localization[Diagnostics]}" IsVisible="{Binding HasFailure}">
+        <TextBox Text="{Binding Diagnostics}" IsReadOnly="True" TextWrapping="Wrap" MaxHeight="96" />
+      </Expander>
+    </StackPanel>
+  </Border>
+</UserControl>

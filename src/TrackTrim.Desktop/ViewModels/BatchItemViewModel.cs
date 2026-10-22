@@ -27,9 +27,10 @@ public sealed class BatchItemViewModel : ObservableObject
     {
         this.options = options;
         item = options.Item;
-        outputFolder = options.OutputFolder;
-        outputDirectoryRoot = item.FolderOrigin is not null && !string.IsNullOrEmpty(outputFolder) ? outputFolder : null;
-        outputPath = string.IsNullOrEmpty(options.OutputFolder) ? string.Empty : DeriveDestination(options.OutputFolder);
+        outputFolder = item.IntendedOutputDirectoryRoot ?? options.OutputFolder;
+        outputDirectoryRoot = item.IntendedOutputDirectoryRoot ??
+            (item.FolderOrigin is not null && !string.IsNullOrEmpty(outputFolder) ? outputFolder : null);
+        outputPath = item.IntendedDestinationPath ?? (string.IsNullOrEmpty(options.OutputFolder) ? string.Empty : DeriveDestination(options.OutputFolder));
         ApplySnapshot(item);
     }
 
@@ -116,7 +117,7 @@ public sealed class BatchItemViewModel : ObservableObject
 
             outputDirectoryRoot = item.FolderOrigin is not null && OutputPathPolicy.IsWithinDirectory(outputFolder, value)
                 ? outputFolder : null;
-            Invalidate();
+            StoreDestination();
         }
     }
 
@@ -144,6 +145,12 @@ public sealed class BatchItemViewModel : ObservableObject
 
         var selectionChanged = !snapshot.CurrentRetainedTrackIds.SequenceEqual(item.CurrentRetainedTrackIds);
         item = snapshot;
+
+        if (snapshot.IntendedDestinationPath is { } intended)
+        {
+            outputPath = intended;
+            outputDirectoryRoot = snapshot.IntendedOutputDirectoryRoot;
+        }
 
         if (snapshot.Inspection is { } inspection && !ReferenceEquals(displayedInspection, inspection))
         {
@@ -225,7 +232,8 @@ public sealed class BatchItemViewModel : ObservableObject
 
         var destination = DeriveDestination(folder);
         var directoryRoot = item.FolderOrigin is not null ? folder : null;
-        var unchanged = outputPath == destination && outputDirectoryRoot == directoryRoot;
+        var unchanged = outputPath == destination && outputDirectoryRoot == directoryRoot &&
+            item.IntendedDestinationPath == destination && item.IntendedOutputDirectoryRoot == directoryRoot;
         outputFolder = folder;
 
         if (unchanged)
@@ -236,14 +244,16 @@ public sealed class BatchItemViewModel : ObservableObject
         outputPath = destination;
         outputDirectoryRoot = directoryRoot;
 
-        if (item.Inspection is null)
-        {
-            Refresh();
-            options.Changed();
-            return;
-        }
+        StoreDestination();
+    }
 
-        Invalidate();
+    /// <summary>Retains destination intent below presentation without creating approval authority.</summary>
+    private void StoreDestination()
+    {
+        var changed = options.Session.SetDestination(new(Id, outputPath, outputDirectoryRoot));
+        planningFailure = changed.Failure;
+        Refresh();
+        options.Changed();
     }
 
     /// <summary>Refreshes labels without changing the file's tracks, plan or outcome.</summary>

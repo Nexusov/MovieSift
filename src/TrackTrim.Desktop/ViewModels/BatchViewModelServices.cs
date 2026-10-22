@@ -15,4 +15,5 @@ public sealed record BatchViewModelServices(
     LocalizationService Localization,
     bool DataWritable,
     ILogger Log,
-    RulePresetService Presets);
+    RulePresetService Presets,
+    IQueueListStore QueueLists);
