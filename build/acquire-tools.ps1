@@ -100,7 +100,11 @@ if ($RuntimeIdentifier -eq 'win-x64') {
     Copy-Item -LiteralPath (Join-Path $distributionDirectory 'mkvmerge.exe') -Destination $destinationPath
     Copy-Item -LiteralPath (Join-Path $distributionDirectory 'mkvextract.exe') -Destination $destinationPath
     Copy-Item -LiteralPath (Join-Path $distributionDirectory 'doc') -Destination $licenseDirectory -Recurse
-    Copy-Item -LiteralPath (Join-Path $distributionDirectory 'data') -Destination $licenseDirectory -Recurse
+    & python (Join-Path $PSScriptRoot 'select-tool-payload.py') --runtime-identifier $RuntimeIdentifier --source $distributionDirectory --destination $destinationPath
+
+    if ($LASTEXITCODE) {
+        throw 'The pinned Windows GUI-asset omission policy did not match the upstream payload.'
+    }
     $mergeExecutable = Join-Path $destinationPath 'mkvmerge.exe'
     $extractExecutable = Join-Path $destinationPath 'mkvextract.exe'
 }
@@ -138,8 +142,12 @@ if ($RuntimeIdentifier -eq 'linux-x64') {
     New-Item -ItemType Directory -Path $binaryDirectory -Force | Out-Null
     Copy-Item -LiteralPath (Join-Path $extractedDirectory 'usr/bin/mkvmerge') -Destination $binaryDirectory
     Copy-Item -LiteralPath (Join-Path $extractedDirectory 'usr/bin/mkvextract') -Destination $binaryDirectory
-    # Preserve the upstream library closure conservatively, including its Qt-linked CLI dependencies.
-    Copy-Item -LiteralPath (Join-Path $extractedDirectory 'usr/lib') -Destination (Join-Path $applicationRoot 'usr') -Recurse
+    # Select only the unchanged, hash-verified CLI closure; every omitted upstream file is receipted.
+    & python (Join-Path $PSScriptRoot 'select-tool-payload.py') --runtime-identifier $RuntimeIdentifier --source $extractedDirectory --destination $destinationPath
+
+    if ($LASTEXITCODE) {
+        throw 'The pinned Linux CLI library selection did not match the upstream payload.'
+    }
 
     foreach ($toolName in @('mkvmerge', 'mkvextract')) {
         $wrapper = @'
@@ -183,20 +191,50 @@ $applicableMaterials = @($materialLock.materials | Where-Object runtimeIdentifie
 foreach ($material in $applicableMaterials) {
     $materialCache = Join-Path $cachePath $material.sha256
 
-    if (-not (Test-Path -LiteralPath $materialCache -PathType Leaf)) {
-        Invoke-WebRequest -Uri $material.url -OutFile $materialCache -TimeoutSec 120
+    if ($material.PSObject.Properties.Name -contains 'localFile') {
+        $materialCache = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot $material.localFile))
+        $buildPrefix = [IO.Path]::GetFullPath($PSScriptRoot) + [IO.Path]::DirectorySeparatorChar
+
+        if (-not $materialCache.StartsWith($buildPrefix, [StringComparison]::OrdinalIgnoreCase)) {
+            throw 'A collected notice must remain inside the repository build directory.'
+        }
+    }
+    elseif (-not (Test-Path -LiteralPath $materialCache -PathType Leaf)) {
+        Invoke-WebRequest -Uri $material.url -OutFile $materialCache -TimeoutSec 240
     }
 
     if ((Get-FileHash -LiteralPath $materialCache -Algorithm SHA256).Hash.ToLowerInvariant() -ne $material.sha256) {
-        throw "Upstream terms/header material hash mismatch: $($material.url)."
+        throw "Upstream source/notice material hash mismatch: $($material.path)."
     }
 
-    $materialTarget = Join-Path $licenseDirectory (Join-Path 'upstream-terms' $material.path)
+    foreach ($payload in $material.correspondsTo) {
+        $payloadPath = Join-Path $destinationPath $payload.path
+        $matchesMaterial = (Test-Path -LiteralPath $payloadPath -PathType Leaf) -and
+            (Get-Item -LiteralPath $payloadPath).Length -eq $payload.size -and
+            (Get-FileHash -LiteralPath $payloadPath -Algorithm SHA256).Hash.ToLowerInvariant() -eq $payload.sha256
+
+        if (-not $matchesMaterial) {
+            throw "A source material no longer corresponds to the actual shipped library: $($payload.path)."
+        }
+    }
+
+    $materialDirectory = 'upstream-terms'
+
+    if ($material.PSObject.Properties.Name -contains 'outputDirectory') {
+
+        if ($material.outputDirectory -ne 'corresponding-source') {
+            throw 'Unsupported included-material directory.'
+        }
+
+        $materialDirectory = $material.outputDirectory
+    }
+
+    $materialTarget = Join-Path $licenseDirectory (Join-Path $materialDirectory $material.path)
     New-Item -ItemType Directory -Path ([IO.Path]::GetDirectoryName($materialTarget)) -Force | Out-Null
     Copy-Item -LiteralPath $materialCache -Destination $materialTarget
 }
 
-ConvertTo-Json -InputObject $applicableMaterials -Depth 5 | Set-Content -LiteralPath (Join-Path $licenseDirectory 'upstream-materials.json') -Encoding utf8NoBOM
+ConvertTo-Json -InputObject $applicableMaterials -Depth 12 | Set-Content -LiteralPath (Join-Path $licenseDirectory 'upstream-materials.json') -Encoding utf8NoBOM
 & (Join-Path $PSScriptRoot 'acquire-ffmpeg.ps1') -RuntimeIdentifier $RuntimeIdentifier -Destination $destinationPath -CacheDirectory $cachePath
 $ffmpegLock = Get-Content -LiteralPath (Join-Path $destinationPath 'ffmpeg-provenance.json') -Raw | ConvertFrom-Json
 $ffmpegMembers = @{}
@@ -212,12 +250,26 @@ $fileProvenance = @(Get-ChildItem -LiteralPath $destinationPath -File -Recurse -
     $originArchiveHash = ''
     $originMember = ''
 
-    if ($relativePath.StartsWith('licenses/upstream-terms/')) {
-        $materialPath = $relativePath.Substring('licenses/upstream-terms/'.Length)
-        $material = $applicableMaterials | Where-Object path -EQ $materialPath
+    $material = $applicableMaterials | Where-Object {
+        $directory = 'upstream-terms'
+
+        if ($_.PSObject.Properties.Name -contains 'outputDirectory') {
+            $directory = $_.outputDirectory
+        }
+
+        $relativePath -eq ('licenses/' + $directory + '/' + $_.path)
+    }
+
+    if ($material) {
         $origin = $material.relationship
         $originArchive = $material.url
         $originArchiveHash = $material.sha256
+
+        if ($material.PSObject.Properties.Name -contains 'sourceArtifact') {
+            $originArchive = $material.sourceArtifact.url
+            $originArchiveHash = $material.sourceArtifact.sha256
+            $originMember = $material.sourceArtifact.member
+        }
     }
 
     if ($relativePath.StartsWith('licenses/source-notices/')) {
@@ -234,13 +286,13 @@ $fileProvenance = @(Get-ChildItem -LiteralPath $destinationPath -File -Recurse -
         $originMember = "mkvtoolnix-$($toolLock.version)/" + $relativePath.Substring('licenses/source-build-materials/'.Length)
     }
 
-    if ($relativePath.StartsWith('licenses/corresponding-source/')) {
+    if ($relativePath -eq ('licenses/corresponding-source/' + $sourceArchiveName)) {
         $origin = 'complete pinned source archive'
         $originArchive = $toolLock.source.url
         $originArchiveHash = $sourceHash
     }
 
-    $isWindowsPayload = $RuntimeIdentifier -eq 'win-x64' -and ($relativePath -in @('mkvmerge.exe', 'mkvextract.exe') -or $relativePath.StartsWith('licenses/doc/') -or $relativePath.StartsWith('licenses/data/'))
+    $isWindowsPayload = $RuntimeIdentifier -eq 'win-x64' -and ($relativePath -in @('mkvmerge.exe', 'mkvextract.exe') -or $relativePath.StartsWith('licenses/doc/'))
 
     if ($isWindowsPayload) {
         $origin = 'unchanged member of the pinned upstream binary ZIP'
@@ -257,38 +309,24 @@ $fileProvenance = @(Get-ChildItem -LiteralPath $destinationPath -File -Recurse -
     }
 
     if ($ffmpegMembers.ContainsKey($relativePath)) {
-        $member = $ffmpegMembers[$relativePath]
-        $artifact = $ffmpegLock.$RuntimeIdentifier
-
-        if ($member.artifactKind -ne 'binary') {
-            $artifact = $ffmpegLock.($member.artifactKind)
-        }
-
-        $origin = 'unchanged selected member of the pinned FFmpeg ' + $member.artifactKind + ' artifact'
-        $originArchive = $artifact.url
-        $originArchiveHash = $artifact.sha256
-        $originMember = $member.upstreamMember
+        $origin = 'source-built worker; exact inputs, local recipe, compiler and complete worker hash in licenses/ffmpeg/source-build/build-receipt.json'
+        $originArchive = $ffmpegLock.source.url
+        $originArchiveHash = $ffmpegLock.source.sha256
     }
 
-    foreach ($materialKind in @('source', 'buildRecipes')) {
+    foreach ($materialKind in @('source', 'zlib')) {
 
         if ($relativePath -eq ('licenses/ffmpeg/' + $ffmpegLock.$materialKind.fileName)) {
-            $origin = 'complete pinned FFmpeg ' + $materialKind + ' archive'
+            $origin = 'complete pinned FFmpeg ' + $materialKind + ' source archive'
             $originArchive = $ffmpegLock.$materialKind.url
             $originArchiveHash = $ffmpegLock.$materialKind.sha256
         }
     }
 
-    if ($relativePath -eq 'licenses/ffmpeg/checksums.sha256') {
-        $origin = 'published FFmpeg binary checksum list'
-        $originArchive = $ffmpegLock.checksums.url
-        $originArchiveHash = $ffmpegLock.checksums.sha256
-    }
-
     $isGeneratedFfmpegMaterial = ($relativePath.StartsWith('licenses/ffmpeg/') -and -not $originArchiveHash) -or $relativePath -eq 'ffmpeg-provenance.json'
 
     if ($isGeneratedFfmpegMaterial) {
-        $origin = 'generated by build/acquire-ffmpeg.ps1 and build/ffmpeg.lock.json; exact executed version/configuration or pinned recipe declarations'
+        $origin = 'generated by build/acquire-ffmpeg.ps1 and build/ffmpeg.lock.json; exact executed version/configuration, local source-build recipe and bound source/compiler/worker receipt'
     }
 
     [ordered]@{

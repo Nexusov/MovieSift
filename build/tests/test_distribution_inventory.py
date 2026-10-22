@@ -62,17 +62,43 @@ class DistributionInventoryTests(unittest.TestCase):
         }])
         self.write("tools/ffmpeg.exe", b"tiny ffmpeg stand-in")
         self.write("tools/ffprobe.exe", b"tiny ffprobe stand-in")
-        ffmpeg_lock = {"version": "test-pinned", "win-x64": {"sha256": "4" * 64}}
-        for key, name in (("source", "source.tar.gz"), ("buildRecipes", "recipes.tar.gz"), ("checksums", "checksums.sha256")):
-            self.write("tools/licenses/ffmpeg/" + name, ("small " + key + " stand-in").encode())
+        ffmpeg_lock = {"schemaVersion": 2, "version": "test-pinned", "recipe": "build-ffmpeg.sh"}
+        for key, name in (("source", "source.tar.gz"), ("zlib", "zlib.tar.xz")):
+            self.write("tools/licenses/ffmpeg/" + name, ("small " + key + " source stand-in").encode())
             ffmpeg_lock[key] = {"fileName": name, "sha256": INVENTORY.file_hash(self.root / "tools/licenses/ffmpeg" / name)}
+        ffmpeg_lock["zlib"]["version"] = "1.3.2"
+        self.write("tools/licenses/ffmpeg/build-recipes/build-ffmpeg.sh", b"controlled source recipe")
+        ffmpeg_lock["recipeSha256"] = INVENTORY.file_hash(self.root / "tools/licenses/ffmpeg/build-recipes/build-ffmpeg.sh")
+        receipt = {"schemaVersion": 1, "runtimeIdentifier": "win-x64", "version": "test-pinned",
+                   "sourceSha256": ffmpeg_lock["source"]["sha256"], "zlibSha256": ffmpeg_lock["zlib"]["sha256"],
+                   "recipeSha256": ffmpeg_lock["recipeSha256"], "workers": [], "materials": [],
+                   "staticExternalDependencies": [{"component": "zlib", "version": "1.3.2", "sourceSha256": ffmpeg_lock["zlib"]["sha256"]}]}
+        for name in ("ffmpeg.exe", "ffprobe.exe"):
+            receipt["workers"].append({"path": name, "size": (self.root / "tools" / name).stat().st_size,
+                                       "sha256": INVENTORY.file_hash(self.root / "tools" / name)})
+        material_names = ("configure-arguments.txt", "configure-output.txt", "config.h", "config_components.h", "config.mak",
+                          "compiler-version.txt", "compiler-target.txt", "compiler-runtime-macros.txt", "make-version.txt",
+                          "assembler-version.txt", "build-host.txt")
+        for name in material_names:
+            target = "tools/licenses/ffmpeg/source-build/" + name
+            self.write(target, ("controlled " + name).encode())
+            receipt["materials"].append({"path": name, "size": (self.root / target).stat().st_size,
+                                         "sha256": INVENTORY.file_hash(self.root / target)})
+        self.json("tools/licenses/ffmpeg/source-build/build-receipt.json", receipt)
+        ffmpeg_lock["buildReceiptSha256"] = INVENTORY.file_hash(self.root / "tools/licenses/ffmpeg/source-build/build-receipt.json")
         self.json("ffmpeg-provenance.json", ffmpeg_lock)
         self.json("tools/ffmpeg-provenance.json", ffmpeg_lock)
         for tool in ("ffmpeg", "ffprobe"):
             self.write("tools/licenses/ffmpeg/" + tool + "-version.txt", (tool + " version test-pinned Copyright fixture\n").encode())
-            self.write("tools/licenses/ffmpeg/" + tool + "-buildconf.txt", b"configuration: --enable-version3 --disable-libx264\n")
-        self.json("tools/licenses/ffmpeg/dependency-recipes.json", {"recipes": []})
+            self.write("tools/licenses/ffmpeg/" + tool + "-buildconf.txt", b"configuration: --disable-autodetect --disable-network --disable-everything --enable-zlib\n")
+        for name in ("GCC-GPL-3.0.txt", "GCC-Runtime-Exception-3.1.txt", "MinGW-w64-13.0.0-COPYING.MinGW-w64-runtime.txt"):
+            self.write("tools/licenses/upstream-terms/compiler-runtime/" + name, b"controlled complete notice stand-in")
         self.json("tools/licenses/ffmpeg/runtime-dependencies.json", {"runtimeIdentifier": "win-x64", "workers": [{"path": name, "sha256": INVENTORY.file_hash(self.root / "tools" / name)} for name in ("ffmpeg.exe", "ffprobe.exe")]})
+        self.selection_policy = {"schemaVersion": 1, "win-x64": {"artifactSha256": "2" * 64, "includedFiles": [], "omittedFiles": []}}
+        self.json("tools/licenses/payload-selection.lock.json", self.selection_policy)
+        self.json("tools/payload-selection.json", {"schemaVersion": 1, "runtimeIdentifier": "win-x64", "artifactSha256": "2" * 64,
+                                                  "policySha256": INVENTORY.file_hash(self.root / "tools/licenses/payload-selection.lock.json"),
+                                                  "includedFiles": [], "omittedFiles": []})
         tool_records = []
         for path in (self.root / "tools").rglob("*"):
 
@@ -203,7 +229,7 @@ class DistributionInventoryTests(unittest.TestCase):
         """Retained unused tool libraries still require acquisition evidence."""
         self.write("tools/app-root/usr/lib/unused.a", b"static archive")
         self.pack()
-        with self.assertRaisesRegex(ValueError, "does not cover all retained"):
+        with self.assertRaisesRegex(ValueError, "undeclared CLI library"):
             self.generate()
 
     def test_wrong_native_observation_platform_is_excluded(self):
@@ -232,13 +258,14 @@ class DistributionInventoryTests(unittest.TestCase):
         ffmpeg = next(row for row in report["files"] if row["path"] == "tools/ffmpeg.exe")
         self.assertEqual(ffmpeg["componentVersion"], "test-pinned")
         self.assertEqual(ffmpeg["category"], "bundled-executable")
-        self.assertTrue(any(row["component"] == "FFmpeg static third-party closure" for row in report["unresolved"]))
+        self.assertEqual(report["ffmpegProvenance"]["recipeSha256"], INVENTORY.file_hash(self.root / "tools/licenses/ffmpeg/build-recipes/build-ffmpeg.sh"))
+        self.assertFalse(any(row["component"] == "FFmpeg static third-party closure" for row in report["unresolved"]))
 
     def test_ffmpeg_source_or_recipe_hash_must_match(self):
         """A similarly named source/build archive cannot satisfy the new tool evidence."""
-        self.write("tools/licenses/ffmpeg/recipes.tar.gz", b"wrong recipes")
+        self.write("tools/licenses/ffmpeg/build-recipes/build-ffmpeg.sh", b"wrong recipes")
         self.pack()
-        with self.assertRaisesRegex(ValueError, "FFmpeg source/build archive"):
+        with self.assertRaisesRegex(ValueError, "FFmpeg local source-build recipe/receipt"):
             self.generate()
 
     def test_nonfree_or_gpl_configuration_is_not_the_selected_build(self):
@@ -255,18 +282,63 @@ class DistributionInventoryTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "ffplay must not be distributed"):
             self.generate()
 
+    def test_lgpl_v3_configuration_cannot_claim_lgpl_21(self):
+        """Keep the effective license consistent with the explicitly selected build."""
+        path = self.root / "tools/licenses/ffmpeg/ffmpeg-buildconf.txt"
+        path.write_text(path.read_text() + " --enable-version3", encoding="utf-8")
+        self.pack()
+        with self.assertRaisesRegex(ValueError, "outside the pinned LGPL build"):
+            self.generate()
+
     def test_missing_ffprobe_cannot_silently_produce_inventory(self):
         """Both required executables must be actual package payloads."""
         (self.root / "tools/ffprobe.exe").unlink()
         self.pack()
-        with self.assertRaisesRegex(ValueError, "executable is missing"):
+        with self.assertRaisesRegex(ValueError, "does not match the actual worker/material"):
             self.generate()
 
     def test_dependency_observation_must_match_actual_ffmpeg_worker(self):
         """Do not carry a native-dependency receipt across different binary builds."""
         self.write("tools/ffmpeg.exe", b"substituted worker")
         self.pack()
-        with self.assertRaisesRegex(ValueError, "does not match the actual worker"):
+        with self.assertRaisesRegex(ValueError, "does not match the actual worker/material"):
+            self.generate()
+
+    def test_package_must_preserve_acquired_build_provenance(self):
+        """A bare input lock must not overwrite the acquisition's actual recipe/worker receipt."""
+        lock = json.loads((self.root / "ffmpeg-provenance.json").read_text())
+        lock.pop("recipeSha256")
+        lock.pop("buildReceiptSha256")
+        self.json("ffmpeg-provenance.json", lock)
+        self.pack()
+        with self.assertRaisesRegex(ValueError, "package and acquisition provenance differ"):
+            self.generate()
+
+    def test_missing_source_build_material_fails_visibly(self):
+        """A version label alone cannot replace complete source/configuration evidence."""
+        (self.root / "tools/licenses/ffmpeg/source-build/config.h").unlink()
+        self.pack()
+        with self.assertRaisesRegex(ValueError, "actual worker/material"):
+            self.generate()
+
+    def test_changed_zlib_source_is_rejected(self):
+        """The one explicit static dependency must retain its exact complete source archive."""
+        self.write("tools/licenses/ffmpeg/zlib.tar.xz", b"different similarly named source")
+        self.pack()
+        with self.assertRaisesRegex(ValueError, "FFmpeg/zlib source archive"):
+            self.generate()
+
+    def test_receipted_omitted_asset_cannot_reappear(self):
+        """The exact omission policy is checked against the actual package files."""
+        omitted = {"previousPackagePath": "licenses/data/gui-resource.rcc", "sourceMember": "data/gui-resource.rcc", "size": 1, "sha256": "0" * 64}
+        self.selection_policy["win-x64"]["omittedFiles"] = [omitted]
+        self.json("tools/licenses/payload-selection.lock.json", self.selection_policy)
+        self.json("tools/payload-selection.json", {"schemaVersion": 1, "runtimeIdentifier": "win-x64", "artifactSha256": "2" * 64,
+                                                  "policySha256": INVENTORY.file_hash(self.root / "tools/licenses/payload-selection.lock.json"),
+                                                  "includedFiles": [], "omittedFiles": [omitted]})
+        self.write("tools/licenses/data/gui-resource.rcc", b"unwanted")
+        self.pack()
+        with self.assertRaisesRegex(ValueError, "expressly excluded"):
             self.generate()
 
 

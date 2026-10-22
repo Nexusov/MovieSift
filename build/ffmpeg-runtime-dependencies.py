@@ -6,6 +6,28 @@ import json
 from pathlib import Path
 import struct
 import subprocess
+import re
+
+
+WINDOWS_SYSTEM_LIBRARIES = frozenset({
+    "advapi32.dll", "bcrypt.dll", "kernel32.dll", "msvcrt.dll", "ntdll.dll", "ole32.dll", "shell32.dll",
+    "user32.dll", "userenv.dll", "ucrtbase.dll", "version.dll", "winmm.dll", "ws2_32.dll",
+})
+LINUX_SYSTEM_LIBRARIES = frozenset({
+    "linux-vdso.so.1", "ld-linux-x86-64.so.2", "libc.so.6", "libm.so.6", "libmvec.so.1",
+    "libdl.so.2", "librt.so.1", "libpthread.so.0", "libgcc_s.so.1",
+})
+
+
+def validate_runtime_libraries(names, runtime_identifier):
+    """Do not let a compiler silently add an undeclared optional/native dependency."""
+    for name in names:
+        normalized = name.casefold() if runtime_identifier == "win-x64" else name
+        is_api_set = runtime_identifier == "win-x64" and normalized.endswith(".dll") and normalized.startswith(("api-ms-win-", "ext-ms-win-"))
+        allowed = normalized in (WINDOWS_SYSTEM_LIBRARIES if runtime_identifier == "win-x64" else LINUX_SYSTEM_LIBRARIES)
+
+        if not allowed and not is_api_set:
+            raise ValueError("Unexpected source-built FFmpeg runtime library: " + name)
 
 
 def windows_imports(path):
@@ -82,6 +104,7 @@ def generate(directory, runtime_identifier, output):
 
         if extension:
             row["ordinaryPeImports"] = windows_imports(path)
+            validate_runtime_libraries(row["ordinaryPeImports"], runtime_identifier)
             row["method"] = "Bounded read of ordinary PE32+ import descriptors; Windows system DLLs supplied by the declared OS"
         else:
             result = subprocess.run(["ldd", str(path)], capture_output=True, text=True, check=False, timeout=30)
@@ -90,12 +113,15 @@ def generate(directory, runtime_identifier, output):
             if "not found" in dependency_text or (result.returncode and "not a dynamic executable" not in dependency_text):
                 raise ValueError("Unresolved FFmpeg runtime dependency: " + dependency_text)
 
+            libraries = re.findall(r"(?:^|\n)\s*(?:/[^\s]*/)?([^\s/]+\.so(?:\.[0-9]+)*)(?:\s|$)", dependency_text)
+            validate_runtime_libraries(libraries, runtime_identifier)
+
             row["ldd"] = dependency_text.strip()
             row["method"] = "Actual ldd resolution on the matching Linux builder; package/container execution is checked separately"
 
         workers.append(row)
 
-    output.write_text(json.dumps({"schemaVersion": 1, "runtimeIdentifier": runtime_identifier, "workers": workers, "limits": "Optional runtime-loaded hardware drivers are not required for the supported stream-copy workflow; static third-party components remain covered by source/build reconciliation."}, indent=2) + "\n", encoding="utf-8")
+    output.write_text(json.dumps({"schemaVersion": 1, "runtimeIdentifier": runtime_identifier, "workers": workers, "limits": "The explicit source build disables autodetection/network and statically includes only the pinned zlib beyond native FFmpeg code. Ordinary dynamic imports are restricted to the declared OS/compiler runtime; mandatory package/container execution is checked separately."}, indent=2) + "\n", encoding="utf-8")
 
 
 def main():

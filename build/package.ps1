@@ -74,7 +74,7 @@ try {
 
     Copy-Item -LiteralPath (Join-Path $repositoryRoot 'docs') -Destination $packageRoot -Recurse
     Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'tools.lock.json') -Destination (Join-Path $packageRoot 'tool-provenance.json')
-    Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'ffmpeg.lock.json') -Destination (Join-Path $packageRoot 'ffmpeg-provenance.json')
+    Copy-Item -LiteralPath (Join-Path $packageRoot 'tools/ffmpeg-provenance.json') -Destination (Join-Path $packageRoot 'ffmpeg-provenance.json')
     & (Join-Path $PSScriptRoot 'collect-licenses.ps1') -AssetsFile (Join-Path $repositoryRoot 'src/TrackTrim.Desktop/obj/project.assets.json') -Destination (Join-Path $licenseRoot 'nuget') -AdditionalPackages @("Microsoft.NETCore.App.Runtime.$RuntimeIdentifier/$runtimeVersion") -CacheDirectory (Join-Path $ToolCacheDirectory 'license-materials')
     Set-Content -LiteralPath (Join-Path $licenseRoot 'APPLICATION-LICENSE-PENDING.txt') -Encoding utf8NoBOM -Value 'No license for original TrackTrim code has been selected. These are review/test artifacts, not public release artifacts. Consult THIRD_PARTY_NOTICES.md for outstanding corresponding-source and redistribution work.'
     $runtimeConfiguration = Get-Content -LiteralPath (Join-Path $packageRoot 'TrackTrim.runtimeconfig.json') -Raw | ConvertFrom-Json

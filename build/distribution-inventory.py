@@ -243,11 +243,11 @@ def classify(records, origins, components, tool_lock, profile):
             if ffmpeg_material:
                 record.update(origin="Pinned FFmpeg source/build/binary acquisition; see ffmpegProvenance")
 
-            if name.endswith((".tar.xz", ".tar.gz")):
+            if name.endswith((".tar.xz", ".tar.gz", ".src.rpm")):
                 record["category"] = "included-source-archive"
 
             if name in ("tools/ffmpeg.exe", "tools/ffprobe.exe", "tools/ffmpeg", "tools/ffprobe"):
-                record.update(category="bundled-executable", component="FFmpeg", origin="Unchanged selected member of pinned static LGPL binary artifact", staticComponentStatus="Actual build configuration and pinned dependency recipes recorded; source/build reconciliation remains explicit")
+                record.update(category="bundled-executable", component="FFmpeg", origin="Source-built from the pinned FFmpeg and static zlib archives", staticComponentStatus="Exact source, local recipe, compiler/target and complete worker hashes are recorded; no optional external codec libraries")
                 continue
 
             if "/app-root/usr/lib/" in name:
@@ -293,14 +293,26 @@ def tool_origins(root, records, tool_lock, runtime_identifier, ffmpeg_lock):
     provenance = read_json(root / "tools/file-provenance.json")
     supplemental = read_json(root / "tools/licenses/upstream-materials.json")
     permitted_hashes = {tool_lock["source"]["sha256"], tool_lock[runtime_identifier]["sha256"]}
-    permitted_hashes.update(ffmpeg_lock[key]["sha256"] for key in (runtime_identifier, "source", "buildRecipes", "checksums"))
+    permitted_hashes.update(ffmpeg_lock[key]["sha256"] for key in ("source", "zlib"))
     for material in supplemental:
-        name = "tools/licenses/upstream-terms/" + relative_path(material["path"])
+        directory = material.get("outputDirectory", "upstream-terms")
+
+        if directory not in ("upstream-terms", "corresponding-source"):
+            raise ValueError("Unsupported included-material directory")
+
+        name = "tools/licenses/" + directory + "/" + relative_path(material["path"])
 
         if name not in records or records[name]["sha256"] != material["sha256"]:
             raise ValueError("An included upstream terms/header material is missing or changed")
 
         permitted_hashes.add(material["sha256"])
+        if material.get("sourceArtifact"):
+            permitted_hashes.add(material["sourceArtifact"]["sha256"])
+        for payload in material.get("correspondsTo", []):
+            shipped = records.get("tools/" + relative_path(payload["path"]))
+
+            if shipped is None or shipped["sha256"] != payload["sha256"] or shipped["size"] != payload["size"]:
+                raise ValueError("Included source material does not correspond to the actual shipped library")
     observed = set()
     for origin in provenance:
         name = "tools/" + relative_path(origin["path"])
@@ -322,6 +334,39 @@ def tool_origins(root, records, tool_lock, runtime_identifier, ffmpeg_lock):
         raise ValueError("Tool acquisition evidence does not cover all retained payloads")
 
 
+def payload_selection_evidence(root, records, tool_lock, runtime_identifier):
+    """Require exact, auditable omissions rather than silently dropping unknown upstream files."""
+    receipt = read_json(root / "tools/payload-selection.json")
+    policy_path = root / "tools/licenses/payload-selection.lock.json"
+    policy = read_json(policy_path)
+    selected = policy[runtime_identifier]
+    matching_identity = receipt["schemaVersion"] == 1 and receipt["runtimeIdentifier"] == runtime_identifier \
+        and receipt["policySha256"] == file_hash(policy_path) \
+        and receipt["artifactSha256"] == selected["artifactSha256"] == tool_lock[runtime_identifier]["sha256"]
+
+    if not matching_identity or receipt["includedFiles"] != selected["includedFiles"] or receipt["omittedFiles"] != selected["omittedFiles"]:
+        raise ValueError("Tool payload selection does not match the pinned artifact/policy")
+
+    for row in receipt["includedFiles"]:
+        name = "tools/" + relative_path(row["path"])
+
+        if name not in records or records[name]["sha256"] != row["sha256"] or records[name]["size"] != row["size"]:
+            raise ValueError("A required CLI library was omitted or changed")
+
+    for row in receipt["omittedFiles"]:
+
+        if "tools/" + relative_path(row["previousPackagePath"]) in records:
+            raise ValueError("A payload expressly excluded by the CLI selection was distributed")
+
+    actual_libraries = {name for name in records if name.startswith("tools/app-root/usr/lib/")}
+    declared_libraries = {"tools/" + row["path"] for row in receipt["includedFiles"]}
+
+    if actual_libraries != declared_libraries:
+        raise ValueError("The package contains an undeclared CLI library")
+
+    return receipt
+
+
 def ffmpeg_evidence(root, records, runtime_identifier):
     """Require actual binaries and exact source/build/configuration material for this RID."""
     lock = read_json(root / "ffmpeg-provenance.json")
@@ -334,16 +379,41 @@ def ffmpeg_evidence(root, records, runtime_identifier):
     if any(PurePosixPath(name).name in ("ffplay", "ffplay.exe") for name in records):
         raise ValueError("Unneeded ffplay must not be distributed")
 
-    for key in ("source", "buildRecipes"):
+    for key in ("source", "zlib"):
         name = "tools/licenses/ffmpeg/" + relative_path(lock[key]["fileName"])
 
         if name not in records or records[name]["sha256"] != lock[key]["sha256"]:
-            raise ValueError("Pinned FFmpeg source/build archive missing or changed")
+            raise ValueError("Pinned FFmpeg/zlib source archive missing or changed")
 
-    checksum_name = "tools/licenses/ffmpeg/checksums.sha256"
+    recipe_name = "tools/licenses/ffmpeg/build-recipes/" + relative_path(lock["recipe"])
+    receipt_name = "tools/licenses/ffmpeg/source-build/build-receipt.json"
 
-    if checksum_name not in records or records[checksum_name]["sha256"] != lock["checksums"]["sha256"]:
-        raise ValueError("Pinned FFmpeg publisher checksum list missing or changed")
+    if recipe_name not in records or records[recipe_name]["sha256"] != lock["recipeSha256"] \
+            or receipt_name not in records or records[receipt_name]["sha256"] != lock["buildReceiptSha256"]:
+        raise ValueError("FFmpeg local source-build recipe/receipt missing or changed")
+
+    receipt = read_json(root / receipt_name)
+    matching_inputs = receipt["schemaVersion"] == 1 and receipt["runtimeIdentifier"] == runtime_identifier \
+        and receipt["version"] == lock["version"] and receipt["sourceSha256"] == lock["source"]["sha256"] \
+        and receipt["zlibSha256"] == lock["zlib"]["sha256"] and receipt["recipeSha256"] == lock["recipeSha256"]
+    expected_workers = {tool + extension for tool in ("ffmpeg", "ffprobe")}
+    expected_materials = {"configure-arguments.txt", "configure-output.txt", "config.h", "config_components.h", "config.mak",
+                          "compiler-version.txt", "compiler-target.txt", "compiler-runtime-macros.txt", "make-version.txt",
+                          "assembler-version.txt", "build-host.txt"}
+    complete_receipt = len(receipt["workers"]) == len(expected_workers) \
+        and {row["path"] for row in receipt["workers"]} == expected_workers \
+        and len(receipt["materials"]) == len(expected_materials) \
+        and {row["path"] for row in receipt["materials"]} == expected_materials
+
+    if not matching_inputs or not complete_receipt:
+        raise ValueError("FFmpeg source-build receipt inputs or complete worker/material set differ")
+
+    for row in receipt["workers"] + receipt["materials"]:
+        prefix = "tools/" if row in receipt["workers"] else "tools/licenses/ffmpeg/source-build/"
+        name = prefix + relative_path(row["path"])
+
+        if name not in records or records[name]["sha256"] != row["sha256"] or records[name]["size"] != row["size"]:
+            raise ValueError("FFmpeg source-build receipt does not match the actual worker/material")
 
     for tool in ("ffmpeg", "ffprobe"):
         name = "tools/" + tool + extension
@@ -353,7 +423,9 @@ def ffmpeg_evidence(root, records, runtime_identifier):
 
         version = (root / "tools/licenses/ffmpeg" / (tool + "-version.txt")).read_text(encoding="utf-8-sig")
         configuration = (root / "tools/licenses/ffmpeg" / (tool + "-buildconf.txt")).read_text(encoding="utf-8-sig")
-        invalid_configuration = "--enable-nonfree" in configuration or "--enable-gpl" in configuration or "--enable-version3" not in configuration
+        required_configuration = ("--disable-autodetect", "--disable-network", "--disable-everything", "--enable-zlib")
+        invalid_configuration = "--enable-nonfree" in configuration or "--enable-gpl" in configuration or "--enable-version3" in configuration \
+            or "--enable-lib" in configuration or not all(flag in configuration for flag in required_configuration)
 
         if not version.startswith(tool + " version " + lock["version"] + " ") or invalid_configuration:
             raise ValueError("FFmpeg actual version/configuration is outside the pinned LGPL build")
@@ -372,10 +444,23 @@ def ffmpeg_evidence(root, records, runtime_identifier):
         if worker["sha256"] != records["tools/" + worker["path"]]["sha256"]:
             raise ValueError("FFmpeg runtime dependency evidence does not match the actual worker")
 
+    expected_static_dependencies = [{"component": "zlib", "version": lock["zlib"]["version"], "sourceSha256": lock["zlib"]["sha256"]}]
+
+    if receipt["staticExternalDependencies"] != expected_static_dependencies:
+        raise ValueError("FFmpeg static dependency receipt differs from the explicit source-built closure")
+
+    required_notices = ["GCC-GPL-3.0.txt", "GCC-Runtime-Exception-3.1.txt"]
+
+    if runtime_identifier == "win-x64":
+        required_notices.append("MinGW-w64-13.0.0-COPYING.MinGW-w64-runtime.txt")
+
+    if any("tools/licenses/upstream-terms/compiler-runtime/" + name not in records for name in required_notices):
+        raise ValueError("Source-built compiler-runtime notices/exception are missing")
+
     return lock
 
 
-def native_evidence(profile, records, tool_lock, runtime_identifier, components):
+def native_evidence(profile, records, tool_lock, runtime_identifier, components, omitted_paths=frozenset()):
     """Apply bounded researched observations only to the pinned, actually shipped components."""
     if profile["pinnedTools"][runtime_identifier] != tool_lock[runtime_identifier]["sha256"]:
         raise ValueError("Native research profile is for a different pinned tool artifact")
@@ -391,6 +476,13 @@ def native_evidence(profile, records, tool_lock, runtime_identifier, components)
 
         if owner and "nuget:" + owner not in component_ids:
             continue
+
+        paths = row.get("paths", [])
+
+        if paths and all(name in omitted_paths for name in paths):
+            continue
+
+        row = dict(row, paths=[name for name in paths if name not in omitted_paths]) if paths else row
 
         for name in row.get("paths", []):
 
@@ -433,25 +525,28 @@ def generate(package_root, archive, assets_file, output, profile_file):
     origins, components = nuget_origins(read_json(assets_file), packages, records)
     profile = read_json(profile_file)
     classify(records, origins, components, tool_lock, profile)
+    selection = payload_selection_evidence(root, records, tool_lock, build["runtimeIdentifier"])
     ffmpeg_lock = ffmpeg_evidence(root, records, build["runtimeIdentifier"])
     tool_origins(root, records, tool_lock, build["runtimeIdentifier"], ffmpeg_lock)
-    observations = native_evidence(profile, records, tool_lock, build["runtimeIdentifier"], components)
+    omitted_paths = {"tools/" + row["previousPackagePath"] for row in selection["omittedFiles"]}
+    observations = native_evidence(profile, records, tool_lock, build["runtimeIdentifier"], components, omitted_paths)
     unknowns = [name for name, record in records.items() if record["category"] == "unresolved-origin"]
     report = {
         "schemaVersion": 1, "purpose": "Distribution inventory and unresolved licensing preparation; not legal approval",
         "redistributionReady": False, "build": build,
         "archive": {"name": archive.name, "size": archive.stat().st_size, "sha256": file_hash(archive)},
         "manifest": records["SHA256SUMS"], "toolProvenance": tool_lock, "ffmpegProvenance": ffmpeg_lock,
+        "toolPayloadSelection": selection,
         "inventoryGeneratorSha256": file_hash(Path(__file__)),
         "mechanicalChecks": {"manifestCoverage": "passed", "archiveMatchesStaging": "passed", "includedMaterialReferences": "passed", "pinnedMkvSourceHash": "passed", "pinnedFfmpegSourceBuildAndVersion": "passed"},
         "counts": dict(Counter(record["category"] for record in records.values())),
         "files": list(records.values()), "nugetComponents": components,
-        "buildOnlyDependencies": [".NET SDK (version in build provenance)", "xUnit, Microsoft.NET.Test.Sdk, test runner and Avalonia.Headless (test projects only)", "Python, PowerShell, archive utilities and Linux build/container tools"],
+        "buildOnlyDependencies": [".NET SDK (version in build provenance)", "xUnit, Microsoft.NET.Test.Sdk, test runner and Avalonia.Headless (test projects only)", "Python, PowerShell, archive utilities and Linux build/container tools", "GCC/MinGW-w64, binutils, Make, NASM and MSYS2; actual compiler/target and build-tool evidence is bound by the FFmpeg source-build receipt"],
         "nativeComponentEvidence": observations,
-        "unresolved": profile["unresolved"] + [{"component": "FFmpeg static third-party closure", "missing": "Reconcile actual linked optional components and their complete notices/source/build material against the exact included recipe tree; recipe source declarations alone are not binary/source attestations", "nextAction": "Use included actual buildconf, dependency-recipes.json and complete pinned recipe/patch archive before public redistribution"}] + [{"component": name, "missing": "Exact origin/version and applicable materials", "nextAction": "Inspect the unmatched actual payload before release"} for name in unknowns],
+        "unresolved": profile["unresolved"] + [{"component": name, "missing": "Exact origin/version and applicable materials", "nextAction": "Inspect the unmatched actual payload before release"} for name in unknowns],
         "limits": [
             "NuGet match proves byte identity to a signed archive member, not complete source or legal compliance.",
-            "No payload is omitted because a CLI does not load it; retained AppImage libraries and static archives remain distributed.",
+            "Omissions are limited to the hash-pinned CLI selection, backed by source, dependency, representative runtime and mandatory packaged-workflow evidence.",
             "Third-party-notice inclusion alone does not prove which optional components were compiled.",
             "Original TrackTrim license, combined-work analysis and corresponding-source/build completeness remain open.",
         ],
@@ -465,10 +560,18 @@ def generate(package_root, archive, assets_file, output, profile_file):
         "ffmpeg-provenance.json": "ffmpeg-provenance.json",
         "tools/file-provenance.json": "tool-file-provenance.json",
         "tools/licenses/upstream-materials.json": "upstream-materials.json",
+        "tools/payload-selection.json": "tool-payload-selection.json",
     }.items():
         shutil.copyfile(root / source, output / destination)
-    for name in ("ffmpeg-version.txt", "ffprobe-version.txt", "ffmpeg-buildconf.txt", "ffprobe-buildconf.txt", "dependency-recipes.json", "runtime-dependencies.json"):
+    for name in ("ffmpeg-version.txt", "ffprobe-version.txt", "ffmpeg-buildconf.txt", "ffprobe-buildconf.txt", "runtime-dependencies.json"):
         shutil.copyfile(root / "tools/licenses/ffmpeg" / name, output / name)
+    shutil.copyfile(root / "tools/licenses/ffmpeg/source-build/build-receipt.json", output / "ffmpeg-build-receipt.json")
+    build_receipt = read_json(root / "tools/licenses/ffmpeg/source-build/build-receipt.json")
+    build_evidence = output / "ffmpeg-source-build"
+    build_evidence.mkdir(exist_ok=True)
+    for material in build_receipt["materials"]:
+        name = relative_path(material["path"])
+        shutil.copyfile(root / "tools/licenses/ffmpeg/source-build" / name, build_evidence / name)
     print(f"Distribution inventory: {report_path.name}; {len(records)} shipped files; {len(unknowns)} unmatched origins; redistribution remains pending")
     return report
 
