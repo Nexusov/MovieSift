@@ -21,7 +21,10 @@ public sealed record TrackLanguageRule(
     LanguageRuleMode Mode,
     ImmutableArray<string> Languages,
     TrackTitleFilter? TitleFilter = null);
-public sealed record LanguageRules(TrackLanguageRule Audio, TrackLanguageRule Subtitles);
+public sealed record LanguageRules(
+    TrackLanguageRule Audio,
+    TrackLanguageRule Subtitles,
+    bool KeepOnlyForcedSubtitles = false);
 public sealed record LanguageSelectionRequest(
     MediaInspection Inspection,
     ImmutableArray<int> CurrentRetainedTrackIds,
@@ -43,4 +46,5 @@ internal sealed record CategoryLanguageSelection(
     TrackLanguageRule? Rule,
     ImmutableArray<MediaTrack> Tracks,
     HashSet<int> RetainedIdentifiers,
-    ImmutableArray<LanguageRuleIssue>.Builder Issues);
+    ImmutableArray<LanguageRuleIssue>.Builder Issues,
+    bool KeepOnlyForcedSubtitles = false);

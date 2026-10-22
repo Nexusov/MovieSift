@@ -206,6 +206,8 @@
   <data name="RuleAudioTitleContains" xml:space="preserve"><value>Audio title contains (literal text)</value></data>
   <data name="RuleSubtitleTitleFilter" xml:space="preserve"><value>Also require subtitle title to contain text</value></data>
   <data name="RuleSubtitleTitleContains" xml:space="preserve"><value>Subtitle title contains (literal text)</value></data>
+  <data name="RuleForcedSubtitlesOnly" xml:space="preserve"><value>Keep only forced subtitles</value></data>
+  <data name="RuleForcedSubtitleHelp" xml:space="preserve"><value>Uses the MKV track's forced flag in addition to language and optional title. Selects whole tracks; subtitle text and individual events are not inspected.</value></data>
   <data name="RuleTitleHelp" xml:space="preserve"><value>Optional title text is combined with the language rule. It matches the actual track title, ignoring case and trimming surrounding search whitespace. Punctuation is literal; blank titles do not match. No regular expressions or wildcards.</value></data>
   <data name="RuleSubtitleCodes" xml:space="preserve"><value>Subtitle language codes (comma separated)</value></data>
   <data name="RuleTagHelp" xml:space="preserve"><value>Comma-separated codes, e.g. en, ger, ru-RU, sr-Latn. Tags match exactly: ru does not match ru-RU. Supported tags have an ISO language plus optional script/region. Language metadata is not proof of the language spoken.</value></data>

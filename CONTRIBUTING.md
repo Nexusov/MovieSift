@@ -27,6 +27,8 @@ The real-media suite uses generated fixtures, two checked-in direct FFmpeg-origi
 
 Phase 2A tests are grouped under Application `Batches`, Infrastructure `BatchInputDiscoveryTests` / `BatchMediaIntegrationTests`, and Desktop batch headless tests. Phase 2B1 adds Core `LanguageRuleMatcherTests`, Application language/selection guard tests, Desktop `BatchLanguageRulesTests`, and real `BatchLanguageRuleIntegrationTests`. Phase 2B2 adds `LanguageTitleFilterTests`, Application/Desktop `BatchTitleFilterTests` and real `BatchTitleFilterIntegrationTests`. The real rule cases must obtain selections through production Preview/Apply before explicit approval/review, compare all retained extracted payloads from reordered inputs, source hashes and owned cleanup. Keep literal-title conjunction tests distinct from language uncertainty and preservation policy; regex-looking input remains literal. Use deterministic signals for lifecycle boundaries. These checks are separate from native desktop acceptance. Preserve the existing required media-test environment; do not turn missing tools/fixtures into a successful skip in CI.
 
+Phase 2B3 adds pure `ForcedSubtitleRuleTests`, Application/Desktop `BatchForcedSubtitleTests`, controlled `MkvForcedFlagParsingTests` and real `BatchForcedSubtitleIntegrationTests`. The real case uses `ForcedSubtitleFixture` to give otherwise matching subtitles different actual flags and payloads across reordered inputs. It must exercise production rule application, compare all retained track/attachment payloads and source hashes, and retain both owned remux handles through exit. Keep JSON parsing, controlled lifecycle, headless and native evidence distinct. Do not bypass conservative language validation using title/forced nonmatches.
+
 Generate the original fixtures without FFmpeg or a production codec dependency:
 
 ```powershell
@@ -77,13 +79,13 @@ The [applied protection record](docs/verification/main-protection.md) links the 
 
 ## Changes and licensing
 
-Follow `AGENTS.md` and the project dependency boundaries. Prefer small changes with a specific user-visible behavior or safety invariant. Update the relevant preservation matrix and tests when support expands. Current scope is Phase 2A independent plans/bounded discovery/sequential dispatch plus Phase 2B explicit language-rule preview/application and optional literal title constraints. Matching uses Core policy and file-local inspections, never another file's IDs. Preview must not mutate approvals, Apply must reject stale state, and only real choice changes invalidate plans. Title-only/regex/forced-only matching, presets, recursion, persistent queues and MP4 require another task. Do not claim unsupported container fidelity.
+Follow `AGENTS.md` and the project dependency boundaries. Prefer small changes with a specific user-visible behavior or safety invariant. Update the relevant preservation matrix and tests when support expands. Current scope is Phase 2A independent plans/bounded discovery/sequential dispatch plus Phase 2B explicit language-rule preview/application, optional literal titles and subtitle forced flags. Matching uses Core policy and file-local inspections, never another file's IDs. Preview must not mutate approvals, Apply must reject stale state, and only real choice changes invalidate plans. Title-only/regex rules, other forced-filter modes, presets, recursion, persistent queues and MP4 require another task. Do not claim unsupported container fidelity.
 
 The Phase 2A review branch targets `review/phase-0-1` and depends on draft PR #1. Keep both reviews unmerged until separately authorized; the unfiltered `pull_request` workflow runs the same complete platform jobs on dependent PRs. Do not change required contexts or protected-main policy to deliver a feature.
 
 The Phase 2B1 branch `review/phase-2b-language-rules` targets `review/phase-2a-batch` and depends on draft PR #2. Preserve both existing draft PRs. The same unfiltered workflow must run both exact platform contexts, including packaging/inventory/relocation and the applicable Linux container check.
 
-The Phase 2B2 branch `review/phase-2b-title-filter` targets `review/phase-2b-language-rules` and depends on draft PR #3. Preserve all earlier draft reviews; no branch merges or dependency changes are part of this slice.
+The Phase 2B2 branch `review/phase-2b-title-filter` targets `review/phase-2b-language-rules` and depends on draft PR #3. The Phase 2B3 branch `review/phase-2b-forced-subtitles` targets `review/phase-2b-title-filter` and depends on draft PR #4. Preserve all earlier draft reviews; no branch merges or dependency changes are part of these slices.
 
 Keep code, documentation, and commit messages in English. Keep English/Russian resource keys and formatting arguments aligned. Never log full media probe XML/JSON or collect remote telemetry.
 

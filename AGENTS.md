@@ -1,6 +1,6 @@
 # Repository instructions
 
-Read `PROJECT_BRIEF.md` before changing behavior. Work only on the explicitly authorized phase. Phase 2A adds bounded explicit-file/top-level-folder discovery, independent manual plans and a sequential in-memory queue over the existing single-job lifecycle. Phase 2B1 adds explicit language-rule preview/application before those independent approvals. Phase 2B2 adds an optional literal title-contains constraint to each targeted language category. Title-only/regex/forced-only matching, presets, recursion, persisted queues, MP4, playback, source replacement and speculative frameworks remain outside this task.
+Read `PROJECT_BRIEF.md` before changing behavior. Work only on the explicitly authorized phase. Phase 2A adds bounded explicit-file/top-level-folder discovery, independent manual plans and a sequential in-memory queue over the existing single-job lifecycle. Phase 2B1 adds explicit language-rule preview/application before those independent approvals. Phase 2B2 adds an optional literal title-contains constraint to each targeted language category. Phase 2B3 adds an optional forced-flag constraint to matching subtitles. Title-only/regex rules, other forced-filter modes, presets, recursion, persisted queues, MP4, playback, source replacement and speculative frameworks remain outside this task.
 
 ## Architecture
 
@@ -36,6 +36,8 @@ Track/chapter/tag language equivalence uses the shared explicit ISO registry tab
 Language-selection rules normalize aliases only for matching and compare complete supported tags exactly. Preview is read-only and revision-bound; Apply uses each item's actual inspection and current selection. Unknown/conflicting targeted metadata or no audio matches leaves that whole file unchanged for manual review. Only actual choice changes invalidate approvals; no operation implicitly approves, excludes or runs a file. Keep matching policy separate from preservation verification.
 
 Title constraints default off and are ANDed with language matches. Trim search whitespace and use literal `OrdinalIgnoreCase` substring matching against the actual inspected title only. Enabled blank searches are invalid; missing/blank titles do not match. Evaluate every targeted language even when its title does not match. Configuration edits discard only the transient preview, never selections or approvals.
+
+The subtitle-only forced constraint defaults off, is ignored in unchanged mode, and is ANDed with language/optional title using inspected `MediaTrack.IsForced`. Validate every targeted language even on non-forced tracks. Never infer forced status from titles, default flags or subtitle text; this selects whole tracks and does not promise player behavior. No combined subtitle matches explicitly proposes none. Reuse the existing proposal identity, ownership gates and changed-only Apply lifecycle.
 
 ## Verification and delivery
 

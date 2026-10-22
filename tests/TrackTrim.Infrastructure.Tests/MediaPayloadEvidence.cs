@@ -13,14 +13,17 @@ internal static class MediaPayloadEvidence
     private static readonly TimeSpan ExtractionTimeout = TimeSpan.FromMinutes(2);
 
     /// <summary>Extracts both approved stream identities and compares their complete encoded payload hashes.</summary>
-    internal static async Task AssertIdenticalAsync(PayloadComparison request)
+    internal static async Task<ComparedPayload> AssertIdenticalAsync(PayloadComparison request)
     {
         var sourcePayload = Path.Combine(request.OutputDirectory, request.Label + ".source.payload");
         var outputPayload = Path.Combine(request.OutputDirectory, request.Label + ".output.payload");
-        await ExtractAsync(new PayloadExtraction(request.SourcePath, request.SourceIdentifier, sourcePayload));
-        await ExtractAsync(new PayloadExtraction(request.OutputPath, request.OutputIdentifier, outputPayload));
+        await ExtractAsync(new PayloadExtraction(request.SourcePath, request.SourceIdentifier, sourcePayload, request.ExtractionMode));
+        await ExtractAsync(new PayloadExtraction(request.OutputPath, request.OutputIdentifier, outputPayload, request.ExtractionMode));
         Assert.True(new FileInfo(sourcePayload).Length != 0, "Empty extraction cannot establish retained payload preservation.");
-        Assert.Equal(await HashAsync(sourcePayload), await HashAsync(outputPayload));
+        var sourceHash = await HashAsync(sourcePayload);
+        var outputHash = await HashAsync(outputPayload);
+        Assert.Equal(sourceHash, outputHash);
+        return new(sourceHash, outputHash, new FileInfo(sourcePayload).Length);
     }
 
     /// <summary>Uses the pinned native extractor with explicit paths and the production UTF-8 locale contract.</summary>
@@ -41,7 +44,7 @@ internal static class MediaPayloadEvidence
         }
 
         var result = await new OwnedProcessRunner().RunAsync(new ProcessRequest(tools.MkvExtract,
-            [request.SourcePath, "tracks", $"{request.Identifier.ToString(CultureInfo.InvariantCulture)}:{request.DestinationPath}"],
+            [request.SourcePath, request.ExtractionMode, $"{request.Identifier.ToString(CultureInfo.InvariantCulture)}:{request.DestinationPath}"],
             MaximumDiagnosticsCharacters, ExtractionTimeout, null, TestContext.Current.CancellationToken, environment));
         Assert.True(result.ExitCode == 0, result.StandardError);
     }
@@ -53,8 +56,10 @@ internal static class MediaPayloadEvidence
         return Convert.ToHexString(await SHA256.HashDataAsync(stream));
     }
 
-    private sealed record PayloadExtraction(string SourcePath, int Identifier, string DestinationPath);
+    private sealed record PayloadExtraction(string SourcePath, int Identifier, string DestinationPath, string ExtractionMode);
 }
 
 internal sealed record PayloadComparison(string SourcePath, int SourceIdentifier,
-    string OutputPath, int OutputIdentifier, string OutputDirectory, string Label);
+    string OutputPath, int OutputIdentifier, string OutputDirectory, string Label, string ExtractionMode = "tracks");
+
+internal sealed record ComparedPayload(string SourceSha256, string OutputSha256, long Bytes);
