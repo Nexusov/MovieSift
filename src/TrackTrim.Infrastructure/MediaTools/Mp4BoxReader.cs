@@ -17,6 +17,7 @@ internal sealed class Mp4BoxReader
     private const int ExtendedHeaderBytes = 16;
     private const int MaximumSmallBoxBytes = 65_536;
     private const int MaximumTracks = 256;
+    private const int MaximumReferencedChapterTracks = 1;
     private static readonly HashSet<string> Brands = new(StringComparer.Ordinal)
         { "isom", "iso2", "iso3", "iso4", "iso5", "iso6", "mp41", "mp42", "avc1" };
     private static readonly HashSet<string> MetadataAtoms = new(StringComparer.Ordinal)
@@ -79,6 +80,11 @@ internal sealed class Mp4BoxReader
         if (!reader.chapterTrackIds.IsSubsetOf(reader.tracks.Select(track => track.Id)))
         {
             throw Unsupported("A chapter reference names an absent MP4 track.");
+        }
+
+        if (reader.chapterTrackIds.Count > MaximumReferencedChapterTracks)
+        {
+            throw Unsupported("Multiple distinct referenced QuickTime chapter tracks are unsupported; their separate chapter contents cannot be preserved safely.");
         }
 
         return new(reader.majorBrand!, reader.movieTimescale,

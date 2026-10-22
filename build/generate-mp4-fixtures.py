@@ -8,6 +8,7 @@ from pathlib import Path
 import struct
 import subprocess
 import zlib
+from mp4_chapter_fixtures import write_chapter_reference_fixture
 
 
 SOURCE_SHA256 = "b0b5fc3c0e290fb435be3cc09a1952ccfc343d93c2d6d13e9e8332e55b791000"
@@ -129,14 +130,20 @@ def main():
     commands.append(command)
     normalized = [[value.replace(str(destination), "<fixture-directory>").replace(str(source), "<original-h264-aac-mkv>")
                    .replace(str(executable), "<pinned-ffmpeg>") for value in command] for command in commands]
+    multiple_chapter_tracks = destination / "multiple-qt-chapters.mp4"
+    repeated_chapter_reference = destination / "repeated-qt-reference.mp4"
+    chapter_variants = [write_chapter_reference_fixture(ordinary, multiple_chapter_tracks, distinct=True),
+                        write_chapter_reference_fixture(ordinary, repeated_chapter_reference, distinct=False)]
     provenance = {
         "origin": "Original TrackTrim synthetic H.264, distinguishable AAC tones, two captions, artwork and chapters.",
         "source": source.name, "sourceSha256": source_hash,
         "ffmpegVersionAndConfiguration": version,
         "ffmpegExecutableSha256": digest(executable),
         "commands": normalized,
+        "chapterReferenceVariants": chapter_variants,
         "files": [{"path": path.name, "bytes": path.stat().st_size, "sha256": digest(path)}
-                  for path in [ordinary, reordered, multiple, fragmented, priming, jpeg_artwork, cover, jpeg_cover, subtitles, chapters]],
+                  for path in [ordinary, reordered, multiple, fragmented, priming, jpeg_artwork, cover, jpeg_cover, subtitles, chapters,
+                               multiple_chapter_tracks, repeated_chapter_reference]],
         "scope": "Development-only encoding of mov_text and generated artwork; production always stream-copies.",
     }
     (destination / "mp4-provenance.json").write_text(json.dumps(provenance, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

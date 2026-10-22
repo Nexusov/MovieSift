@@ -7,6 +7,60 @@
   "dependentDraftPr": "https://github.com/Nexusov/TrackTrim/pull/9",
   "scope": "MP4-to-MP4 stream copy through the existing single/mixed sequential workflow; no conversion or transcoding.",
   "contract": "../SUPPORTED_FORMATS.md#mp4-preservation-contract",
+  "integrationChapterCorrection": {
+    "reviewBase": "9eb0652c6614df5d526b57e80464c3c86bab3b6c",
+    "platform": "Windows 10 Home Single Language 22H2 x64, 19045.6456",
+    "method": "Real pinned FFmpeg through InspectionService, PlanBuilder, JobCoordinator and OwnedOutputStore; not native GUI",
+    "recipe": "build/mp4_chapter_fixtures.py, invoked by build/generate-mp4-fixtures.py",
+    "distinctFixture": {
+      "sha256": "6e0d1ced7ba07674ab6c30108023c3d3fd8d1984ced1b79f97c955d411b529b4",
+      "chapterTrackIds": [8, 9],
+      "samplesPerTrack": [2, 2],
+      "firstTitles": ["First chapter", "Вторая глава"],
+      "secondTitles": ["Other chapter", "Another chapter variant"],
+      "neroChapterList": false
+    },
+    "beforeCorrection": {
+      "result": "Regression failed: accepted, remux exit 0, verification passed, published Completed",
+      "outputChapterTracks": 1,
+      "outputAggregateTitles": ["Other chapter", "Another chapter variant"],
+      "lostFirstChapterList": true,
+      "sourceUnchanged": true,
+      "localReceipt": "TestResults/phase3-regressions/multiple-qt-chapters-red-valid-header.trx"
+    },
+    "afterCorrection": {
+      "result": "UnsupportedFeature at capability inspection",
+      "remuxWorkers": 0,
+      "outputCandidateAndJournalAbsent": true,
+      "sourceUnchanged": true,
+      "distinctReferencedChapterTrackLimit": 1,
+      "focusedTestsPassed": 40,
+      "failed": 0,
+      "skipped": 0,
+      "localReceipt": "TestResults/phase3-regressions/multiple-qt-chapters-green.trx"
+    },
+    "completeLocalVerification": {
+      "executedBeforeThisCoherentCommit": true,
+      "lockedRestoreAndFormatting": "passed",
+      "releaseBuildWarnings": 0,
+      "releaseBuildErrors": 0,
+      "corePassed": 175,
+      "applicationPassed": 279,
+      "infrastructurePassed": 406,
+      "desktopHeadlessPassed": 123,
+      "totalPassed": 983,
+      "linuxOnlySkippedOnWindows": 23,
+      "failed": 0,
+      "pythonPassed": 22,
+      "receipts": "TestResults/final-chapter-correction/*.trx; required platform CI is reported on PR #9"
+    },
+    "repeatedReferenceControl": {
+      "sha256": "4b93c026377cc0e7a20e51f26688a0cb3bdbd17b3cf192a5d8fd5b068642b5bb",
+      "distinctChapterTrackIds": [8],
+      "result": "Completed with one preserved chapter list; source unchanged; owned cleanup empty"
+    },
+    "scope": "Repeated references to one chapter track, ordinary single-track PNG/JPEG cases and existing Nero consistency checks pass. Raw local TRX paths are receipts, not committed binaries or private machine logs. Historical package and CI observations below retain their original revision."
+  },
   "verification": {
     "commands": [
       "dotnet restore --locked-mode",
