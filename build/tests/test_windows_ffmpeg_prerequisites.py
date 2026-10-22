@@ -129,8 +129,13 @@ switch ($Action) {
         environment = dict(os.environ)
         environment["GITHUB_ACTIONS"] = "false"
         destination = self.root / "must remain absent"
+        entry_point = self.root / "entry-point.ps1"
+        entry_point.write_text("""param($Helper, $CacheDirectory, $EvidencePath)
+try { & $Helper -CacheDirectory $CacheDirectory -EvidencePath $EvidencePath }
+catch { [Console]::Error.WriteLine($_.Exception.Message); exit 1 }
+""", encoding="utf-8")
         result = subprocess.run([
-            shutil.which("pwsh"), "-NoProfile", "-NonInteractive", "-File", str(self.helper),
+            shutil.which("pwsh"), "-NoProfile", "-NonInteractive", "-File", str(entry_point), "-Helper", str(self.helper),
             "-CacheDirectory", str(destination), "-EvidencePath", str(self.root / "not-created.json"),
         ], capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=30, env=environment, check=False)
         self.assertNotEqual(result.returncode, 0)
