@@ -18,6 +18,8 @@ The [completion evidence](verification/phase-2-completion-evidence.json) identif
 
 Queue-list errors remain separate from media-ownership errors and must not claim successful restart recovery. The finite public-release gates are desktop access/final acceptance, the rights holder's original-code license choice and the specific unresolved bundled-component material in [the distribution audit](verification/distribution-audit.md). Historical warning/cancellation and visual limits remain recorded below. The next major implementation milestone is MP4; it is not started here.
 
+The evidence-head Linux run exposed intermittent `Busy` in the existing sequential preset byte-budget test. A deterministic duplicated-descriptor regression reproduced the underlying close-only `flock` release defect, then passed with explicit unlock before close and idempotent disposal. Genuine active-owner contention still fails immediately. This correction belongs to the same Phase 2 delivery, with fresh portable builds and full required verification; no retry, skip or lighter gate is substituted. Earlier native/package receipts retain their original `d8d839e` identity.
+
 Integration order, after explicit authorization: **PR #1 → #2 → #3 → #4 → #5 → #6 → #7 → this completion PR**. Preserve ancestry with ordinary merges, retarget the next dependent PR only after its base has integrated, and rerun its required checks before merging. Do not force-push/rewrite the reviewed stack. MP4 follows Phase 2 completion and uses the resulting complete code; no merge is performed by this task.
 
 ## Historical verification
