@@ -1,6 +1,6 @@
 # Portable distribution inventory and material gaps
 
-**Scope: Phase 0/1; redistribution readiness remains blocked.** This audit accounts for actual Windows/Linux portable contents, distinguishes known provenance from unresolved source/build facts, and prepares the original-code license decision. It does not change application behavior, tool/dependency pins, native acceptance, or the protected-main policy. No binary release or operative application license is produced.
+**Historical inventory checkpoints; see the current [release-candidate closure](release-distribution-closure.md).** The candidate uses a minimal same-source FFmpeg build and a proven CLI-only MKVToolNix payload selection, with new exact notices/source mappings. The older AppImage/full optional FFmpeg file sets and their counts below describe their recorded builds, not today's candidate. [Candidate evidence](release-candidate-evidence.json) and each new CI inventory bind the actual revision/archive/files. Redistribution is not declared ready; the specific remaining source/license-route and original-code decisions are listed in the closure/checklist. No public binary release or operative application license is produced.
 
 ## Reproducible evidence
 

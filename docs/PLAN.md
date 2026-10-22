@@ -1,11 +1,14 @@
-# Route to the first complete portable release
+# Release candidate — features frozen
 
-The remaining route has two milestones. Phase 2 implementation is complete within its recorded scope; its review stack remains unmerged. Corrections, packaging and verification belong to each complete milestone, not additional product phases.
+The complete MKV/MP4 feature stack, PRs **#1–#9**, has been integrated through ordinary protected merges. The release-candidate branch starts at integrated main `88b5da788e77f3b6490e2dc418fbf5c129661e61`; its tree equals the corrected Phase 3 head `5dfe4f1badb0dcae5a11da47eb56fa8866388b0d`. Review branches are retained and main protection/check names are unchanged. The proposed first version is **0.1.0-rc.1**, with no public tag or release assets.
 
-1. **Phase 3 — complete MP4 delivery.** Integrate the admitted H.264/AAC/mov_text MP4 subset into single-file and mixed sequential batches, existing rules/presets, recursive relative destinations and unfinished-list recovery. Freeze format/backend authority in approved plans; preserve exact retained content, supported metadata/chapters/artwork and rational timing through pinned FFmpeg/ffprobe. Completion requires meaningful controlled/headless/real-media regressions, both complete required platform CI jobs and clean identified local portable review archives exercising both containers. No native acceptance is inferred from CLI/headless/container execution.
-2. **Authorized integration and public-release preparation.** Integrate the reviewed stack only after explicit authorization; perform consolidated packaged EN/RU desktop acceptance on Windows 11 x64 25H2 and Ubuntu 24.04 x64 Desktop/X11-XWayland, finish actual notices/corresponding-source/build material, obtain the rights holder's original-code license decision, and verify final archives. No additional optional feature is a prerequisite. Public binaries remain gated by these finite external requirements.
+The final milestone contains the reproduced chapter correction, the integration's already-reviewed Linux lock-release backport, source-built FFmpeg workers, exact CLI payload selection, missing notices/material collection, consolidated available acceptance and identified local review archives. [Candidate evidence](verification/release-candidate-evidence.json) records actual outcomes and source/artifact identities. The [distribution closure](verification/release-distribution-closure.md) separates enforceable source/notice/relink requirements from optional provenance preferences.
 
-## Current Phase 3 delivery
+Both complete required platform jobs remain mandatory, including real MKV/MP4 tests, packaging/inventory, relocation and the no-SDK/no-external-media/no-network Linux container. Native UIA, visual capture, headless tests and CLI/container execution remain distinct. The available host is Windows 10 Home Single Language 22H2 x64 `19045.6456`; Windows 11 25H2 and Ubuntu 24.04 Desktop are unavailable here. Prior native evidence is not relabeled as acceptance of the candidate.
+
+Only the finite [final release checklist](release-checklist.md) remains: actual outstanding covered-worker material/license route, the owner's original-code license decision, declared-target desktop/visual acceptance, and final candidate/publication review. No optional feature or evidence-only product phase is a prerequisite. The release-candidate PR remains draft and unmerged.
+
+## Historical Phase 3 delivery
 
 Comparison base: `afe537466c7351e896bce875d551badd2b4a29de`, matching the fetched clean `review/phase-2-completion` branch; no newer upstream changes were present. `review/phase-3-mp4` targets that branch and depends on draft PR #8. Main/protection, the earlier drafts and required check names are preserved. This delivery implements MP4 without changing the MKV backend or adding conversion, transcoding, parallel jobs or trusted persisted selections.
 

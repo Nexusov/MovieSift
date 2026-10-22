@@ -1,6 +1,6 @@
 # Repository instructions
 
-Read `PROJECT_BRIEF.md` before changing behavior. Work only on the explicitly authorized milestone. Phase 2 provides bounded explicit-file/folder discovery, independent plans, sequential jobs, language/title/forced rules, portable rule presets, relative recursive outputs and explicit unfinished-list Restore/Discard. Phase 3 adds the documented MP4 subset through pinned FFmpeg/ffprobe, preserving the MKVToolNix workflow. Preset overwrite/update, import/export, automatic loading, new filters, live/persistent job authority, byte-offset resume, playback, source replacement and speculative frameworks remain outside this delivery. Integration and public release require separate authorization.
+Read `PROJECT_BRIEF.md` before changing behavior. Features are frozen for the final release-candidate milestone. The integrated application provides MKV/the documented MP4 subset, independent sequential batches, language/title/forced rules, portable presets, recursive relative outputs and explicit unfinished-list Restore/Discard. Make only demonstrated correctness, packaging, material, documentation and acceptance corrections in this milestone. Preset overwrite/update, import/export, automatic loading, new filters, live/persistent job authority, byte-offset resume, playback, source replacement and speculative frameworks remain outside it. Ordinary protected integration of PRs #1–#9 is authorized; the subsequent release-candidate PR, public tags/assets and original-code license still require final owner review/authorization.
 
 ## Architecture
 

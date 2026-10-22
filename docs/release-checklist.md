@@ -1,0 +1,10 @@
+# Final release checklist
+
+Features are frozen. The release-candidate PR remains unmerged and no public tag or assets are authorized by this milestone.
+
+1. **Original-code decision — owner.** Confirm the rights holder's authority over the original code/assets/contributions and explicitly choose its license. The [MIT/Apache/GPL proposal](license-decision.md) is advice, not an operative license. `APPLICATION-LICENSE-PENDING.txt` remains in review packages.
+2. **Specific covered-worker material — distributor/upstream.** Complete the Windows MKVToolNix/static-dependency source, patch and relevant build-material items, and confirm the Linux QtCore license/source/relink route in [the closure record](verification/release-distribution-closure.md), or validate the documented same-backend source-build alternative. Do not replace this with a generic homepage or an approximate source tarball. The prepared upstream question has not been sent.
+3. **Declared desktop targets — test access.** Obtain Windows 11 x64 25H2 and Ubuntu 24.04 x64 Desktop/X11-XWayland access and complete the consolidated candidate matrix, including actual visual/focus/scrolling and supported 100%/150%/200% display combinations. Available Windows 10 functional observations and Linux CLI/container tests retain their actual scope. Preserve the recorded unverified active-cancellation and real-warning cases rather than relabeling them.
+4. **Final review/publication — owner.** Review the candidate PR, exact binary/source-material identities, complete required CI and the actual remaining acceptance/material outcomes. Authorize integration and public publication separately only after the preceding applicable requirements are satisfied. No public source-distribution assurance follows merely from generating the private material bundle.
+
+Bit-for-bit build reproduction, full compiler history and source archives for every permissively licensed component are not universal release conditions. Applicable notice, corresponding-source and relinking conditions still apply to the actual distributed combination; the closure record distinguishes them from provenance preferences.

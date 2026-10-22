@@ -1,0 +1,178 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Private release-candidate preparation; no public release authorization",
+  "comparisonBase": "88b5da788e77f3b6490e2dc418fbf5c129661e61",
+  "featureFreeze": true,
+  "proposedVersion": "0.1.0-rc.1",
+  "chapterCorrection": {
+    "commit": "ce1f6adaa335912ca78cf155b13448d181120621",
+    "method": "Pinned production inspection/planning/job/publication lifecycle before the fix; generated valid source with two distinct referenced text chapter tracks and equal chapter counts but different contents",
+    "sourceSha256": "6e0d1ced7ba07674ab6c30108023c3d3fd8d1984ced1b79f97c955d411b529b4",
+    "before": "Completed publication lost the first chapter track while aggregate chapter verification passed",
+    "after": "Inspection rejects more than one distinct referenced chapter-track ID before reservation/remux; source unchanged and no output/candidate/journal",
+    "positiveControl": "Repeated references to the same chapter track remain supported; ordinary single-track chapter coverage remains passing",
+    "focused": {
+      "passed": 40,
+      "failed": 0,
+      "skipped": 0
+    },
+    "details": "phase-3-mp4-evidence.json"
+  },
+  "integration": {
+    "method": "Ordinary protected merges, retargeting and up-to-date branch merges; no bypass/rebase/force push/branch deletion",
+    "pullRequests": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "initialMain": "69c9babe668c3ba6d0032de3304f793337964c4f",
+    "main": "88b5da788e77f3b6490e2dc418fbf5c129661e61",
+    "tree": "f4d3d93d8b3373fd334165b68cd4cf8e03374455",
+    "treeEqualsCorrectedFeatureHead": "5dfe4f1badb0dcae5a11da47eb56fa8866388b0d",
+    "mainCi": "https://github.com/Nexusov/TrackTrim/actions/runs/39862849052",
+    "mainCiResult": "passed both complete required platform jobs",
+    "lockBackport": {
+      "commit": "313db354f81be65021d8376049d6d3b9bd9598cb",
+      "reason": "Actual PR7 Linux Busy failure exposed the old close-only flock release, already corrected in reviewed PR8",
+      "controlledLinuxRed": {
+        "passed": 0,
+        "failed": 1
+      },
+      "controlledLinuxGreen": {
+        "passed": 66,
+        "failed": 0,
+        "skipped": 0
+      },
+      "pr8Resolution": "Ordinary two-file extraction conflict resolution preserves the exact original reviewed PR8 tree"
+    },
+    "protection": "https://github.com/Nexusov/TrackTrim/rules/25401528",
+    "actualMainCheckout": "88b5da788e77f3b6490e2dc418fbf5c129661e61",
+    "mainParents": [
+      "348b3e9d014a4151356da76ebce56ad9e5673893",
+      "5e24afee1e3b8c545d9b3b76107fa963b875b090"
+    ],
+    "requiredChecks": [
+      {
+        "name": "Required media checks and win-x64 package",
+        "producerId": 15368,
+        "headSha": "88b5da788e77f3b6490e2dc418fbf5c129661e61",
+        "conclusion": "success",
+        "url": "https://github.com/Nexusov/TrackTrim/actions/runs/39862849052/job/120117621578"
+      },
+      {
+        "name": "Required media checks and linux-x64 package",
+        "producerId": 15368,
+        "headSha": "88b5da788e77f3b6490e2dc418fbf5c129661e61",
+        "conclusion": "success",
+        "url": "https://github.com/Nexusov/TrackTrim/actions/runs/39862849052/job/120117622095"
+      }
+    ],
+    "mainResults": {
+      "windowsPassed": 983,
+      "windowsDocumentedOsSkips": 23,
+      "linuxPassed": 1006,
+      "linuxSkipped": 0,
+      "pythonPerPlatform": 22
+    },
+    "merges": [
+      {
+        "number": 1,
+        "branchHead": "19cb79ab0542addaec264e11c14f829526bc2066",
+        "merge": "0268c668bc3ee9f1a04bea4d45a3a99092e472ae",
+        "checkedRevision": "ac4266f5875244ecd8d5f1f5dc187e2376ee543a",
+        "ci": "https://github.com/Nexusov/TrackTrim/actions/runs/39330535061"
+      },
+      {
+        "number": 2,
+        "branchHead": "8719dca20fa905eb74b07205c23a3b213a67003b",
+        "merge": "bada83526eabca837a5396ee9d94faf299544f2b",
+        "checkedRevision": "f4aafd4c3631e244d769bf9d42bcb7e331aae8a5",
+        "ci": "https://github.com/Nexusov/TrackTrim/actions/runs/39811918757"
+      },
+      {
+        "number": 3,
+        "branchHead": "a6d73b53df27778e6f87207170621cd2e13e300e",
+        "merge": "d01f78b45a2b095c0753fb762dd32ca7091e42a8",
+        "checkedRevision": "3bbbc0440015350a86c42bf45e9dab0cf29d06bf",
+        "ci": "https://github.com/Nexusov/TrackTrim/actions/runs/39812821852"
+      },
+      {
+        "number": 4,
+        "branchHead": "3bdd127b780355da375fe0b19cbf15997d546a22",
+        "merge": "39891fb5d4dee1207bcce3f9572b1b1e1fe26e52",
+        "checkedRevision": "3709c7e732e1eda8cb6b5e99e7eec1a453fd0061",
+        "ci": "https://github.com/Nexusov/TrackTrim/actions/runs/39857343839"
+      },
+      {
+        "number": 5,
+        "branchHead": "338f798d310348e90a0852ae75b56df740cc4116",
+        "merge": "e950e542551f9b43e773a9c99cef63b547f9048d",
+        "checkedRevision": "2fa712d8eeb92deb6c82814948a2e303e870605d",
+        "ci": "https://github.com/Nexusov/TrackTrim/actions/runs/39858009842"
+      },
+      {
+        "number": 6,
+        "branchHead": "885ddeb0655b7373e0a49d8ce238ae51bfef2663",
+        "merge": "a21a82421b77b4f70a563f514dea579ea85eb34b",
+        "checkedRevision": "572e8040e56e959fb9c123a2279f63329d31cb28",
+        "ci": "https://github.com/Nexusov/TrackTrim/actions/runs/39858598778"
+      },
+      {
+        "number": 7,
+        "branchHead": "313db354f81be65021d8376049d6d3b9bd9598cb",
+        "merge": "7d182ed8049e202c7417add7c514c7ae42ae9aab",
+        "checkedRevision": "6ffb6089b6ea3fca5808b095e04345d612c96e4f",
+        "ci": "https://github.com/Nexusov/TrackTrim/actions/runs/39860698702"
+      },
+      {
+        "number": 8,
+        "branchHead": "56f0eeaaa64bd6231795e149f0c99a23e755c6b9",
+        "merge": "348b3e9d014a4151356da76ebce56ad9e5673893",
+        "checkedRevision": "83bd5bc34ce3054aa40eda12dd292937d54412d1",
+        "ci": "https://github.com/Nexusov/TrackTrim/actions/runs/39861517812"
+      },
+      {
+        "number": 9,
+        "branchHead": "5e24afee1e3b8c545d9b3b76107fa963b875b090",
+        "merge": "88b5da788e77f3b6490e2dc418fbf5c129661e61",
+        "checkedRevision": "0c958532d8e1a43b32e9508f52db537a1acc0102",
+        "ci": "https://github.com/Nexusov/TrackTrim/actions/runs/39862161375"
+      }
+    ]
+  },
+  "candidate": {
+    "branch": "review/release-candidate",
+    "sourceRevision": null,
+    "archives": [],
+    "automatedChecks": {
+      "localWindowsPython": {
+        "passed": 51,
+        "failed": 0,
+        "skipped": 0
+      },
+      "fullApplicationAndPackageChecks": "pending candidate build"
+    },
+    "native": {
+      "status": "not run",
+      "reason": "The identified candidate portable build is not prepared yet",
+      "availablePlatform": "Windows 10 Home Single Language 22H2 x64, build 19045.6456",
+      "missingTargets": [
+        "Windows 11 x64 25H2",
+        "Ubuntu 24.04 x64 Desktop/X11-XWayland"
+      ],
+      "visualCapture": "Known unchanged Computer Use capture/geometry blocker is not retried; UIA would be functional evidence only"
+    }
+  },
+  "limits": [
+    "Historical native receipts retain their original source/package/platform identity",
+    "Active-remux Cancel input correlation, repeated close, real warning fixture and visual/scaling requirements are not closed by controlled/headless/media tests",
+    "Original application license remains pending; no public binary or source-distribution assurance is made",
+    "Specific Windows MKVToolNix static material and Linux QtCore route remain in release-distribution-closure.md"
+  ]
+}
