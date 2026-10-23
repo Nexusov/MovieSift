@@ -1,6 +1,6 @@
 # Third-party notices and provenance
 
-No license for original TrackTrim code has been selected. Do not infer an author identity or apply MIT to every shipped file. The archives produced locally by this branch are acceptance artifacts; public release readiness is not claimed. A review/testing label does not exempt binary redistribution from any license duty. Required application jobs keep portable archives on their runners and upload only test/provenance evidence. The separate source-builder can retain the complete MKV worker/material set as an explicitly authorized, expiring review artifact; it is not a public application release or the eventual public source-delivery arrangement.
+Original TrackTrim code is licensed under [MIT](LICENSE), copyright (c) 2026 Nexusov, by the explicit owner decision recorded in [the license decision](docs/license-decision.md). This license does not replace third-party terms or apply MIT to every shipped file. The archives produced locally by this branch are acceptance artifacts; public release readiness is not claimed. A review/testing label does not exempt binary redistribution from any license duty. Required application jobs keep portable and matching source/material archives on their runners and upload only test/provenance evidence. The separate source-builder can retain the complete MKV worker/material set as an explicitly authorized, expiring review artifact; it is not a public application release or the eventual public source-delivery arrangement.
 
 ## Application and build dependencies
 
@@ -32,7 +32,7 @@ Windows builds from the pinned release source and exact MSYS2 UCRT64 package inp
 
 The unchanged Linux CLI closure retains QtCore **6.6.1** and the other 21 required libraries. VirtualKeyboard, unused Qt modules and three static Boost archives are excluded. Fifteen retained shared libraries match primary AlmaLinux binary RPM members byte-for-byte; SourceRPM headers bind 13 complete source RPMs with upstream archives, patches and build specifications. Actual binary-RPM notices are included. QtCore and all three ICU libraries match the official Qt 6.6.1 SDK bytes. Complete QtBase source, actual SDK qconfig and primary module/runtime terms are collected. `build/tool-materials.lock.json` binds these relationships; included sources live under `tools/licenses/corresponding-source`, notices/configuration under `tools/licenses/upstream-terms`. Core's GPL2 alternative is selected alongside the GPL2 worker. The SDK Enterprise label is not a commercial-only source restriction. No additional missing Linux Core source/build or relink artifact was identified. Public distribution must still deliver the applicable collected source/materials and notices on both targets; see the [closure record](docs/verification/release-distribution-closure.md).
 
-The exact texts remain the primary record. Running a separate executable does not remove its redistribution obligations, automatically assign its license to the C# code, or settle whether a particular combination is an aggregate. [The original-code license proposal](docs/license-decision.md) keeps that question separate from the author's pending choice.
+The exact texts remain the primary record. Running a separate executable does not remove its redistribution obligations, automatically assign its license to the C# code, or settle whether a particular combination is an aggregate. [The original-code license decision](docs/license-decision.md) keeps that question separate from the selected MIT terms.
 
 ## FFmpeg artifacts
 
@@ -44,7 +44,6 @@ Only OS runtime dependencies are allowed: Windows OS/UCRT/API-set DLLs, or Linux
 
 ## Outstanding public-release obligations
 
-- Select a license for original application code explicitly.
 - Review the actual source-built Windows and retained Linux closures recorded in the [current closure record](docs/verification/release-distribution-closure.md). Their collected materials replace the historical Windows static-source gap; mechanical file coverage is not legal approval or actual public source delivery.
 - Provide the applicable corresponding-source/build material for the exact redistributed MKVToolNix binaries and their covered dependencies using a distribution method that satisfies their licenses. A homepage link alone is insufficient. Include source versions, build configuration/patches, and any required offers/material with a future public release.
 - Review the final source-built FFmpeg/zlib/compiler-runtime notices and source-distribution method against the actual recorded configuration. Exact historical compiler reconstruction is a reproducibility preference unless a specific applicable term requires more material.

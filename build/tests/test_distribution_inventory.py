@@ -35,6 +35,7 @@ class DistributionInventoryTests(unittest.TestCase):
         self.output = self.directory / "evidence"
         self.write("Sample.dll", b"published sample assembly")
         self.write("TrackTrim.dll", b"original application")
+        self.write("LICENSE", (Path(__file__).parents[2] / "LICENSE").read_bytes())
         self.write("unknown.dat", b"explicitly unknown")
         self.write("tools/licenses/corresponding-source/source.tar.xz", b"small source archive stand-in")
         self.json("tools/licenses/upstream-materials.json", [])
@@ -262,6 +263,42 @@ class DistributionInventoryTests(unittest.TestCase):
         self.json("mkv-source-provenance.json", self.mkv_provenance)
         self.refresh_tool_origins()
         self.pack()
+
+    def test_operative_application_license_is_inventoried_and_copied(self):
+        """Bind the selected original-code license to the actual shipped bytes."""
+        report = self.generate()
+        license_record = report["originalApplicationLicense"]
+        self.assertEqual(license_record["identifier"], "MIT")
+        self.assertEqual(license_record["copyright"], "Copyright (c) 2026 Nexusov")
+        self.assertEqual(license_record["sha256"], INVENTORY.file_hash(self.root / "LICENSE"))
+        self.assertEqual((self.output / "LICENSE").read_bytes(), (self.root / "LICENSE").read_bytes())
+        records = {record["path"]: record for record in report["files"]}
+        self.assertEqual(records["LICENSE"]["category"], "original-or-generated-project-output")
+        self.assertFalse(report["redistributionReady"])
+
+    def test_missing_application_license_is_rejected(self):
+        """Manifest coverage cannot excuse a package without its operative license."""
+        (self.root / "LICENSE").unlink()
+        self.pack()
+
+        with self.assertRaisesRegex(ValueError, "operative application license"):
+            self.generate()
+
+    def test_changed_application_license_is_rejected(self):
+        """A self-consistent archive must still carry the actual repository grant."""
+        self.write("LICENSE", b"unapproved replacement terms")
+        self.pack()
+
+        with self.assertRaisesRegex(ValueError, "operative application license"):
+            self.generate()
+
+    def test_obsolete_application_license_marker_is_rejected(self):
+        """An obsolete pending claim is invalid even when present in the manifest."""
+        self.write("licenses/APPLICATION-LICENSE-PENDING.txt", b"No license selected")
+        self.pack()
+
+        with self.assertRaisesRegex(ValueError, "pending marker"):
+            self.generate()
 
     def test_zip_accounts_for_every_actual_byte_and_explicit_unknown(self):
         """Report the final hash, every file, exact origin and unresolved payload."""

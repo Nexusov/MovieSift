@@ -1,6 +1,10 @@
 # Original application license decision
 
-**Status: pending rights-holder decision.** Research checked on 2026-10-20 against application source at `41b036e34eb4663505f0232dfdb96ee626493ef1` and the pinned dependencies. MIT is recommended for original TrackTrim code, consistent with [the brief](../PROJECT_BRIEF.md#10-licensing-and-provenance). This note grants no license, identifies no author or copyright owner, and does not change the pending status in [README](../README.md#licensing) or [THIRD_PARTY_NOTICES](../THIRD_PARTY_NOTICES.md).
+**Decision: MIT for original TrackTrim code, copyright (c) 2026 Nexusov.** The owner explicitly selected MIT and the attribution `Nexusov` on 2026-10-23. The operative grant is [LICENSE](../LICENSE), included unchanged in portable packages and their matching source/material bundles. This attribution was supplied by the owner, not inferred from GitHub or machine metadata.
+
+The decision covers original project material to which the grant applies; third-party files and contributions retain their applicable notices and terms. It does not certify third-party redistribution readiness, resolve aggregate-versus-combined-work questions, authorize public publication or establish ownership over material the licensor does not control. Contribution terms are recorded in [CONTRIBUTING](../CONTRIBUTING.md#licensing).
+
+The comparison below is retained as background research checked on 2026-10-20 against application source at `41b036e34eb4663505f0232dfdb96ee626493ef1` and the pinned dependencies. The alternatives are no longer pending choices for this candidate.
 
 ## Confirmed implementation and component terms
 
@@ -19,7 +23,7 @@ The inspected MKVToolNix source archive matches [tools.lock.json](../build/tools
 
 [MkvBackend](../src/TrackTrim.Infrastructure/MediaTools/MkvBackend.cs) invokes app-local `mkvmerge` and `mkvextract` through [OwnedProcessRunner](../src/TrackTrim.Infrastructure/Processes/OwnedProcessRunner.cs): separate processes, argument arrays, redirected streams, JSON/XML and media files. Production project references do not link MKVToolNix code into the C# application.
 
-The MP4 adapter uses the same process boundary for app-local FFmpeg/ffprobe. Candidate acquisition deliberately replaces the broad prior optional-library binary with the same FFmpeg source and a captured minimal build; it does not change the original-code recommendation into an adopted license. Separate executables do not by themselves settle the combination question discussed below.
+The MP4 adapter uses the same process boundary for app-local FFmpeg/ffprobe. Candidate acquisition deliberately replaces the broad prior optional-library binary with the same FFmpeg source and a captured minimal build. The original-code MIT decision is independent of this replacement. Separate executables do not by themselves settle the combination question discussed below.
 
 ## Alternatives for original code
 
@@ -33,10 +37,10 @@ None of these choices transfers contributors' copyright to the maintainer. Exist
 
 ## Recommendation and unresolved legal questions
 
-**Recommend MIT for original TrackTrim code:** it follows the brief's proposed simple license and permits broad reuse with little administration. The tradeoff is allowing closed downstream modifications and having no express patent grant. Prefer Apache-2.0 if explicit contributor patent terms are the priority; prefer GPL-3.0-or-later if reciprocal source availability for conveyed covered modifications is the goal. These are policy alternatives, not an adopted license.
+**MIT was recommended and selected for original TrackTrim code:** it follows the brief's proposed simple license and permits broad reuse with little administration. The tradeoff is allowing closed downstream modifications and having no express patent grant. Apache-2.0 offers explicit contributor patent terms; GPL-3.0-or-later offers reciprocal source availability for conveyed covered modifications. Neither alternative is adopted here.
 
 **Inference, not a legal conclusion:** the observed CLI boundary supports treating the application and workers as independent programs. It does not settle derivative-work or aggregation analysis. The [FSF's aggregation FAQ](https://www.gnu.org/licenses/gpl-faq.en.html#MereAggregation) considers communication semantics as well as process boundaries; applicable copyright law and the actual combination still require assessment.
 
 One concrete compatibility question must remain visible: [the ASF's compatibility explanation](https://www.apache.org/licenses/GPL-compatibility.html) permits Apache-2.0 code in GPLv3 works but identifies incompatibility with GPLv2. Serilog is already Apache-2.0, and the inspected worker notices specify GPL v2. If these components were legally one GPLv2-covered work, an original-code MIT label would not resolve that conflict. Do not assume a worker upgrade to GPLv3 or that selecting GPL-3.0-or-later for TrackTrim fixes it.
 
-Before adopting an operative license, confirm the rights holder(s), authority over existing original code/assets/contributions, and the intended scope. No identity or assignment is inferred from a GitHub account or commit metadata. Independently resolve the exact shipped native closure, notices, source/build material and applicable distribution method recorded in [THIRD_PARTY_NOTICES](../THIRD_PARTY_NOTICES.md#outstanding-public-release-obligations). Original-code license selection cannot complete that review, and a review-build label does not waive redistribution duties.
+No copyright assignment is inferred from a GitHub account or commit metadata. The exact shipped native closure, notices, source/build materials and applicable public distribution method remain independently governed by [THIRD_PARTY_NOTICES](../THIRD_PARTY_NOTICES.md#outstanding-public-release-obligations). Original-code license selection does not complete those obligations, and a review-build label does not waive redistribution duties.

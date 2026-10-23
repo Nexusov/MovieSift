@@ -222,7 +222,7 @@ Native AOT, trimming, single-file publishing, and an application AppImage are la
 
 ## 10. Licensing and provenance
 
-Preserve an existing repository license. MIT remains a proposed simple choice for original application code; do not silently assign a new public license or invent author details. Unresolved license selection does not block ordinary local implementation, but it remains a public-release item.
+Preserve the repository's operative license. Following the explicit owner decision on 2026-10-23, original TrackTrim code uses MIT with `Copyright (c) 2026 Nexusov`; see `LICENSE` and `docs/license-decision.md`. Do not extend that grant to third-party material or invent further author details. Public release authorization and covered-source delivery remain separate requirements.
 
 MKVToolNix states GPL v2 licensing and lists included components separately. FFmpeg's effective license depends on its build configuration. Executing a separate tool does not remove obligations for redistributing that tool. Do not infer either that every shipped file is MIT or that launching a GPL executable automatically determines the original C# application's license.
 

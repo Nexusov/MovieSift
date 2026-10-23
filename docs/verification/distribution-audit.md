@@ -1,6 +1,6 @@
 # Portable distribution inventory and material gaps
 
-**Historical inventory checkpoints; see the current [release-candidate closure](release-distribution-closure.md).** The candidate uses source-built FFmpeg and Windows MKV workers with bound source/build materials; the unchanged Linux MKV CLI closure retains its exact payload/source policy. The older upstream Windows/static, AppImage and optional FFmpeg file sets below describe their recorded builds. [Candidate evidence](release-candidate-evidence.json) and each new CI inventory bind actual revisions/archives/files. The old Windows static-material gap is replaced by the same-version source build, not attributed to approximate sources. Public source delivery and original-code licensing remain required. No public release or operative application license is produced.
+**Historical inventory checkpoints; see the current [release-candidate closure](release-distribution-closure.md).** The candidate uses source-built FFmpeg and Windows MKV workers with bound source/build materials; the unchanged Linux MKV CLI closure retains its exact payload/source policy. The older upstream Windows/static, AppImage and optional FFmpeg file sets below describe their recorded builds. [Candidate evidence](release-candidate-evidence.json) and each new CI inventory bind actual revisions/archives/files. The old Windows static-material gap is replaced by the same-version source build, not attributed to approximate sources. Original TrackTrim code now has the owner's explicit MIT grant, copyright (c) 2026 Nexusov; the historical pending statements below retain their checkpoint scope. Public covered-source delivery and final release authorization remain required.
 
 ## Reproducible evidence
 
@@ -12,6 +12,7 @@ Each `test-evidence-<RID>` CI artifact includes `distribution-reports/<RID>/`:
 | --- | --- |
 | `distribution-<RID>.json` | Actual Git checkout/tree/parents and dirty state; RID; final archive name, byte size and SHA256; every shipped path/size/hash; component matches, applicable native observations, and explicit unresolved items. |
 | `package-SHA256SUMS.txt` | The existing full package manifest. The report separately accounts for the manifest itself, which cannot hash itself. |
+| `LICENSE`, `review-materials.json` | The operative original-code MIT grant and the matching private source/material bundle's revision, binary archive identity, name, size and SHA256. No binary or source archive is uploaded. |
 | `build-provenance.json`, `tool-provenance.json` | Actual SDK/runtime/build platform and pinned tool/source URLs/hashes. |
 | `nuget-inventory.json` | Restored metadata, publisher repository commits, copied notice files, and exact supplemental text provenance. This is not a substitute for actual file inventory. |
 | `tool-file-provenance.json`, `upstream-materials.json` | Every retained tool/material's actual hash and acquisition origin; exact supplemental terms/header URLs and hashes. |

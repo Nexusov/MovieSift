@@ -1,6 +1,6 @@
 # TrackTrim 0.1.0-rc.1 — proposed first release
 
-This is a private review candidate, not a public release or tag. The proposed version is subject to final review. No license for original TrackTrim code has been selected.
+This is a private review candidate, not a public release or tag. The proposed version is subject to final review. Original TrackTrim code is licensed under [MIT](../LICENSE), copyright (c) 2026 Nexusov. Bundled components retain their own terms; public covered-source delivery and the remaining desktop acceptance gates are independent requirements.
 
 ## Included functionality
 

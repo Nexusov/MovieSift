@@ -540,8 +540,8 @@ def classify(records, origins, components, tool_lock, profile):
             continue
 
         original = name.startswith("TrackTrim") or name.startswith("docs/") or name == "ru/TrackTrim.resources.dll" or name in {
-            "README.md", "CONTRIBUTING.md", "THIRD_PARTY_NOTICES.md", "portable.flag", "SHA256SUMS",
-            "build-provenance.json", "tool-provenance.json", "ffmpeg-provenance.json", "mkv-source-provenance.json", "native-dependencies.txt", "licenses/APPLICATION-LICENSE-PENDING.txt",
+            "LICENSE", "README.md", "CONTRIBUTING.md", "THIRD_PARTY_NOTICES.md", "portable.flag", "SHA256SUMS",
+            "build-provenance.json", "tool-provenance.json", "ffmpeg-provenance.json", "mkv-source-provenance.json", "native-dependencies.txt",
         }
 
         if original:
@@ -799,6 +799,15 @@ def generate(package_root, archive, assets_file, output, profile_file, mkv_lock_
     records = staged_files(root)
     verify_manifest(root, records)
     verify_archive(archive, root.name, records)
+    license_record = records.get("LICENSE")
+    expected_license = Path(__file__).parents[1] / "LICENSE"
+
+    if license_record is None or license_record["sha256"] != file_hash(expected_license):
+        raise ValueError("The operative application license is missing or differs from the repository LICENSE")
+
+    if "licenses/APPLICATION-LICENSE-PENDING.txt" in records:
+        raise ValueError("The obsolete application-license-pending marker must not be packaged")
+
     build = read_json(root / "build-provenance.json")
     tool_lock = read_json(root / "tool-provenance.json")
     packages = read_json(root / "licenses/nuget/inventory.json")
@@ -859,6 +868,9 @@ def generate(package_root, archive, assets_file, output, profile_file, mkv_lock_
     report = {
         "schemaVersion": 1, "purpose": "Distribution inventory and unresolved licensing preparation; not legal approval",
         "redistributionReady": False, "build": build,
+        "originalApplicationLicense": {"identifier": "MIT", "copyright": "Copyright (c) 2026 Nexusov",
+                                       "path": "LICENSE", "sha256": license_record["sha256"],
+                                       "scope": "Original TrackTrim code; third-party terms remain independent"},
         "archive": {"name": archive.name, "size": archive.stat().st_size, "sha256": file_hash(archive)},
         "manifest": records["SHA256SUMS"], "toolProvenance": tool_lock, "ffmpegProvenance": ffmpeg_lock,
         "toolPayloadSelection": selection,
@@ -874,14 +886,14 @@ def generate(package_root, archive, assets_file, output, profile_file, mkv_lock_
             "NuGet match proves byte identity to a signed archive member, not complete source or legal compliance.",
             "Omissions are limited to the hash-pinned CLI selection, backed by source, dependency, representative runtime and mandatory packaged-workflow evidence.",
             "Third-party-notice inclusion alone does not prove which optional components were compiled.",
-            "Original TrackTrim license, combined-work analysis and corresponding-source/build completeness remain open.",
+            "Original TrackTrim code is MIT; combined-work analysis and actual covered-source/build delivery remain independent requirements.",
         ],
     }
     output.mkdir(parents=True, exist_ok=True)
     report_path = output / f"distribution-{build['runtimeIdentifier']}.json"
     report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     for source, destination in {
-        "SHA256SUMS": "package-SHA256SUMS.txt", "build-provenance.json": "build-provenance.json",
+        "LICENSE": "LICENSE", "SHA256SUMS": "package-SHA256SUMS.txt", "build-provenance.json": "build-provenance.json",
         "tool-provenance.json": "tool-provenance.json", "licenses/nuget/inventory.json": "nuget-inventory.json",
         "ffmpeg-provenance.json": "ffmpeg-provenance.json",
         "tools/file-provenance.json": "tool-file-provenance.json",

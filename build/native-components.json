@@ -2172,13 +2172,6 @@
   ],
   "unresolved": [
     {
-      "component": "Original TrackTrim code/assets",
-      "evidence": "No operative original-code license; four original assemblies and project assets are shipped.",
-      "missing": "Rights-holder identity/authority, policy choice and operative terms.",
-      "primaryLocationChecked": "docs/license-decision.md and PROJECT_BRIEF.md",
-      "nextAction": "Owner decides the original-code license after confirming rights; do not infer an owner from account metadata."
-    },
-    {
       "component": "Windows MKVToolNix source delivery",
       "evidence": "The same-version source-built CLI pair replaces the historical staticQt6.10.2/MXE workers. Actual DLL bytes match pinned UCRT64 packages; binary BUILDINFO recipe hashes bind their complete source/patch packages. QtCore6.12/GMP GPL2 alternatives, exact primary notices and configuration/compiler/build scripts are collected in mkvSourceBuildEvidence.",
       "missing": "Actually deliver the collected applicable covered-source/build materials and notices alongside the matching public binaries. The old official binary closure remains unproven historical research, not a shipped replacement dependency.",
