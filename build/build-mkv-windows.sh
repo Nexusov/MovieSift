@@ -2,10 +2,15 @@
 # Build the pinned CLI pair in an ephemeral Windows UCRT64 environment.
 set -euo pipefail
 
-if [[ "${GITHUB_ACTIONS:-}" != true || "${RUNNER_OS:-}" != Windows || "${MSYSTEM:-}" != UCRT64 ]]; then
+if [[ "${GITHUB_ACTIONS:-}" != true || "${RUNNER_OS:-}" != Windows ]]; then
   printf '%s\n' 'This recipe requires the isolated UCRT64 Windows Actions builder.' >&2
   exit 1
 fi
+
+# --noprofile/--norc intentionally avoids changing other worker build environments.
+export MSYSTEM=UCRT64
+export MINGW_PREFIX=/ucrt64
+export MSYSTEM_PREFIX=/ucrt64
 
 if [[ "$#" != 3 ]]; then
   printf '%s\n' 'Usage: build-mkv-windows.sh source-directory destination material-directory' >&2

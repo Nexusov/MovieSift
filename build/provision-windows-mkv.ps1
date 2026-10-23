@@ -82,7 +82,11 @@ function Get-VerifiedMkvTargetPackages {
     $failures = @($results | Where-Object Failure | ForEach-Object { "$($_.FileName): $($_.Failure)" })
 
     if ($results.Count -ne $Artifacts.Count -or $failures.Count) {
-        throw ('Pinned target package batch failed before installation: ' + ($failures -join '; '))
+        foreach ($failure in $failures) {
+            [Console]::Error.WriteLine($failure)
+        }
+
+        throw "Pinned target package batch failed before installation ($($failures.Count) failures among $($Artifacts.Count) inputs)."
     }
 }
 
@@ -127,6 +131,8 @@ Copy-Item -LiteralPath $lockPath -Destination $materialDirectory
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'build-mkv-windows.sh') -Destination $materialDirectory
 $sourceArchive = Get-VerifiedMkvBuildInput -Artifact $lock.source -Directory $cachePath
 Copy-Item -LiteralPath $sourceArchive -Destination $sourceMaterials
+$recipeLicense = Get-VerifiedMkvBuildInput -Artifact $lock.recipeSnapshot.license -Directory $cachePath
+Copy-Item -LiteralPath $recipeLicense -Destination $materialDirectory
 
 # These host-only tools are not shipped. Their actual installed versions are recorded.
 & $pacman -S --needed --noconfirm make diffutils patch grep sed gawk tar xz zstd
@@ -141,10 +147,7 @@ Get-VerifiedMkvTargetPackages -Artifacts $packageInputs -Directory $cachePath
 
 $packageList = Join-Path $cachePath 'package-files.txt'
 $lock.packages.fileName | Set-Content -LiteralPath $packageList -Encoding utf8NoBOM
-$env:MSYSTEM = 'UCRT64'
-$env:CHERE_INVOKING = '1'
-$env:TRACKTRIM_MKV_PACKAGE_CACHE = $cachePath
-& $bash --noprofile --norc -c 'set -euo pipefail; cd "$(cygpath -u "$TRACKTRIM_MKV_PACKAGE_CACHE")"; mapfile -t packages < package-files.txt; pacman -U --noconfirm --needed "${packages[@]}"'
+& $bash --noprofile --norc -c 'set -euo pipefail; cd "$(cygpath -u "$1")"; mapfile -t packages < package-files.txt; pacman -U --noconfirm --needed "${packages[@]}"' tracktrim-mkv-install $cachePath
 
 if ($LASTEXITCODE) {
     throw 'The exact locked UCRT64 package closure could not be installed.'
@@ -152,9 +155,9 @@ if ($LASTEXITCODE) {
 
 $workDirectory = Join-Path $cachePath ('compile-' + [Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $workDirectory | Out-Null
-$env:TRACKTRIM_MKV_SOURCE_ARCHIVE = $sourceArchive
-$env:TRACKTRIM_MKV_WORK_DIRECTORY = $workDirectory
-& $bash --noprofile --norc -c 'set -euo pipefail; tar -xJf "$(cygpath -u "$TRACKTRIM_MKV_SOURCE_ARCHIVE")" --exclude=mkvtoolnix-102.0/drake --exclude=mkvtoolnix-102.0/doc/man/mkvtoolnix-doc.css -C "$(cygpath -u "$TRACKTRIM_MKV_WORK_DIRECTORY")"'
+# The pinned archive has exactly these two optional symlinks. Neither is needed by
+# the CLI targets; the complete original source archive is retained unchanged.
+& $bash --noprofile --norc -c 'set -euo pipefail; tar -xJf "$(cygpath -u "$1")" --exclude=mkvtoolnix-102.0/drake --exclude=mkvtoolnix-102.0/doc/man/mkvtoolnix-doc.css -C "$(cygpath -u "$2")"' tracktrim-mkv-extract $sourceArchive $workDirectory
 
 if ($LASTEXITCODE) {
     throw 'The pinned MKVToolNix source archive could not be extracted.'

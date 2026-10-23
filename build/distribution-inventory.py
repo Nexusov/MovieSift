@@ -187,10 +187,12 @@ def mkv_source_build_evidence(directory, records, lock_path, recipe_path, standa
     if observed_files != expected_files:
         raise ValueError("MKV source-build receipt does not cover exactly the actual build files")
 
+    recipe_license = lock["recipeSnapshot"]["license"]
     required_materials = {
         "mkv-source.lock.json", "build-mkv-windows.sh", "config.h", "build-config", "config.log",
         "configure-arguments.json", "installed-packages.json", "compiler-versions.txt", "dependency-packages.json",
         "collect-mkv-build.py", "provision-windows-mkv.ps1", "ffmpeg-runtime-dependencies.py",
+        relative_path(recipe_license["fileName"]),
         "source/" + lock["source"]["fileName"],
     }
     material_names = {row["path"] for row in materials}
@@ -201,6 +203,7 @@ def mkv_source_build_evidence(directory, records, lock_path, recipe_path, standa
     pinned_materials = {
         "mkv-source.lock.json": lock_hash, "build-mkv-windows.sh": recipe_hash,
         "source/" + lock["source"]["fileName"]: lock["source"]["sha256"],
+        recipe_license["fileName"]: recipe_license["sha256"],
     }
     for name in ("collect-mkv-build.py", "provision-windows-mkv.ps1", "ffmpeg-runtime-dependencies.py"):
         pinned_materials[name] = file_hash(Path(__file__).with_name(name))
@@ -208,6 +211,9 @@ def mkv_source_build_evidence(directory, records, lock_path, recipe_path, standa
 
         if records[MKV_BUILD_MATERIAL_PREFIX + name]["sha256"] != expected_hash:
             raise ValueError("MKV source-build included source/lock/recipe differs from its pin")
+
+    if records[MKV_BUILD_MATERIAL_PREFIX + recipe_license["fileName"]]["size"] != recipe_license["size"]:
+        raise ValueError("MKV source-build recipe snapshot license size differs from its pin")
 
     arguments = read_mkv_build_json(directory / MKV_BUILD_MATERIAL_PREFIX / "configure-arguments.json")
 
@@ -534,6 +540,7 @@ def tool_origins(root, records, tool_lock, runtime_identifier, ffmpeg_lock, mkv_
         permitted_hashes.update(package["sourcePackage"]["sha256"] for package in mkv_source["lock"]["packages"] if package.get("sourcePackage"))
         shipped_packages = {row["packageName"] for row in mkv_source["receipt"]["dependencies"]}
         permitted_hashes.update(package["sha256"] for package in mkv_source["lock"]["packages"] if package["name"] in shipped_packages)
+        permitted_hashes.add(mkv_source["lock"]["recipeSnapshot"]["license"]["sha256"])
     for material in supplemental:
         directory = material.get("outputDirectory", "upstream-terms")
 

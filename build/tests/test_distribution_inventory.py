@@ -184,11 +184,16 @@ class DistributionInventoryTests(unittest.TestCase):
                    "fileName": "qt6-base.pkg.tar.zst", "url": "https://example.invalid/qt6-base.pkg.tar.zst", "sha256": "7" * 64,
                    "sourcePackage": {"fileName": "qt6-base.src.tar.zst", "url": "https://example.invalid/qt6-base.src.tar.zst",
                                      "sha256": hashlib.sha256(dependency_source).hexdigest()}}
-        lock = {"schemaVersion": 1, "version": "102.0", "source": source, "packages": [package]}
+        recipe_notice = b"controlled original recipe copyright and license notice"
+        recipe_license = {"fileName": "MSYS2-MINGW-packages-LICENSE", "url": "https://example.invalid/pinned-recipe/LICENSE",
+                          "sha256": hashlib.sha256(recipe_notice).hexdigest(), "size": len(recipe_notice)}
+        lock = {"schemaVersion": 1, "version": "102.0", "source": source, "packages": [package],
+                "recipeSnapshot": {"license": recipe_license}}
         self.mkv_lock.write_text(json.dumps(lock), encoding="utf-8")
         prefix = "tools/licenses/mkv-source-build/"
         self.write(prefix + "mkv-source.lock.json", self.mkv_lock.read_bytes())
         self.write(prefix + "build-mkv-windows.sh", self.mkv_recipe.read_bytes())
+        self.write(prefix + recipe_license["fileName"], recipe_notice)
         for name in ("collect-mkv-build.py", "provision-windows-mkv.ps1", "ffmpeg-runtime-dependencies.py"):
             self.write(prefix + name, (Path(__file__).parents[1] / name).read_bytes())
         self.write(prefix + "source/source.tar.xz", source_data)
@@ -542,6 +547,24 @@ class DistributionInventoryTests(unittest.TestCase):
         path.write_bytes(b" " * (INVENTORY.MKV_BUILD_JSON_BYTES + 1))
         with self.assertRaisesRegex(ValueError, "bounded regular file"):
             INVENTORY.read_mkv_build_json(path)
+
+    def test_source_built_mkv_recipe_snapshot_notice_is_required_and_exact(self):
+        """A source recipe's author notice cannot be omitted or replaced behind a fresh receipt."""
+        self.prepare_mkv_source_build()
+        name = "MSYS2-MINGW-packages-LICENSE"
+        path = self.root / "tools/licenses/mkv-source-build" / name
+        row = next(row for row in self.mkv_receipt["materials"] if row["path"] == name)
+        self.mkv_receipt["materials"].remove(row)
+        path.unlink()
+        self.write_mkv_receipt()
+        with self.assertRaisesRegex(ValueError, "required source/configuration/notices are missing"):
+            self.generate()
+        path.write_bytes(b"replacement recipe terms")
+        row.update(size=path.stat().st_size, sha256=INVENTORY.file_hash(path))
+        self.mkv_receipt["materials"].append(row)
+        self.write_mkv_receipt()
+        with self.assertRaisesRegex(ValueError, "included source/lock/recipe differs"):
+            self.generate()
 
 
 if __name__ == "__main__":

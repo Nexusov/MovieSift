@@ -407,6 +407,14 @@ $fileProvenance = @(Get-ChildItem -LiteralPath $destinationPath -File -Recurse -
                 $originArchiveHash = $artifact.sha256
             }
         }
+
+        $recipeLicense = $mkvBuildLock.recipeSnapshot.license
+
+        if ($relativePath -ceq ('licenses/mkv-source-build/' + $recipeLicense.fileName)) {
+            $origin = 'unchanged author notice for the exact pinned MSYS2 MINGW-packages recipe snapshot'
+            $originArchive = $recipeLicense.url
+            $originArchiveHash = $recipeLicense.sha256
+        }
     }
 
     if ($ffmpegMembers.ContainsKey($relativePath)) {
