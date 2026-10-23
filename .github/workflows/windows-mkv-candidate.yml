@@ -44,5 +44,7 @@ jobs:
         with:
           name: windows-mkv-source-candidate
           path: ${{ runner.temp }}/mkv-source-candidate/
+          # Original binary metadata is part of the hash-bound source evidence.
+          include-hidden-files: true
           if-no-files-found: error
           retention-days: 3
