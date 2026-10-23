@@ -1,6 +1,7 @@
 """Protect the isolated Windows MKV source-builder's collection and installation boundary."""
 
 import importlib.util
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -45,6 +46,55 @@ class WindowsMkvBuildTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "absent or changed"):
                 COLLECTION.require_cached_archive(root, {"fileName": archive.name, "sha256": "0" * 64})
             self.assertEqual(b"unexpected cached bytes", archive.read_bytes())
+
+    def run_target_batch(self, root, artifacts):
+        """Invoke the real downloader function with cached controlled packages, never an installer."""
+        runner = root / "runner.ps1"
+        runner.write_text("""param($Helper, $Cache, $Artifacts)
+$ErrorActionPreference = 'Stop'
+$tokens = $null
+$parseErrors = $null
+$syntax = [Management.Automation.Language.Parser]::ParseFile($Helper, [ref]$tokens, [ref]$parseErrors)
+$functions = $syntax.FindAll({ param($node) $node -is [Management.Automation.Language.FunctionDefinitionAst] }, $false)
+foreach ($definition in $functions) { Invoke-Expression $definition.Extent.Text }
+try {
+    $inputs = @(Get-Content -LiteralPath $Artifacts -Raw | ConvertFrom-Json)
+    Get-VerifiedMkvTargetPackages -Artifacts $inputs -Directory $Cache
+    [Console]::WriteLine('accepted complete package batch')
+}
+catch { [Console]::Error.WriteLine($_.Exception.Message); exit 1 }
+""", encoding="utf-8")
+        artifact_path = root / "artifacts.json"
+        artifact_path.write_text(json.dumps(artifacts), encoding="utf-8")
+        return subprocess.run([
+            shutil.which("pwsh"), "-NoProfile", "-NonInteractive", "-File", str(runner),
+            "-Helper", str(BUILD / "provision-windows-mkv.ps1"), "-Cache", str(root), "-Artifacts", str(artifact_path),
+        ], capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=30)
+
+    def test_parallel_target_batch_accepts_verified_cached_packages(self):
+        """Exercise supported parallel invocation before any target-package installation."""
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            artifacts = []
+            for name in ("first.pkg.tar.zst", "second.pkg.tar.zst"):
+                payload = name.encode("ascii")
+                (root / name).write_bytes(payload)
+                artifacts.append({"fileName": name, "url": "https://example.invalid/not-needed", "sha256": hashlib.sha256(payload).hexdigest()})
+            result = self.run_target_batch(root, artifacts)
+            self.assertEqual(0, result.returncode, result.stderr)
+            self.assertIn("accepted complete package batch", result.stdout)
+
+    def test_parallel_target_batch_failure_prevents_acceptance_and_preserves_bytes(self):
+        """An error in a worker runspace must reject the entire install input batch."""
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            archive = root / "changed.pkg.tar.zst"
+            archive.write_bytes(b"changed cache")
+            result = self.run_target_batch(root, [{"fileName": archive.name, "url": "https://example.invalid/not-needed", "sha256": "0" * 64}])
+            self.assertNotEqual(0, result.returncode)
+            self.assertIn("Pinned target package validation failed", result.stderr)
+            self.assertNotIn("accepted complete", result.stdout)
+            self.assertEqual(b"changed cache", archive.read_bytes())
 
     def test_package_member_paths_are_relative_and_non_traversing(self):
         """Only ordinary package-relative names can become collected material paths."""

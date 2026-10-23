@@ -51,6 +51,41 @@ function Get-VerifiedMkvBuildInput {
     return $path
 }
 
+## Verifies the complete pinned target package batch before installation can begin.
+function Get-VerifiedMkvTargetPackages {
+    param([Parameter(Mandatory)] [object[]] $Artifacts, [Parameter(Mandatory)] [string] $Directory)
+
+    $results = @($Artifacts | ForEach-Object -ThrottleLimit 8 -Parallel {
+        $ErrorActionPreference = 'Stop'
+        $artifact = $_
+
+        try {
+            $path = Join-Path $using:Directory $artifact.fileName
+
+            if (-not (Test-Path -LiteralPath $path)) {
+                Invoke-WebRequest -Uri $artifact.url -OutFile $path -TimeoutSec 240
+            }
+
+            $metadata = Get-Item -LiteralPath $path -Force
+            $regular = -not $metadata.PSIsContainer -and -not ($metadata.Attributes -band [IO.FileAttributes]::ReparsePoint)
+
+            if (-not $regular -or (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant() -cne $artifact.sha256) {
+                throw "Pinned target package validation failed: $($artifact.fileName)."
+            }
+
+            [PSCustomObject]@{ FileName = $artifact.fileName; Failure = '' }
+        }
+        catch {
+            [PSCustomObject]@{ FileName = $artifact.fileName; Failure = $_.Exception.Message }
+        }
+    })
+    $failures = @($results | Where-Object Failure | ForEach-Object { "$($_.FileName): $($_.Failure)" })
+
+    if ($results.Count -ne $Artifacts.Count -or $failures.Count) {
+        throw ('Pinned target package batch failed before installation: ' + ($failures -join '; '))
+    }
+}
+
 $supportedRunner = $IsWindows -and $env:GITHUB_ACTIONS -ceq 'true' -and $env:RUNNER_OS -ceq 'Windows'
 
 if (-not $supportedRunner -or -not $env:RUNNER_TEMP) {
@@ -102,21 +137,7 @@ if ($LASTEXITCODE) {
 
 # Download immutable target archives in parallel, then install the entire locked closure together.
 $packageInputs = @($lock.packages | ForEach-Object { $_ })
-$packageInputs | ForEach-Object -ThrottleLimit 8 -Parallel {
-    $artifact = $_
-    $path = Join-Path $using:cachePath $artifact.fileName
-
-    if (-not (Test-Path -LiteralPath $path)) {
-        Invoke-WebRequest -Uri $artifact.url -OutFile $path -TimeoutSec 240
-    }
-
-    $metadata = Get-Item -LiteralPath $path -Force
-    $regular = -not $metadata.PSIsContainer -and -not ($metadata.Attributes -band [IO.FileAttributes]::ReparsePoint)
-
-    if (-not $regular -or (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant() -cne $artifact.sha256) {
-        throw "Pinned target package validation failed: $($artifact.fileName)."
-    }
-} -ErrorAction Stop
+Get-VerifiedMkvTargetPackages -Artifacts $packageInputs -Directory $cachePath
 
 $packageList = Join-Path $cachePath 'package-files.txt'
 $lock.packages.fileName | Set-Content -LiteralPath $packageList -Encoding utf8NoBOM
