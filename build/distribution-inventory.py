@@ -247,6 +247,32 @@ def mkv_source_build_evidence(directory, records, lock_path, recipe_path, standa
                 or not isinstance(notices, list) or not notices or any(notice not in material_names for notice in notices):
             raise ValueError("MKV source-build exact dependency sources/notices are missing or changed")
 
+        source_notice_policy = pinned.get("sourceNotices")
+        source_notice_evidence = package.get("sourceNoticeEvidence")
+
+        if source_notice_policy or source_notice_evidence:
+
+            if name != "mingw-w64-ucrt-x86_64-gmp" or not isinstance(source_notice_policy, dict) or not isinstance(source_notice_evidence, dict):
+                raise ValueError("MKV source-build source notice evidence lacks its explicit GMP policy")
+
+            expected_notices = [{"path": "packages/" + name + "/notices/" + relative_path(row["fileName"]),
+                                 "upstreamMember": row["path"], "size": row["size"], "sha256": row["sha256"]}
+                                for row in source_notice_policy["members"]]
+            expected_evidence = {
+                "sourcePackageSha256": pinned["sourcePackage"]["sha256"],
+                "sourcePackageMember": source_notice_policy["sourcePackageMember"],
+                "sourceArchiveSha256": source_notice_policy["sourceArchiveSha256"], "members": expected_notices,
+            }
+
+            if source_notice_evidence != expected_evidence or notices != [row["path"] for row in expected_notices]:
+                raise ValueError("MKV source-build GMP notice evidence differs from the exact pinned source policy")
+
+            for row in expected_notices:
+                included_notice = records[MKV_BUILD_MATERIAL_PREFIX + row["path"]]
+
+                if included_notice["sha256"] != row["sha256"] or included_notice["size"] != row["size"]:
+                    raise ValueError("MKV source-build GMP source notice bytes differ from the exact pin")
+
     for dependency in dependencies:
 
         if dependency["packageVersion"] != declared_packages[dependency["packageName"]]["version"]:

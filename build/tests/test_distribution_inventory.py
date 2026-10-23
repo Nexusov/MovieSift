@@ -172,7 +172,7 @@ class DistributionInventoryTests(unittest.TestCase):
             name_offset += len(encoded)
         return bytes(data)
 
-    def prepare_mkv_source_build(self):
+    def prepare_mkv_source_build(self, source_notices=False):
         """Create a complete source-built Windows tool/material closure with real PE import evidence."""
         self.mkv_lock = self.directory / "mkv-source.lock.json"
         self.mkv_recipe = self.directory / "build-mkv-windows.sh"
@@ -184,6 +184,13 @@ class DistributionInventoryTests(unittest.TestCase):
                    "fileName": "qt6-base.pkg.tar.zst", "url": "https://example.invalid/qt6-base.pkg.tar.zst", "sha256": "7" * 64,
                    "sourcePackage": {"fileName": "qt6-base.src.tar.zst", "url": "https://example.invalid/qt6-base.src.tar.zst",
                                      "sha256": hashlib.sha256(dependency_source).hexdigest()}}
+        notice_data = {"README": b"controlled GMP copyright and dual-license grant", "COPYINGv2": b"controlled complete GPL2 text"}
+
+        if source_notices:
+            package.update(name="mingw-w64-ucrt-x86_64-gmp", version="6.3.0-3")
+            package["sourceNotices"] = {"sourcePackageMember": "mingw-w64-gmp/gmp-6.3.0.tar.xz", "sourceArchiveSha256": "8" * 64,
+                                        "members": [{"path": "gmp-6.3.0/" + name, "fileName": name, "size": len(data),
+                                                     "sha256": hashlib.sha256(data).hexdigest()} for name, data in notice_data.items()]}
         recipe_notice = b"controlled original recipe copyright and license notice"
         recipe_license = {"fileName": "MSYS2-MINGW-packages-LICENSE", "url": "https://example.invalid/pinned-recipe/LICENSE",
                           "sha256": hashlib.sha256(recipe_notice).hexdigest(), "size": len(recipe_notice)}
@@ -202,7 +209,20 @@ class DistributionInventoryTests(unittest.TestCase):
             self.write(prefix + name, ("controlled " + name).encode())
         self.json(prefix + "configure-arguments.json", ["--disable-gui", "--disable-update-check"])
         self.json(prefix + "installed-packages.json", [package])
-        self.json(prefix + "dependency-packages.json", [dict(package, noticePaths=["notices/Qt-COPYING"])])
+        package_evidence = dict(package, noticePaths=["notices/Qt-COPYING"])
+
+        if source_notices:
+            notice_members = []
+            for name, data in notice_data.items():
+                path = "packages/" + package["name"] + "/notices/" + name
+                self.write(prefix + path, data)
+                notice_members.append({"path": path, "upstreamMember": "gmp-6.3.0/" + name,
+                                       "size": len(data), "sha256": hashlib.sha256(data).hexdigest()})
+            package_evidence["noticePaths"] = [row["path"] for row in notice_members]
+            package_evidence["sourceNoticeEvidence"] = {"sourcePackageSha256": package["sourcePackage"]["sha256"],
+                                                       "sourcePackageMember": package["sourceNotices"]["sourcePackageMember"],
+                                                       "sourceArchiveSha256": package["sourceNotices"]["sourceArchiveSha256"], "members": notice_members}
+        self.json(prefix + "dependency-packages.json", [package_evidence])
         imports = {"mkvmerge.exe": ["Qt6Core.dll", "KERNEL32.dll"], "mkvextract.exe": ["Qt6Core.dll", "KERNEL32.dll"],
                    "Qt6Core.dll": ["KERNEL32.dll"]}
         for name, names in imports.items():
@@ -564,6 +584,31 @@ class DistributionInventoryTests(unittest.TestCase):
         self.mkv_receipt["materials"].append(row)
         self.write_mkv_receipt()
         with self.assertRaisesRegex(ValueError, "included source/lock/recipe differs"):
+            self.generate()
+
+    def test_source_built_mkv_gmp_notices_require_exact_nested_source_evidence(self):
+        """The explicit GMP source route keeps its grant/text while unrelated packages retain the normal notice gate."""
+        self.prepare_mkv_source_build(source_notices=True)
+        self.assertEqual("passed", self.generate()["mechanicalChecks"]["pinnedMkvSourceBuild"])
+        path = self.root / "tools/licenses/mkv-source-build/dependency-packages.json"
+        packages = json.loads(path.read_text(encoding="utf-8"))
+        packages[0]["sourceNoticeEvidence"]["sourceArchiveSha256"] = "0" * 64
+        self.json("tools/licenses/mkv-source-build/dependency-packages.json", packages)
+        row = next(row for row in self.mkv_receipt["materials"] if row["path"] == "dependency-packages.json")
+        row.update(size=path.stat().st_size, sha256=INVENTORY.file_hash(path))
+        self.write_mkv_receipt()
+        with self.assertRaisesRegex(ValueError, "GMP notice evidence differs"):
+            self.generate()
+        packages[0]["sourceNoticeEvidence"]["sourceArchiveSha256"] = "8" * 64
+        self.json("tools/licenses/mkv-source-build/dependency-packages.json", packages)
+        row.update(size=path.stat().st_size, sha256=INVENTORY.file_hash(path))
+        notice = packages[0]["noticePaths"][0]
+        notice_path = self.root / "tools/licenses/mkv-source-build" / notice
+        notice_path.write_bytes(b"substituted grant")
+        notice_row = next(row for row in self.mkv_receipt["materials"] if row["path"] == notice)
+        notice_row.update(size=notice_path.stat().st_size, sha256=INVENTORY.file_hash(notice_path))
+        self.write_mkv_receipt()
+        with self.assertRaisesRegex(ValueError, "GMP source notice bytes differ"):
             self.generate()
 
 

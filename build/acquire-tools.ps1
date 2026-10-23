@@ -127,6 +127,7 @@ if ($RuntimeIdentifier -eq 'win-x64') {
 
         $mkvSourceReceipt = Get-Content -LiteralPath (Join-Path $WindowsMkvBuildDirectory $mkvSourceProvenance.receiptPath) -Raw | ConvertFrom-Json
         $mkvBuildLock = Get-Content -LiteralPath (Join-Path $WindowsMkvBuildDirectory 'licenses/mkv-source-build/mkv-source.lock.json') -Raw | ConvertFrom-Json
+        $mkvDependencyPackages = Get-Content -LiteralPath (Join-Path $WindowsMkvBuildDirectory 'licenses/mkv-source-build/dependency-packages.json') -Raw | ConvertFrom-Json
         $mkvBuildFiles = @('mkv-source-provenance.json', $mkvSourceProvenance.receiptPath) +
             @($mkvSourceReceipt.workers.path) + @($mkvSourceReceipt.dependencies.path) +
             @($mkvSourceReceipt.materials | ForEach-Object { 'licenses/mkv-source-build/' + $_.path })
@@ -414,6 +415,23 @@ $fileProvenance = @(Get-ChildItem -LiteralPath $destinationPath -File -Recurse -
             $origin = 'unchanged author notice for the exact pinned MSYS2 MINGW-packages recipe snapshot'
             $originArchive = $recipeLicense.url
             $originArchiveHash = $recipeLicense.sha256
+        }
+
+        foreach ($packageEvidence in $mkvDependencyPackages) {
+
+            if ($packageEvidence.PSObject.Properties.Name -notcontains 'sourceNoticeEvidence') {
+                continue
+            }
+
+            foreach ($notice in $packageEvidence.sourceNoticeEvidence.members) {
+
+                if ($relativePath -ceq ('licenses/mkv-source-build/' + $notice.path)) {
+                    $origin = 'exact GMP notice from the pinned nested source archive; sourceNoticeEvidence binds the outer package, nested archive and notice member hashes'
+                    $originArchive = $packageEvidence.sourcePackage.url
+                    $originArchiveHash = $packageEvidence.sourcePackage.sha256
+                    $originMember = $packageEvidence.sourceNoticeEvidence.sourcePackageMember
+                }
+            }
         }
     }
 

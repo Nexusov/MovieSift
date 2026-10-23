@@ -3,11 +3,13 @@
 import argparse
 import hashlib
 import importlib.util
+import io
 import json
 import os
 from pathlib import Path, PurePosixPath
 import shutil
 import subprocess
+import tarfile
 import urllib.request
 import uuid
 
@@ -16,6 +18,8 @@ MAXIMUM_SOURCE_BYTES = 512 * 1024 * 1024
 MAXIMUM_MEMBER_BYTES = 128 * 1024 * 1024
 MAXIMUM_RECEIPT_BYTES = 1024 * 1024
 MAXIMUM_DEPENDENCIES = 100
+MAXIMUM_NOTICE_BYTES = 512 * 1024
+GMP_PACKAGE = "mingw-w64-ucrt-x86_64-gmp"
 SYSTEM_LIBRARIES = frozenset({
     "advapi32.dll", "avrt.dll", "bcrypt.dll", "cfgmgr32.dll", "comctl32.dll", "comdlg32.dll",
     "crypt32.dll", "dbghelp.dll", "dnsapi.dll", "dwmapi.dll", "gdi32.dll", "imm32.dll",
@@ -115,6 +119,22 @@ def metadata_fields(data):
     return fields
 
 
+def package_member_path(source, prefix):
+    """Map the selected Windows DLL to its actual MSYS2 package/owner-query path."""
+    relative = source.relative_to(prefix)
+
+    if len(relative.parts) != 2 or relative.parts[0] != "bin" or relative.suffix.casefold() != ".dll":
+        raise ValueError("A Windows MKV runtime DLL must belong directly to the locked UCRT64 bin directory")
+
+    return "ucrt64/" + relative.as_posix()
+
+
+def query_dll_owner(pacman, source, prefix):
+    """Ask the installed package database for ownership using its native POSIX path."""
+    member = package_member_path(source, prefix)
+    return command([str(pacman), "-Qqo", "/" + member]).decode("utf-8").strip()
+
+
 def require_cached_archive(cache, artifact):
     """Require exact package identity and preserve unexpected cached bytes."""
     path = cache / artifact["fileName"]
@@ -153,6 +173,40 @@ def acquire_source(cache, artifact):
     return path
 
 
+def extract_gmp_notice_members(archive_bytes, policy):
+    """Read exact GMP grant/license bytes from the authenticated nested upstream source archive."""
+    if hashlib.sha256(archive_bytes).hexdigest() != policy["sourceArchiveSha256"]:
+        raise ValueError("The nested GMP source archive differs from its pinned SHA256")
+
+    collected = []
+    with tarfile.open(fileobj=io.BytesIO(archive_bytes), mode="r:xz") as archive:
+        for member in policy["members"]:
+            source_path = safe_member(member["path"])
+            destination_path = safe_member(member["fileName"])
+
+            if destination_path.name != member["fileName"]:
+                raise ValueError("GMP notice names must be single literal filenames")
+
+            try:
+                metadata = archive.getmember(source_path.as_posix())
+            except KeyError as error:
+                raise ValueError("A pinned GMP source notice is missing: " + member["path"]) from error
+
+            valid_member = metadata.isfile() and 0 < metadata.size <= MAXIMUM_NOTICE_BYTES and metadata.size == member["size"]
+
+            if not valid_member:
+                raise ValueError("A GMP source notice is not the expected bounded regular member")
+
+            data = archive.extractfile(metadata).read(MAXIMUM_NOTICE_BYTES + 1)
+
+            if len(data) != member["size"] or hashlib.sha256(data).hexdigest() != member["sha256"]:
+                raise ValueError("A GMP source notice differs from its pinned SHA256")
+
+            collected.append({**member, "data": data})
+
+    return collected
+
+
 def collect(directory, cache, prefix, pacman, lock_path, recipe):
     """Bind the CLI pair, recursive DLLs and source/recipe/notices to the exact executed build."""
     lock = json.loads(lock_path.read_text(encoding="utf-8"))
@@ -183,14 +237,14 @@ def collect(directory, cache, prefix, pacman, lock_path, recipe):
             if source is None or len(dependencies) >= MAXIMUM_DEPENDENCIES:
                 raise ValueError("Unresolved or excessive Windows MKV dependency: " + name)
 
-            package_name = command([str(pacman), "-Qqo", str(source)]).decode("utf-8").strip()
+            archive_path = package_member_path(source, prefix)
+            package_name = query_dll_owner(pacman, source, prefix)
             package = packages.get(package_name)
 
             if package is None:
                 raise ValueError("A runtime DLL does not belong to the locked target closure: " + name)
 
             archive = require_cached_archive(cache, package)
-            archive_path = "ucrt64/bin/" + source.name
             archive_bytes = tar_member(archive, archive_path)
 
             if hashlib.sha256(archive_bytes).hexdigest() != file_hash(source):
@@ -250,7 +304,29 @@ def collect(directory, cache, prefix, pacman, lock_path, recipe):
             target.write_bytes(tar_member(binary_archive, name))
             notices.append(target.relative_to(material_root).as_posix())
 
-        included_packages.append({"name": package_name, "version": package["version"], "sourcePackage": source_pin, "noticePaths": notices})
+        package_evidence = {"name": package_name, "version": package["version"], "sourcePackage": source_pin, "noticePaths": notices}
+
+        if not notices and package_name == GMP_PACKAGE:
+            # This exact binary package omits notices. Its matched complete source
+            # contains the actual copyright/grant and GPL2 text; no generic fallback.
+            policy = package["sourceNotices"]
+            nested_source = tar_member(source_archive, policy["sourcePackageMember"])
+            source_notices = extract_gmp_notice_members(nested_source, policy)
+            notice_evidence = []
+            for notice in source_notices:
+                target = package_root / "notices" / notice["fileName"]
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes(notice["data"])
+                relative_path = target.relative_to(material_root).as_posix()
+                notices.append(relative_path)
+                notice_evidence.append({"path": relative_path, "upstreamMember": notice["path"], "size": notice["size"], "sha256": notice["sha256"]})
+
+            package_evidence["sourceNoticeEvidence"] = {
+                "sourcePackageSha256": source_pin["sha256"], "sourcePackageMember": policy["sourcePackageMember"],
+                "sourceArchiveSha256": policy["sourceArchiveSha256"], "members": notice_evidence,
+            }
+
+        included_packages.append(package_evidence)
 
     configure_arguments = (material_root / "configure-arguments.txt").read_text(encoding="utf-8").splitlines()
     write_json(material_root / "configure-arguments.json", configure_arguments)

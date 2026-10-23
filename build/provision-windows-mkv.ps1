@@ -184,4 +184,10 @@ if ($LASTEXITCODE) {
     throw 'MKV worker dependency/source/material validation failed; the candidate is not accepted.'
 }
 
+& python (Join-Path $PSScriptRoot 'distribution-inventory.py') --validate-windows-mkv-build $destinationPath
+
+if ($LASTEXITCODE) {
+    throw 'The complete newly built MKV candidate failed independent payload/material validation.'
+}
+
 Write-Output "Built the pinned MKVToolNix CLI candidate at $destinationPath; mandatory application/package tests must accept it before adoption."

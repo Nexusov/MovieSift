@@ -2,13 +2,16 @@
 
 import importlib.util
 import hashlib
+import io
 import json
 import os
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 import shutil
 import subprocess
 import tempfile
+import tarfile
 import unittest
+from unittest.mock import patch
 
 
 BUILD = Path(__file__).resolve().parents[1]
@@ -28,12 +31,17 @@ class WindowsMkvBuildTests(unittest.TestCase):
             destination = Path(temporary) / "tools must remain absent"
             cache = Path(temporary) / "cache must remain absent"
             environment = dict(os.environ, GITHUB_ACTIONS="false", RUNNER_OS="Windows")
+            runner = Path(temporary) / "entry-point.ps1"
+            runner.write_text("""param($Helper, $Destination, $CacheDirectory)
+try { & $Helper -Destination $Destination -CacheDirectory $CacheDirectory }
+catch { [Console]::Error.WriteLine($_.Exception.Message); exit 1 }
+""", encoding="utf-8")
             result = subprocess.run([
-                powershell, "-NoProfile", "-File", str(BUILD / "provision-windows-mkv.ps1"),
+                powershell, "-NoProfile", "-File", str(runner), "-Helper", str(BUILD / "provision-windows-mkv.ps1"),
                 "-Destination", str(destination), "-CacheDirectory", str(cache),
             ], env=environment, capture_output=True, text=True, timeout=30)
             self.assertNotEqual(0, result.returncode)
-            self.assertIn("restricted to an ephemeral Windows GitHub Actions runner", result.stderr)
+            self.assertEqual("MKV source-build provisioning is restricted to an ephemeral Windows GitHub Actions runner.", result.stderr.strip())
             self.assertFalse(destination.exists())
             self.assertFalse(cache.exists())
 
@@ -140,6 +148,61 @@ catch { [Console]::Error.WriteLine($_.Exception.Message); exit 1 }
         fields = COLLECTION.metadata_fields(b"# build receipt\npkgbuild_sha256sum = abc123\ninstalled = first\ninstalled = second\n")
         self.assertEqual(["abc123"], fields["pkgbuild_sha256sum"])
         self.assertEqual(["first", "second"], fields["installed"])
+
+    def test_owner_queries_use_the_actual_posix_package_member(self):
+        """Native Python's Windows path must not be passed unconverted to pacman ownership lookup."""
+        prefix = PureWindowsPath("C:/msys64/ucrt64")
+        source = prefix / "bin/libboost_filesystem-mt.dll"
+        member = COLLECTION.package_member_path(source, prefix)
+        self.assertEqual("ucrt64/bin/libboost_filesystem-mt.dll", member)
+        self.assertEqual("/ucrt64/bin/libboost_filesystem-mt.dll", "/" + member)
+        pacman = Path("C:/msys64/usr/bin/pacman.exe")
+        with patch.object(COLLECTION, "command", return_value=b"controlled-installed-owner\n") as query:
+            self.assertEqual("controlled-installed-owner", COLLECTION.query_dll_owner(pacman, source, prefix))
+        query.assert_called_once_with([str(pacman), "-Qqo", "/ucrt64/bin/libboost_filesystem-mt.dll"])
+        with self.assertRaises(ValueError):
+            COLLECTION.package_member_path(PureWindowsPath("C:/other/libboost_filesystem-mt.dll"), prefix)
+
+    def controlled_gmp_source(self, omit_license=False):
+        """Generate a small authenticated nested source archive for notice-boundary tests."""
+        contents = {"README": b"controlled copyright and GPL2 grant", "COPYINGv2": b"controlled GPL2 license text"}
+        archive_stream = io.BytesIO()
+        with tarfile.open(fileobj=archive_stream, mode="w:xz") as archive:
+            for name, data in contents.items():
+
+                if omit_license and name == "COPYINGv2":
+                    continue
+
+                member = tarfile.TarInfo("gmp-6.3.0/" + name)
+                member.size = len(data)
+                archive.addfile(member, io.BytesIO(data))
+        data = archive_stream.getvalue()
+        policy = {
+            "sourceArchiveSha256": hashlib.sha256(data).hexdigest(),
+            "members": [{"path": "gmp-6.3.0/" + name, "fileName": name, "size": len(payload), "sha256": hashlib.sha256(payload).hexdigest()} for name, payload in contents.items()],
+        }
+        return data, policy, contents
+
+    def test_gmp_notices_come_from_exact_nested_source_members(self):
+        """The grant and license are actual source bytes, without fabricated binary-package notices."""
+        archive, policy, contents = self.controlled_gmp_source()
+        notices = COLLECTION.extract_gmp_notice_members(archive, policy)
+        self.assertEqual(contents, {notice["fileName"]: notice["data"] for notice in notices})
+
+    def test_gmp_missing_source_notice_is_rejected(self):
+        """A complete matching archive hash cannot compensate for a missing required notice member."""
+        archive, policy, _ = self.controlled_gmp_source(omit_license=True)
+        with self.assertRaisesRegex(ValueError, "source notice is missing"):
+            COLLECTION.extract_gmp_notice_members(archive, policy)
+
+    def test_gmp_changed_archive_or_notice_hash_is_rejected(self):
+        """Both the nested upstream archive and each extracted primary text must match their pins."""
+        archive, policy, _ = self.controlled_gmp_source()
+        with self.assertRaisesRegex(ValueError, "nested GMP source archive"):
+            COLLECTION.extract_gmp_notice_members(archive + b"changed bytes", policy)
+        policy["members"][0]["sha256"] = "0" * 64
+        with self.assertRaisesRegex(ValueError, "source notice differs"):
+            COLLECTION.extract_gmp_notice_members(archive, policy)
 
     def test_target_package_lock_has_unique_immutable_identities(self):
         """The whole target install graph is frozen while host-only observations remain separate."""
