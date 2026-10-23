@@ -172,7 +172,7 @@ class DistributionInventoryTests(unittest.TestCase):
             name_offset += len(encoded)
         return bytes(data)
 
-    def prepare_mkv_source_build(self, source_notices=False):
+    def prepare_mkv_source_build(self, source_notices=False, source_notice_package="mingw-w64-ucrt-x86_64-gmp"):
         """Create a complete source-built Windows tool/material closure with real PE import evidence."""
         self.mkv_lock = self.directory / "mkv-source.lock.json"
         self.mkv_recipe = self.directory / "build-mkv-windows.sh"
@@ -187,7 +187,7 @@ class DistributionInventoryTests(unittest.TestCase):
         notice_data = {"README": b"controlled GMP copyright and dual-license grant", "COPYINGv2": b"controlled complete GPL2 text"}
 
         if source_notices:
-            package.update(name="mingw-w64-ucrt-x86_64-gmp", version="6.3.0-3")
+            package.update(name=source_notice_package, version="6.3.0-3")
             package["sourceNotices"] = {"sourcePackageMember": "mingw-w64-gmp/gmp-6.3.0.tar.xz", "sourceArchiveSha256": "8" * 64,
                                         "members": [{"path": "gmp-6.3.0/" + name, "fileName": name, "size": len(data),
                                                      "sha256": hashlib.sha256(data).hexdigest()} for name, data in notice_data.items()]}
@@ -597,7 +597,7 @@ class DistributionInventoryTests(unittest.TestCase):
         row = next(row for row in self.mkv_receipt["materials"] if row["path"] == "dependency-packages.json")
         row.update(size=path.stat().st_size, sha256=INVENTORY.file_hash(path))
         self.write_mkv_receipt()
-        with self.assertRaisesRegex(ValueError, "GMP notice evidence differs"):
+        with self.assertRaisesRegex(ValueError, "notice evidence differs"):
             self.generate()
         packages[0]["sourceNoticeEvidence"]["sourceArchiveSha256"] = "8" * 64
         self.json("tools/licenses/mkv-source-build/dependency-packages.json", packages)
@@ -608,7 +608,23 @@ class DistributionInventoryTests(unittest.TestCase):
         notice_row = next(row for row in self.mkv_receipt["materials"] if row["path"] == notice)
         notice_row.update(size=notice_path.stat().st_size, sha256=INVENTORY.file_hash(notice_path))
         self.write_mkv_receipt()
-        with self.assertRaisesRegex(ValueError, "GMP source notice bytes differ"):
+        with self.assertRaisesRegex(ValueError, "source notice bytes differ"):
+            self.generate()
+
+    def test_source_built_mkv_icu_source_notice_policy_is_accepted(self):
+        """The exact ICU source-notice route uses the same complete package/member/hash validation."""
+        self.prepare_mkv_source_build(source_notices=True, source_notice_package="mingw-w64-ucrt-x86_64-icu")
+        self.assertEqual("passed", self.generate()["mechanicalChecks"]["pinnedMkvSourceBuild"])
+
+    def test_source_built_mkv_vorbis_source_notice_policy_is_accepted(self):
+        """The exact Vorbis source-notice route does not require a nonexistent binary notice directory."""
+        self.prepare_mkv_source_build(source_notices=True, source_notice_package="mingw-w64-ucrt-x86_64-libvorbis")
+        self.assertEqual("passed", self.generate()["mechanicalChecks"]["pinnedMkvSourceBuild"])
+
+    def test_unlisted_package_cannot_use_source_notice_fallback(self):
+        """A new empty-notice package requires its own concrete assessment instead of a generic waiver."""
+        self.prepare_mkv_source_build(source_notices=True, source_notice_package="unlisted-runtime-package")
+        with self.assertRaisesRegex(ValueError, "lacks its explicit package policy"):
             self.generate()
 
 

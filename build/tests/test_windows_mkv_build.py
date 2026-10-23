@@ -163,11 +163,11 @@ catch { [Console]::Error.WriteLine($_.Exception.Message); exit 1 }
         with self.assertRaises(ValueError):
             COLLECTION.package_member_path(PureWindowsPath("C:/other/libboost_filesystem-mt.dll"), prefix)
 
-    def controlled_gmp_source(self, omit_license=False):
+    def controlled_gmp_source(self, omit_license=False, compression="xz"):
         """Generate a small authenticated nested source archive for notice-boundary tests."""
         contents = {"README": b"controlled copyright and GPL2 grant", "COPYINGv2": b"controlled GPL2 license text"}
         archive_stream = io.BytesIO()
-        with tarfile.open(fileobj=archive_stream, mode="w:xz") as archive:
+        with tarfile.open(fileobj=archive_stream, mode="w:" + compression) as archive:
             for name, data in contents.items():
 
                 if omit_license and name == "COPYINGv2":
@@ -186,23 +186,30 @@ catch { [Console]::Error.WriteLine($_.Exception.Message); exit 1 }
     def test_gmp_notices_come_from_exact_nested_source_members(self):
         """The grant and license are actual source bytes, without fabricated binary-package notices."""
         archive, policy, contents = self.controlled_gmp_source()
-        notices = COLLECTION.extract_gmp_notice_members(archive, policy)
+        notices = COLLECTION.extract_source_notice_members(archive, policy)
         self.assertEqual(contents, {notice["fileName"]: notice["data"] for notice in notices})
 
     def test_gmp_missing_source_notice_is_rejected(self):
         """A complete matching archive hash cannot compensate for a missing required notice member."""
         archive, policy, _ = self.controlled_gmp_source(omit_license=True)
         with self.assertRaisesRegex(ValueError, "source notice is missing"):
-            COLLECTION.extract_gmp_notice_members(archive, policy)
+            COLLECTION.extract_source_notice_members(archive, policy)
 
     def test_gmp_changed_archive_or_notice_hash_is_rejected(self):
         """Both the nested upstream archive and each extracted primary text must match their pins."""
         archive, policy, _ = self.controlled_gmp_source()
-        with self.assertRaisesRegex(ValueError, "nested GMP source archive"):
-            COLLECTION.extract_gmp_notice_members(archive + b"changed bytes", policy)
+        with self.assertRaisesRegex(ValueError, "nested source archive"):
+            COLLECTION.extract_source_notice_members(archive + b"changed bytes", policy)
         policy["members"][0]["sha256"] = "0" * 64
         with self.assertRaisesRegex(ValueError, "source notice differs"):
-            COLLECTION.extract_gmp_notice_members(archive, policy)
+            COLLECTION.extract_source_notice_members(archive, policy)
+
+    def test_pinned_gzip_source_notices_use_the_same_strict_boundary(self):
+        """The ICU/Vorbis gzip source archives retain the same full archive/member hash checks."""
+        archive, policy, contents = self.controlled_gmp_source(compression="gz")
+        notices = COLLECTION.extract_source_notice_members(archive, policy)
+        self.assertEqual(contents, {notice["fileName"]: notice["data"] for notice in notices})
+        self.assertEqual({COLLECTION.GMP_PACKAGE, "mingw-w64-ucrt-x86_64-icu", "mingw-w64-ucrt-x86_64-libvorbis"}, COLLECTION.SOURCE_NOTICE_PACKAGES)
 
     def test_target_package_lock_has_unique_immutable_identities(self):
         """The whole target install graph is frozen while host-only observations remain separate."""

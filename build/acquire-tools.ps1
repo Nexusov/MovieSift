@@ -426,7 +426,7 @@ $fileProvenance = @(Get-ChildItem -LiteralPath $destinationPath -File -Recurse -
             foreach ($notice in $packageEvidence.sourceNoticeEvidence.members) {
 
                 if ($relativePath -ceq ('licenses/mkv-source-build/' + $notice.path)) {
-                    $origin = 'exact GMP notice from the pinned nested source archive; sourceNoticeEvidence binds the outer package, nested archive and notice member hashes'
+                    $origin = 'exact dependency notice from the pinned nested source archive; sourceNoticeEvidence binds the outer package, nested archive and notice member hashes'
                     $originArchive = $packageEvidence.sourcePackage.url
                     $originArchiveHash = $packageEvidence.sourcePackage.sha256
                     $originMember = $packageEvidence.sourceNoticeEvidence.sourcePackageMember

@@ -20,6 +20,9 @@ MKV_BUILD_MAX_FILES = 4096
 MKV_BUILD_MAX_PAYLOAD_BYTES = 128 * 1024 * 1024
 MKV_BUILD_MATERIAL_PREFIX = "licenses/mkv-source-build/"
 MKV_BUILD_WORKERS = frozenset({"mkvmerge.exe", "mkvextract.exe"})
+MKV_SOURCE_NOTICE_PACKAGES = frozenset({
+    "mingw-w64-ucrt-x86_64-gmp", "mingw-w64-ucrt-x86_64-icu", "mingw-w64-ucrt-x86_64-libvorbis",
+})
 
 
 def digest(stream, algorithm="sha256"):
@@ -252,8 +255,8 @@ def mkv_source_build_evidence(directory, records, lock_path, recipe_path, standa
 
         if source_notice_policy or source_notice_evidence:
 
-            if name != "mingw-w64-ucrt-x86_64-gmp" or not isinstance(source_notice_policy, dict) or not isinstance(source_notice_evidence, dict):
-                raise ValueError("MKV source-build source notice evidence lacks its explicit GMP policy")
+            if name not in MKV_SOURCE_NOTICE_PACKAGES or not isinstance(source_notice_policy, dict) or not isinstance(source_notice_evidence, dict):
+                raise ValueError("MKV source-build source notice evidence lacks its explicit package policy")
 
             expected_notices = [{"path": "packages/" + name + "/notices/" + relative_path(row["fileName"]),
                                  "upstreamMember": row["path"], "size": row["size"], "sha256": row["sha256"]}
@@ -265,13 +268,13 @@ def mkv_source_build_evidence(directory, records, lock_path, recipe_path, standa
             }
 
             if source_notice_evidence != expected_evidence or notices != [row["path"] for row in expected_notices]:
-                raise ValueError("MKV source-build GMP notice evidence differs from the exact pinned source policy")
+                raise ValueError("MKV source-build notice evidence differs from the exact pinned source policy")
 
             for row in expected_notices:
                 included_notice = records[MKV_BUILD_MATERIAL_PREFIX + row["path"]]
 
                 if included_notice["sha256"] != row["sha256"] or included_notice["size"] != row["size"]:
-                    raise ValueError("MKV source-build GMP source notice bytes differ from the exact pin")
+                    raise ValueError("MKV source-build source notice bytes differ from the exact pin")
 
     for dependency in dependencies:
 

@@ -20,6 +20,7 @@ MAXIMUM_RECEIPT_BYTES = 1024 * 1024
 MAXIMUM_DEPENDENCIES = 100
 MAXIMUM_NOTICE_BYTES = 512 * 1024
 GMP_PACKAGE = "mingw-w64-ucrt-x86_64-gmp"
+SOURCE_NOTICE_PACKAGES = frozenset({GMP_PACKAGE, "mingw-w64-ucrt-x86_64-icu", "mingw-w64-ucrt-x86_64-libvorbis"})
 SYSTEM_LIBRARIES = frozenset({
     "advapi32.dll", "avrt.dll", "bcrypt.dll", "cfgmgr32.dll", "comctl32.dll", "comdlg32.dll",
     "crypt32.dll", "dbghelp.dll", "dnsapi.dll", "dwmapi.dll", "gdi32.dll", "imm32.dll",
@@ -173,34 +174,34 @@ def acquire_source(cache, artifact):
     return path
 
 
-def extract_gmp_notice_members(archive_bytes, policy):
-    """Read exact GMP grant/license bytes from the authenticated nested upstream source archive."""
+def extract_source_notice_members(archive_bytes, policy):
+    """Read exact primary notice bytes from one authenticated, explicitly pinned nested source archive."""
     if hashlib.sha256(archive_bytes).hexdigest() != policy["sourceArchiveSha256"]:
-        raise ValueError("The nested GMP source archive differs from its pinned SHA256")
+        raise ValueError("The nested source archive differs from its pinned SHA256")
 
     collected = []
-    with tarfile.open(fileobj=io.BytesIO(archive_bytes), mode="r:xz") as archive:
+    with tarfile.open(fileobj=io.BytesIO(archive_bytes), mode="r:*") as archive:
         for member in policy["members"]:
             source_path = safe_member(member["path"])
             destination_path = safe_member(member["fileName"])
 
             if destination_path.name != member["fileName"]:
-                raise ValueError("GMP notice names must be single literal filenames")
+                raise ValueError("Source notice names must be single literal filenames")
 
             try:
                 metadata = archive.getmember(source_path.as_posix())
             except KeyError as error:
-                raise ValueError("A pinned GMP source notice is missing: " + member["path"]) from error
+                raise ValueError("A pinned source notice is missing: " + member["path"]) from error
 
             valid_member = metadata.isfile() and 0 < metadata.size <= MAXIMUM_NOTICE_BYTES and metadata.size == member["size"]
 
             if not valid_member:
-                raise ValueError("A GMP source notice is not the expected bounded regular member")
+                raise ValueError("A source notice is not the expected bounded regular member")
 
             data = archive.extractfile(metadata).read(MAXIMUM_NOTICE_BYTES + 1)
 
             if len(data) != member["size"] or hashlib.sha256(data).hexdigest() != member["sha256"]:
-                raise ValueError("A GMP source notice differs from its pinned SHA256")
+                raise ValueError("A source notice differs from its pinned SHA256")
 
             collected.append({**member, "data": data})
 
@@ -306,12 +307,12 @@ def collect(directory, cache, prefix, pacman, lock_path, recipe):
 
         package_evidence = {"name": package_name, "version": package["version"], "sourcePackage": source_pin, "noticePaths": notices}
 
-        if not notices and package_name == GMP_PACKAGE:
-            # This exact binary package omits notices. Its matched complete source
-            # contains the actual copyright/grant and GPL2 text; no generic fallback.
+        if not notices and package_name in SOURCE_NOTICE_PACKAGES:
+            # These three exact binary packages omit notices. Collect their actual
+            # primary texts from matched complete sources, never a generic fallback.
             policy = package["sourceNotices"]
             nested_source = tar_member(source_archive, policy["sourcePackageMember"])
-            source_notices = extract_gmp_notice_members(nested_source, policy)
+            source_notices = extract_source_notice_members(nested_source, policy)
             notice_evidence = []
             for notice in source_notices:
                 target = package_root / "notices" / notice["fileName"]
