@@ -389,6 +389,138 @@
     "Historical native receipts retain their original source/package/platform identity",
     "Active-remux Cancel input correlation, repeated close, real warning fixture and visual/scaling requirements are not closed by controlled/headless/media tests",
     "Original application license remains pending; no public binary or source-distribution assurance is made",
-    "Windows MKVToolNix static covered-source/build material remains in release-distribution-closure.md; no additional missing Linux QtCore artifact was identified. Actual public source delivery and original-code license are still required."
-  ]
+    "The Windows worker source/build-material gap is closed for the replacement, not for the historical official static binaries. Actual matching public source/material delivery, original-code license and declared-target desktop acceptance remain required."
+  ],
+  "windowsMkvSourceFollowUp": {
+    "comparisonBase": "95a4933b86f5901d3fbf9952f06474b69912c6aa",
+    "scope": "Replace the historical official Windows static worker closure with same-version source-built CLI workers and exact matched materials; no application, Linux payload or FFmpeg recipe changes",
+    "upstreamCheck": "The official 102.0 Windows release directory had binary/checksum entries but no usable exact static Qt/MXE material bundle; its source cross-build helper follows moving MXE inputs. No upstream message was sent.",
+    "sourceBuild": {
+      "run": "https://github.com/Nexusov/TrackTrim/actions/runs/39885765650",
+      "result": "success",
+      "controlRevision": "f9b42e65a0c0bcde74b39b62e279b1892ac0c881",
+      "actualCheckout": "f22a04d357b8b0796294d4c7e3741735d3a9b4a0",
+      "checkoutParents": [
+        "88b5da788e77f3b6490e2dc418fbf5c129661e61",
+        "f9b42e65a0c0bcde74b39b62e279b1892ac0c881"
+      ],
+      "checkoutTreeEqualsHead": true,
+      "platform": "Windows Server 2025 Datacenter 10.0.26100; hosted image windows-2025-vs2026 20261007.264.1",
+      "buildAndCollectionUtc": [
+        "2026-10-23T01:46:07Z",
+        "2026-10-23T01:58:55Z"
+      ],
+      "provenance": {
+        "schemaVersion": 1,
+        "component": "MKVToolNix",
+        "version": "102.0",
+        "runtimeIdentifier": "win-x64",
+        "buildKind": "windows-ucrt64-source",
+        "source": {
+          "fileName": "mkvtoolnix-102.0.tar.xz",
+          "url": "https://mkvtoolnix.download/sources/mkvtoolnix-102.0.tar.xz",
+          "sha256": "9f0a810f17c7df8adb9064a3a41d5784399be412d19704cf080745ad7d45da30"
+        },
+        "lockSha256": "c260d6a03df4263bff7ddf633838db9812fd7ab0a8cd2fd9a56bec385e26649b",
+        "recipeSha256": "62c7e22e1a3ef806671875198f21f8a3df98764921c46bb5375a0b8e74e5d48c",
+        "receiptPath": "licenses/mkv-source-build/build-receipt.json",
+        "receiptSha256": "1707b2a197ea9424c375e904dd381e572727922bbc81cf67ea472cb6577ccc12"
+      },
+      "workers": [
+        {
+          "path": "mkvmerge.exe",
+          "size": 8422912,
+          "sha256": "149990bcac63c4d0c87ce32ea46b1daa620faaa1b7bfbec987b8bba0ea9da733"
+        },
+        {
+          "path": "mkvextract.exe",
+          "size": 4819968,
+          "sha256": "bd8e35ec82c56dadcae944153a04fb70c94e9c800095081e82e5c9b0f57a3412"
+        }
+      ],
+      "actualRuntimeDlls": 19,
+      "actualRuntimeOwnerPackages": 17,
+      "hashedMaterialFiles": 148,
+      "completeDependencySourceArchives": 16,
+      "completeMkvSourceArchiveIncluded": true,
+      "relationship": "Each DLL matches a pinned binary package member; its original BUILDINFO PKGBUILD hash matches the complete collected source package. Full sources, patches, recipes, original notices, compiler/configure/build observations and controlling scripts are bound by the receipt.",
+      "noticeExceptions": "Only exact GMP, ICU and Vorbis source members substitute for absent binary share/licenses entries; outer/nested/member hashes are pinned. No general missing-notice waiver."
+    },
+    "completeReviewArtifact": {
+      "run": "https://github.com/Nexusov/TrackTrim/actions/runs/39887191246",
+      "controlRevision": "b9ca3ab25e1a67b0a3da3375123992bde53852ad",
+      "artifactId": 12473396507,
+      "name": "windows-mkv-source-candidate",
+      "size": 420951525,
+      "artifactDigest": "6c7080141a7efa5370b2d40eb09240afed724237f22b753b3b3f0ad159926cf0",
+      "localIndependentValidation": "passed, including original .PKGINFO/.BUILDINFO",
+      "limit": "Authorized three-day worker/material review handoff, not an application release or final public source delivery. The initial upload omitted hidden metadata; this corrected handoff includes it and reuses the independently validated build."
+    },
+    "windowsExecution": {
+      "platform": "Windows 10 Home Single Language 22H2 x64, 19045.6456",
+      "workers": "Both locally executed as 102.0; real identification format 20",
+      "adoptionGate": "Clean pre-adoption archive 9a0a457ec190fce2e9ebfabf58ffd321a329dd14 passed actual MKV/MP4 packaged workflows and fresh archive relocation before the replacement became default",
+      "csharpSuiteRevision": "9a0a457ec190fce2e9ebfabf58ffd321a329dd14",
+      "mandatoryMediaTools": true,
+      "csharp": {
+        "corePassed": 175,
+        "applicationPassed": 279,
+        "applicationOsSkips": 4,
+        "infrastructurePassed": 406,
+        "infrastructureOsSkips": 19,
+        "headlessDesktopPassed": 123,
+        "totalPassed": 983,
+        "failed": 0,
+        "documentedOsSkips": 23
+      },
+      "python": {
+        "passed": 80,
+        "failed": 0,
+        "scope": "Existing inventory/FFmpeg checks plus exact Windows worker/material binding, failure propagation and source-notice regressions"
+      },
+      "mediaEvidence": "Existing real MKV retention/frame timing/chapters/tags/attachments/aliases/cancellation/collision/cleanup checks and unchanged MP4 suite passed with the replacement. Controlled lifecycle/warning tests remain controlled; desktop tests remain headless.",
+      "ffmpegBytesUnchangedFromPriorAcceptedTools": {
+        "ffmpeg.exe": "6ab07d1433ea91815f19a2aaa6b199f01e9450035d9b11a40a8db203d6656e88",
+        "ffprobe.exe": "be944ce382a74b92084c2d885fbcb7d8e3777139197a7e251c81714e8d3e4065"
+      }
+    },
+    "portableArchive": {
+      "name": "TrackTrim-win-x64.zip",
+      "size": 533573594,
+      "sha256": "f66bbc58cb9b8ebed872a2247163716b933d4cf758a29d311718d77d316d36d3",
+      "sourceRevision": "62713d8f040109204d0b02e7fbbe4ef1673611a3",
+      "sourceTree": "f0af98c6d5938c0b7560e1f4042b83a8d5863080",
+      "worktreeDirty": false,
+      "localReviewDirectory": "work/windows-mkv-materials-20261023/final-62713d8 Кириллица",
+      "actualFileCountIncludingManifest": 628,
+      "unmatchedOrigins": 0,
+      "packagedMkvAndMp4Workflow": "passed",
+      "freshArchiveRelocation": "passed; spaces/Cyrillic/metacharacters, unrelated working directory, app-local tools without developer overrides",
+      "fixtureSourceSha256Unchanged": {
+        "ordinary.mkv": "055c7f3ebdc3c579dd6d7740c78a1e8ee0e2525f23542b5c6af9a0869ce4a0f8",
+        "mp4/ordinary.mp4": "b5a94767353d2e895ea04f5f1650df1f561fc507b4cb2db277f556c6b9a77112"
+      },
+      "verificationScope": "MKV per-job structural/timing/metadata checks; stronger extracted payload/attachment hashes belong to the real integration suite. MP4 per-job streamed encoded packet/rational timing checks."
+    },
+    "privateMaterialBundle": {
+      "name": "TrackTrim-windows-materials-62713d8f0401.tar.gz",
+      "size": 424722332,
+      "sha256": "dac63fd74d61d1fb58514cee32c2109b31bba2cbc74587d49c5e4d86d9c8342d",
+      "sourceRevision": "62713d8f040109204d0b02e7fbbe4ef1673611a3",
+      "localReviewDirectory": "work/windows-mkv-materials-20261023/materials-62713d8",
+      "copiedInventoriedMaterialFiles": 339,
+      "verifiedManifestedFiles": 343,
+      "verification": "Every outer member hash and exact clean git source archive verified; all copied materials match this portable inventory; no standalone runtime workers included",
+      "publicDeliveryPerformed": false,
+      "deliveryArrangement": "Provide this matching source/build/notices set alongside the future Windows binary, retaining complete dependency source packages and controlling TrackTrim source/scripts. Expiring review artifacts are not that public delivery."
+    },
+    "requiredCi": "The complete Windows/Linux jobs remain mandatory; final pushed-head run and actual synthetic merge provenance are recorded in PR #10, without CI-ID-only evidence commits.",
+    "nativeAndResourceLimit": "No Computer Use, desktop/display actions, Docker or WSL startup during this follow-up. Hosted Windows execution is not Windows 11 desktop acceptance. Historical native evidence retains its binary/platform scope.",
+    "remainingReleaseGates": [
+      "Owner original-code/assets rights and operative license decision",
+      "Actual public delivery of matching covered source/build materials and notices",
+      "Declared-target desktop and visual/scaling acceptance, including existing warning/active-cancellation limits",
+      "Final RC integration/publication review and authorization"
+    ]
+  }
 }
