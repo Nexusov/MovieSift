@@ -50,10 +50,10 @@ dotnet restore --locked-mode
 dotnet format --verify-no-changes --no-restore
 dotnet build --configuration Release --no-restore
 dotnet test --configuration Release --no-build --no-restore
-pwsh ./build/acquire-tools.ps1 -RuntimeIdentifier win-x64 -Destination ./tools
-pwsh ./build/package.ps1 -RuntimeIdentifier win-x64
+pwsh ./build/acquire-tools.ps1 -RuntimeIdentifier win-x64 -Destination ./tools -WindowsMkvBuildDirectory /path/to/verified/windows-mkv-build
+pwsh ./build/package.ps1 -RuntimeIdentifier win-x64 -WindowsMkvBuildDirectory /path/to/verified/windows-mkv-build
 ```
 
-Run the corresponding Linux commands on Linux. Tool acquisition is explicit, pinned, and hash checked. CI's media/package job is required to fail if provisioning fails; do not skip its backend suite to make it green. Consult `CONTRIBUTING.md` for fixture and environment setup. Record exact executed commands, versions/results, and pending acceptance in `docs/PLAN.md`. Defined CI and cross-publication are not runtime proof. Do not claim packet integrity from stream counts or source preservation without an actual check.
+Run the corresponding Linux commands on Linux, without the Windows build parameter. Windows acquisition requires the complete verified same-version source-built MKV worker/material directory (or `TRACKTRIM_WINDOWS_MKV_BUILD_DIRECTORY`); no official-binary fallback is allowed. Its installer is restricted to ephemeral Windows CI and must not install local prerequisites. Tool acquisition is explicit, pinned, and hash checked. CI's media/package job is required to fail if provisioning fails; do not skip its backend suite to make it green. Consult `CONTRIBUTING.md` for fixture and environment setup. Record exact executed commands, versions/results, and pending acceptance in `docs/PLAN.md`. Defined CI and cross-publication are not runtime proof. Do not claim packet integrity from stream counts or source preservation without an actual check.
 
 Inspect Git status and applicable instructions before editing. Preserve unrelated work. Make small coherent commits and review diffs. Push/PR actions require session authorization; never merge, force-push, rewrite pushed history, publish releases, or push task work to an existing default branch without explicit authorization.

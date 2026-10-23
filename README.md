@@ -99,6 +99,8 @@ Run each command on its target OS. The outputs are `artifacts/TrackTrim-win-x64.
 
 Linux packaging extracts a pinned upstream MKVToolNix AppImage **at build time**. The application launches its extracted native CLI executables directly, with an app-relative library path in the child environment; it does not run media through a shell. Build-time acquisition/fixture helpers may use fixed wrappers. No FUSE, extraction, or download is required at first launch. Native dependency checks must pass during packaging; this is not a guarantee for arbitrary Linux distributions.
 
+Windows packaging uses a verified source build of the same MKVToolNix 102.0 CLI pair, with its actual DLL closure and complete matched source/build materials. The build runs on an ephemeral Windows runner; an identified build can be reused locally without installing compilers. Provide `-WindowsMkvBuildDirectory` (or `TRACKTRIM_WINDOWS_MKV_BUILD_DIRECTORY`) as described in [CONTRIBUTING](CONTRIBUTING.md#explicit-media-tool-acquisition). Missing or changed workers/materials fail acquisition; official Windows binaries are not a fallback. This changes the worker distribution arrangement, not the MKV preservation contract.
+
 Declared acceptance targets remain Windows 11 x64 25H2 and Ubuntu 24.04 x64 Desktop using X11/XWayland. Exact tested hosts and unverified desktop checks are recorded in [PLAN](docs/PLAN.md). See [native requirements](docs/SUPPORTED_FORMATS.md#platform-and-native-requirements) before making a compatibility claim.
 
 To test a relocated archive, provide a generated multi-track fixture:

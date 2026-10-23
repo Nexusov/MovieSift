@@ -16,10 +16,14 @@ If formatting is required, run `dotnet format --no-restore`, inspect the diff, a
 ## Explicit media tool acquisition
 
 ```powershell
-pwsh ./build/acquire-tools.ps1 -RuntimeIdentifier win-x64 -Destination ./tools
+pwsh ./build/acquire-tools.ps1 -RuntimeIdentifier win-x64 -Destination ./tools -WindowsMkvBuildDirectory /path/to/verified/windows-mkv-build
 ```
 
 Use `linux-x64` on Linux. MKVToolNix artifacts and the FFmpeg/zlib source hashes are pinned in `build/tools.lock.json` and `build/ffmpeg.lock.json`; the tools are not checked into Git. Linux extraction occurs at build time and preserves the dependency tree, without requiring FUSE on users' systems. The build requires network access, adequate disk space, and Linux archive extraction tools; acquisition failures are real failures.
+
+The Windows MKV pair is built from the same 102.0 release source using `build/build-mkv-windows.sh` and the exact UCRT64 binary/source package pins in `build/mkv-source.lock.json`. `build/provision-windows-mkv.ps1` runs only on an ephemeral Windows GitHub Actions runner, never as a local prerequisite installer. It builds only `mkvmerge`/`mkvextract`, retains required QtCore and the actual recursively imported DLLs, and collects complete source packages, original patches/PKGBUILDs, binary metadata, notices and configuration/compiler evidence. Each binary's BUILDINFO recipe hash must match its collected source PKGBUILD. GMP, ICU and Vorbis notices come from exact pinned upstream source members where their binary packages omit notices. Host-only packages are recorded, not shipped.
+
+The required Windows job constructs or reuses only an exact-input verified build. Local acquisition/packaging can consume that complete worker/material directory through the parameter above or `TRACKTRIM_WINDOWS_MKV_BUILD_DIRECTORY`; no MSYS2 installation is then needed. `python build/distribution-inventory.py --validate-windows-mkv-build /path/to/build` independently checks the pair, all actual PE imports and complete material hashes. Review worker artifacts expire and do not substitute for delivering the covered source/materials with an eventual release. There is no automatic fallback to the historical official ZIP.
 
 FFmpeg/ffprobe are built from the same pinned source with explicit static zlib, no autodetected optional codec libraries and no GPL/version3/nonfree configuration. Build-only prerequisites are GCC, binutils, GNU Make and NASM; native Windows builds also require MSYS2 Bash and MinGW-w64. CI uses `build/provision-windows-ffmpeg.ps1` only on its ephemeral Windows runner, with hash-pinned Make/NASM archives and no floating MSYS2 update. It refuses local-host installation. On Linux, install the documented compiler/make/NASM development prerequisites before acquisition. A verified existing source-build cache can be reused without a local compiler; source/RID/recipe and every worker/material hash must match. Actual compiler/configuration receipts accompany the package. Use a whitespace-free build-cache directory; packaged application, media and output paths still support spaces/Cyrillic. End users install neither compilers, .NET nor media tools.
 

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "scope": "Pinned upstream observations, extended by complete-byte RPM/SDK matches and an exact CLI-only payload policy for the release candidate. Earlier omitted-component observations remain historical research; actual inventories exclude only hash-receipted omissions. Source/build provenance is not legal approval.",
+  "scope": "Pinned upstream observations, extended by complete-byte RPM/SDK matches and exact CLI-only payload selection. Official Windows worker observations remain historical; replacement inventories use their actual mkvSourceBuildEvidence instead. Linux payload research is unchanged. Source/build provenance is not legal approval.",
   "pinnedTools": {
     "win-x64": "c02e918900f6d945d9307b426237e456378b79a200589ac6928de39064409a44",
     "linux-x64": "c66345b30d6d5fd640ea982ab5e202a99b9f541a20e42aa19edd90f3ddd5dc9b"
@@ -145,6 +145,7 @@
       "component": "mkvmerge.exe",
       "runtimeIdentifier": "win-x64",
       "kind": "tool-binary-observation",
+      "scope": "Historical official Windows ZIP only; not attributed to the source-built replacement.",
       "paths": [
         "tools/mkvmerge.exe"
       ],
@@ -220,6 +221,7 @@
       "component": "mkvextract.exe",
       "runtimeIdentifier": "win-x64",
       "kind": "tool-binary-observation",
+      "scope": "Historical official Windows ZIP only; not attributed to the source-built replacement.",
       "paths": [
         "tools/mkvextract.exe"
       ],
@@ -2177,11 +2179,11 @@
       "nextAction": "Owner decides the original-code license after confirming rights; do not infer an owner from account metadata."
     },
     {
-      "component": "Windows MKVToolNix static closure",
-      "evidence": "Pinned102.0 tools embed staticQt6.10.2 and compiler string; exact source tar includes generic build recipes.",
-      "missing": "Binary-bound covered dependency sources/patches and scripts needed to build/install them, and applicable QtCore licensing/relink route. The exact MXE revision is one practical means of identifying those inputs; an identical historical compiler is not demanded by GPL2 itself.",
-      "primaryLocationChecked": "https://mkvtoolnix.download/sources/mkvtoolnix-102.0.tar.xz",
-      "nextAction": "Obtain the binary-bound covered source/build material or evaluate a same-version source-built replacement. The prepared upstream question is not sent; a broad speculative toolchain rebuild is not part of this candidate."
+      "component": "Windows MKVToolNix source delivery",
+      "evidence": "The same-version source-built CLI pair replaces the historical staticQt6.10.2/MXE workers. Actual DLL bytes match pinned UCRT64 packages; binary BUILDINFO recipe hashes bind their complete source/patch packages. QtCore6.12/GMP GPL2 alternatives, exact primary notices and configuration/compiler/build scripts are collected in mkvSourceBuildEvidence.",
+      "missing": "Actually deliver the collected applicable covered-source/build materials and notices alongside the matching public binaries. The old official binary closure remains unproven historical research, not a shipped replacement dependency.",
+      "primaryLocationChecked": "build/mkv-source.lock.json, build/build-mkv-windows.sh and actual worker/dependency/material receipts; primary package sources at https://repo.msys2.org/mingw/sources/",
+      "nextAction": "Retain the source-built closure and provide its bound materials through the eventual release's compliant source-delivery arrangement. A private bundle or expiring CI review artifact is not that public delivery."
     },
     {
       "component": "Retained Linux MKV CLI closure",
@@ -2207,7 +2209,7 @@
   ],
   "releaseCandidateMaterialSummary": {
     "ffmpeg": "Same exact source commit; minimal explicit static zlib source build replaces opaque optional-library closure. Actual recipes/configuration/toolchain/worker receipts plus FFmpeg/zlib source and compiler-runtime terms accompany both targets.",
-    "mkv": "Unchanged102.0 executable bytes and pinned artifacts; exact omissions and complete matched source RPM material are independently checked during acquisition/inventory.",
+    "mkv": "Same102.0 source-built Windows CLI workers with actual DLL/source/recipe/notices; unchanged Linux executable bytes, exact AppImage omissions and complete matched source RPM/QtBase materials. Acquisition/inventory validate each route independently.",
     "legalScope": "Provenance unknowns are recorded separately from affirmative license requirements. Full compiler history or optional reproducibility is not universally required by permissive licenses or the GCC Runtime Library Exception."
   }
 }

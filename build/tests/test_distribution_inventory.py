@@ -479,7 +479,13 @@ class DistributionInventoryTests(unittest.TestCase):
         self.assertTrue((self.output / "mkv-source-build-receipt.json").is_file())
         self.assertTrue((self.output / "mkv-source-build/config.h").is_file())
         self.assertFalse((self.output / "mkv-source-build/source").exists())
-        self.assertEqual("bundled-native-library", next(row for row in report["files"] if row["path"] == "tools/Qt6Core.dll")["category"])
+        dependency = next(row for row in report["files"] if row["path"] == "tools/Qt6Core.dll")
+        self.assertEqual("bundled-native-library", dependency["category"])
+        self.assertEqual("mingw-w64-ucrt-x86_64-qt6-base", dependency["component"])
+        self.assertEqual("6.10.2-1", dependency["componentVersion"])
+        worker = next(row for row in report["files"] if row["path"] == "tools/mkvmerge.exe")
+        self.assertEqual("MKVToolNix/102.0", worker["component"])
+        self.assertEqual("102.0", worker["componentVersion"])
 
     def test_source_built_mkv_changed_worker_or_material_is_rejected(self):
         """A freshly manifested package must still match its exact compiled worker/material receipt."""

@@ -841,7 +841,8 @@ def generate(package_root, archive, assets_file, output, profile_file, mkv_lock_
         for row in mkv_source["receipt"]["workers"] + mkv_source["receipt"]["dependencies"]:
             record = records["tools/" + row["path"]]
             record.update(category="bundled-executable" if row["path"] in MKV_BUILD_WORKERS else "bundled-native-library",
-                          component="MKVToolNix/102.0", componentVersion="102.0" if row["path"] in MKV_BUILD_WORKERS else row["packageVersion"],
+                          component="MKVToolNix/102.0" if row["path"] in MKV_BUILD_WORKERS else row["packageName"],
+                          componentVersion="102.0" if row["path"] in MKV_BUILD_WORKERS else row["packageVersion"],
                           origin="Source-built Windows CLI closure; exact source/recipe/configuration and DLL owner sources in mkvSourceBuildEvidence")
 
         for name, record in records.items():
