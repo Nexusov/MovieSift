@@ -47,10 +47,10 @@ class WindowsMkvBuildTests(unittest.TestCase):
                 COLLECTION.require_cached_archive(root, {"fileName": archive.name, "sha256": "0" * 64})
             self.assertEqual(b"unexpected cached bytes", archive.read_bytes())
 
-    def run_target_batch(self, root, artifacts):
+    def run_target_batch(self, root, artifacts, action="download"):
         """Invoke the real downloader function with cached controlled packages, never an installer."""
         runner = root / "runner.ps1"
-        runner.write_text("""param($Helper, $Cache, $Artifacts)
+        runner.write_text("""param($Helper, $Cache, $Artifacts, $Action)
 $ErrorActionPreference = 'Stop'
 $tokens = $null
 $parseErrors = $null
@@ -59,7 +59,12 @@ $functions = $syntax.FindAll({ param($node) $node -is [Management.Automation.Lan
 foreach ($definition in $functions) { Invoke-Expression $definition.Extent.Text }
 try {
     $inputs = @(Get-Content -LiteralPath $Artifacts -Raw | ConvertFrom-Json)
-    Get-VerifiedMkvTargetPackages -Artifacts $inputs -Directory $Cache
+    if ($Action -eq 'list') {
+        Write-MkvPackageFileList -Artifacts $inputs -Path (Join-Path $Cache 'package-files.txt')
+    }
+    else {
+        Get-VerifiedMkvTargetPackages -Artifacts $inputs -Directory $Cache
+    }
     [Console]::WriteLine('accepted complete package batch')
 }
 catch { [Console]::Error.WriteLine($_.Exception.Message); exit 1 }
@@ -69,6 +74,7 @@ catch { [Console]::Error.WriteLine($_.Exception.Message); exit 1 }
         return subprocess.run([
             shutil.which("pwsh"), "-NoProfile", "-NonInteractive", "-File", str(runner),
             "-Helper", str(BUILD / "provision-windows-mkv.ps1"), "-Cache", str(root), "-Artifacts", str(artifact_path),
+            "-Action", action,
         ], capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=30)
 
     def test_parallel_target_batch_accepts_verified_cached_packages(self):
@@ -95,6 +101,25 @@ catch { [Console]::Error.WriteLine($_.Exception.Message); exit 1 }
             self.assertIn("Pinned target package validation failed", result.stderr)
             self.assertNotIn("accepted complete", result.stdout)
             self.assertEqual(b"changed cache", archive.read_bytes())
+
+    def test_archive_file_list_uses_literal_lf_names_for_bash(self):
+        """A Windows CRLF must never become part of the package filename passed to pacman."""
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            names = ["first.pkg.tar.zst", "second.pkg.tar.zst"]
+            result = self.run_target_batch(root, [{"fileName": name} for name in names], action="list")
+            self.assertEqual(0, result.returncode, result.stderr)
+            package_list = root / "package-files.txt"
+            self.assertEqual(b"first.pkg.tar.zst\nsecond.pkg.tar.zst\n", package_list.read_bytes())
+            bash = str(Path(os.environ.get("ProgramFiles", "C:/Program Files")) / "Git/bin/bash.exe") if os.name == "nt" else shutil.which("bash")
+            self.assertTrue(bash and Path(bash).is_file(), "The documented Git Bash/Linux Bash build reader is required")
+            shell = subprocess.run([
+                bash, "--noprofile", "--norc", "-c",
+                'export PATH=/usr/bin:$PATH; path="$1"; if command -v cygpath >/dev/null; then path=$(cygpath -u "$path"); fi; mapfile -t packages < "$path"; printf "%s\\0" "${packages[@]}"',
+                "read-mkv-package-list", str(package_list),
+            ], capture_output=True, timeout=30)
+            self.assertEqual(0, shell.returncode, shell.stderr.decode("utf-8", errors="replace"))
+            self.assertEqual(b"first.pkg.tar.zst\0second.pkg.tar.zst\0", shell.stdout)
 
     def test_package_member_paths_are_relative_and_non_traversing(self):
         """Only ordinary package-relative names can become collected material paths."""

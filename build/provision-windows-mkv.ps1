@@ -90,6 +90,13 @@ function Get-VerifiedMkvTargetPackages {
     }
 }
 
+## Writes the literal archive names consumed by the MSYS2 Bash installer.
+function Write-MkvPackageFileList {
+    param([Parameter(Mandatory)] [object[]] $Artifacts, [Parameter(Mandatory)] [string] $Path)
+
+    [IO.File]::WriteAllText($Path, ($Artifacts.fileName -join "`n") + "`n", [Text.UTF8Encoding]::new($false))
+}
+
 $supportedRunner = $IsWindows -and $env:GITHUB_ACTIONS -ceq 'true' -and $env:RUNNER_OS -ceq 'Windows'
 
 if (-not $supportedRunner -or -not $env:RUNNER_TEMP) {
@@ -146,7 +153,7 @@ $packageInputs = @($lock.packages | ForEach-Object { $_ })
 Get-VerifiedMkvTargetPackages -Artifacts $packageInputs -Directory $cachePath
 
 $packageList = Join-Path $cachePath 'package-files.txt'
-$lock.packages.fileName | Set-Content -LiteralPath $packageList -Encoding utf8NoBOM
+Write-MkvPackageFileList -Artifacts $packageInputs -Path $packageList
 & $bash --noprofile --norc -c 'set -euo pipefail; export PATH=/usr/bin:$PATH; cd "$(cygpath -u "$1")"; mapfile -t packages < package-files.txt; pacman -U --noconfirm --needed "${packages[@]}"' tracktrim-mkv-install $cachePath
 
 if ($LASTEXITCODE) {
