@@ -7,6 +7,7 @@ import importlib.util
 import io
 import json
 from pathlib import Path
+import struct
 import tarfile
 import tempfile
 import unittest
@@ -138,7 +139,101 @@ class DistributionInventoryTests(unittest.TestCase):
     def generate(self):
         """Run the public evidence entry point with only explicit fixture inputs."""
         with contextlib.redirect_stdout(io.StringIO()):
-            return INVENTORY.generate(self.root, self.archive, self.assets, self.output, self.profile)
+            return INVENTORY.generate(self.root, self.archive, self.assets, self.output, self.profile,
+                                      getattr(self, "mkv_lock", None), getattr(self, "mkv_recipe", None))
+
+    def refresh_tool_origins(self):
+        """Refresh acquisition evidence after deliberately constructing controlled tool payloads."""
+        records = []
+        for path in (self.root / "tools").rglob("*"):
+
+            if path.is_file() and path.name != "file-provenance.json":
+                records.append({"path": path.relative_to(self.root / "tools").as_posix(), "size": path.stat().st_size,
+                                "sha256": INVENTORY.file_hash(path), "upstreamArchiveSha256": ""})
+
+        self.json("tools/file-provenance.json", records)
+
+    def pe_payload(self, imports):
+        """Build a tiny file-backed PE import table; no fixture executable is ever launched."""
+        data = bytearray(2048)
+        data[:2] = b"MZ"
+        struct.pack_into("<I", data, 60, 128)
+        data[128:132] = b"PE\0\0"
+        struct.pack_into("<H", data, 134, 1)
+        struct.pack_into("<H", data, 148, 240)
+        struct.pack_into("<H", data, 152, 0x20B)
+        struct.pack_into("<II", data, 272, 4096, (len(imports) + 1) * 20)
+        struct.pack_into("<IIII", data, 400, 1536, 4096, 1536, 512)
+        name_offset = 1024
+        for index, name in enumerate(imports):
+            encoded = name.encode("ascii") + b"\0"
+            struct.pack_into("<IIIII", data, 512 + index * 20, 0, 0, 0, 4096 + name_offset - 512, 0)
+            data[name_offset:name_offset + len(encoded)] = encoded
+            name_offset += len(encoded)
+        return bytes(data)
+
+    def prepare_mkv_source_build(self):
+        """Create a complete source-built Windows tool/material closure with real PE import evidence."""
+        self.mkv_lock = self.directory / "mkv-source.lock.json"
+        self.mkv_recipe = self.directory / "build-mkv-windows.sh"
+        self.mkv_recipe.write_bytes(b"controlled exact MKV source-build recipe\n")
+        source_data = (self.root / "tools/licenses/corresponding-source/source.tar.xz").read_bytes()
+        source = {"url": "https://example.invalid/source.tar.xz", "fileName": "source.tar.xz", "sha256": hashlib.sha256(source_data).hexdigest()}
+        dependency_source = b"complete controlled Qt source package"
+        package = {"name": "mingw-w64-ucrt-x86_64-qt6-base", "version": "6.10.2-1",
+                   "sourcePackage": {"fileName": "qt6-base.src.tar.zst", "url": "https://example.invalid/qt6-base.src.tar.zst",
+                                     "sha256": hashlib.sha256(dependency_source).hexdigest()}}
+        lock = {"schemaVersion": 1, "version": "102.0", "source": source, "packages": [package]}
+        self.mkv_lock.write_text(json.dumps(lock), encoding="utf-8")
+        prefix = "tools/licenses/mkv-source-build/"
+        self.write(prefix + "mkv-source.lock.json", self.mkv_lock.read_bytes())
+        self.write(prefix + "build-mkv-windows.sh", self.mkv_recipe.read_bytes())
+        self.write(prefix + "source/source.tar.xz", source_data)
+        self.write(prefix + "source/qt6-base.src.tar.zst", dependency_source)
+        for name in ("config.h", "build-config", "config.log", "compiler-versions.txt", "notices/Qt-COPYING"):
+            self.write(prefix + name, ("controlled " + name).encode())
+        self.json(prefix + "configure-arguments.json", ["--disable-gui", "--disable-update-check"])
+        self.json(prefix + "installed-packages.json", [package])
+        self.json(prefix + "dependency-packages.json", [dict(package, noticePaths=["notices/Qt-COPYING"])])
+        imports = {"mkvmerge.exe": ["Qt6Core.dll", "KERNEL32.dll"], "mkvextract.exe": ["Qt6Core.dll", "KERNEL32.dll"],
+                   "Qt6Core.dll": ["KERNEL32.dll"]}
+        for name, names in imports.items():
+            self.write("tools/" + name, self.pe_payload(names))
+        self.mkv_receipt = {"schemaVersion": 1, "version": "102.0", "runtimeIdentifier": "win-x64",
+                            "sourceSha256": source["sha256"], "lockSha256": INVENTORY.file_hash(self.mkv_lock),
+                            "recipeSha256": INVENTORY.file_hash(self.mkv_recipe), "workers": [], "dependencies": [], "materials": [],
+                            "dllImports": [{"path": name, "imports": names} for name, names in imports.items()],
+                            "configureArguments": ["--disable-gui", "--disable-update-check"], "buildEnvironment": {"compiler": "controlled"}}
+        for name in imports:
+            path = self.root / "tools" / name
+            row = {"path": name, "size": path.stat().st_size, "sha256": INVENTORY.file_hash(path)}
+
+            if name.endswith(".dll"):
+                row.update(packageName=package["name"], packageVersion=package["version"])
+                self.mkv_receipt["dependencies"].append(row)
+                continue
+
+            self.mkv_receipt["workers"].append(row)
+        for path in (self.root / prefix).rglob("*"):
+
+            if path.is_file():
+                self.mkv_receipt["materials"].append({"path": path.relative_to(self.root / prefix).as_posix(),
+                                                       "size": path.stat().st_size, "sha256": INVENTORY.file_hash(path)})
+        self.mkv_provenance = {"schemaVersion": 1, "component": "MKVToolNix", "version": "102.0", "runtimeIdentifier": "win-x64",
+                               "buildKind": "windows-ucrt64-source", "source": source, "lockSha256": INVENTORY.file_hash(self.mkv_lock),
+                               "recipeSha256": INVENTORY.file_hash(self.mkv_recipe), "receiptPath": "licenses/mkv-source-build/build-receipt.json"}
+        (self.root / "tools/payload-selection.json").unlink()
+        (self.root / "tools/licenses/payload-selection.lock.json").unlink()
+        self.write_mkv_receipt()
+
+    def write_mkv_receipt(self):
+        """Bind a controlled receipt to both actual acquisition and packaged provenance."""
+        self.json("tools/" + self.mkv_provenance["receiptPath"], self.mkv_receipt)
+        self.mkv_provenance["receiptSha256"] = INVENTORY.file_hash(self.root / "tools" / self.mkv_provenance["receiptPath"])
+        self.json("tools/mkv-source-provenance.json", self.mkv_provenance)
+        self.json("mkv-source-provenance.json", self.mkv_provenance)
+        self.refresh_tool_origins()
+        self.pack()
 
     def test_zip_accounts_for_every_actual_byte_and_explicit_unknown(self):
         """Report the final hash, every file, exact origin and unresolved payload."""
@@ -339,6 +434,87 @@ class DistributionInventoryTests(unittest.TestCase):
         self.write("tools/licenses/data/gui-resource.rcc", b"unwanted")
         self.pack()
         with self.assertRaisesRegex(ValueError, "expressly excluded"):
+            self.generate()
+
+    def test_source_built_mkv_uses_actual_sources_workers_and_imports(self):
+        """A replacement reports its own exact closure instead of inheriting official ZIP claims."""
+        self.prepare_mkv_source_build()
+        self.profile.write_text(json.dumps({"pinnedTools": {"win-x64": "2" * 64}, "components": [
+            {"component": "mkvmerge.exe", "runtimeIdentifier": "win-x64", "kind": "tool-binary-observation",
+             "paths": ["tools/mkvmerge.exe"], "sha256": "0" * 64},
+        ], "unresolved": []}), encoding="utf-8")
+        report = self.generate()
+        self.assertEqual("passed", report["mechanicalChecks"]["pinnedMkvSourceBuild"])
+        self.assertIsNone(report["toolPayloadSelection"])
+        self.assertEqual("validated-source-build", report["nativeComponentEvidence"][0]["kind"])
+        self.assertEqual(self.mkv_provenance, report["mkvSourceBuildEvidence"]["provenance"])
+        self.assertTrue((self.output / "mkv-source-build-receipt.json").is_file())
+        self.assertTrue((self.output / "mkv-source-build/config.h").is_file())
+        self.assertFalse((self.output / "mkv-source-build/source").exists())
+        self.assertEqual("bundled-native-library", next(row for row in report["files"] if row["path"] == "tools/Qt6Core.dll")["category"])
+
+    def test_source_built_mkv_changed_worker_or_material_is_rejected(self):
+        """A freshly manifested package must still match its exact compiled worker/material receipt."""
+        self.prepare_mkv_source_build()
+        for name in ("tools/mkvmerge.exe", "tools/licenses/mkv-source-build/config.h"):
+            with self.subTest(name=name):
+                original = (self.root / name).read_bytes()
+                self.write(name, b"substituted content")
+                self.refresh_tool_origins()
+                self.pack()
+                with self.assertRaisesRegex(ValueError, "does not match the actual worker/material"):
+                    self.generate()
+                self.write(name, original)
+
+    def test_source_built_mkv_missing_dependency_source_is_rejected(self):
+        """A notice or approximate archive cannot stand in for the pinned DLL owner's complete source."""
+        self.prepare_mkv_source_build()
+        name = "source/qt6-base.src.tar.zst"
+        self.mkv_receipt["materials"] = [row for row in self.mkv_receipt["materials"] if row["path"] != name]
+        (self.root / "tools/licenses/mkv-source-build" / name).unlink()
+        self.write_mkv_receipt()
+        with self.assertRaisesRegex(ValueError, "exact dependency sources/notices"):
+            self.generate()
+
+    def test_source_built_mkv_undeclared_dll_is_rejected_from_actual_pe(self):
+        """Installed developer DLLs cannot satisfy an unshipped portable dependency."""
+        self.prepare_mkv_source_build()
+        self.write("tools/mkvmerge.exe", self.pe_payload(["Qt6Core.dll", "unshipped.dll"]))
+        row = next(row for row in self.mkv_receipt["workers"] if row["path"] == "mkvmerge.exe")
+        row.update(size=(self.root / "tools/mkvmerge.exe").stat().st_size, sha256=INVENTORY.file_hash(self.root / "tools/mkvmerge.exe"))
+        next(row for row in self.mkv_receipt["dllImports"] if row["path"] == "mkvmerge.exe")["imports"] = ["Qt6Core.dll", "unshipped.dll"]
+        self.write_mkv_receipt()
+        with self.assertRaisesRegex(ValueError, "Undeclared MKV.*unshipped"):
+            self.generate()
+
+    def test_source_built_mkv_cannot_reuse_official_payload_selection(self):
+        """Do not attribute a local build to omitted members of the unrelated official ZIP."""
+        self.prepare_mkv_source_build()
+        self.json("tools/payload-selection.json", {"schemaVersion": 1})
+        self.refresh_tool_origins()
+        self.pack()
+        with self.assertRaisesRegex(ValueError, "cannot inherit an official binary"):
+            self.generate()
+
+    def test_source_built_mkv_package_provenance_must_match_acquisition(self):
+        """A package must retain actual acquired identity rather than replacing it with an input lock."""
+        self.prepare_mkv_source_build()
+        self.json("mkv-source-provenance.json", {"version": "102.0"})
+        self.pack()
+        with self.assertRaisesRegex(ValueError, "package and acquisition provenance differ"):
+            self.generate()
+
+    def test_source_built_mkv_wrong_recipe_and_extra_payload_are_rejected(self):
+        """Require both the chosen recipe and complete, bounded payload accounting."""
+        self.prepare_mkv_source_build()
+        self.mkv_recipe.write_bytes(b"another source-build recipe")
+        with self.assertRaisesRegex(ValueError, "pinned source/lock/recipe"):
+            self.generate()
+        self.mkv_recipe.write_bytes(b"controlled exact MKV source-build recipe\n")
+        self.write("tools/unlisted.dll", self.pe_payload(["KERNEL32.dll"]))
+        self.refresh_tool_origins()
+        self.pack()
+        with self.assertRaisesRegex(ValueError, "cover exactly the actual build files"):
             self.generate()
 
 

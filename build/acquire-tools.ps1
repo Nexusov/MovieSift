@@ -4,7 +4,8 @@ param(
     [string] $RuntimeIdentifier,
     [Parameter(Mandatory)]
     [string] $Destination,
-    [string] $CacheDirectory = (Join-Path $PSScriptRoot '../artifacts/downloads')
+    [string] $CacheDirectory = (Join-Path $PSScriptRoot '../artifacts/downloads'),
+    [string] $WindowsMkvBuildDirectory = $env:TRACKTRIM_WINDOWS_MKV_BUILD_DIRECTORY
 )
 
 $ErrorActionPreference = 'Stop'
@@ -13,6 +14,16 @@ $toolLock = Get-Content -LiteralPath (Join-Path $PSScriptRoot 'tools.lock.json')
 $distribution = $toolLock.$RuntimeIdentifier
 $destinationPath = [System.IO.Path]::GetFullPath($Destination)
 $cachePath = [System.IO.Path]::GetFullPath($CacheDirectory)
+$sourceBuiltWindows = $RuntimeIdentifier -eq 'win-x64' -and -not [string]::IsNullOrWhiteSpace($WindowsMkvBuildDirectory)
+
+if ($RuntimeIdentifier -eq 'win-x64' -and $distribution.PSObject.Properties.Name -contains 'kind' -and $distribution.kind -eq 'source-build' -and -not $sourceBuiltWindows) {
+    throw 'The pinned Windows MKV source build is required. Provide -WindowsMkvBuildDirectory (or TRACKTRIM_WINDOWS_MKV_BUILD_DIRECTORY) pointing to the complete verified worker/material directory; official binaries are not a fallback.'
+}
+
+if ($WindowsMkvBuildDirectory -and $RuntimeIdentifier -ne 'win-x64') {
+    throw 'A Windows MKV source build cannot be used for another runtime identifier.'
+}
+
 New-Item -ItemType Directory -Path $cachePath -Force | Out-Null
 
 if (Test-Path -LiteralPath $destinationPath) {
@@ -24,17 +35,22 @@ if (Test-Path -LiteralPath $destinationPath) {
 }
 
 New-Item -ItemType Directory -Path $destinationPath -Force | Out-Null
-$archiveName = [System.IO.Path]::GetFileName(([Uri] $distribution.url).AbsolutePath)
-$archivePath = Join-Path $cachePath $archiveName
+$archivePath = $null
+$actualHash = $null
 
-if (!(Test-Path -LiteralPath $archivePath)) {
-    Invoke-WebRequest -Uri $distribution.url -OutFile $archivePath -TimeoutSec 180
-}
+if (-not $sourceBuiltWindows) {
+    $archiveName = [System.IO.Path]::GetFileName(([Uri] $distribution.url).AbsolutePath)
+    $archivePath = Join-Path $cachePath $archiveName
 
-$actualHash = (Get-FileHash -LiteralPath $archivePath -Algorithm SHA256).Hash.ToLowerInvariant()
+    if (!(Test-Path -LiteralPath $archivePath)) {
+        Invoke-WebRequest -Uri $distribution.url -OutFile $archivePath -TimeoutSec 180
+    }
 
-if ($actualHash -ne $distribution.sha256) {
-    throw "Tool archive hash mismatch: expected $($distribution.sha256), received $actualHash. Remove the incorrect cached archive explicitly."
+    $actualHash = (Get-FileHash -LiteralPath $archivePath -Algorithm SHA256).Hash.ToLowerInvariant()
+
+    if ($actualHash -ne $distribution.sha256) {
+        throw "Tool archive hash mismatch: expected $($distribution.sha256), received $actualHash. Remove the incorrect cached archive explicitly."
+    }
 }
 
 $licenseDirectory = Join-Path $destinationPath 'licenses'
@@ -94,16 +110,50 @@ if ($RuntimeIdentifier -eq 'win-x64') {
         throw 'Windows tool acquisition/version acceptance must run on Windows.'
     }
 
-    $stageDirectory = Join-Path $cachePath ('extract-' + [Guid]::NewGuid().ToString('N'))
-    Expand-Archive -LiteralPath $archivePath -DestinationPath $stageDirectory
-    $distributionDirectory = Join-Path $stageDirectory 'mkvtoolnix'
-    Copy-Item -LiteralPath (Join-Path $distributionDirectory 'mkvmerge.exe') -Destination $destinationPath
-    Copy-Item -LiteralPath (Join-Path $distributionDirectory 'mkvextract.exe') -Destination $destinationPath
-    Copy-Item -LiteralPath (Join-Path $distributionDirectory 'doc') -Destination $licenseDirectory -Recurse
-    & python (Join-Path $PSScriptRoot 'select-tool-payload.py') --runtime-identifier $RuntimeIdentifier --source $distributionDirectory --destination $destinationPath
+    if ($sourceBuiltWindows) {
+        $WindowsMkvBuildDirectory = [IO.Path]::GetFullPath($WindowsMkvBuildDirectory)
+        & python (Join-Path $PSScriptRoot 'distribution-inventory.py') --validate-windows-mkv-build $WindowsMkvBuildDirectory
 
-    if ($LASTEXITCODE) {
-        throw 'The pinned Windows GUI-asset omission policy did not match the upstream payload.'
+        if ($LASTEXITCODE) {
+            throw 'The Windows MKV source-build worker/material directory failed its pinned validation.'
+        }
+
+        $mkvProvenancePath = Join-Path $WindowsMkvBuildDirectory 'mkv-source-provenance.json'
+        $mkvSourceProvenance = Get-Content -LiteralPath $mkvProvenancePath -Raw | ConvertFrom-Json
+
+        if ($mkvSourceProvenance.source.sha256 -cne $toolLock.source.sha256) {
+            throw 'The MKV source build and the application must use the same pinned 102.0 source archive.'
+        }
+
+        $mkvSourceReceipt = Get-Content -LiteralPath (Join-Path $WindowsMkvBuildDirectory $mkvSourceProvenance.receiptPath) -Raw | ConvertFrom-Json
+        $mkvBuildFiles = @('mkv-source-provenance.json', $mkvSourceProvenance.receiptPath) +
+            @($mkvSourceReceipt.workers.path) + @($mkvSourceReceipt.dependencies.path) +
+            @($mkvSourceReceipt.materials | ForEach-Object { 'licenses/mkv-source-build/' + $_.path })
+
+        foreach ($relativePath in $mkvBuildFiles) {
+            $target = Join-Path $destinationPath $relativePath
+
+            if (Test-Path -LiteralPath $target) {
+                throw "Acquisition never overwrites an existing source-built member: $target."
+            }
+
+            New-Item -ItemType Directory -Path ([IO.Path]::GetDirectoryName($target)) -Force | Out-Null
+            Copy-Item -LiteralPath (Join-Path $WindowsMkvBuildDirectory $relativePath) -Destination $target
+        }
+    }
+
+    if (-not $sourceBuiltWindows) {
+        $stageDirectory = Join-Path $cachePath ('extract-' + [Guid]::NewGuid().ToString('N'))
+        Expand-Archive -LiteralPath $archivePath -DestinationPath $stageDirectory
+        $distributionDirectory = Join-Path $stageDirectory 'mkvtoolnix'
+        Copy-Item -LiteralPath (Join-Path $distributionDirectory 'mkvmerge.exe') -Destination $destinationPath
+        Copy-Item -LiteralPath (Join-Path $distributionDirectory 'mkvextract.exe') -Destination $destinationPath
+        Copy-Item -LiteralPath (Join-Path $distributionDirectory 'doc') -Destination $licenseDirectory -Recurse
+        & python (Join-Path $PSScriptRoot 'select-tool-payload.py') --runtime-identifier $RuntimeIdentifier --source $distributionDirectory --destination $destinationPath
+
+        if ($LASTEXITCODE) {
+            throw 'The pinned Windows GUI-asset omission policy did not match the upstream payload.'
+        }
     }
     $mergeExecutable = Join-Path $destinationPath 'mkvmerge.exe'
     $extractExecutable = Join-Path $destinationPath 'mkvextract.exe'
@@ -187,6 +237,10 @@ Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'tools.lock.json') -Destination 
 $materialLockPath = Join-Path $PSScriptRoot 'tool-materials.lock.json'
 $materialLock = Get-Content -LiteralPath $materialLockPath -Raw | ConvertFrom-Json
 $applicableMaterials = @($materialLock.materials | Where-Object runtimeIdentifier -EQ $RuntimeIdentifier)
+
+if ($sourceBuiltWindows) {
+    $applicableMaterials = @($applicableMaterials | Where-Object { $_.component -notin @('Qt Core', 'FLAC library') })
+}
 
 foreach ($material in $applicableMaterials) {
     $materialCache = Join-Path $cachePath $material.sha256
@@ -301,7 +355,7 @@ $fileProvenance = @(Get-ChildItem -LiteralPath $destinationPath -File -Recurse -
         $originArchiveHash = $sourceHash
     }
 
-    $isWindowsPayload = $RuntimeIdentifier -eq 'win-x64' -and ($relativePath -in @('mkvmerge.exe', 'mkvextract.exe') -or $relativePath.StartsWith('licenses/doc/'))
+    $isWindowsPayload = $RuntimeIdentifier -eq 'win-x64' -and -not $sourceBuiltWindows -and ($relativePath -in @('mkvmerge.exe', 'mkvextract.exe') -or $relativePath.StartsWith('licenses/doc/'))
 
     if ($isWindowsPayload) {
         $origin = 'unchanged member of the pinned upstream binary ZIP'
@@ -315,6 +369,15 @@ $fileProvenance = @(Get-ChildItem -LiteralPath $destinationPath -File -Recurse -
         $originArchive = $distribution.url
         $originArchiveHash = $actualHash
         $originMember = $relativePath.Substring('app-root/'.Length)
+    }
+
+    $isMkvSourceBuildMember = $sourceBuiltWindows -and $relativePath -in $mkvBuildFiles
+
+    if ($isMkvSourceBuildMember) {
+        $origin = 'source-built MKVToolNix worker/dependency/material; exact pinned sources, local recipe, configuration, complete worker/library hashes and PE imports in licenses/mkv-source-build/build-receipt.json'
+        $originArchive = $toolLock.source.url
+        $originArchiveHash = $sourceHash
+        $originMember = ''
     }
 
     if ($ffmpegMembers.ContainsKey($relativePath)) {
@@ -349,5 +412,9 @@ $fileProvenance = @(Get-ChildItem -LiteralPath $destinationPath -File -Recurse -
     }
 })
 $fileProvenance | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $destinationPath 'file-provenance.json') -Encoding utf8NoBOM
-Write-Output "$mergeVersion; $extractVersion; verified archive SHA-256 $actualHash"
+Write-Output "$mergeVersion; $extractVersion; verified MKV source SHA-256 $sourceHash"
+
+if (-not $sourceBuiltWindows) {
+    Write-Output "Verified upstream binary archive SHA-256 $actualHash."
+}
 Write-Output "Acquired pinned tools at $destinationPath. Public redistribution obligations for all bundled components still require review."
