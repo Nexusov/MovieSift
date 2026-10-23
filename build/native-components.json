@@ -407,14 +407,14 @@
         "tools/app-root/usr/lib/libQt6Core.so.6"
       ],
       "missing": [
-        "Confirm the applicable QtCore distribution-license route and any required source/build or relinking material for that route. The SDK Enterprise build label does not choose that route."
+        "Deliver the collected complete QtBase source/build material and applicable notices with the eventual public release under Core's GPL2 alternative. No additional missing Core source, patch or relink-object artifact was identified; the SDK Enterprise label does not remove the source's alternative terms."
       ],
       "primaryLocationCheck": {
         "checkedUtc": "2026-10-19T21:35:07.395885+00:00",
         "httpStatus": 200,
         "result": "retrieved; not proof of exact binary source"
       },
-      "versionStatus": "Observed upstream/base version; exact downstream patches and build identity remain unresolved",
+      "versionStatus": "Exact official SDK binary match; complete QtBase source and SDK configuration collected. Selected GPL2 alternative and public material-delivery requirement recorded in release-distribution-closure.md.",
       "sourcePackageEvidence": {
         "component": "Qt Core",
         "version": "6.6.1",
@@ -424,7 +424,7 @@
         "path": "Qt-Core/6.6.1/qtbase-everywhere-src-6.6.1.tar.xz",
         "outputDirectory": "corresponding-source",
         "kind": "upstream-source-archive",
-        "relationship": "Complete upstream QtBase6.6.1 source, including bundled third-party sources/notices. Shipped QtCore matches the official Qt6.6.1 SDK binary byte-for-byte. This is not a selected-license or full SDK build/relink compliance conclusion.",
+        "relationship": "Complete upstream QtBase6.6.1 source/build material, including bundled third-party sources/notices. Shipped QtCore matches the official Qt6.6.1 SDK binary byte-for-byte. The candidate selects Core's GPL2 alternative with the GPL2 MKV worker; actual public source/notice delivery remains required. No additional missing Core source, patch or relink-object artifact was identified.",
         "correspondsTo": [
           {
             "path": "app-root/usr/lib/libQt6Core.so.6",
@@ -2186,9 +2186,9 @@
     {
       "component": "Retained Linux MKV CLI closure",
       "evidence": "Exact payload policy retains22 libraries and omits83 unused libraries/static archives.15 retained libraries match13 complete primary source RPMs; QtCore and all3 ICU libraries match official Qt SDK bytes. Applicable collected notices are included.",
-      "missing": "Confirm the remaining QtCore licensing/source or relinking route and the final compliant source-distribution method. Custom Boost/cmark build details remain provenance unknowns, not automatic permissive-source blockers.",
+      "missing": "Actually deliver the collected covered source/build material and notices with the eventual public release. Core's GPL2 alternative is selected and complete QtBase/SDK configuration material is collected; no additional Core source/patch/relink-object gap was identified. Custom Boost/cmark build details remain provenance unknowns, not automatic permissive-source blockers.",
       "primaryLocationChecked": "Hash-bound build/tool-payload.lock.json, build/tool-materials.lock.json and official AlmaLinux/Qt archive members.",
-      "nextAction": "Review the actual retained closure and included source/build/notices under the selected license routes; do not demand source for omitted GUI payloads."
+      "nextAction": "Retain Core's selected GPL2 alternative and provide the collected source/build/notices alongside the eventual release; do not demand source for omitted GUI payloads. See docs/verification/release-distribution-closure.md."
     },
     {
       "component": "NuGet native static subcomponents and generated apphost",

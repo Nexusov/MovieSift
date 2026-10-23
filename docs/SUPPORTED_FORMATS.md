@@ -1,6 +1,6 @@
 # Supported formats and preservation
 
-Runtime adapters are MKVToolNix **102.0** (`mkvmerge`/`mkvextract`) for MKV and FFmpeg/ffprobe **n9.0.2-17-g2a571b6068-20260930** for the MP4 subset below. The MKV identification parser accepts format version **20**, established from the pinned executable's JSON. The selected container/backend is frozen in each approved plan, with no cross-container conversion or fallback. A suffix routes candidates to inspection; it does not prove support.
+Runtime adapters are MKVToolNix **102.0** (`mkvmerge`/`mkvextract`) for MKV and FFmpeg/ffprobe **9.0.2-TrackTrim-source-2a571b606854** for the MP4 subset below. The MKV identification parser accepts format version **20**, established from the pinned executable's JSON. The selected container/backend is frozen in each approved plan, with no cross-container conversion or fallback. A suffix routes candidates to inspection; it does not prove support.
 
 ## MKV preservation contract
 
