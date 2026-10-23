@@ -1,4 +1,4 @@
-"""Bind private review source/material bundles to tiny real packages and Git commits."""
+"""Bind review source/material bundles to tiny real packages and Git commits."""
 
 import hashlib
 import importlib.util
@@ -113,6 +113,9 @@ class ReviewMaterialTests(unittest.TestCase):
             with tarfile.open(fileobj=io.BytesIO(source), mode="r:gz") as source_archive:
                 self.assertEqual(LICENSE, source_archive.extractfile("TrackTrim-source-" + self.revision[:12] + "/LICENSE").read())
             provenance = json.load(archive.extractfile(prefix + "materials-provenance.json"))
+            instructions = archive.extractfile(prefix + "READ-ME-FIRST.txt").read().decode()
+            self.assertIn("public repository are not private", instructions)
+            self.assertIn("preparing this bundle does not publish it", instructions)
             for row in provenance["copiedMaterials"]:
                 content = archive.extractfile(prefix + self.runtime + "/" + row["path"]).read()
                 self.assertEqual(row["size"], len(content))

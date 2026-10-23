@@ -5,6 +5,12 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+    inputs:
+      retain_candidates:
+        description: Retain verified binary and matching material archives as publicly accessible workflow artifacts
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: read
@@ -89,7 +95,7 @@ jobs:
         run: ./build/package.ps1 -RuntimeIdentifier '${{ matrix.runtime }}' -FixturePath '${{ github.workspace }}/artifacts/fixtures/ordinary.mkv' -Mp4FixturePath '${{ github.workspace }}/artifacts/fixtures/mp4/ordinary.mp4'
       - name: Relocate archive and run the actual application workflow
         run: ./build/verify-package.ps1 -ArchivePath './artifacts/${{ matrix.archive }}' -FixturePath '${{ github.workspace }}/artifacts/fixtures/ordinary.mkv' -Mp4FixturePath '${{ github.workspace }}/artifacts/fixtures/mp4/ordinary.mp4'
-      - name: Prepare matching private source and build materials
+      - name: Prepare matching review source and build materials
         run: |
           python ./build/prepare-review-materials.py --repository . --archive './artifacts/${{ matrix.archive }}' --inventory './artifacts/distribution-reports/${{ matrix.runtime }}/distribution-${{ matrix.runtime }}.json' --output './artifacts/review-materials-${{ matrix.runtime }}'
           if ($LASTEXITCODE -ne 0) { throw 'Matching review-material preparation failed.' }
@@ -98,6 +104,29 @@ jobs:
         if: runner.os == 'Linux'
         shell: bash
         run: bash ./build/verify-clean-linux.sh ./artifacts/TrackTrim-linux-x64.tar.gz ./artifacts/fixtures/ordinary.mkv ./artifacts/fixtures/mp4/ordinary.mp4
+      - name: Validate and stage the explicitly requested candidate set
+        id: candidates
+        if: ${{ success() && github.event_name == 'workflow_dispatch' && inputs.retain_candidates == true }}
+        run: |
+          $selection = python ./build/prepare-candidate-retention.py --repository . --archive './artifacts/${{ matrix.archive }}' --inventory './artifacts/distribution-reports/${{ matrix.runtime }}/distribution-${{ matrix.runtime }}.json' --materials './artifacts/review-materials-${{ matrix.runtime }}' --runtime '${{ matrix.runtime }}' --source-revision '${{ github.sha }}' --run-id '${{ github.run_id }}' --run-attempt '${{ github.run_attempt }}' --output './artifacts/candidate-retention-${{ matrix.runtime }}'
+          if ($LASTEXITCODE -ne 0) { throw 'Candidate identity validation or staging failed.' }
+          $selection = $selection | ConvertFrom-Json
+          ('artifact_name=' + $selection.artifactName) | Add-Content -LiteralPath $env:GITHUB_OUTPUT -Encoding utf8NoBOM
+          ('materials_name=' + $selection.materialsName) | Add-Content -LiteralPath $env:GITHUB_OUTPUT -Encoding utf8NoBOM
+      - name: Retain the explicitly requested verified candidate set
+        if: ${{ success() && github.event_name == 'workflow_dispatch' && inputs.retain_candidates == true }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ${{ steps.candidates.outputs.artifact_name }}
+          path: |
+            artifacts/candidate-retention-${{ matrix.runtime }}/${{ matrix.archive }}
+            artifacts/candidate-retention-${{ matrix.runtime }}/${{ steps.candidates.outputs.materials_name }}
+            artifacts/candidate-retention-${{ matrix.runtime }}/distribution-${{ matrix.runtime }}.json
+            artifacts/candidate-retention-${{ matrix.runtime }}/material-summary.json
+            artifacts/candidate-retention-${{ matrix.runtime }}/SHA256SUMS
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
       - name: Upload test evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -113,6 +142,5 @@ jobs:
             artifacts/**/evidence/container-workflow.txt
           if-no-files-found: warn
           retention-days: 7
-      # Keep binary/source archives local to the runner until public publication
-      # and matching covered-source delivery are authorized. Only test evidence
-      # is uploaded; successful package checks are still mandatory above.
+      # PRs, pushes and default manual runs retain evidence only. Candidate sets
+      # require explicit manual opt-in after every required platform check passes.

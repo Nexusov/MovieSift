@@ -1,4 +1,4 @@
-"""Prepare private, inventory-bound review materials without copying runtime workers."""
+"""Prepare inventory-bound review materials without copying runtime workers."""
 
 import argparse
 import hashlib
@@ -162,7 +162,7 @@ def copy_package(archive_path, inventory, records, target):
 
 
 def prepare(repository, archive_path, inventory_path, output):
-    """Create one private matching material bundle and a compact CI-safe identity report."""
+    """Create one matching material bundle and a compact CI-safe identity report."""
     inventory, records = load_inputs(repository, archive_path, inventory_path)
     build = inventory["build"]
     revision = build["sourceRevision"]
@@ -176,14 +176,15 @@ def prepare(repository, archive_path, inventory_path, output):
                     "--prefix=TrackTrim-source-" + revision[:12] + "/", "--output", str(source.resolve()), revision], check=True)
     license_evidence = {"spdxId": "MIT", "copyright": COPYRIGHT, "path": "LICENSE", "sha256": records["LICENSE"]["sha256"]}
     provenance = {
-        "schemaVersion": 1, "purpose": "private source/build-material review", "publicDeliveryPerformed": False,
+        "schemaVersion": 1, "purpose": "source/build-material review", "publicDeliveryPerformed": False,
         "completeRedistributionAssurance": False, "sourceRevision": revision, "sourceTree": build["sourceTree"],
         "runtimeIdentifier": build["runtimeIdentifier"], "binaryArchive": inventory["archive"],
         "sourceArchive": file_record(source), "originalApplicationLicense": license_evidence, "copiedMaterials": copied,
     }
     (staging / "materials-provenance.json").write_text(json.dumps(provenance, indent=2) + "\n", encoding="utf-8")
     (staging / "READ-ME-FIRST.txt").write_text(
-        "Private review materials; no public source/material delivery has occurred.\n"
+        "Review materials; preparing this bundle does not publish it.\n"
+        "Workflow artifacts in a public repository are not private; check the run's visibility and retention.\n"
         "Original TrackTrim code is MIT-licensed. Third-party components retain their own terms.\n"
         "Package materials match the identified binary inventory; no standalone runtime workers are copied.\n"
         "Deliver applicable covered-source/build materials and notices with any eventual authorized public binaries.\n",
