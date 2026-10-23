@@ -388,8 +388,8 @@
   "limits": [
     "Historical native receipts retain their original source/package/platform identity",
     "Active-remux Cancel input correlation, repeated close, real warning fixture and visual/scaling requirements are not closed by controlled/headless/media tests",
-    "Original application license remains pending; no public binary or source-distribution assurance is made",
-    "The Windows worker source/build-material gap is closed for the replacement, not for the historical official static binaries. Actual matching public source/material delivery, original-code license and declared-target desktop acceptance remain required."
+    "Original TrackTrim code now uses the explicit MIT grant, copyright (c) 2026 Nexusov; no public binary or source-distribution assurance is made",
+    "The Windows worker source/build-material gap is closed for the replacement, not for the historical official static binaries. Actual matching public source/material delivery and declared-target desktop acceptance remain required."
   ],
   "windowsMkvSourceFollowUp": {
     "comparisonBase": "95a4933b86f5901d3fbf9952f06474b69912c6aa",
@@ -1297,5 +1297,190 @@
         "stopRequestedBy": "Assistant wrote the observer-owned stop marker after the owner stopped Computer Use; this stopped only read-only observation and did not terminate the GUI or a media process."
       }
     }
+  },
+  "licenseAdoption": {
+    "comparisonBase": "fa8da0b02caa65235b1e47fd95eb623c73a0c075",
+    "decision": {
+      "date": "2026-10-23",
+      "identifier": "MIT",
+      "copyright": "Copyright (c) 2026 Nexusov",
+      "authority": "Explicit owner selection of MIT and the Nexusov attribution; not inferred from account metadata",
+      "scope": "Original TrackTrim code; third-party terms and final publication authorization remain independent",
+      "file": "LICENSE",
+      "sha256": "bf135fd03e98daeb576a944ea4017375fdedf6e3c46fcca6fd502127e5a2a698"
+    },
+    "changeScope": "Operative license, documentation, package/inventory verification and existing review-material copier adaptation only; no src/, dependency pins, workers, supported-format or preservation changes",
+    "windowsCandidate": {
+      "archive": {
+        "name": "TrackTrim-win-x64.zip",
+        "size": 533587172,
+        "sha256": "dd040b3c6e0b77ac801abbcf301d83b9c944e2f693c734a5c26d95a96b2ad20b"
+      },
+      "build": {
+        "schemaVersion": 1,
+        "runtimeIdentifier": "win-x64",
+        "sdkVersion": "10.0.402",
+        "runtimeVersion": "10.0.13",
+        "sourceRevision": "c7c81ba632befd7d921f14e704136fe8d39e6ee3",
+        "sourceTree": "a1141a2a77d378f8d0e0307626cd692e1f237564",
+        "sourceParents": [
+          "fa8da0b02caa65235b1e47fd95eb623c73a0c075"
+        ],
+        "worktreeDirty": false,
+        "configuration": "Release; self-contained; untrimmed; non-single-file; no AOT",
+        "operatingSystem": "Microsoft Windows 10.0.19045",
+        "artifactPurpose": "review and acceptance testing; public-release obligations remain"
+      },
+      "localReviewDirectory": "work/license-candidate-20261023/package-c7c81ba Кириллица",
+      "fileCountIncludingManifest": 628,
+      "operativeLicenseIncluded": true,
+      "obsoletePendingMarkerPresent": false,
+      "manifestAndArchiveIntegrity": "passed",
+      "packagedMkvAndMp4Workflows": "passed",
+      "freshRelocationMkvAndMp4Workflows": "passed",
+      "mediaSourceHashesUnchanged": true,
+      "nativeDesktopRetestPerformed": false
+    },
+    "matchingWindowsMaterials": {
+      "schemaVersion": 1,
+      "sourceRevision": "c7c81ba632befd7d921f14e704136fe8d39e6ee3",
+      "sourceTree": "a1141a2a77d378f8d0e0307626cd692e1f237564",
+      "runtimeIdentifier": "win-x64",
+      "binaryArchive": {
+        "name": "TrackTrim-win-x64.zip",
+        "size": 533587172,
+        "sha256": "dd040b3c6e0b77ac801abbcf301d83b9c944e2f693c734a5c26d95a96b2ad20b"
+      },
+      "originalApplicationLicense": {
+        "spdxId": "MIT",
+        "copyright": "Copyright (c) 2026 Nexusov",
+        "path": "LICENSE",
+        "sha256": "bf135fd03e98daeb576a944ea4017375fdedf6e3c46fcca6fd502127e5a2a698"
+      },
+      "publicDeliveryPerformed": false,
+      "completeRedistributionAssurance": false,
+      "archive": {
+        "name": "TrackTrim-win-x64-materials-c7c81ba632be.tar.gz",
+        "size": 424762075,
+        "sha256": "dc30b72fdf5bd110239bd1288ac0bbd8002f8b08790ec6d89f11f049e964f62f"
+      },
+      "sourceArchive": {
+        "name": "TrackTrim-source-c7c81ba632be.tar.gz",
+        "size": 922766,
+        "sha256": "d7496c5b79135c5bfb1a9e3eef3edc80775a4a9b2f98985e6b4def8acd95c922"
+      },
+      "materialFiles": 339,
+      "manifestedFiles": 343,
+      "localReviewDirectory": "work/license-candidate-20261023/materials-c7c81ba",
+      "independentVerification": {
+        "status": "passed",
+        "sourceRevision": "c7c81ba632befd7d921f14e704136fe8d39e6ee3",
+        "manifestedFiles": 343,
+        "copiedMaterials": 339,
+        "archive": {
+          "name": "TrackTrim-win-x64-materials-c7c81ba632be.tar.gz",
+          "size": 424762075,
+          "sha256": "dc30b72fdf5bd110239bd1288ac0bbd8002f8b08790ec6d89f11f049e964f62f"
+        },
+        "matchingBinaryArchive": {
+          "name": "TrackTrim-win-x64.zip",
+          "size": 533587172,
+          "sha256": "dd040b3c6e0b77ac801abbcf301d83b9c944e2f693c734a5c26d95a96b2ad20b"
+        },
+        "exactSourceAndPackageLicenseMatch": true,
+        "standaloneWorkersIncluded": false,
+        "publicDeliveryPerformed": false
+      }
+    },
+    "thirdPartyPreservation": {
+      "thirdPartyToolAndNoticeFilesUnchanged": 358,
+      "operativeLicense": {
+        "identifier": "MIT",
+        "copyright": "Copyright (c) 2026 Nexusov",
+        "path": "LICENSE",
+        "sha256": "bf135fd03e98daeb576a944ea4017375fdedf6e3c46fcca6fd502127e5a2a698",
+        "scope": "Original TrackTrim code; third-party terms remain independent"
+      },
+      "oldPendingMarkerRemoved": true,
+      "runtimeWorkers": [
+        {
+          "path": "tools/mkvmerge.exe",
+          "sha256": "149990bcac63c4d0c87ce32ea46b1daa620faaa1b7bfbec987b8bba0ea9da733"
+        },
+        {
+          "path": "tools/mkvextract.exe",
+          "sha256": "bd8e35ec82c56dadcae944153a04fb70c94e9c800095081e82e5c9b0f57a3412"
+        },
+        {
+          "path": "tools/ffmpeg.exe",
+          "sha256": "6ab07d1433ea91815f19a2aaa6b199f01e9450035d9b11a40a8db203d6656e88"
+        },
+        {
+          "path": "tools/ffprobe.exe",
+          "sha256": "be944ce382a74b92084c2d885fbcb7d8e3777139197a7e251c81714e8d3e4065"
+        }
+      ]
+    },
+    "historicalArchivesRehashed": {
+      "acceptedWindowsArchive": {
+        "name": "TrackTrim-win-x64.zip",
+        "size": 533573594,
+        "sha256": "f66bbc58cb9b8ebed872a2247163716b933d4cf758a29d311718d77d316d36d3",
+        "unchanged": true
+      },
+      "acceptedWindowsMaterials": {
+        "name": "TrackTrim-windows-materials-62713d8f0401.tar.gz",
+        "size": 424722332,
+        "sha256": "dac63fd74d61d1fb58514cee32c2109b31bba2cbc74587d49c5e4d86d9c8342d",
+        "unchanged": true
+      },
+      "historicalLinuxArchive": {
+        "name": "TrackTrim-linux-x64.tar.gz",
+        "size": 179640788,
+        "sha256": "91e004779bd5d065db26346c456682bc27dacda75aadcd589c9273f14a506d70",
+        "unchanged": true
+      },
+      "historicalCombinedMaterials": {
+        "name": "TrackTrim-review-materials-5ccb75afb24d.tar.gz",
+        "size": 138435938,
+        "sha256": "966f1c1eee40d005490b49d4d0f82d8fdefc5e76ded0957eff733e6bb3a5249c",
+        "unchanged": true
+      }
+    },
+    "localValidation": {
+      "timing": "Before the adoption commit on its final source/script tree; package workflows then ran on the clean identified adoption commit",
+      "lockedRestore": "passed",
+      "formatVerification": "passed",
+      "releaseBuild": {
+        "result": "passed",
+        "warnings": 0,
+        "errors": 0
+      },
+      "csharp": {
+        "passed": 983,
+        "failed": 0,
+        "documentedLinuxOnlySkips": 23,
+        "mandatoryMediaTools": true
+      },
+      "python": {
+        "passed": 90,
+        "failed": 0,
+        "skipped": 0,
+        "newCoverage": "Four operative-license inventory cases and six matching source/material cases; the three new negative license checks failed before the gate was added",
+        "developmentCorrection": "The material-test temporary Git repository now fixes eol=lf and tests with core.autocrlf=true; exact source/package byte checks remain intact"
+      }
+    },
+    "linuxCandidate": {
+      "executionMethod": "Existing required Linux CI; both portable and matching material archives remain runner-local and only compact identity/provenance reports are uploaded",
+      "localPackaging": "not run; this host is Windows and local Docker/WSL startup is excluded",
+      "identityLocation": "Final PR #10 required-check evidence: distribution-linux-x64.json and review-materials.json",
+      "previousLocalArchive": "Preserved at its original 5ccb75a revision; not relabeled as this candidate"
+    },
+    "acceptanceAndPublicationLimits": [
+      "No new Computer Use session after physical Escape; no display change, local Docker/WSL startup or disk cleanup",
+      "The native-tested 62713d8 Windows ZIP and all historical native records retain their original identities",
+      "Windows 11/Ubuntu Desktop, visual/scaling, active Cancel/close and real-warning gaps remain unchanged",
+      "MIT adoption does not establish actual public delivery of covered source/notices or authorize candidate integration/public publication"
+    ]
   }
 }

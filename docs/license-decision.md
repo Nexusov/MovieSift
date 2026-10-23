@@ -2,7 +2,7 @@
 
 **Decision: MIT for original TrackTrim code, copyright (c) 2026 Nexusov.** The owner explicitly selected MIT and the attribution `Nexusov` on 2026-10-23. The operative grant is [LICENSE](../LICENSE), included unchanged in portable packages and their matching source/material bundles. This attribution was supplied by the owner, not inferred from GitHub or machine metadata.
 
-The decision covers original project material to which the grant applies; third-party files and contributions retain their applicable notices and terms. It does not certify third-party redistribution readiness, resolve aggregate-versus-combined-work questions, authorize public publication or establish ownership over material the licensor does not control. Contribution terms are recorded in [CONTRIBUTING](../CONTRIBUTING.md#licensing).
+The decision covers original project material to which the grant applies; third-party files and contributions retain their applicable notices and terms. It does not certify third-party redistribution readiness, resolve aggregate-versus-combined-work questions, authorize public publication or establish ownership over material the licensor does not control. Contribution terms are recorded in [CONTRIBUTING](../CONTRIBUTING.md#changes-and-licensing).
 
 The comparison below is retained as background research checked on 2026-10-20 against application source at `41b036e34eb4663505f0232dfdb96ee626493ef1` and the pinned dependencies. The alternatives are no longer pending choices for this candidate.
 
