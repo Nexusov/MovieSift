@@ -1,6 +1,6 @@
 # Third-party notices and provenance
 
-No license for original TrackTrim code has been selected. Do not infer an author identity or apply MIT to every shipped file. The archives produced locally by this branch are acceptance artifacts; public release readiness is not claimed. A review/testing label does not exempt binary redistribution from any license duty. CI builds and tests its archives locally on each runner but uploads only test/provenance evidence until redistribution/source obligations are resolved.
+No license for original TrackTrim code has been selected. Do not infer an author identity or apply MIT to every shipped file. The archives produced locally by this branch are acceptance artifacts; public release readiness is not claimed. A review/testing label does not exempt binary redistribution from any license duty. Required application jobs keep portable archives on their runners and upload only test/provenance evidence. The separate source-builder can retain the complete MKV worker/material set as an explicitly authorized, expiring review artifact; it is not a public application release or the eventual public source-delivery arrangement.
 
 ## Application and build dependencies
 

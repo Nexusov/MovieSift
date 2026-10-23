@@ -1,10 +1,7 @@
 name: Windows MKV source-build candidate
 
 on:
-  pull_request:
-    paths:
-      - '.github/workflows/windows-mkv-candidate.yml'
-      - 'build/*mkv*'
+  workflow_dispatch:
 
 permissions:
   contents: read

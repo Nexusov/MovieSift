@@ -15,8 +15,9 @@ $distribution = $toolLock.$RuntimeIdentifier
 $destinationPath = [System.IO.Path]::GetFullPath($Destination)
 $cachePath = [System.IO.Path]::GetFullPath($CacheDirectory)
 $sourceBuiltWindows = $RuntimeIdentifier -eq 'win-x64' -and -not [string]::IsNullOrWhiteSpace($WindowsMkvBuildDirectory)
+$requiresWindowsSourceBuild = $RuntimeIdentifier -eq 'win-x64' -and $distribution.PSObject.Properties.Name -contains 'kind' -and $distribution.kind -eq 'source-build'
 
-if ($RuntimeIdentifier -eq 'win-x64' -and $distribution.PSObject.Properties.Name -contains 'kind' -and $distribution.kind -eq 'source-build' -and -not $sourceBuiltWindows) {
+if ($requiresWindowsSourceBuild -and -not $sourceBuiltWindows) {
     throw 'The pinned Windows MKV source build is required. Provide -WindowsMkvBuildDirectory (or TRACKTRIM_WINDOWS_MKV_BUILD_DIRECTORY) pointing to the complete verified worker/material directory; official binaries are not a fallback.'
 }
 

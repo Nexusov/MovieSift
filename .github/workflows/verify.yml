@@ -47,6 +47,18 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y build-essential nasm squashfs-tools file libx11-6 libice6 libsm6 libfontconfig1 libicu74 libssl3t64 libgssapi-krb5-2 libbrotli1 libgmp10 libgl1 libegl1 libxrandr2 libxcursor1 libxi6 libxinerama1
+      - name: Restore the exact Windows MKV source build
+        if: runner.os == 'Windows'
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ${{ runner.temp }}/mkv-source-candidate
+          key: windows-mkv-source-${{ hashFiles('build/*mkv*', 'build/ffmpeg-runtime-dependencies.py') }}
+      - name: Build or validate the pinned Windows MKV workers and materials
+        if: runner.os == 'Windows'
+        run: |
+          $mkvBuildDirectory = Join-Path '${{ runner.temp }}' 'mkv-source-candidate'
+          ./build/provision-windows-mkv.ps1 -Destination $mkvBuildDirectory -CacheDirectory '${{ runner.temp }}/mkv-source-downloads'
+          ('TRACKTRIM_WINDOWS_MKV_BUILD_DIRECTORY=' + $mkvBuildDirectory) | Add-Content -LiteralPath $env:GITHUB_ENV -Encoding utf8NoBOM
       - name: Provision pinned Windows source-build prerequisites
         if: runner.os == 'Windows'
         run: ./build/provision-windows-ffmpeg.ps1
