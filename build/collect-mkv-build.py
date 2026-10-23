@@ -22,7 +22,7 @@ MAXIMUM_NOTICE_BYTES = 512 * 1024
 GMP_PACKAGE = "mingw-w64-ucrt-x86_64-gmp"
 SOURCE_NOTICE_PACKAGES = frozenset({GMP_PACKAGE, "mingw-w64-ucrt-x86_64-icu", "mingw-w64-ucrt-x86_64-libvorbis"})
 SYSTEM_LIBRARIES = frozenset({
-    "advapi32.dll", "avrt.dll", "bcrypt.dll", "cfgmgr32.dll", "comctl32.dll", "comdlg32.dll",
+    "advapi32.dll", "authz.dll", "avrt.dll", "bcrypt.dll", "cfgmgr32.dll", "comctl32.dll", "comdlg32.dll",
     "crypt32.dll", "dbghelp.dll", "dnsapi.dll", "dwmapi.dll", "gdi32.dll", "imm32.dll",
     "iphlpapi.dll", "kernel32.dll", "mpr.dll", "msvcrt.dll", "msvcp_win.dll", "netapi32.dll",
     "ntdll.dll", "ole32.dll", "oleaut32.dll", "powrprof.dll", "propsys.dll", "psapi.dll",
@@ -123,8 +123,9 @@ def metadata_fields(data):
 def package_member_path(source, prefix):
     """Map the selected Windows DLL to its actual MSYS2 package/owner-query path."""
     relative = source.relative_to(prefix)
+    invalid_member = len(relative.parts) != 2 or relative.parts[0] != "bin" or relative.suffix.casefold() != ".dll"
 
-    if len(relative.parts) != 2 or relative.parts[0] != "bin" or relative.suffix.casefold() != ".dll":
+    if invalid_member:
         raise ValueError("A Windows MKV runtime DLL must belong directly to the locked UCRT64 bin directory")
 
     return "ucrt64/" + relative.as_posix()

@@ -138,7 +138,7 @@ catch { [Console]::Error.WriteLine($_.Exception.Message); exit 1 }
 
     def test_operating_system_imports_do_not_admit_arbitrary_dlls(self):
         """Runtime DLLs remain explicitly accounted for instead of being treated as OS files."""
-        for name in ("KERNEL32.dll", "ucrtbase.dll", "api-ms-win-core-file-l1-2-0.dll"):
+        for name in ("KERNEL32.dll", "AUTHZ.dll", "ucrtbase.dll", "api-ms-win-core-file-l1-2-0.dll"):
             self.assertTrue(COLLECTION.is_system_library(name))
         for name in ("Qt6Core.dll", "libFLAC-14.dll", "libstdc++-6.dll", "api-ms-win-file.exe"):
             self.assertFalse(COLLECTION.is_system_library(name))

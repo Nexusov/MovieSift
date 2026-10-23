@@ -33,7 +33,6 @@ configure_arguments=(
   --disable-dbus
   --disable-update-check
   --disable-mkvtoolnix
-  --with-boost-system=boost_filesystem-mt
   --with-boost-filesystem=boost_filesystem-mt
   --with-qmake6=/ucrt64/bin/qmake6
   ac_cv_lib_gtest_main_main=no
