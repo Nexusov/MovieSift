@@ -168,7 +168,8 @@ def mkv_source_build_evidence(directory, records, lock_path, recipe_path, standa
         name = row["path"]
         valid_dependency = PurePosixPath(name).name == name and name.endswith(".dll") \
             and isinstance(row.get("packageName"), str) and bool(row["packageName"]) \
-            and isinstance(row.get("packageVersion"), str) and bool(row["packageVersion"])
+            and isinstance(row.get("packageVersion"), str) and bool(row["packageVersion"]) \
+            and row.get("upstreamMember") == "ucrt64/bin/" + name
 
         if not valid_dependency or name.casefold() in declared_dependencies:
             raise ValueError("MKV source-build dependency names/packages are invalid or duplicate")
@@ -189,6 +190,7 @@ def mkv_source_build_evidence(directory, records, lock_path, recipe_path, standa
     required_materials = {
         "mkv-source.lock.json", "build-mkv-windows.sh", "config.h", "build-config", "config.log",
         "configure-arguments.json", "installed-packages.json", "compiler-versions.txt", "dependency-packages.json",
+        "collect-mkv-build.py", "provision-windows-mkv.ps1", "ffmpeg-runtime-dependencies.py",
         "source/" + lock["source"]["fileName"],
     }
     material_names = {row["path"] for row in materials}
@@ -200,6 +202,8 @@ def mkv_source_build_evidence(directory, records, lock_path, recipe_path, standa
         "mkv-source.lock.json": lock_hash, "build-mkv-windows.sh": recipe_hash,
         "source/" + lock["source"]["fileName"]: lock["source"]["sha256"],
     }
+    for name in ("collect-mkv-build.py", "provision-windows-mkv.ps1", "ffmpeg-runtime-dependencies.py"):
+        pinned_materials[name] = file_hash(Path(__file__).with_name(name))
     for name, expected_hash in pinned_materials.items():
 
         if records[MKV_BUILD_MATERIAL_PREFIX + name]["sha256"] != expected_hash:
@@ -528,6 +532,8 @@ def tool_origins(root, records, tool_lock, runtime_identifier, ffmpeg_lock, mkv_
 
     if mkv_source:
         permitted_hashes.update(package["sourcePackage"]["sha256"] for package in mkv_source["lock"]["packages"] if package.get("sourcePackage"))
+        shipped_packages = {row["packageName"] for row in mkv_source["receipt"]["dependencies"]}
+        permitted_hashes.update(package["sha256"] for package in mkv_source["lock"]["packages"] if package["name"] in shipped_packages)
     for material in supplemental:
         directory = material.get("outputDirectory", "upstream-terms")
 

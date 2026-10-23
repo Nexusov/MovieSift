@@ -126,6 +126,7 @@ if ($RuntimeIdentifier -eq 'win-x64') {
         }
 
         $mkvSourceReceipt = Get-Content -LiteralPath (Join-Path $WindowsMkvBuildDirectory $mkvSourceProvenance.receiptPath) -Raw | ConvertFrom-Json
+        $mkvBuildLock = Get-Content -LiteralPath (Join-Path $WindowsMkvBuildDirectory 'licenses/mkv-source-build/mkv-source.lock.json') -Raw | ConvertFrom-Json
         $mkvBuildFiles = @('mkv-source-provenance.json', $mkvSourceProvenance.receiptPath) +
             @($mkvSourceReceipt.workers.path) + @($mkvSourceReceipt.dependencies.path) +
             @($mkvSourceReceipt.materials | ForEach-Object { 'licenses/mkv-source-build/' + $_.path })
@@ -375,9 +376,37 @@ $fileProvenance = @(Get-ChildItem -LiteralPath $destinationPath -File -Recurse -
 
     if ($isMkvSourceBuildMember) {
         $origin = 'source-built MKVToolNix worker/dependency/material; exact pinned sources, local recipe, configuration, complete worker/library hashes and PE imports in licenses/mkv-source-build/build-receipt.json'
-        $originArchive = $toolLock.source.url
-        $originArchiveHash = $sourceHash
+        $originArchive = ''
+        $originArchiveHash = ''
         $originMember = ''
+
+        if ($relativePath -cin @('mkvmerge.exe', 'mkvextract.exe')) {
+            $originArchive = $toolLock.source.url
+            $originArchiveHash = $sourceHash
+        }
+
+        $dependency = @($mkvSourceReceipt.dependencies | Where-Object path -CEQ $relativePath)
+
+        if ($dependency.Count -eq 1) {
+            $package = $mkvBuildLock.packages | Where-Object name -CEQ $dependency[0].packageName
+            $origin = 'unchanged runtime DLL from the exact pinned MSYS2 binary package; complete corresponding source/recipe/notices are included and bound by the MKV source-build receipt'
+            $originArchive = $package.url
+            $originArchiveHash = $package.sha256
+            $originMember = $dependency[0].upstreamMember
+        }
+
+        $sourceArtifacts = @($mkvBuildLock.source) + @($mkvBuildLock.packages | Where-Object {
+            $_.PSObject.Properties.Name -contains 'sourcePackage'
+        } | ForEach-Object sourcePackage)
+
+        foreach ($artifact in $sourceArtifacts) {
+
+            if ($relativePath -ceq ('licenses/mkv-source-build/source/' + $artifact.fileName)) {
+                $origin = 'complete hash-pinned source archive used by the Windows MKV source-build closure'
+                $originArchive = $artifact.url
+                $originArchiveHash = $artifact.sha256
+            }
+        }
     }
 
     if ($ffmpegMembers.ContainsKey($relativePath)) {

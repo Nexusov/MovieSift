@@ -181,6 +181,7 @@ class DistributionInventoryTests(unittest.TestCase):
         source = {"url": "https://example.invalid/source.tar.xz", "fileName": "source.tar.xz", "sha256": hashlib.sha256(source_data).hexdigest()}
         dependency_source = b"complete controlled Qt source package"
         package = {"name": "mingw-w64-ucrt-x86_64-qt6-base", "version": "6.10.2-1",
+                   "fileName": "qt6-base.pkg.tar.zst", "url": "https://example.invalid/qt6-base.pkg.tar.zst", "sha256": "7" * 64,
                    "sourcePackage": {"fileName": "qt6-base.src.tar.zst", "url": "https://example.invalid/qt6-base.src.tar.zst",
                                      "sha256": hashlib.sha256(dependency_source).hexdigest()}}
         lock = {"schemaVersion": 1, "version": "102.0", "source": source, "packages": [package]}
@@ -188,6 +189,8 @@ class DistributionInventoryTests(unittest.TestCase):
         prefix = "tools/licenses/mkv-source-build/"
         self.write(prefix + "mkv-source.lock.json", self.mkv_lock.read_bytes())
         self.write(prefix + "build-mkv-windows.sh", self.mkv_recipe.read_bytes())
+        for name in ("collect-mkv-build.py", "provision-windows-mkv.ps1", "ffmpeg-runtime-dependencies.py"):
+            self.write(prefix + name, (Path(__file__).parents[1] / name).read_bytes())
         self.write(prefix + "source/source.tar.xz", source_data)
         self.write(prefix + "source/qt6-base.src.tar.zst", dependency_source)
         for name in ("config.h", "build-config", "config.log", "compiler-versions.txt", "notices/Qt-COPYING"):
@@ -209,7 +212,7 @@ class DistributionInventoryTests(unittest.TestCase):
             row = {"path": name, "size": path.stat().st_size, "sha256": INVENTORY.file_hash(path)}
 
             if name.endswith(".dll"):
-                row.update(packageName=package["name"], packageVersion=package["version"])
+                row.update(packageName=package["name"], packageVersion=package["version"], upstreamMember="ucrt64/bin/" + name)
                 self.mkv_receipt["dependencies"].append(row)
                 continue
 
@@ -516,6 +519,29 @@ class DistributionInventoryTests(unittest.TestCase):
         self.pack()
         with self.assertRaisesRegex(ValueError, "cover exactly the actual build files"):
             self.generate()
+
+    def test_source_built_mkv_control_scripts_and_required_materials_are_bound(self):
+        """The collector/provisioner cannot be substituted behind an otherwise valid recipe identity."""
+        self.prepare_mkv_source_build()
+        name = "collect-mkv-build.py"
+        self.write("tools/licenses/mkv-source-build/" + name, b"different collection logic")
+        row = next(row for row in self.mkv_receipt["materials"] if row["path"] == name)
+        path = self.root / "tools/licenses/mkv-source-build" / name
+        row.update(size=path.stat().st_size, sha256=INVENTORY.file_hash(path))
+        self.write_mkv_receipt()
+        with self.assertRaisesRegex(ValueError, "included source/lock/recipe differs"):
+            self.generate()
+
+    def test_source_build_record_rejects_nonregular_or_oversized_files(self):
+        """A directory/FIFO cannot block record loading, and JSON is bounded before decoding."""
+        path = self.directory / "invalid-receipt"
+        path.mkdir()
+        with self.assertRaisesRegex(ValueError, "bounded regular file"):
+            INVENTORY.read_mkv_build_json(path)
+        path.rmdir()
+        path.write_bytes(b" " * (INVENTORY.MKV_BUILD_JSON_BYTES + 1))
+        with self.assertRaisesRegex(ValueError, "bounded regular file"):
+            INVENTORY.read_mkv_build_json(path)
 
 
 if __name__ == "__main__":
