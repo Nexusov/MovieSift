@@ -103,6 +103,8 @@ Windows packaging uses a verified source build of the same MKVToolNix 102.0 CLI 
 
 Declared acceptance targets remain Windows 11 x64 25H2 and Ubuntu 24.04 x64 Desktop using X11/XWayland. Exact tested hosts and unverified desktop checks are recorded in [PLAN](docs/PLAN.md). See [native requirements](docs/SUPPORTED_FORMATS.md#platform-and-native-requirements) before making a compatibility claim.
 
+The `62713d8` Windows candidate has [consolidated native functional evidence](docs/verification/release-candidate-evidence.json) on Windows 10: owner-assisted pickers, single MKV/MP4, mixed recursive plans/rules/presets and explicit queue Restore/Discard. Independent checks matched fourteen retained stream payloads across four GUI outputs and confirmed unchanged sources. UIA functional evidence does not establish visual layout, effective scaling or acceptance on the declared desktop targets.
+
 To test a relocated archive, provide a generated multi-track fixture:
 
 ```powershell

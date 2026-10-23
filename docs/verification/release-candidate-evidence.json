@@ -522,5 +522,780 @@
       "Declared-target desktop and visual/scaling acceptance, including existing warning/active-cancellation limits",
       "Final RC integration/publication review and authorization"
     ]
+  },
+  "desktopAcceptance": {
+    "comparisonBase": "8fa45df6fc854c8674263d34de6ce4c27522c217",
+    "scope": "New owner-authorized consolidated functional Computer Use session; historical native evidence above remains unchanged. No production or packaging change.",
+    "artifact": {
+      "sourceRevision": "62713d8f040109204d0b02e7fbbe4ef1673611a3",
+      "archiveSha256": "f66bbc58cb9b8ebed872a2247163716b933d4cf758a29d311718d77d316d36d3",
+      "archiveBytes": 533573594,
+      "sourceWorktreeDirty": false,
+      "sourceToComparisonBaseChanges": [
+        "docs/PLAN.md",
+        "docs/verification/release-candidate-evidence.json"
+      ],
+      "verifiedArchivePayloadEntries": 627,
+      "filesIncludingManifest": 628,
+      "freshAppLocalDataFiles": 0
+    },
+    "platform": {
+      "os": "Windows 10 Home Single Language 22H2 x64",
+      "build": "19045.6456",
+      "interactiveSession": 1,
+      "displayReportedByVideoController": "1920x1080 at 60 Hz, NVIDIA GeForce RTX 3050",
+      "effectiveScale": "Not observed; no display settings changed",
+      "runtimeContext": "Separate .NET is installed; no external media commands on PATH. Exact portable executable/app-local workers were used without developer overrides. This is not clean-machine acceptance."
+    },
+    "method": "Installed computer-use skill, @oai/sky native UIA and keyboard through the exact isolated packaged process; source/output probes and extraction were separate read-only shell verification.",
+    "consolidatedMatrix": [
+      {
+        "case": "English-first and EN/RU state",
+        "status": "passed",
+        "observed": "Fresh English baseline at 15:29:05.774Z. The approved single-MKV plan 0/2/3 and path survived EN -> RU -> EN without another Review. Batch EN -> RU preserved the valid unapplied proposal; explicit Apply occurred in RU before returning to English, which preserved resulting settings/state. Original metadata and user preset name stayed original.",
+        "limit": "The batch sequence is not an unchanged unapplied-preview round trip. UIA does not expose checkbox ToggleState."
+      },
+      {
+        "case": "Actual native file/folder selection",
+        "status": "blocked",
+        "passedScope": "Owner-assisted actual source file pickers, single-output folder, recursive source and output-root folder acceptance, corroborated by resulting paths/rows. Separately observed File picker Escape returned Ready with the same empty source/output and no job; no owner selection was pending.",
+        "remaining": "File-picker Escape was observed on the same empty Ready workspace with no owner handoff pending. Folder-picker cancellation preserving an approved plan was not run before the owner stopped Computer Use; earlier overlapping/stale-focus attempts are excluded."
+      },
+      {
+        "case": "Single MKV and MP4",
+        "status": "passed",
+        "observed": "Owner selected each source in the native picker. Computer Use changed Keep choices, reviewed and ran MKV 0/2/3 and MP4 0/2/3/7. Both GUI results report a separate new file; independent payload/metadata evidence follows."
+      },
+      {
+        "case": "Mixed recursive queue and independent plans",
+        "status": "passed",
+        "observed": "Two native discovered rows with preserved Season 1/2 provenance; MKV manual Keep 0/2/3 and rule-derived MP4 Keep 0/3/5/7 were explicitly approved and jointly Reviewed. Computer Use started the queue at 16:43:40.387Z. At 16:44:04.042Z both rows showed Completed; separate output published, one result for each row.",
+        "preparation": "Existing empty output root; both season parents/output files absent at 16:38:45.385520Z before execution; actual nested destinations exist afterward."
+      },
+      {
+        "case": "Rules/presets and explicit approval/Review",
+        "status": "passed",
+        "observed": "Audio en AND literal Commentary; subtitles ru AND literal Captions AND actual forced flag. Preview reported 1 changed/1 manual. Saved new preset RC — Commentary + forced without changing valid proposal/MKV approval. Editing Commentary to Alternate cleared only the preview. Selecting the saved entry did not load it; explicit Load restored Commentary and required a fresh Preview. Explicit Apply changed MP4 only, preserved the manual-review MKV plan, did not approve or run. Both per-file approvals and aggregate Review were explicit."
+      },
+      {
+        "case": "Restart and explicit Restore",
+        "status": "passed",
+        "observed": "Normal idle close/restart exposed the two intended paths behind explicit Restore/Discard. Computer Use activated Restore. Owner opened the batch tab; the batch showed two restored entries; the selected MKV was Pending inspection with its original nested destination, Inspect pending available and Run disabled. No automatic inspection, preset Load or job. A second normal restart offered the same list; owner confirmed Discard at action time and Computer Use activated it. Recovery notice disappeared; listing became empty.",
+        "storageEvidence": {
+          "status": "passed",
+          "scope": "Read-only storage/media facts paired with the separately recorded native Restore/Discard actions. Listing records contain intent only and authorize neither processing nor ownership cleanup. Snapshot quiescence is not active-cancellation evidence.",
+          "localReceipts": [
+            "Evidence/queue-restore-before-discard.json",
+            "Evidence/queue-discard-verification.json"
+          ],
+          "queueList": {
+            "path": "Fresh app с пробелами/TrackTrim-win-x64/data/queue-list.json",
+            "version": 1,
+            "rootFields": [
+              "entries",
+              "revision",
+              "version"
+            ],
+            "entryFields": [
+              "destinationPath",
+              "folderOrigin",
+              "included",
+              "outputDirectoryRoot",
+              "sourcePath"
+            ],
+            "onlyIntentFieldsPresent": true,
+            "beforeDiscard": {
+              "observedUtc": "2026-10-23T17:10:13.576765+00:00",
+              "finishedUtc": "2026-10-23T17:10:14.180347+00:00",
+              "revision": "4cf22ae9-afc9-4554-81e3-8ba2834a08f9",
+              "bytes": 2110,
+              "sha256": "2f1f5260dcf139a29973c32d973572f6f092bb62a4ff068bd84024e3fb92d08a",
+              "entries": [
+                {
+                  "source": "Сериал Series/Season 1/episode.mkv",
+                  "destination": "Recursive outputs/Season 1/episode.trimmed.mkv",
+                  "included": true,
+                  "folderOrigin": {
+                    "root": "Сериал Series",
+                    "relativePath": "Season 1/episode.mkv"
+                  },
+                  "outputDirectoryRoot": "Recursive outputs",
+                  "sourceExists": true,
+                  "destinationAlreadyExists": true
+                },
+                {
+                  "source": "Сериал Series/Season 2/episode.mp4",
+                  "destination": "Recursive outputs/Season 2/episode.trimmed.mp4",
+                  "included": true,
+                  "folderOrigin": {
+                    "root": "Сериал Series",
+                    "relativePath": "Season 2/episode.mp4"
+                  },
+                  "outputDirectoryRoot": "Recursive outputs",
+                  "sourceExists": true,
+                  "destinationAlreadyExists": true
+                }
+              ]
+            },
+            "afterDiscard": {
+              "observedUtc": "2026-10-23T17:16:01.574764+00:00",
+              "finishedUtc": "2026-10-23T17:16:02.133127+00:00",
+              "revision": "3e6496fc-f950-43d0-af9a-b53b11476afa",
+              "bytes": 93,
+              "sha256": "a69f115979e2630f3667ea2b53e5ef29e676c2c6b6637785692f3b358098c2a7",
+              "entries": []
+            },
+            "existingDestinationLimit": "Both intended destinations already existed from the completed mixed run. Restore did not overwrite or automatically process them; fresh inspection/approval/Review must still recheck collisions."
+          },
+          "catalog": {
+            "path": "Fresh app с пробелами/TrackTrim-win-x64/data/rule-presets.json",
+            "version": 1,
+            "bytesUnchanged": 692,
+            "equalBeforeAfterSha256": "2e581234a07f1d88510712856970afe51a6677073ab2775c37c8800be88e35df",
+            "entryCountBefore": 1,
+            "entryCountAfter": 1,
+            "presets": [
+              {
+                "id": "df041e9a-a557-4041-99a7-7014804c6089",
+                "name": "RC — Commentary + forced",
+                "rules": {
+                  "audio": {
+                    "mode": "KeepMatching",
+                    "languages": [
+                      "en"
+                    ],
+                    "titleFilter": {
+                      "enabled": true,
+                      "text": "Commentary"
+                    }
+                  },
+                  "subtitles": {
+                    "mode": "KeepMatching",
+                    "languages": [
+                      "ru"
+                    ],
+                    "titleFilter": {
+                      "enabled": true,
+                      "text": "Captions"
+                    }
+                  },
+                  "keepOnlyForcedSubtitles": true
+                }
+              }
+            ],
+            "scope": "Storage identity/content only. This does not infer that a preset was automatically loaded into the editor."
+          },
+          "mediaPreservation": {
+            "identityReference": "outputVerification.files matched by source.path and output.path: all four complete source and four output hashes/sizes were rechecked against those exact identities before and after Discard.",
+            "sourceCount": 4,
+            "outputCount": 4,
+            "allSourceHashesAndSizesUnchanged": true,
+            "allOutputHashesAndSizesUnchanged": true,
+            "collisionSentinel": {
+              "path": "Collision sentinel/existing.mkv",
+              "bytes": 46,
+              "equalBeforeAfterSha256": "5c95a22674003cd8dcbc84c286f166c13b88fc8d42f098cdde0a5205af9ac53d"
+            }
+          },
+          "quiescenceSnapshots": [
+            {
+              "stage": "beforeDiscard",
+              "ownedStorageObservedUtc": "2026-10-23T17:10:13.602806+00:00",
+              "candidateCount": 0,
+              "ownershipRecordCount": 0,
+              "inspectionScratchCount": 0,
+              "workersObservedUtc": "2026-10-23T17:10:14.180323+00:00",
+              "matchingPackagedWorkerCount": 0,
+              "unidentifiableMediaWorkerCount": 0
+            },
+            {
+              "stage": "afterDiscard",
+              "ownedStorageObservedUtc": "2026-10-23T17:16:01.600143+00:00",
+              "candidateCount": 0,
+              "ownershipRecordCount": 0,
+              "inspectionScratchCount": 0,
+              "workersObservedUtc": "2026-10-23T17:16:02.133110+00:00",
+              "matchingPackagedWorkerCount": 0,
+              "unidentifiableMediaWorkerCount": 0
+            }
+          ]
+        }
+      },
+      {
+        "case": "Existing-destination refusal",
+        "status": "passed",
+        "observed": "A single-file plan targeting the owned sentinel reached Run and was refused: The destination already exists. Choose another output filename. Sentinel SHA stayed unchanged and no candidate/journal remained. Explicit destination correction disabled Run until fresh Review. Review itself is pure; filesystem refusal occurred at Run."
+      },
+      {
+        "case": "Live-worker-correlated Cancel and close",
+        "status": "not run",
+        "reason": "Existing accepted C1GiB fixture copied and full SHA verified. Owner reported that its tracks appeared; the next Computer Use observation was stopped by physical Escape before those tracks/selection/destination could be confirmed. No remux, Cancel or active-close input was sent. Post-success snapshots and the identification-only observer are not cancellation evidence."
+      },
+      {
+        "case": "Resize/scroll/keyboard/visible focus and 100/150/200 percent layout",
+        "status": "blocked",
+        "passedScope": "Functional observed Tab/Shift+Tab reachability of source/output, track, approval, rule/preset and queue actions.",
+        "reason": "One native capture failed: Error: FrameArrived timed out: timed out waiting on channel. Indexed click failed: Error: coordinate input geometry is unavailable. No usable screenshot; appearance, visible focus, resizing/scrolling layout and effective 100/150/200 percent scales are unverified."
+      }
+    ],
+    "assistance": [
+      "Owner selected the two single-file sources and native folders, switched to the batch tab, selected the MP4 row, and clicked Russian. Other successful selection edits, rules/preset operations, approvals, Reviews and Runs used observed Computer Use keyboard controls.",
+      "Input/observation timestamps are not invented timestamps for owner actions.",
+      "For final C1GiB preparation the owner reported tracks appeared, but physical Escape stopped the immediate observation. This is an owner report only, not directly observed candidate track/plan acceptance."
+    ],
+    "automationLimits": [
+      "Native folder fields intermittently return accessibility:null with no separate targetable modal. Earlier exact failures: Cannot set a value for an element that is not settable; element 180 has no cached secondary actions for TrackTrim.exe.",
+      "Avalonia set_value sometimes timed out (wait for accessibility set value: timed out waiting on channel) after actually changing the value; state was reread before another activation. UIA sometimes returned stale focus. One Space accidentally toggled Include subfolders during empty-list preparation; it was corrected at the observed control, with no media/job change. This is an automation protocol deviation, not an application defect."
+    ],
+    "outputVerification": {
+      "schemaVersion": 1,
+      "status": "passed",
+      "package": {
+        "sourceRevision": "62713d8f040109204d0b02e7fbbe4ef1673611a3",
+        "archiveSha256": "f66bbc58cb9b8ebed872a2247163716b933d4cf758a29d311718d77d316d36d3",
+        "archiveBytes": 533573594
+      },
+      "scope": "Read-only proof for four native-GUI outputs. BOTH retained-payload evidence sets were collected AFTER GUI completion. Complete BEFORE-GUI source hashes were recorded at preparation; matching AFTER hashes bind unchanged originals. No verification tool initiated an application job. Snapshots prove quiescence, not active-cancellation or retained-handle termination timing.",
+      "methods": {
+        "mkv": "SHA256 of complete mkvextract tracks, including retained SRT; every timestamps_v2 value and terminal boundary compared. Chapters/global-and-retained tags compared semantically; attachments compared by metadata and bytes. Per-job MKV structural/timing checks are distinct from these fixture payload checks.",
+        "mp4": "Bundled ffprobe encoded-packet size/SHA256 records in retained order. payloadEvidenceSha256 is SHA256 of canonical ordered size/hash records, not an elementary-stream file hash. A separate digest includes exact rational PTS/DTS/duration, flags and complete AAC skip/padding. Codec/extradata, original tags, dispositions and raw tkhd flags compared. Untimed attached artwork retains exact packet bytes; artwork packet timing is excluded by the documented contract. Ordinary chapter presentation boundaries/titles and supported container tags compared."
+      },
+      "files": [
+        {
+          "container": "Matroska",
+          "source": {
+            "path": "Источники с пробелами/Обычный MKV.mkv",
+            "bytesBeforeGui": 392464,
+            "bytesAfterVerification": 392464,
+            "sha256BeforeGui": "055c7f3ebdc3c579dd6d7740c78a1e8ee0e2525f23542b5c6af9a0869ce4a0f8",
+            "sha256AfterVerification": "055c7f3ebdc3c579dd6d7740c78a1e8ee0e2525f23542b5c6af9a0869ce4a0f8"
+          },
+          "output": {
+            "path": "Results с пробелами/Обычный MKV.trimmed.mkv",
+            "bytes": 200137,
+            "sha256": "4a5bc94053a5f9493a8381c7f86ebf39834d4de4ed1373cfb8e9373b4e46df2a"
+          },
+          "verificationUtc": {
+            "started": "2026-10-23T16:13:31.823247+00:00",
+            "finished": "2026-10-23T16:13:34.416865+00:00"
+          },
+          "retained": [
+            {
+              "sourceIndex": 0,
+              "outputIndex": 0,
+              "kind": "video",
+              "actualMatroskaUid": "12774094189724925210",
+              "equalExtractedPayloadSha256": "6a290a6583f3b4269ac0c3eb32b27285dd7511abb6a632afeeaa7be61399d8dd",
+              "payloadBytes": 1312,
+              "equalTimestampValuesIncludingBoundary": 21,
+              "maximumTimestampDeltaMilliseconds": 0.0
+            },
+            {
+              "sourceIndex": 2,
+              "outputIndex": 1,
+              "kind": "audio",
+              "actualMatroskaUid": "15985661122095681775",
+              "equalExtractedPayloadSha256": "df961853f7276107b6162929061318b051fecbbefa5263c548906bf286b69a8b",
+              "payloadBytes": 192104,
+              "equalTimestampValuesIncludingBoundary": 51,
+              "maximumTimestampDeltaMilliseconds": 0.0
+            },
+            {
+              "sourceIndex": 3,
+              "outputIndex": 2,
+              "kind": "subtitles",
+              "actualMatroskaUid": "10803935449919660822",
+              "equalExtractedPayloadSha256": "1dde3885b740ce1c19ff31e13cba5e64c9a2c26a90ba7ebd1170277854876eac",
+              "payloadBytes": 69,
+              "equalTimestampValuesIncludingBoundary": 2,
+              "maximumTimestampDeltaMilliseconds": 0.0
+            }
+          ],
+          "metadata": {
+            "codecLanguageTitleFlagsPropertiesEqual": true,
+            "chaptersEqual": true,
+            "expectedRetainedAndGlobalTagsEqual": true,
+            "attachments": [
+              {
+                "id": 1,
+                "actualMatroskaUid": "11257959064039487625",
+                "metadataEqual": true,
+                "equalPayloadSha256": "0363bb41bac06b4a38868abe4c72666e022773f7d0ce436d77c0832bfae1c601"
+              }
+            ]
+          },
+          "cleanupSnapshot": {
+            "observedUtc": "2026-10-23T16:13:33.734186+00:00",
+            "candidateCount": 0,
+            "ownershipRecordCount": 0,
+            "inspectionScratchCount": 0
+          },
+          "workerSnapshot": {
+            "observedUtc": "2026-10-23T16:13:34.416841+00:00",
+            "matchingPackagedWorkerCount": 0,
+            "unidentifiableMediaWorkerCount": 0
+          }
+        },
+        {
+          "container": "Mp4",
+          "source": {
+            "path": "Источники с пробелами/Обычный MP4.mp4",
+            "bytesBeforeGui": 34046,
+            "bytesAfterVerification": 34046,
+            "sha256BeforeGui": "b5a94767353d2e895ea04f5f1650df1f561fc507b4cb2db277f556c6b9a77112",
+            "sha256AfterVerification": "b5a94767353d2e895ea04f5f1650df1f561fc507b4cb2db277f556c6b9a77112"
+          },
+          "output": {
+            "path": "Results с пробелами/Обычный MP4.trimmed.mp4",
+            "bytes": 23137,
+            "sha256": "20c5cc018f5cfd68f952880477082dd4beb89c49804d3be2ace2d6cce381d0b8"
+          },
+          "verificationUtc": {
+            "started": "2026-10-23T16:16:29.808656+00:00",
+            "finished": "2026-10-23T16:16:30.732202+00:00"
+          },
+          "retained": [
+            {
+              "sourceIndex": 0,
+              "outputIndex": 0,
+              "codec": "h264",
+              "packetCount": 50,
+              "encodedBytes": 1400,
+              "equalPayloadEvidenceSha256": "a0ecead37c6c1c07e5d9f38363a6c7ed4d44341a17a01d12cfdf6f58d04e8819",
+              "equalRationalTimingFlagsSkipEvidenceSha256": "40d983580f39213ba4731fed6587e88117a2a710d044db7ae26ab966438a07b7",
+              "equalTkhdFlags": 3,
+              "equalSkipPaddingRecords": [],
+              "artworkUntimed": false
+            },
+            {
+              "sourceIndex": 2,
+              "outputIndex": 1,
+              "codec": "aac",
+              "packetCount": 95,
+              "encodedBytes": 8138,
+              "equalPayloadEvidenceSha256": "4e7d0ad3e9a3150f9a2e5690719285b6c42a9c7229eb20f616b44cb262d7c6ca",
+              "equalRationalTimingFlagsSkipEvidenceSha256": "d835826fb027ced42596c42fcc654d69556d21c5162fb739e80e1784de6f46db",
+              "equalTkhdFlags": 2,
+              "equalSkipPaddingRecords": [
+                {
+                  "ordinal": 0,
+                  "sideData": [
+                    {
+                      "side_data_type": "Skip Samples",
+                      "skip_samples": 1008,
+                      "discard_padding": 0,
+                      "skip_reason": 0,
+                      "discard_reason": 0
+                    }
+                  ]
+                },
+                {
+                  "ordinal": 94,
+                  "sideData": [
+                    {
+                      "side_data_type": "Skip Samples",
+                      "skip_samples": 0,
+                      "discard_padding": 16,
+                      "skip_reason": 0,
+                      "discard_reason": 0
+                    }
+                  ]
+                }
+              ],
+              "artworkUntimed": false
+            },
+            {
+              "sourceIndex": 3,
+              "outputIndex": 2,
+              "codec": "aac",
+              "packetCount": 95,
+              "encodedBytes": 8171,
+              "equalPayloadEvidenceSha256": "6a54bdb1d1457d0504de67ff6300f5b519820f89542b8ad1797d1de2cbcd5d01",
+              "equalRationalTimingFlagsSkipEvidenceSha256": "c808176deed9a00767802f08b9a671af280aa7537ccf14098935d4ad0154a830",
+              "equalTkhdFlags": 2,
+              "equalSkipPaddingRecords": [
+                {
+                  "ordinal": 0,
+                  "sideData": [
+                    {
+                      "side_data_type": "Skip Samples",
+                      "skip_samples": 1008,
+                      "discard_padding": 0,
+                      "skip_reason": 0,
+                      "discard_reason": 0
+                    }
+                  ]
+                },
+                {
+                  "ordinal": 94,
+                  "sideData": [
+                    {
+                      "side_data_type": "Skip Samples",
+                      "skip_samples": 0,
+                      "discard_padding": 16,
+                      "skip_reason": 0,
+                      "discard_reason": 0
+                    }
+                  ]
+                }
+              ],
+              "artworkUntimed": false
+            },
+            {
+              "sourceIndex": 7,
+              "outputIndex": 4,
+              "codec": "png",
+              "packetCount": 1,
+              "encodedBytes": 132,
+              "equalPayloadEvidenceSha256": "665dc7bc76ce1caf79d8f55649086b5fbedefa7a03276f1641c9d31c3024168d",
+              "equalRationalTimingFlagsSkipEvidenceSha256": "171932f4a3c2f588757e542a2eb9ca70c508368aa2695ebd81cb68813d0afb32",
+              "equalTkhdFlags": null,
+              "equalSkipPaddingRecords": [],
+              "artworkUntimed": true
+            }
+          ],
+          "metadata": {
+            "codecExtradataSideDataTagsDispositionsEqual": true,
+            "supportedContainerTagsEqual": true,
+            "ordinaryChapterPresentationEqual": true,
+            "ordinaryChapterCount": 2,
+            "artworkEncodedBytesEqual": true,
+            "noDefaultAudioPromotion": true,
+            "noSubtitlesRemain": true
+          },
+          "cleanupSnapshot": {
+            "observedUtc": "2026-10-23T16:16:30.135901+00:00",
+            "candidateCount": 0,
+            "ownershipRecordCount": 0,
+            "inspectionScratchCount": 0
+          },
+          "workerSnapshot": {
+            "observedUtc": "2026-10-23T16:16:30.732184+00:00",
+            "matchingPackagedWorkerCount": 0,
+            "unidentifiableMediaWorkerCount": 0
+          }
+        },
+        {
+          "container": "Matroska",
+          "source": {
+            "path": "Сериал Series/Season 1/episode.mkv",
+            "bytesBeforeGui": 392464,
+            "bytesAfterVerification": 392464,
+            "sha256BeforeGui": "055c7f3ebdc3c579dd6d7740c78a1e8ee0e2525f23542b5c6af9a0869ce4a0f8",
+            "sha256AfterVerification": "055c7f3ebdc3c579dd6d7740c78a1e8ee0e2525f23542b5c6af9a0869ce4a0f8"
+          },
+          "output": {
+            "path": "Recursive outputs/Season 1/episode.trimmed.mkv",
+            "bytes": 200137,
+            "sha256": "8ff333620e332802092c3cfb8b016724e8e02bdc5abe97b92fdd4e4cb6ae3aab"
+          },
+          "verificationUtc": {
+            "started": "2026-10-23T16:44:47.728122+00:00",
+            "finished": "2026-10-23T16:44:50.166273+00:00"
+          },
+          "retained": [
+            {
+              "sourceIndex": 0,
+              "outputIndex": 0,
+              "kind": "video",
+              "actualMatroskaUid": "12774094189724925210",
+              "equalExtractedPayloadSha256": "6a290a6583f3b4269ac0c3eb32b27285dd7511abb6a632afeeaa7be61399d8dd",
+              "payloadBytes": 1312,
+              "equalTimestampValuesIncludingBoundary": 21,
+              "maximumTimestampDeltaMilliseconds": 0.0
+            },
+            {
+              "sourceIndex": 2,
+              "outputIndex": 1,
+              "kind": "audio",
+              "actualMatroskaUid": "15985661122095681775",
+              "equalExtractedPayloadSha256": "df961853f7276107b6162929061318b051fecbbefa5263c548906bf286b69a8b",
+              "payloadBytes": 192104,
+              "equalTimestampValuesIncludingBoundary": 51,
+              "maximumTimestampDeltaMilliseconds": 0.0
+            },
+            {
+              "sourceIndex": 3,
+              "outputIndex": 2,
+              "kind": "subtitles",
+              "actualMatroskaUid": "10803935449919660822",
+              "equalExtractedPayloadSha256": "1dde3885b740ce1c19ff31e13cba5e64c9a2c26a90ba7ebd1170277854876eac",
+              "payloadBytes": 69,
+              "equalTimestampValuesIncludingBoundary": 2,
+              "maximumTimestampDeltaMilliseconds": 0.0
+            }
+          ],
+          "metadata": {
+            "codecLanguageTitleFlagsPropertiesEqual": true,
+            "chaptersEqual": true,
+            "expectedRetainedAndGlobalTagsEqual": true,
+            "attachments": [
+              {
+                "id": 1,
+                "actualMatroskaUid": "11257959064039487625",
+                "metadataEqual": true,
+                "equalPayloadSha256": "0363bb41bac06b4a38868abe4c72666e022773f7d0ce436d77c0832bfae1c601"
+              }
+            ]
+          },
+          "cleanupSnapshot": {
+            "observedUtc": "2026-10-23T16:44:49.629834+00:00",
+            "candidateCount": 0,
+            "ownershipRecordCount": 0,
+            "inspectionScratchCount": 0
+          },
+          "workerSnapshot": {
+            "observedUtc": "2026-10-23T16:44:50.166253+00:00",
+            "matchingPackagedWorkerCount": 0,
+            "unidentifiableMediaWorkerCount": 0
+          }
+        },
+        {
+          "container": "Mp4",
+          "source": {
+            "path": "Сериал Series/Season 2/episode.mp4",
+            "bytesBeforeGui": 34046,
+            "bytesAfterVerification": 34046,
+            "sha256BeforeGui": "b5a94767353d2e895ea04f5f1650df1f561fc507b4cb2db277f556c6b9a77112",
+            "sha256AfterVerification": "b5a94767353d2e895ea04f5f1650df1f561fc507b4cb2db277f556c6b9a77112"
+          },
+          "output": {
+            "path": "Recursive outputs/Season 2/episode.trimmed.mp4",
+            "bytes": 14238,
+            "sha256": "f9642b6ff272acb3ed3ac89f8185550cfc3c1547a2eff2504af2b71293c4ae46"
+          },
+          "verificationUtc": {
+            "started": "2026-10-23T16:44:50.270217+00:00",
+            "finished": "2026-10-23T16:44:51.109095+00:00"
+          },
+          "retained": [
+            {
+              "sourceIndex": 0,
+              "outputIndex": 0,
+              "codec": "h264",
+              "packetCount": 50,
+              "encodedBytes": 1400,
+              "equalPayloadEvidenceSha256": "a0ecead37c6c1c07e5d9f38363a6c7ed4d44341a17a01d12cfdf6f58d04e8819",
+              "equalRationalTimingFlagsSkipEvidenceSha256": "40d983580f39213ba4731fed6587e88117a2a710d044db7ae26ab966438a07b7",
+              "equalTkhdFlags": 3,
+              "equalSkipPaddingRecords": [],
+              "artworkUntimed": false
+            },
+            {
+              "sourceIndex": 3,
+              "outputIndex": 1,
+              "codec": "aac",
+              "packetCount": 95,
+              "encodedBytes": 8171,
+              "equalPayloadEvidenceSha256": "6a54bdb1d1457d0504de67ff6300f5b519820f89542b8ad1797d1de2cbcd5d01",
+              "equalRationalTimingFlagsSkipEvidenceSha256": "c808176deed9a00767802f08b9a671af280aa7537ccf14098935d4ad0154a830",
+              "equalTkhdFlags": 2,
+              "equalSkipPaddingRecords": [
+                {
+                  "ordinal": 0,
+                  "sideData": [
+                    {
+                      "side_data_type": "Skip Samples",
+                      "skip_samples": 1008,
+                      "discard_padding": 0,
+                      "skip_reason": 0,
+                      "discard_reason": 0
+                    }
+                  ]
+                },
+                {
+                  "ordinal": 94,
+                  "sideData": [
+                    {
+                      "side_data_type": "Skip Samples",
+                      "skip_samples": 0,
+                      "discard_padding": 16,
+                      "skip_reason": 0,
+                      "discard_reason": 0
+                    }
+                  ]
+                }
+              ],
+              "artworkUntimed": false
+            },
+            {
+              "sourceIndex": 5,
+              "outputIndex": 2,
+              "codec": "mov_text",
+              "packetCount": 2,
+              "encodedBytes": 47,
+              "equalPayloadEvidenceSha256": "7b1eff09830687fa5138ef8490d1c9ca14588d8446bb230e15d5c903b1f505e2",
+              "equalRationalTimingFlagsSkipEvidenceSha256": "6c49221700a9f4cb830ace2ea8ba73c1f7a32b9aef6cbd0f7803ca86ce0cd15e",
+              "equalTkhdFlags": 2,
+              "equalSkipPaddingRecords": [],
+              "artworkUntimed": false
+            },
+            {
+              "sourceIndex": 7,
+              "outputIndex": 4,
+              "codec": "png",
+              "packetCount": 1,
+              "encodedBytes": 132,
+              "equalPayloadEvidenceSha256": "665dc7bc76ce1caf79d8f55649086b5fbedefa7a03276f1641c9d31c3024168d",
+              "equalRationalTimingFlagsSkipEvidenceSha256": "171932f4a3c2f588757e542a2eb9ca70c508368aa2695ebd81cb68813d0afb32",
+              "equalTkhdFlags": null,
+              "equalSkipPaddingRecords": [],
+              "artworkUntimed": true
+            }
+          ],
+          "metadata": {
+            "codecExtradataSideDataTagsDispositionsEqual": true,
+            "supportedContainerTagsEqual": true,
+            "ordinaryChapterPresentationEqual": true,
+            "ordinaryChapterCount": 2,
+            "artworkEncodedBytesEqual": true,
+            "noDefaultAudioPromotion": true,
+            "exactlyOneForcedSubtitleRetained": true
+          },
+          "cleanupSnapshot": {
+            "observedUtc": "2026-10-23T16:44:50.577239+00:00",
+            "candidateCount": 0,
+            "ownershipRecordCount": 0,
+            "inspectionScratchCount": 0
+          },
+          "workerSnapshot": {
+            "observedUtc": "2026-10-23T16:44:51.109076+00:00",
+            "matchingPackagedWorkerCount": 0,
+            "unidentifiableMediaWorkerCount": 0
+          }
+        }
+      ],
+      "limits": "UI actions, approvals and assistance are recorded separately. No visual/scaling or target-OS acceptance is claimed. Raw probe/packet/XML/extraction data remains local; paths are task-relative.",
+      "preservationAfterRecursiveRun": {
+        "observedUtc": "2026-10-23T16:45:39.524267+00:00",
+        "priorSingleOutputsRehashedUnchanged": 2,
+        "collisionSentinel": {
+          "path": "Collision sentinel/existing.mkv",
+          "bytes": 46,
+          "sha256Before": "5c95a22674003cd8dcbc84c286f166c13b88fc8d42f098cdde0a5205af9ac53d",
+          "sha256After": "5c95a22674003cd8dcbc84c286f166c13b88fc8d42f098cdde0a5205af9ac53d",
+          "unchanged": true
+        }
+      }
+    },
+    "unavailableTargets": [
+      "Windows 11 x64 25H2",
+      "Ubuntu 24.04 x64 Desktop/X11-XWayland"
+    ],
+    "otherLimits": [
+      "No real mkvmerge warning fixture or native warning-review result; controlled tests remain controlled.",
+      "No production defect demonstrated; no runtime rebuild for documentation.",
+      "No Docker/WSL startup, display change, public upload, application license selection or release publication."
+    ],
+    "redactions": "Task-relative paths only. Raw native trees, probe/packet/XML/payload files, absolute private paths and unrelated desktop/process information remain local.",
+    "localVerification": {
+      "python": {
+        "command": "python -m unittest discover -s build/tests -q",
+        "passed": 80,
+        "failed": 0,
+        "skipped": 0,
+        "environment": "TRACKTRIM_TOOL_DIRECTORY points to the already verified app-local tool/source bundle for these test subprocesses only; the native application was launched without developer overrides.",
+        "initialFailure": "First run lacked mandatory pinned FFmpeg sources at the default tools path (79 passed, 1 failed). Correcting the documented test environment passed all 80; no test or gate was weakened."
+      }
+    },
+    "sessionStop": {
+      "method": "Owner physical Escape",
+      "toolResult": "Computer Use was stopped by the user with the physical Escape key. Stop your work, do not call further Computer Use tools in this turn, and send a final message noting that the user stopped Computer Use.",
+      "scope": "No further Computer Use tool or app input after this result. Independent shell checks/documentation/CI continued. The test GUI was left open; no external process termination was used.",
+      "timestampLimit": "No exact physical-key timestamp is claimed. The separately recorded observer stop time is not that input time."
+    },
+    "finalPreservation": {
+      "status": "passed",
+      "observedUtc": "2026-10-23T17:33:53.117090+00:00",
+      "finishedUtc": "2026-10-23T17:33:54.647649+00:00",
+      "scope": "Final read-only preservation after owner physical-Escape stop. No further Computer Use, native input, remux, Cancel or active-close action. Source-open/track state after stop is owner-reported only. Snapshots and the identification observer are not cancellation evidence.",
+      "mediaIdentityReference": "outputVerification.files: all four source and four published-output complete hashes/sizes were rechecked and remain identical to those exact records.",
+      "unchangedPriorSourceCount": 4,
+      "unchangedPublishedOutputCount": 4,
+      "additionalSource": {
+        "path": "Источники с пробелами/Рабочая копия cancellation 1GiB.mkv",
+        "bytes": 1079470784,
+        "sha256BeforeNativeUse": "0565b34f5fc0965225bf45b8d37e5cb007fe20611b77f0f66c175c970e4307f9",
+        "sha256Final": "0565b34f5fc0965225bf45b8d37e5cb007fe20611b77f0f66c175c970e4307f9",
+        "unchanged": true
+      },
+      "collisionSentinel": {
+        "path": "Collision sentinel/existing.mkv",
+        "bytes": 46,
+        "equalBeforeFinalSha256": "5c95a22674003cd8dcbc84c286f166c13b88fc8d42f098cdde0a5205af9ac53d"
+      },
+      "catalog": {
+        "path": "Fresh app с пробелами/TrackTrim-win-x64/data/rule-presets.json",
+        "bytes": 692,
+        "equalAfterDiscardFinalSha256": "2e581234a07f1d88510712856970afe51a6677073ab2775c37c8800be88e35df",
+        "entryCount": 1
+      },
+      "queueList": {
+        "path": "Fresh app с пробелами/TrackTrim-win-x64/data/queue-list.json",
+        "version": 1,
+        "entryCount": 0,
+        "revision": "3e6496fc-f950-43d0-af9a-b53b11476afa",
+        "bytes": 93,
+        "equalAfterDiscardFinalSha256": "a69f115979e2630f3667ea2b53e5ef29e676c2c6b6637785692f3b358098c2a7"
+      },
+      "outputInventoryReference": "outputVerification.files output.path: the two controlled output trees contain exactly those four files and no additional output. No C1GiB destination was configured/approved; no intended destination was invented.",
+      "ownedStorageSnapshot": {
+        "observedUtc": "2026-10-23T17:33:54.039632+00:00",
+        "candidateCount": 0,
+        "ownershipRecordCount": 0,
+        "inspectionScratchCount": 0
+      },
+      "workerSnapshot": {
+        "observedUtc": "2026-10-23T17:33:54.647629+00:00",
+        "matchingPackagedWorkerCount": 0,
+        "unidentifiableMediaWorkerCount": 0
+      },
+      "readOnlyObserver": {
+        "path": "Evidence/native-workers-rc-01.jsonl",
+        "rawBytes": 2318,
+        "rawSha256": "bb5faad5abaac6f327b40ce12bc7200e5aec2697bf203d1ec6057f139412e50a",
+        "eventCounts": {
+          "ObserverStarted": 1,
+          "DiscoveryRaceOrReadFailure": 1,
+          "WorkerFirstSeen": 1,
+          "WorkerExited": 1,
+          "ObserverStopped": 1
+        },
+        "startedUtc": "2026-10-23T17:22:54.0640807+00:00",
+        "stoppedUtc": "2026-10-23T17:31:16.9028865+00:00",
+        "stopReason": "OwnerStopMarker",
+        "guiProcessId": 26840,
+        "guiStartUtc": "2026-10-23T17:09:05.5623454Z",
+        "guiHadExitedAtObserverStop": false,
+        "operatorInputTimestampsRecorded": false,
+        "knownWorkerCount": 1,
+        "workers": [
+          {
+            "pid": 28120,
+            "parentPid": 26840,
+            "identityKey": "28120:639283734125551698",
+            "kind": "IdentificationOrVersionProbe",
+            "startUtc": "2026-10-23T17:30:12.5551698Z",
+            "firstSeenUtc": "2026-10-23T17:30:12.7270946+00:00",
+            "hasExitedAtFirstSeen": false,
+            "tool": "mkvmerge.exe",
+            "operationSource": "Источники с пробелами/Рабочая копия cancellation 1GiB.mkv",
+            "exitCode": 0,
+            "exitUtc": "2026-10-23T17:30:15.2749058Z",
+            "exitObservedUtc": "2026-10-23T17:30:15.3984143+00:00"
+          }
+        ],
+        "discoveryRaces": [
+          {
+            "pid": 44144,
+            "observedUtc": "2026-10-23T17:30:12.4219945+00:00",
+            "detail": "Exception calling \"GetProcessById\" with \"1\" argument(s): \"Process with an Id of 44144 is not running.\""
+          }
+        ],
+        "remuxCandidateEventCount": 0,
+        "scope": "The one retained worker was an identification probe, exited0. A separate short-lived process was not retained because it had already exited; its invocation kind/exit code are unknown. No GUI cancel/close input was recorded or attempted, and this observer file establishes no active cancellation.",
+        "stopRequestedBy": "Assistant wrote the observer-owned stop marker after the owner stopped Computer Use; this stopped only read-only observation and did not terminate the GUI or a media process."
+      }
+    }
   }
 }
