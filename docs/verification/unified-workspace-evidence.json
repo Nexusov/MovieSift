@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "feature": "Unified workspace and aggregate metadata track selection",
+  "comparisonBase": "cbda363b0fa32e618f62aaff66b601fdaa19bb98",
+  "implementationRevision": "d4b87429c965efa28e6858dfad08428df938ee97",
+  "scope": "Automated source verification; no native desktop interaction or new candidate handoff",
+  "localPlatform": {
+    "os": "Windows 10 Home Single Language 22H2",
+    "build": "19045.6456",
+    "architecture": "x64",
+    "sdk": "10.0.402"
+  },
+  "checks": {
+    "lockedRestore": "passed",
+    "formatVerification": "passed",
+    "releaseBuild": {
+      "status": "passed",
+      "warnings": 0,
+      "errors": 0
+    },
+    "core": {
+      "passed": 181,
+      "skipped": 0
+    },
+    "application": {
+      "passed": 293,
+      "skipped": 4
+    },
+    "infrastructure": {
+      "passed": 407,
+      "skipped": 19
+    },
+    "desktopHeadless": {
+      "passed": 130,
+      "skipped": 0
+    },
+    "pythonDistributionChecks": {
+      "passed": 100
+    },
+    "skipScope": "Existing Linux-only FIFO, redirected-file and descriptor-lock cases; required Linux CI executes them."
+  },
+  "automatedCoverage": [
+    "Union of four similar episodes and a differently described movie; last-episode-only Spanish coverage and file-local identities",
+    "Duplicate occurrences, exact aliases/tags, conservative titles/semantic roles and unknown/conflicting singleton members",
+    "Mixed/member choices; new inspection Keep defaults; exclusion/removal/reinspection and stale edit rejection",
+    "Single explicit Review, independent immutable plans, zero-audio consent, unresolved included rows and NoChange",
+    "Actual compiled tri-state CheckBox via headless keyboard Space: checked removes, mixed keeps all",
+    "EN/RU, expansion, rules/presets, queue recovery, warning/cleanup gates and one-owner shutdown"
+  ],
+  "realMedia": {
+    "kind": "real-unified-aggregate-selection",
+    "groupCoverage": 1,
+    "includedFiles": 2,
+    "groupOccurrences": 1,
+    "removedSourceTrackId": 0,
+    "protectedOtherFileVideoId": 0,
+    "immutablePlans": 2,
+    "publishedOutputs": 1,
+    "unchangedJobs": 1,
+    "retainedTrackPayloads": 4,
+    "retainedAttachmentPayloads": 1,
+    "preservationVerified": true,
+    "sourceHashes": {
+      "Episode 1 исходник.mkv": "055C7F3EBDC3C579DD6D7740C78A1E8EE0E2525F23542B5C6AF9A0869CE4A0F8",
+      "Episode 2 Español.mkv": "B162C42F3166B37E30D35AD3FF83EE316A8BA73F44C5757FA25D1307C4D5955F"
+    },
+    "sourcesUnchanged": true,
+    "sameWorkerHandleExited": true,
+    "candidateDirectoriesRemaining": 0,
+    "ownershipRecordsRemaining": 0,
+    "scratchEntriesRemaining": 0
+  },
+  "methods": {
+    "payload": "Production MKV verification plus existing MediaPayloadEvidence extraction/hash helper for each retained track and attachment",
+    "source": "Complete SHA256 before/after",
+    "ownership": "Actual retained remux process handle exited; exact owned candidate/journal/scratch locations empty",
+    "ui": "Avalonia.Headless compiled views and controlled ports; not native appearance or scaling"
+  },
+  "correctedVerificationSetup": [
+    "Initial Infrastructure invocation used the wrong fixture environment variable and failed 37 required-media cases; the complete suite passed with TRACKTRIM_FIXTURE_DIRECTORY and mandatory tools enabled.",
+    "Initial Python invocation omitted TRACKTRIM_TOOL_DIRECTORY and failed the required source-build input check; all 100 passed with the existing pinned source/material bundle.",
+    "Concurrent incremental Desktop builds produced a missing precompiled-XAML test artifact; a sequential nonincremental rebuild and full final suite passed."
+  ],
+  "limits": [
+    "Native Computer Use and recording campaigns deliberately deferred by task",
+    "No native/visual/scaling acceptance of the new interface",
+    "Historical b288be1 artifacts/receipts remain bound to their original binary/platform",
+    "Packaging, relocation and Linux clean-container verification remain mandatory in the unchanged required CI; final run provenance is reported in the draft PR."
+  ]
+}
