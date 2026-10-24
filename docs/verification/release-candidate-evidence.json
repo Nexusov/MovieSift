@@ -1489,6 +1489,7 @@
     "sourceTree": "6bbd076bd2853b6b6183e406f481c8174b67a6e6",
     "archiveSha256": "f406162e52c9de3a44c6c18d0eae620fce2a1d710694e614eda6847fe51562a3",
     "functionalSmokeStatus": "passed",
+    "ownerOperatedCancellationOutcomeAndCleanup": "passed; ownerOperatedW13 in the companion record",
     "activeCancelAndCloseStatus": "not established",
     "scope": "Delivered Windows archive, Windows 10 22H2 x64 19045.6456. Distinct from every historical candidate/native record above; newer evidence documentation does not change the tested binary"
   }

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "purpose": "Sanitized extract of completed native smoke; documentation review only, without another application, media or Computer Use run",
+  "purpose": "Sanitized delivered-candidate native smoke and a distinct later owner-operated W13 attempt; historical observations keep their original sessions and scope",
   "candidate": {
     "sourceRevision": "b288be1d185c62157e7d1bd1249f2f925ffe3093",
     "sourceTree": "6bbd076bd2853b6b6183e406f481c8174b67a6e6",
@@ -397,9 +397,8 @@
   },
   "manualContinuation": {
     "procedure": "native-desktop-acceptance.md#delivered-candidate-owner-operated-continuation",
-    "nextCase": "One owner-operated W13 only; do not start it as part of this documentation task",
-    "existingFixture": "C1GiB with full hash in sources; Keep 0/2/3, fresh manual-W13-01.trimmed.mkv destination; preserve all published outputs",
-    "missingPrerequisite": "An actually available owner-controlled recording of physical Cancel activation, correlated to the host UTC used by the retained-worker observer with stated uncertainty. Existing worker logs record no operator input time; current procedure states this requirement but has not demonstrated a recording method",
+    "completedScope": "One owner-operated W13; see ownerOperatedW13. No further Run/Cancel in this task.",
+    "remainingInputCorrelation": "Cancelled and cleanup are confirmed; displayed Cancel transition overlaps worker exit once timing uncertainty is included. Strict active-remux ordering remains not established.",
     "laterRepeatedCloseGuard": "A second Close must target the same observed still-existing test window and PID/start identity while shutdown continues. Stop if that window disappears; never blind repeated Alt+F4 with the older instance open"
   },
   "receiptProvenance": {
@@ -452,5 +451,264 @@
       }
     ],
     "omissions": "Private absolute workspace roots, raw UI trees/picker bookmarks, unrelated process identities, chat/permission history, captures and media omitted. Source paths reduced to task-owned fixture basenames; output paths remain task-relative. Raw receipts remain local; their hashes identify the originals, not redacted copies"
+  },
+  "ownerOperatedW13": {
+    "status": "not established",
+    "scope": "One owner-operated Run/Cancel attempt only. Native Cancelled, retained-worker exit and cleanup are confirmed; strict input-before-remux-exit ordering is not established. No application defect demonstrated.",
+    "sourceRevision": "b288be1d185c62157e7d1bd1249f2f925ffe3093",
+    "archiveSha256": "f406162e52c9de3a44c6c18d0eae620fce2a1d710694e614eda6847fe51562a3",
+    "platformReference": "#/platform",
+    "language": "English",
+    "testGui": {
+      "processId": 24984,
+      "startUtc": "2026-10-24T00:58:03.8375499Z",
+      "productVersion": "0.1.0-rc.1+b288be1d185c62157e7d1bd1249f2f925ffe3093",
+      "stillOpenAfterCheck": true,
+      "olderInstancePreserved": true
+    },
+    "fixture": {
+      "name": "C1GiB cancellation attachment fixture",
+      "bytes": 1079470784,
+      "sha256BeforeAndAfter": "0565b34f5fc0965225bf45b8d37e5cb007fe20611b77f0f66c175c970e4307f9"
+    },
+    "plan": {
+      "keepSourceIds": [
+        0,
+        2,
+        3
+      ],
+      "removeSourceIds": [
+        1
+      ],
+      "destination": "Results с пробелами/W13 Cancel/manual-W13-01.trimmed.mkv",
+      "explicitlyReviewedBeforeOwnerRun": true
+    },
+    "nativeMethod": {
+      "preparationAndPostState": "Documented Computer Use UIA/keyboard; no new capture attempt, fallback UI automation or programmatic cancellation",
+      "ownerActions": "Selected the existing source in the native picker, then physically activated Create separate output and Cancel while recording through ScreenReplay",
+      "automationInterruptions": "Physical Escape stopped Computer Use twice; app input stopped immediately each time. The final explicit continuation only observed the completed attempt; the earlier continuation resumed preparation. No second Run/Cancel.",
+      "attemptCount": 1,
+      "externalWorkerTerminationUsed": false
+    },
+    "recording": {
+      "method": "Owner-controlled ScreenReplay; no click marker or global input hook",
+      "bytes": 4083883,
+      "sha256": "2738e2e7cd46946aee4ab623909b451c5f9ea28c37ed22d36edcbec8b4f61e08",
+      "durationSeconds": "7.833317",
+      "frames": 470,
+      "frameRate": "60/1",
+      "resolution": "1920x1080",
+      "timebase": "1/60000",
+      "utcReference": "Read-only host UTC display; requested 50 ms timer, observed updates about 60-130 ms. Display/composition lag is not independently bounded; 1/60 s frames are not exact input UTC.",
+      "originalRemainsPrivate": true,
+      "visualExtract": {
+        "localReceipt": "images/delivered-candidate-w13-owner-controls.png",
+        "bytes": 115142,
+        "sha256": "d4b09c4ee723e4105507bb20364388d75b1dff68099bb2a42ee13749c429c895"
+      }
+    },
+    "inputCorrelation": {
+      "operatorInputTimestampsRecorded": false,
+      "reviewMethod": "Original 60-fps frames, 120-frame segment decoded after a 4 s input seek. No timing conclusion from filenames, filesystem times, owner message or exit code.",
+      "observedFrames": [
+        {
+          "segmentFrame": 95,
+          "displayedUtc": "2026-10-24T01:26:54.937Z",
+          "appearance": "Copying; Cancel before pressed appearance"
+        },
+        {
+          "segmentFrame": 96,
+          "displayedUtc": "2026-10-24T01:26:54.994Z",
+          "appearance": "Copying; Cancel pressed appearance begins"
+        },
+        {
+          "segmentFrame": 101,
+          "displayedUtc": "2026-10-24T01:26:55.058Z",
+          "appearance": "Copying; last sampled pressed appearance"
+        },
+        {
+          "segmentFrame": 102,
+          "displayedUtc": "2026-10-24T01:26:55.058Z",
+          "appearance": "Copying; Cancel returns from pressed appearance"
+        },
+        {
+          "segmentFrame": 107,
+          "displayedUtc": "2026-10-24T01:26:55.121Z",
+          "appearance": "First Cancelled; Cancel disabled"
+        },
+        {
+          "segmentFrame": 108,
+          "displayedUtc": "2026-10-24T01:26:55.185Z",
+          "appearance": "Cancelled; next visible clock update"
+        }
+      ],
+      "conservativeDisplayedEventEnvelopeUtc": {
+        "from": "2026-10-24T01:26:54.937Z",
+        "through": "2026-10-24T01:26:55.185Z"
+      },
+      "conclusion": "The displayed-event envelope already includes retained-worker exit at 01:26:55.0947517Z; refresh/render uncertainty only widens it. Mouse-down/appearance is not the exact command activation. Strict active-remux ordering remains not established."
+    },
+    "retainedRemux": {
+      "workerKey": "24808:639284020122757779",
+      "processId": 24808,
+      "parentProcessId": 24984,
+      "executable": "tools/mkvmerge.exe",
+      "operation": "RemuxCandidate",
+      "startUtc": "2026-10-24T01:26:52.2757779Z",
+      "firstRetainedObservedUtc": "2026-10-24T01:26:52.6804517+00:00",
+      "firstRetainedHasExited": false,
+      "livenessReads": [
+        {
+          "readStartedUtc": "2026-10-24T01:26:52.6811115+00:00",
+          "readCompletedUtc": "2026-10-24T01:26:52.6811691+00:00",
+          "hasExited": false
+        },
+        {
+          "readStartedUtc": "2026-10-24T01:26:53.1007860+00:00",
+          "readCompletedUtc": "2026-10-24T01:26:53.1009203+00:00",
+          "hasExited": false
+        },
+        {
+          "readStartedUtc": "2026-10-24T01:26:53.3891903+00:00",
+          "readCompletedUtc": "2026-10-24T01:26:53.3892479+00:00",
+          "hasExited": false
+        },
+        {
+          "readStartedUtc": "2026-10-24T01:26:53.7528106+00:00",
+          "readCompletedUtc": "2026-10-24T01:26:53.7528743+00:00",
+          "hasExited": false
+        },
+        {
+          "readStartedUtc": "2026-10-24T01:26:54.1083154+00:00",
+          "readCompletedUtc": "2026-10-24T01:26:54.1083654+00:00",
+          "hasExited": false
+        },
+        {
+          "readStartedUtc": "2026-10-24T01:26:54.3570476+00:00",
+          "readCompletedUtc": "2026-10-24T01:26:54.3570912+00:00",
+          "hasExited": false
+        },
+        {
+          "readStartedUtc": "2026-10-24T01:26:54.6656264+00:00",
+          "readCompletedUtc": "2026-10-24T01:26:54.6657101+00:00",
+          "hasExited": false
+        },
+        {
+          "readStartedUtc": "2026-10-24T01:26:55.0102679+00:00",
+          "readCompletedUtc": "2026-10-24T01:26:55.0103170+00:00",
+          "hasExited": false
+        }
+      ],
+      "exitUtc": "2026-10-24T01:26:55.0947517Z",
+      "exitObservedUtc": "2026-10-24T01:26:55.3399729+00:00",
+      "exitCode": -1,
+      "durationSeconds": "2.8189738",
+      "jobIdentifier": "f56d7cb69a7546afb2bed2a43a595902"
+    },
+    "observer": {
+      "script": "../../build/observe-native-workers.ps1",
+      "sha256": "8b342628867912ed77ced5bd67938cb886cabfe5a3239b0b854a03a14d365d16",
+      "repositoryScriptUnchanged": true,
+      "startedUtc": "2026-10-24T01:23:45.4175521+00:00",
+      "operatorInputTimestampsRecorded": false,
+      "retainedWorkers": 2,
+      "unretainedDiscoveryRaces": 1,
+      "qualification": "One short child could not be retained; its operation/exit remain unclassified. Not a complete child-process trace.",
+      "stoppedUtc": "2026-10-24T01:32:33.7705739+00:00",
+      "stopReason": "OwnerStopMarker",
+      "scopeOfStop": "Own observer/display stop markers only, after retained exits; no media process control or deletion"
+    },
+    "result": {
+      "functionalCancellationStatus": "passed",
+      "nativeStatus": "Operation cancelled. The original is preserved.",
+      "postStateObservedUtc": "2026-10-24T01:32:05.544Z",
+      "reviewEnabled": true,
+      "runEnabled": false,
+      "cancelEnabled": false,
+      "guiResponding": true,
+      "sourceAndDestinationStillCorrect": true,
+      "sameRetainedWorkerExitConfirmed": true,
+      "sourceHashUnchanged": true,
+      "finalOutputExists": false,
+      "exactCandidateAndMarkerDirectoryAbsent": true,
+      "exactJournalAbsent": true,
+      "ownershipEntries": [],
+      "inspectionScratchEntries": [],
+      "matchingPackagedMediaWorkers": 0,
+      "unidentifiableProcesses": 0,
+      "cleanupObservedUtc": "2026-10-24T01:36:12.889970+00:00",
+      "quiescenceObservedUtc": "2026-10-24T01:36:13.780438+00:00",
+      "previousPublishedOutputsRehashedUnchanged": 6,
+      "allSourceHashesRecheckedUnchanged": 3,
+      "deliveredArchiveRehashedUnchanged": true
+    },
+    "provenance": {
+      "localEvidenceDirectory": "evidence/manual-W13-20261024-005701-910c03",
+      "localReceipts": [
+        {
+          "localReceipt": "preparation.json",
+          "bytes": 2240,
+          "sha256": "3b3049ceb1d008f9015a770dbbdd40393b97b4ee226bcab678d497aa7a9464a9"
+        },
+        {
+          "localReceipt": "gui-identity.json",
+          "bytes": 481,
+          "sha256": "5bb6bf59aa6e7ed50a46eb69793dd7e881fcf83973d4fdc79d247b3d89b595ea"
+        },
+        {
+          "localReceipt": "extraction-integrity.json",
+          "bytes": 673,
+          "sha256": "c0002f6cce33b9b381cb9026829a01ded94eaa88c7f13fc52df3d381e5c26a5d"
+        },
+        {
+          "localReceipt": "approved-plan-and-preparation.json",
+          "bytes": 20918,
+          "sha256": "193e87df85b4079d5a5a8b1ec80713f6a3946fe84b303b78ab6454ef0f2a99b8"
+        },
+        {
+          "localReceipt": "recording-readiness.json",
+          "bytes": 1259,
+          "sha256": "190a9a90675a92762307d137d68d5296354b8fe1eebb281af7dbaadede5f7ca9"
+        },
+        {
+          "localReceipt": "workers-owner-01.jsonl",
+          "bytes": 6211,
+          "sha256": "7821f442f553067b43e4f89d99a36d1af1b475f2ec1407b2f1036d7e0a8736a6"
+        },
+        {
+          "localReceipt": "attempt-recording.json",
+          "bytes": 326,
+          "sha256": "466b4d56bbce79d82a8e3e3cd0cb912d2efb50772ce1fabee5f584168a19af02"
+        },
+        {
+          "localReceipt": "attempt-probe.json",
+          "bytes": 537,
+          "sha256": "6e5ee4f1ee91845dbf521b6bfe6da855fc81c8794d1ed6908d1b57aa3a209baa"
+        },
+        {
+          "localReceipt": "native-post-attempt.json",
+          "bytes": 4123,
+          "sha256": "db1bba22592688238a21c3eabdbc203b7bace63aca3268aa3a682c4fdc4a3aa1"
+        },
+        {
+          "localReceipt": "post-attempt-files.json",
+          "bytes": 797,
+          "sha256": "fa119ff191cec8f82471c11e1531b9ccb75bfaa4d184e7bf71f3353c419989a5"
+        },
+        {
+          "localReceipt": "filesystem-audit.json",
+          "bytes": 6215,
+          "sha256": "6b0df62b444a3ffb12eb8a83d2a38f778d728ace8329fcfc596b50c97a5e333a"
+        }
+      ],
+      "redactionsAndOmissions": "Private absolute roots, unrelated application identities, full UIA trees, original full-desktop recordings and raw frames remain local. The published PNG contains only UTC and TrackTrim status/buttons cropped from six original frames; all other pixels are omitted, with labels added above each unaltered crop. The two source crop rectangles are x1327/y47/w573/h53 and x240/y920/w600/h95 in the 1920x1080 recording.",
+      "independentReview": "Read-only second review agreed the visible event envelope overlaps worker exit; an independent full-file audit confirmed source/output preservation and cleanup."
+    },
+    "limits": [
+      "No W13 retry; no active-input-before-exit pass from this recording.",
+      "No W14/W15, warning, screenshot-capture, display-setting or target-desktop run.",
+      "No application, backend, dependency, workflow or package change; frozen candidate not rebuilt.",
+      "UIA and cropped owner recording establish this functional event only, not general layout/focus/scaling or clean Windows 11/Ubuntu acceptance."
+    ]
   }
 }
