@@ -9,7 +9,7 @@ using TrackTrim.Core.Rules;
 namespace TrackTrim.Application.Batches;
 
 /// <summary>Dispatches reviewed files sequentially through the existing single-job owner.</summary>
-public sealed class BatchCoordinator(
+public sealed partial class BatchCoordinator(
     BatchSession session,
     InspectionService inspectionService,
     JobCoordinator jobs,
