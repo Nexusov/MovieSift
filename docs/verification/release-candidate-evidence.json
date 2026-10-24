@@ -1482,5 +1482,14 @@
       "Windows 11/Ubuntu Desktop, visual/scaling, active Cancel/close and real-warning gaps remain unchanged",
       "MIT adoption does not establish actual public delivery of covered source/notices or authorize candidate integration/public publication"
     ]
+  },
+  "deliveredCandidateNativeSmoke": {
+    "record": "release-candidate-native-smoke.json",
+    "sourceRevision": "b288be1d185c62157e7d1bd1249f2f925ffe3093",
+    "sourceTree": "6bbd076bd2853b6b6183e406f481c8174b67a6e6",
+    "archiveSha256": "f406162e52c9de3a44c6c18d0eae620fce2a1d710694e614eda6847fe51562a3",
+    "functionalSmokeStatus": "passed",
+    "activeCancelAndCloseStatus": "not established",
+    "scope": "Delivered Windows archive, Windows 10 22H2 x64 19045.6456. Distinct from every historical candidate/native record above; newer evidence documentation does not change the tested binary"
   }
 }

@@ -13,7 +13,7 @@ Bit-for-bit build reproduction, full compiler history and source archives for ev
 
 The existing **Verify and package** workflow defaults `workflow_dispatch.inputs.retain_candidates` to boolean `false`. Pull requests, pushes and manual runs with that default retain only the existing compact evidence. Historical successful runs that uploaded reports only do not provide downloadable binary/material candidates.
 
-After separate authorization, a future manual run can explicitly set `retain_candidates: true`, for example:
+The separately authorized [run 40027855578, attempt 1](https://github.com/Nexusov/TrackTrim/actions/runs/40027855578) delivered both verified runtime/material sets from `b288be1d185c62157e7d1bd1249f2f925ffe3093`. The exact identities and completed download verification are in [PR #10](https://github.com/Nexusov/TrackTrim/pull/10). Any future run requires its own authorization; the opt-in command remains:
 
 ```sh
 gh workflow run verify.yml --ref review/release-candidate -f retain_candidates=true
@@ -23,4 +23,6 @@ Each platform must first pass its complete verification, including actual MKV/MP
 
 One artifact per runtime is named `candidate-<runtime>-<full-checked-source-SHA>-run-<run-id>-attempt-<attempt>`, with **7-day retention**. Its source SHA is the actual checkout, including a synthetic merge if that is what was checked; rebuilding is not assumed to reproduce historical archive bytes. Both exact archives are retained together. The original `.zip`/`.tar.gz` files remain nested unchanged inside the Actions artifact.
 
-TrackTrim is public: these workflow artifacts are **not private**. Signed-in users with repository read access can [download them](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/download-workflow-artifacts) until expiry. This is an explicit candidate handoff, not a GitHub Release, permanent source hosting, redistribution assurance or authorization to publish a release. The material summary's `publicDeliveryPerformed: false` describes bundle preparation, before any optional upload. Current-candidate smoke, live-worker-correlated Cancel, repeated/verification-stage close, real-warning paths, visual/scaling checks and declared Windows 11/Ubuntu Desktop acceptance retain their recorded limits.
+TrackTrim is public: these workflow artifacts are **not private**. Signed-in users with repository read access can [download them](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/download-workflow-artifacts) until expiry. This is an explicit candidate handoff, not a GitHub Release, permanent source hosting, redistribution assurance or authorization to publish a release. The material summary's `publicDeliveryPerformed: false` describes bundle preparation, before any optional upload.
+
+The delivered Windows archive's [native MKV/MP4 smoke and EN → RU → EN check passed](verification/release-candidate-native-smoke.json) on Windows 10 `19045.6456`. Live-worker-correlated Cancel, active/repeated/verification-stage close, real warnings, visual/scaling and declared Windows 11/Ubuntu Desktop acceptance remain unverified. The next manual action is one owner-operated W13, subject to the [input-timing prerequisite](verification/native-desktop-acceptance.md#delivered-candidate-owner-operated-continuation); no further application execution is part of this evidence update.
