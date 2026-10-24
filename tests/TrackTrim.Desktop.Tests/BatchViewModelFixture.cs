@@ -8,6 +8,7 @@ using TrackTrim.Application.Ports;
 using TrackTrim.Application.Presets;
 using TrackTrim.Core.Failures;
 using TrackTrim.Core.Media;
+using TrackTrim.Desktop.Appearance;
 using TrackTrim.Desktop.Interaction;
 using TrackTrim.Desktop.Localization;
 using TrackTrim.Desktop.ViewModels;
@@ -31,6 +32,7 @@ internal sealed class BatchViewModelFixture
     public BatchCoordinator Coordinator { get; }
     public BatchViewModel Batch { get; }
     public MainViewModel Main { get; }
+    public AppearanceViewModel Appearance { get; }
     public Task QueueInitialization { get; }
 
     /// <summary>Shares one job coordinator for every file in the unified workspace.</summary>
@@ -43,7 +45,8 @@ internal sealed class BatchViewModelFixture
         Coordinator = new(Session, new InspectionService(Backend, sourceAccess), jobs, sourceAccess);
         var logger = new LoggerConfiguration().CreateLogger();
         Batch = new(new(Session, Coordinator, Discovery, Dialogs, Localization, true, logger, new(presetStore ?? PresetStore), queueStore ?? QueueStore));
-        Main = new(new(Settings, Outputs, Localization, true, logger, Batch));
+        Appearance = new(new(new WorkspaceAppearanceStore(), Localization, new AppearanceApplier(Avalonia.Application.Current)));
+        Main = new(new(Settings, Outputs, Localization, true, logger, Batch, Appearance));
 
         QueueInitialization = initializeQueue ? Batch.Recovery.InitializeAsync() : Task.CompletedTask;
     }

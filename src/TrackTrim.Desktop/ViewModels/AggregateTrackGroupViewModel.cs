@@ -46,6 +46,7 @@ public sealed class AggregateTrackGroupViewModel : ObservableObject
     {
         $"{Localization["Keep"]}: {KindText}", LanguageText, TitleText, CodecText, ChannelsText, FlagsText, CoverageText
     }.Where(value => !string.IsNullOrWhiteSpace(value)));
+    public bool HasChoiceNotice => Keep != true;
     public string ChoiceText => Localization[Keep is true ? "AggregateAllKept" : Keep is false ? "AggregateAllRemoved" : "AggregateMixed"];
     public IRelayCommand ToggleKeepCommand { get; }
 

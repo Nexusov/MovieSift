@@ -119,8 +119,13 @@ public sealed class WarningReviewCloseTests
         fixture.Backend.ExitCode = 1;
         fixture.Item.Tracks[1].Keep = false;
         await fixture.Workspace.ReviewCommand.ExecuteAsync(null);
+        viewModel.ToggleAppearanceCommand.Execute(null);
+        Assert.True(viewModel.IsAppearanceOpen);
         await fixture.Workspace.RunCommand.ExecuteAsync(null);
         Assert.True(viewModel.HasWarningCandidate);
+        Assert.False(viewModel.IsAppearanceOpen);
+        Assert.True(viewModel.HasPendingMediaDecision);
+        Assert.True(viewModel.ToggleAppearanceCommand.CanExecute(null));
         return window;
     }
 }

@@ -38,7 +38,7 @@
         </StackPanel>
       </Border>
       <TextBlock x:Name="RulePresetStatusText" Text="{Binding StatusText}" TextWrapping="Wrap" />
-      <TextBlock Text="{Binding ErrorText}" TextWrapping="Wrap" Foreground="Crimson" IsVisible="{Binding HasError}" />
+      <TextBlock Text="{Binding ErrorText}" TextWrapping="Wrap" Foreground="{DynamicResource TTErrorBrush}" IsVisible="{Binding HasError}" />
       <Expander Header="{Binding Localization[Diagnostics]}" IsVisible="{Binding HasErrorDetails}">
         <TextBlock Text="{Binding ErrorDetails}" TextWrapping="Wrap" />
       </Expander>

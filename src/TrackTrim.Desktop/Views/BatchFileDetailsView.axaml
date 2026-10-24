@@ -1,0 +1,57 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:viewModels="using:TrackTrim.Desktop.ViewModels"
+             x:Class="TrackTrim.Desktop.Views.BatchFileDetailsView"
+             x:DataType="viewModels:BatchItemViewModel">
+  <Border Classes="panel">
+    <StackPanel Spacing="8">
+      <TextBlock Text="{Binding Localization[BatchSelectedFile]}" FontWeight="SemiBold" />
+      <TextBlock x:Name="BatchSelectedSource" Text="{Binding SourcePath}" TextWrapping="Wrap" />
+      <TextBlock Text="{Binding StateText}" TextWrapping="Wrap" />
+      <TextBlock Text="{Binding BackendDescription}" TextWrapping="Wrap" />
+      <TextBlock Text="{Binding MediaFeaturesText}" TextWrapping="Wrap" />
+      <TextBlock Text="{Binding Localization[Output]}" />
+      <TextBox Text="{Binding OutputPath, Mode=TwoWay}" IsEnabled="{Binding CanEditPlan}" TextWrapping="Wrap"
+               AutomationProperties.Name="{Binding Localization[Output]}" />
+      <ItemsControl ItemsSource="{Binding Tracks}" IsEnabled="{Binding CanEditPlan}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="viewModels:TrackViewModel">
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" Margin="0,4">
+              <CheckBox IsChecked="{Binding Keep, Mode=TwoWay}" IsEnabled="{Binding IsSelectable}"
+                        Content="{Binding Localization[Keep]}" AutomationProperties.Name="{Binding KeepAccessibleName}" VerticalAlignment="Top" />
+              <StackPanel Grid.Column="1" Spacing="3">
+                <WrapPanel>
+                  <TextBlock Text="{Binding KindText}" FontWeight="SemiBold" Margin="0,0,8,0" />
+                  <TextBlock Text="{Binding Localization[TrackId]}" Margin="0,0,4,0" />
+                  <TextBlock Text="{Binding IdentifierText}" Margin="0,0,8,0" />
+                  <TextBlock Text="{Binding Track.Codec}" Margin="0,0,8,0" />
+                  <TextBlock Text="{Binding LanguageText}" />
+                </WrapPanel>
+                <TextBlock Text="{Binding TitleText}" TextWrapping="Wrap" />
+                <TextBlock Text="{Binding FlagsText}" TextWrapping="Wrap" />
+                <WrapPanel IsVisible="{Binding IsAudio}">
+                  <TextBlock Text="{Binding Localization[Channels]}" Margin="0,0,4,0" />
+                  <TextBlock Text="{Binding ChannelsText}" />
+                </WrapPanel>
+                <TextBlock Text="{Binding Localization[AlwaysKept]}" IsVisible="{Binding IsRequired}" />
+              </StackPanel>
+            </Grid>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+      <CheckBox IsChecked="{Binding ZeroAudioConfirmed, Mode=TwoWay}" IsVisible="{Binding NeedsZeroAudioConfirmation}" IsEnabled="{Binding CanEditPlan}">
+        <TextBlock Text="{Binding Localization[ConfirmSilent]}" TextWrapping="Wrap" />
+      </CheckBox>
+      <TextBlock Text="{Binding PlanTracksText}" TextWrapping="Wrap" IsVisible="{Binding HasPlan}" />
+      <TextBlock Text="{Binding PlanDefaultAudioText}" TextWrapping="Wrap" IsVisible="{Binding HasPlan}" />
+      <TextBlock Text="{Binding Localization[SelectionWarning]}" TextWrapping="Wrap" IsVisible="{Binding RemovesDefaultAudio}" />
+      <TextBlock Text="{Binding ErrorText}" Foreground="{DynamicResource TTErrorBrush}" TextWrapping="Wrap" IsVisible="{Binding HasError}" />
+      <TextBlock Text="{Binding ErrorReasonText}" TextWrapping="Wrap" IsVisible="{Binding HasError}" />
+      <TextBlock Text="{Binding PublishedPath}" TextWrapping="Wrap" IsVisible="{Binding HasPublishedPath}" />
+      <TextBlock x:Name="BatchDetailsSizeDifferenceText" Text="{Binding SizeDifferenceText}" TextWrapping="Wrap" IsVisible="{Binding HasSizeDifference}" />
+      <Expander Header="{Binding Localization[Diagnostics]}" IsVisible="{Binding HasDiagnostics}">
+        <TextBox Text="{Binding Diagnostics}" IsReadOnly="True" TextWrapping="Wrap" MaxHeight="200" />
+      </Expander>
+    </StackPanel>
+  </Border>
+</UserControl>

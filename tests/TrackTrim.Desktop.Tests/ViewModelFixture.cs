@@ -7,6 +7,7 @@ using TrackTrim.Application.Jobs;
 using TrackTrim.Application.Ports;
 using TrackTrim.Core.Failures;
 using TrackTrim.Core.Media;
+using TrackTrim.Desktop.Appearance;
 using TrackTrim.Desktop.Interaction;
 using TrackTrim.Desktop.Localization;
 using TrackTrim.Desktop.ViewModels;
@@ -36,10 +37,12 @@ internal sealed class ViewModelFixture
             new JobCoordinator(Backend, sourceAccess, Outputs), sourceAccess);
         Workspace = new(new(session, coordinator, new BatchUiDiscovery([source]), new FakeDialogs(SourcePath),
             localization, true, logger, new(new BatchUiPresetStore()), new BatchUiQueueListStore()));
-        ViewModel = new(new(Settings, Outputs, localization, true, logger, Workspace));
+        Appearance = new(new(new WorkspaceAppearanceStore(), localization, new AppearanceApplier(Avalonia.Application.Current)));
+        ViewModel = new(new(Settings, Outputs, localization, true, logger, Workspace, Appearance));
     }
 
     public MainViewModel ViewModel { get; }
+    public AppearanceViewModel Appearance { get; }
     public BatchViewModel Workspace { get; }
     public BatchItemViewModel Item => Workspace.Items.Single();
     public FakeMediaBackend Backend { get; }

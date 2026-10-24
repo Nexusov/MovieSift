@@ -61,6 +61,8 @@ public sealed partial class BatchViewModel : ObservableObject
         InspectSelectedCommand = new AsyncRelayCommand(InspectSelectedAsync, () => CanInspectSelected);
         RemoveSelectedCommand = new RelayCommand(RemoveSelected, () => CanRemoveSelected);
         ApproveSelectedCommand = new RelayCommand(ApproveSelected, () => SelectedItem?.CanEditPlan == true);
+        CloseReviewCommand = new RelayCommand(CloseReview);
+        OpenSelectedDetailsCommand = new RelayCommand(() => IsDetailsOpen = true, () => SelectedItem is not null);
         ReviewCommand = new AsyncRelayCommand(ReviewAsync, () => CanEdit && Items.Count != 0);
         RunCommand = new AsyncRelayCommand(RunAsync, () => CanRun);
         CancelCommand = new RelayCommand(Cancel, () => IsBusy);
@@ -77,6 +79,7 @@ public sealed partial class BatchViewModel : ObservableObject
 
     public Localization.LocalizationService Localization => services.Localization;
     public ObservableCollection<BatchItemViewModel> Items { get; } = [];
+    public ObservableCollection<BatchReviewRowViewModel> ReviewRows { get; } = [];
     public BatchLanguageRulesViewModel LanguageRules { get; }
     public RulePresetsViewModel Presets { get; }
     public QueueRecoveryViewModel Recovery { get; }
@@ -159,6 +162,8 @@ public sealed partial class BatchViewModel : ObservableObject
     public IRelayCommand NewBatchCommand { get; }
     public IRelayCommand ConfirmNewBatchCommand { get; }
     public IRelayCommand KeepCurrentBatchCommand { get; }
+    public IRelayCommand CloseReviewCommand { get; }
+    public IRelayCommand OpenSelectedDetailsCommand { get; }
 
     /// <summary>Requests explicit consent before clearing any existing list, plans or results.</summary>
     private void RequestNewBatch()
@@ -212,6 +217,9 @@ public sealed partial class BatchViewModel : ObservableObject
         }
 
         operationRevision++;
+        IsReviewOpen = false;
+        IsDetailsOpen = false;
+        IsRulesOpen = false;
         LanguageRules.ClearPreview();
         failure = null;
         reviewFailures = [];
@@ -295,8 +303,17 @@ public sealed partial class BatchViewModel : ObservableObject
     {
         if (IncludeSubfolders && string.IsNullOrWhiteSpace(outputFolder))
         {
-            failure = new(ErrorCode.InvalidDestination, Reason: ErrorReason.RecursiveOutputRequired);
-            return;
+            preparationNoticeKey = "RecursiveOutputGuide";
+            Refresh();
+            var selectedOutput = await services.Dialogs.SelectOutputFolderAsync();
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (selectedOutput is null)
+            {
+                return;
+            }
+
+            ApplyOutputFolder(selectedOutput);
         }
 
         var kind = IncludeSubfolders ? BatchInputKind.RecursiveFolder : BatchInputKind.TopLevelFolder;
@@ -349,12 +366,7 @@ public sealed partial class BatchViewModel : ObservableObject
             return;
         }
 
-        outputFolder = folder;
-
-        foreach (var editor in Items)
-        {
-            editor.ApplyOutputFolder(folder);
-        }
+        ApplyOutputFolder(folder);
     });
 
     /// <summary>Continues explicitly requested inspection after a cancelled preparation.</summary>
@@ -398,22 +410,36 @@ public sealed partial class BatchViewModel : ObservableObject
     private void ApproveSelected() => SelectedItem?.Approve();
 
     /// <summary>Captures displayed consent and creates every independent plan in one explicit Review.</summary>
-    private Task ReviewAsync()
+    private async Task ReviewAsync()
     {
+        if (!CanEdit)
+        {
+            return;
+        }
+
+        IsRulesOpen = false;
         var request = new BatchSelectionReviewRequest(Snapshot.Revision,
             Items.Where(item => item.Included && item.ZeroAudioConfirmed).Select(item => item.Id).ToImmutableArray());
-        return ExecuteOwnedAsync(async cancellationToken =>
+        await ExecuteOwnedAsync(async cancellationToken =>
         {
             var review = await services.Coordinator.ReviewSelectionsAsync(request with { CancellationToken = cancellationToken });
             reviewFailures = review.ItemFailures;
             failure = review.Failure;
         });
+        IsReviewOpen = true;
+        Refresh();
     }
 
     /// <summary>Runs one reviewed queue and rejects callbacks from another attempt, item or plan.</summary>
     private Task RunAsync()
     {
+        if (!CanRun)
+        {
+            return Task.CompletedTask;
+        }
+
         var review = Snapshot.Review;
+        IsReviewOpen = false;
         return ExecuteOwnedAsync(async cancellationToken =>
         {
             if (review is null)
@@ -475,6 +501,7 @@ public sealed partial class BatchViewModel : ObservableObject
         operationRevision++;
         failure = null;
         reviewFailures = [];
+        preparationNoticeKey = string.Empty;
         activeProgress = null;
         IsProgressIndeterminate = true;
         ProgressValue = 0;
@@ -622,6 +649,7 @@ public sealed partial class BatchViewModel : ObservableObject
             item.Refresh();
         }
 
+        RefreshReviewRows();
         OnPropertyChanged(string.Empty);
         AggregateTracks?.Refresh();
         LanguageRules?.Refresh();
@@ -643,6 +671,7 @@ public sealed partial class BatchViewModel : ObservableObject
         NewBatchCommand?.NotifyCanExecuteChanged();
         ConfirmNewBatchCommand?.NotifyCanExecuteChanged();
         KeepCurrentBatchCommand?.NotifyCanExecuteChanged();
+        OpenSelectedDetailsCommand?.NotifyCanExecuteChanged();
     }
 
     /// <summary>Maps the existing single-job progress vocabulary to shared resources.</summary>

@@ -35,6 +35,9 @@ public sealed class BatchNewBatchTests
             var cleanupCount = fixture.Outputs.CleanupCount;
             var workerCount = fixture.Backend.RemuxRequests.Count;
             Assert.All(completed.Items, item => Assert.NotNull(item.Result!.PublishedPath));
+            var options = view.FindControl<Button>("WorkspaceOptions")!;
+            options.Flyout!.ShowAt(options);
+            Dispatcher.UIThread.RunJobs();
             var newBatch = view.FindControl<Button>("NewBatchButton")!;
             Assert.Equal(fixture.Localization["BatchNew"], newBatch.Content);
             Assert.True(newBatch.IsEffectivelyEnabled);

@@ -1,192 +1,168 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:appearance="using:TrackTrim.Desktop.Appearance"
              xmlns:viewModels="using:TrackTrim.Desktop.ViewModels"
              xmlns:views="using:TrackTrim.Desktop.Views"
              x:Class="TrackTrim.Desktop.Views.BatchView"
              x:DataType="viewModels:BatchViewModel">
-  <DockPanel LastChildFill="True">
-    <StackPanel x:Name="BatchRunControls" DockPanel.Dock="Bottom" Spacing="6" Margin="0,12,0,0">
-      <TextBlock x:Name="BatchStatusText" Text="{Binding StatusText}" FontWeight="SemiBold" TextWrapping="Wrap" />
-      <TextBlock Text="{Binding PauseText}" TextWrapping="Wrap" />
-      <TextBlock Text="{Binding CurrentItemText}" TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding CurrentItemText}" />
-      <TextBlock Text="{Binding StageText}" TextWrapping="Wrap" />
-      <ProgressBar Minimum="0" Maximum="100" Value="{Binding ProgressValue}" IsIndeterminate="{Binding IsProgressIndeterminate}" IsVisible="{Binding IsBusy}" />
-      <WrapPanel>
-        <Button x:Name="NewBatchButton" Content="{Binding Localization[BatchNew]}" Command="{Binding NewBatchCommand}" Margin="0,0,8,8" />
-        <Button x:Name="StartBatchButton" Content="{Binding Localization[BatchStart]}" Command="{Binding RunCommand}" Margin="0,0,8,8" />
-        <Button Content="{Binding Localization[BatchPauseAfterCurrent]}" Command="{Binding PauseCommand}" Margin="0,0,8,8" />
-        <Button x:Name="CancelBatchButton" Content="{Binding Localization[BatchCancel]}" Command="{Binding CancelCommand}" Margin="0,0,8,8" />
-      </WrapPanel>
-      <Border x:Name="NewBatchConfirmation" IsVisible="{Binding HasNewBatchConfirmation}" Padding="12" BorderThickness="1"
-              BorderBrush="{DynamicResource SystemControlHighlightAccentBrush}" CornerRadius="4">
+  <Grid>
+  <DockPanel LastChildFill="True" IsVisible="{Binding IsEditingSurfaceVisible}">
+    <!-- Destination, cancellation and Review remain outside the scrolling preparation panels. -->
+    <StackPanel x:Name="BatchRunControls" DockPanel.Dock="Bottom" Spacing="6" Margin="0,10,0,0">
+      <Border Classes="panel" Padding="12">
+        <StackPanel Spacing="8">
+          <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+            <Button x:Name="BatchOutputFolderButton" Content="{Binding Localization[ChooseOutput]}" Command="{Binding ChooseOutputCommand}" />
+            <TextBlock Grid.Column="1" Text="{Binding OutputFolder}" Classes="muted" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" ToolTip.Tip="{Binding OutputFolder}" />
+          </Grid>
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+            <StackPanel Spacing="3" VerticalAlignment="Center">
+              <TextBlock x:Name="BatchStatusText" Text="{Binding StatusText}" TextWrapping="Wrap" FontWeight="SemiBold" />
+              <TextBlock Classes="muted" Text="{Binding Localization[WorkspaceOriginalShort]}" TextWrapping="Wrap" />
+            </StackPanel>
+            <Button Grid.Column="1" x:Name="ReviewBatchButton" Classes="primary" Content="{Binding Localization[BatchReviewRemaining]}" Command="{Binding ReviewCommand}" IsVisible="{Binding !IsReviewOpen}" />
+          </Grid>
+          <StackPanel IsVisible="{Binding IsBusy}" Spacing="5">
+            <TextBlock Text="{Binding CurrentItemText}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding CurrentItemText}" />
+            <TextBlock Text="{Binding StageText}" />
+            <ProgressBar Minimum="0" Maximum="100" Value="{Binding ProgressValue}" IsIndeterminate="{Binding IsProgressIndeterminate}" />
+          </StackPanel>
+          <TextBlock Text="{Binding PauseText}" IsVisible="{Binding HasItems}" TextWrapping="Wrap" />
+          <WrapPanel>
+            <Button Content="{Binding Localization[BatchPauseAfterCurrent]}" Command="{Binding PauseCommand}" IsVisible="{Binding CanPause}" Margin="0,0,8,0" />
+            <Button x:Name="CancelBatchButton" Classes="danger" Content="{Binding Localization[BatchCancel]}" Command="{Binding CancelCommand}" IsVisible="{Binding CanCancel}" />
+          </WrapPanel>
+        </StackPanel>
+      </Border>
+      <Border x:Name="NewBatchConfirmation" Classes="panel" BorderBrush="{DynamicResource TTWarningBrush}" BorderThickness="1" IsVisible="{Binding HasNewBatchConfirmation}">
         <StackPanel Spacing="8">
           <TextBlock Text="{Binding Localization[BatchNewConfirmation]}" TextWrapping="Wrap" />
           <WrapPanel>
-            <Button x:Name="ConfirmNewBatchButton" Content="{Binding Localization[BatchNewConfirm]}" Command="{Binding ConfirmNewBatchCommand}" Margin="0,0,8,8" />
-            <Button x:Name="KeepCurrentBatchButton" Content="{Binding Localization[BatchKeepCurrent]}" Command="{Binding KeepCurrentBatchCommand}" Margin="0,0,8,8" />
+            <Button x:Name="ConfirmNewBatchButton" Content="{Binding Localization[BatchNewConfirm]}" Command="{Binding ConfirmNewBatchCommand}" Margin="0,0,8,0" />
+            <Button x:Name="KeepCurrentBatchButton" Content="{Binding Localization[BatchKeepCurrent]}" Command="{Binding KeepCurrentBatchCommand}" />
           </WrapPanel>
         </StackPanel>
       </Border>
     </StackPanel>
-    <ScrollViewer x:Name="WorkspaceScrollViewer" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-      <StackPanel Spacing="12" Margin="0,12,0,0">
-        <TextBlock Text="{Binding Localization[BatchInstructions]}" TextWrapping="Wrap" />
-        <TextBlock Text="{Binding LimitsText}" TextWrapping="Wrap" Opacity="0.8" />
-        <WrapPanel>
-          <Button x:Name="AddBatchFilesButton" Content="{Binding Localization[BatchAddFiles]}" Command="{Binding AddFilesCommand}" Margin="0,0,8,8" />
-          <Button x:Name="AddBatchFolderButton" Content="{Binding Localization[BatchAddFolder]}" Command="{Binding AddFolderCommand}" Margin="0,0,8,8" />
-          <Button Content="{Binding Localization[BatchInspectPending]}" Command="{Binding InspectPendingCommand}" Margin="0,0,8,8" />
-        </WrapPanel>
-        <CheckBox x:Name="IncludeSubfoldersCheckBox" IsChecked="{Binding IncludeSubfolders, Mode=TwoWay}"
-                  IsEnabled="{Binding CanEdit}" Content="{Binding Localization[BatchIncludeSubfolders]}" />
-        <TextBlock Text="{Binding Localization[BatchFolderScopeHelp]}" TextWrapping="Wrap" Opacity="0.8" />
-        <WrapPanel>
-          <Button x:Name="BatchOutputFolderButton" Content="{Binding Localization[ChooseOutput]}" Command="{Binding ChooseOutputCommand}" Margin="0,0,8,8" />
-          <TextBlock Text="{Binding OutputFolder}" TextWrapping="Wrap" VerticalAlignment="Center" />
-        </WrapPanel>
-        <TextBlock Text="{Binding SummaryText}" TextWrapping="Wrap" />
-        <TextBlock x:Name="QueueCheckpointStatus" Text="{Binding Recovery.StatusText}" TextWrapping="Wrap" />
-        <Button Content="{Binding Localization[QueueReload]}" Command="{Binding Recovery.ReloadCommand}" HorizontalAlignment="Left" />
-        <TextBlock Text="{Binding Localization[BatchInclusionHint]}" TextWrapping="Wrap" Opacity="0.8" />
-        <ListBox x:Name="BatchFileList" ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
-                 Height="200" ScrollViewer.HorizontalScrollBarVisibility="Disabled" AutomationProperties.Name="{Binding Localization[BatchFiles]}">
-          <ListBox.ItemTemplate>
-            <DataTemplate x:DataType="viewModels:BatchItemViewModel">
-              <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" Margin="4">
-                <CheckBox IsChecked="{Binding Included, Mode=TwoWay}" IsEnabled="{Binding CanChangeInclusion}"
-                          Content="{Binding Localization[BatchInclude]}" VerticalAlignment="Top" />
-                <StackPanel Grid.Column="1" Spacing="3">
-                  <TextBlock Text="{Binding SourcePath}" TextWrapping="Wrap" FontWeight="SemiBold" />
-                  <TextBlock Text="{Binding RelativeSourcePath}" IsVisible="{Binding HasFolderOrigin}" TextWrapping="Wrap" />
-                  <TextBlock Text="{Binding StateText}" TextWrapping="Wrap" />
-                  <TextBlock Text="{Binding PublishedPath}" TextWrapping="Wrap" IsVisible="{Binding HasPublishedPath}" />
-                  <TextBlock x:Name="BatchFileSizeDifferenceText" Text="{Binding SizeDifferenceText}" TextWrapping="Wrap" IsVisible="{Binding HasSizeDifference}" />
-                </StackPanel>
+    <Grid RowDefinitions="Auto,*">
+      <WrapPanel Margin="0,0,0,10">
+        <Button x:Name="AddBatchFilesButton" Content="{Binding Localization[BatchAddFiles]}" Command="{Binding AddFilesCommand}" Margin="0,0,8,6" />
+        <Button x:Name="AddBatchFolderButton" Content="{Binding Localization[BatchAddFolder]}" Command="{Binding AddFolderCommand}" Margin="0,0,8,6" />
+        <Button x:Name="OpenRulesButton" Content="{Binding Localization[WorkspaceRules]}" Click="OnOpenRules" IsEnabled="{Binding CanEdit}" Margin="0,0,8,6" />
+        <Button x:Name="WorkspaceOptions" Content="⋯" AutomationProperties.Name="{Binding Localization[WorkspaceOptions]}" Margin="0,0,0,6">
+          <Button.Flyout>
+            <Flyout>
+              <StackPanel Spacing="10" MaxWidth="300">
+                <CheckBox x:Name="IncludeSubfoldersCheckBox" IsChecked="{Binding IncludeSubfolders, Mode=TwoWay}" IsEnabled="{Binding CanEdit}" Content="{Binding Localization[BatchIncludeSubfolders]}" />
+                <TextBlock Text="{Binding Localization[BatchFolderScopeHelp]}" Classes="muted" TextWrapping="Wrap" />
+                <Button x:Name="NewBatchButton" Click="OnNewQueue" Content="{Binding Localization[BatchNew]}" Command="{Binding NewBatchCommand}" IsVisible="{Binding ShowNewQueue}" />
+              </StackPanel>
+            </Flyout>
+          </Button.Flyout>
+        </Button>
+      </WrapPanel>
+      <Grid Grid.Row="1">
+        <!-- One native collection remains alive when the responsive layout changes. -->
+        <Grid x:Name="WorkspaceColumns" ColumnDefinitions="270,*" ColumnSpacing="12" IsVisible="{Binding HasItems}">
+          <Expander x:Name="FileSidebar" Header="{Binding SummaryText}" IsExpanded="True" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" VerticalAlignment="Stretch">
+            <Border Classes="panel" Padding="6">
+              <Grid RowDefinitions="Auto,*">
+                <Button Content="{Binding Localization[BatchInspectPending]}" Command="{Binding InspectPendingCommand}" IsVisible="{Binding HasPendingInspections}" Margin="4,4,4,8" />
+                <ListBox Grid.Row="1" x:Name="BatchFileList" ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem, Mode=TwoWay}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" AutomationProperties.Name="{Binding Localization[BatchFiles]}" DoubleTapped="OnOpenFileDetails">
+                  <ListBox.Styles>
+                    <Style Selector="ListBoxItem"><Setter Property="HorizontalContentAlignment" Value="Stretch" /></Style>
+                  </ListBox.Styles>
+                  <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="viewModels:BatchItemViewModel">
+                      <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8" Margin="3,6" ToolTip.Tip="{Binding SourcePath}">
+                        <CheckBox IsChecked="{Binding Included, Mode=TwoWay}" IsEnabled="{Binding CanChangeInclusion}" VerticalAlignment="Top" AutomationProperties.Name="{Binding SourcePath}" />
+                        <StackPanel Grid.Column="1" Spacing="4">
+                          <TextBlock Text="{Binding FileName}" FontWeight="SemiBold" TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis" />
+                          <TextBlock Text="{Binding ContextPath}" Classes="muted" TextTrimming="PrefixCharacterEllipsis" />
+                          <TextBlock Text="{Binding StateText}" Classes="muted" TextWrapping="Wrap" />
+                          <TextBlock appearance:SoftMotion.ResultKey="{Binding PublishedPath}" Text="{Binding PublishedPath}" IsVisible="{Binding HasPublishedPath}" TextWrapping="Wrap" MaxLines="2" />
+                          <TextBlock x:Name="BatchFileSizeDifferenceText" Text="{Binding SizeDifferenceText}" IsVisible="{Binding HasSizeDifference}" TextWrapping="Wrap" />
+                        </StackPanel>
+                        <Button Grid.Column="2" Classes="icon" Content="⋯" Click="OnFileDetails" VerticalAlignment="Top" AutomationProperties.Name="{Binding Localization[WorkspaceDetails]}" />
+                      </Grid>
+                    </DataTemplate>
+                  </ListBox.ItemTemplate>
+                </ListBox>
               </Grid>
-            </DataTemplate>
-          </ListBox.ItemTemplate>
-        </ListBox>
-        <WrapPanel>
-          <Button Content="{Binding Localization[BatchRemove]}" Command="{Binding RemoveSelectedCommand}" Margin="0,0,8,8" />
-          <Button Content="{Binding Localization[BatchInspectSelected]}" Command="{Binding InspectSelectedCommand}" Margin="0,0,8,8" />
-        </WrapPanel>
-
-        <views:AggregateTracksView DataContext="{Binding AggregateTracks}" />
-        <Expander x:Name="SelectedFileDetails" Header="{Binding Localization[BatchSelectedFile]}">
-          <ContentControl Content="{Binding SelectedItem}" HorizontalContentAlignment="Stretch">
-            <ContentControl.ContentTemplate>
-              <DataTemplate x:DataType="viewModels:BatchItemViewModel">
-                <Border Padding="12" BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="1" CornerRadius="4">
-                  <StackPanel Spacing="8">
-                    <TextBlock Text="{Binding Localization[BatchSelectedFile]}" FontWeight="SemiBold" />
-                    <TextBlock x:Name="BatchSelectedSource" Text="{Binding SourcePath}" TextWrapping="Wrap" />
-                    <TextBlock Text="{Binding StateText}" TextWrapping="Wrap" />
-                    <TextBlock Text="{Binding BackendDescription}" TextWrapping="Wrap" />
-                    <TextBlock Text="{Binding MediaFeaturesText}" TextWrapping="Wrap" />
-                    <TextBlock Text="{Binding Localization[Output]}" />
-                    <TextBox Text="{Binding OutputPath, Mode=TwoWay}" IsEnabled="{Binding CanEditPlan}" TextWrapping="Wrap"
-                             AutomationProperties.Name="{Binding Localization[Output]}" />
-                    <ItemsControl ItemsSource="{Binding Tracks}" IsEnabled="{Binding CanEditPlan}">
-                      <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="viewModels:TrackViewModel">
-                          <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" Margin="0,4">
-                            <CheckBox IsChecked="{Binding Keep, Mode=TwoWay}" IsEnabled="{Binding IsSelectable}"
-                                      Content="{Binding Localization[Keep]}" AutomationProperties.Name="{Binding KeepAccessibleName}" VerticalAlignment="Top" />
-                            <StackPanel Grid.Column="1" Spacing="3">
-                              <WrapPanel>
-                                <TextBlock Text="{Binding KindText}" FontWeight="SemiBold" Margin="0,0,8,0" />
-                                <TextBlock Text="{Binding Localization[TrackId]}" Margin="0,0,4,0" />
-                                <TextBlock Text="{Binding IdentifierText}" Margin="0,0,8,0" />
-                                <TextBlock Text="{Binding Track.Codec}" Margin="0,0,8,0" />
-                                <TextBlock Text="{Binding LanguageText}" />
-                              </WrapPanel>
-                              <TextBlock Text="{Binding TitleText}" TextWrapping="Wrap" />
-                              <TextBlock Text="{Binding FlagsText}" TextWrapping="Wrap" />
-                              <WrapPanel IsVisible="{Binding IsAudio}">
-                                <TextBlock Text="{Binding Localization[Channels]}" Margin="0,0,4,0" />
-                                <TextBlock Text="{Binding ChannelsText}" />
-                              </WrapPanel>
-                              <TextBlock Text="{Binding Localization[AlwaysKept]}" IsVisible="{Binding IsRequired}" />
-                            </StackPanel>
-                          </Grid>
-                        </DataTemplate>
-                      </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                    <CheckBox IsChecked="{Binding ZeroAudioConfirmed, Mode=TwoWay}" IsVisible="{Binding NeedsZeroAudioConfirmation}" IsEnabled="{Binding CanEditPlan}">
-                      <TextBlock Text="{Binding Localization[ConfirmSilent]}" TextWrapping="Wrap" />
-                    </CheckBox>
-                    <TextBlock Text="{Binding PlanTracksText}" TextWrapping="Wrap" IsVisible="{Binding HasPlan}" />
-                    <TextBlock Text="{Binding PlanDefaultAudioText}" TextWrapping="Wrap" IsVisible="{Binding HasPlan}" />
-                    <TextBlock Text="{Binding Localization[SelectionWarning]}" TextWrapping="Wrap" IsVisible="{Binding RemovesDefaultAudio}" />
-                    <TextBlock Text="{Binding ErrorText}" Foreground="Crimson" TextWrapping="Wrap" IsVisible="{Binding HasError}" />
-                    <TextBlock Text="{Binding ErrorReasonText}" TextWrapping="Wrap" IsVisible="{Binding HasError}" />
-                    <TextBlock Text="{Binding PublishedPath}" TextWrapping="Wrap" IsVisible="{Binding HasPublishedPath}" />
-                    <TextBlock x:Name="BatchDetailsSizeDifferenceText" Text="{Binding SizeDifferenceText}" TextWrapping="Wrap" IsVisible="{Binding HasSizeDifference}" />
-                    <Expander Header="{Binding Localization[Diagnostics]}" IsVisible="{Binding HasDiagnostics}">
-                      <TextBox Text="{Binding Diagnostics}" IsReadOnly="True" TextWrapping="Wrap" MaxHeight="200" />
-                    </Expander>
-                  </StackPanel>
-                </Border>
-              </DataTemplate>
-            </ContentControl.ContentTemplate>
-          </ContentControl>
-
-        </Expander>
-        <Expander Header="{Binding Localization[AggregateAdvanced]}">
-          <StackPanel Spacing="12">
-            <views:RulePresetsView DataContext="{Binding Presets}" />
-            <views:BatchLanguageRulesView DataContext="{Binding LanguageRules}" />
-          </StackPanel>
-        </Expander>
-        <StackPanel IsVisible="{Binding HasZeroAudioItems}" Spacing="8">
-          <TextBlock Text="{Binding Localization[AggregateSilentFiles]}" FontWeight="SemiBold" TextWrapping="Wrap" />
-          <ItemsControl ItemsSource="{Binding ZeroAudioItems}">
-            <ItemsControl.ItemTemplate>
-              <DataTemplate x:DataType="viewModels:BatchItemViewModel">
-                <StackPanel Spacing="4">
-                  <TextBlock Text="{Binding SourcePath}" TextWrapping="Wrap" />
-                  <CheckBox IsChecked="{Binding ZeroAudioConfirmed, Mode=TwoWay}" IsEnabled="{Binding CanEditPlan}">
-                    <TextBlock Text="{Binding Localization[ConfirmSilent]}" TextWrapping="Wrap" />
-                  </CheckBox>
+            </Border>
+          </Expander>
+          <ScrollViewer Grid.Column="1" x:Name="WorkspaceScrollViewer" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <StackPanel Spacing="10">
+              <views:AggregateTracksView DataContext="{Binding AggregateTracks}" />
+              <Expander x:Name="SelectedFileDetails" Header="{Binding Localization[BatchSelectedFile]}" IsExpanded="{Binding IsDetailsOpen, Mode=TwoWay}">
+                <StackPanel Spacing="8">
+                  <WrapPanel>
+                    <Button Content="{Binding Localization[BatchInspectSelected]}" Command="{Binding InspectSelectedCommand}" Margin="0,0,8,4" />
+                    <Button Content="{Binding Localization[BatchRemove]}" Command="{Binding RemoveSelectedCommand}" Margin="0,0,0,4" />
+                  </WrapPanel>
+                  <ContentControl Content="{Binding SelectedItem}" HorizontalContentAlignment="Stretch">
+                    <ContentControl.ContentTemplate>
+                      <DataTemplate x:DataType="viewModels:BatchItemViewModel"><views:BatchFileDetailsView /></DataTemplate>
+                    </ContentControl.ContentTemplate>
+                  </ContentControl>
                 </StackPanel>
-              </DataTemplate>
-            </ItemsControl.ItemTemplate>
-          </ItemsControl>
-        </StackPanel>
-        <Button x:Name="ReviewBatchButton" Content="{Binding Localization[BatchReviewRemaining]}" Command="{Binding ReviewCommand}" HorizontalAlignment="Left" />
-        <Border BorderBrush="{DynamicResource SystemControlHighlightAccentBrush}" BorderThickness="1" CornerRadius="4" Padding="12" IsVisible="{Binding HasReview}">
-          <StackPanel Spacing="8">
-            <TextBlock Text="{Binding Localization[BatchReviewedPlans]}" FontWeight="SemiBold" />
-            <TextBlock Text="{Binding ReviewText}" TextWrapping="Wrap" />
-            <TextBlock Text="{Binding Localization[PreservationSummary]}" TextWrapping="Wrap" />
+              </Expander>
+              <TextBlock Text="{Binding ExcludedText}" IsVisible="{Binding HasExcluded}" Classes="muted" TextWrapping="Wrap" />
+              <Expander Header="{Binding Localization[Diagnostics]}" IsVisible="{Binding HasDiagnostics}">
+                <TextBox Text="{Binding Diagnostics}" IsReadOnly="True" TextWrapping="Wrap" MaxHeight="200" />
+              </Expander>
+              <TextBlock Text="{Binding LimitsText}" Classes="muted" TextWrapping="Wrap" />
+            </StackPanel>
+          </ScrollViewer>
+        </Grid>
+        <Border x:Name="EmptyDropTarget" Classes="panel dropTarget" IsVisible="{Binding IsEmpty}" DragDrop.AllowDrop="True" Padding="16">
+          <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8" MaxWidth="420">
+            <TextBlock Text="＋" FontSize="28" HorizontalAlignment="Center" Foreground="{DynamicResource TTAccentBrush}" />
+            <TextBlock Text="{Binding Localization[WorkspaceEmptyTitle]}" Classes="heading" TextWrapping="Wrap" TextAlignment="Center" />
+            <TextBlock Text="{Binding Localization[WorkspaceEmptyHelp]}" Classes="muted" TextWrapping="Wrap" TextAlignment="Center" />
           </StackPanel>
         </Border>
-        <StackPanel IsVisible="{Binding HasExcluded}" Spacing="4">
-          <TextBlock Text="{Binding Localization[BatchExcluded]}" FontWeight="SemiBold" />
-          <TextBlock Text="{Binding ExcludedText}" TextWrapping="Wrap" />
+        <!-- Persistent decisions are never temporary toasts. -->
+        <StackPanel VerticalAlignment="Bottom" Spacing="8" Margin="0,8" IsVisible="{Binding !IsReviewOpen}">
+          <Border Classes="panel" BorderBrush="{DynamicResource TTWarningBrush}" BorderThickness="1" IsVisible="{Binding HasWarningCandidate}">
+            <StackPanel Spacing="8">
+              <TextBlock Text="{Binding Localization[WarningReview]}" TextWrapping="Wrap" />
+              <TextBlock Text="{Binding CurrentItemText}" TextWrapping="Wrap" />
+              <WrapPanel>
+                <Button Content="{Binding Localization[PublishWarnings]}" Command="{Binding PublishWarningsCommand}" Margin="0,0,8,0" />
+                <Button Content="{Binding Localization[Discard]}" Command="{Binding DiscardWarningsCommand}" />
+              </WrapPanel>
+              <TextBlock Text="{Binding Localization[BatchExplicitResume]}" TextWrapping="Wrap" />
+            </StackPanel>
+          </Border>
+          <Border Classes="panel" BorderBrush="{DynamicResource TTErrorBrush}" BorderThickness="1" IsVisible="{Binding HasError}">
+            <StackPanel Spacing="4">
+              <TextBlock Text="{Binding ErrorText}" Foreground="{DynamicResource TTErrorBrush}" TextWrapping="Wrap" />
+              <TextBlock Text="{Binding ErrorReasonText}" TextWrapping="Wrap" />
+              <TextBlock Text="{Binding ReviewIssuesText}" TextWrapping="Wrap" />
+            </StackPanel>
+          </Border>
+          <TextBlock Text="{Binding PreparationNoticeText}" IsVisible="{Binding HasPreparationNotice}" TextWrapping="Wrap" />
+          <TextBlock Text="{Binding Localization[CleanupHeading]}" IsVisible="{Binding HasCleanupIssue}" Foreground="{DynamicResource TTWarningBrush}" TextWrapping="Wrap" />
+          <TextBlock Text="{Binding Localization[PersistenceFailure]}" IsVisible="{Binding WritesBlocked}" Foreground="{DynamicResource TTErrorBrush}" TextWrapping="Wrap" />
         </StackPanel>
-        <TextBlock Text="{Binding ErrorText}" TextWrapping="Wrap" Foreground="Crimson" IsVisible="{Binding HasError}" />
-        <TextBlock Text="{Binding ErrorReasonText}" TextWrapping="Wrap" IsVisible="{Binding HasError}" />
-        <TextBlock Text="{Binding ReviewIssuesText}" TextWrapping="Wrap" Foreground="Crimson" IsVisible="{Binding HasError}" />
-        <Border Padding="12" BorderBrush="Orange" BorderThickness="1" CornerRadius="4" IsVisible="{Binding HasWarningCandidate}">
-          <StackPanel Spacing="8">
-            <TextBlock Text="{Binding Localization[WarningReview]}" TextWrapping="Wrap" />
-            <TextBlock Text="{Binding CurrentItemText}" TextWrapping="Wrap" />
-            <WrapPanel>
-              <Button Content="{Binding Localization[PublishWarnings]}" Command="{Binding PublishWarningsCommand}" Margin="0,0,8,8" />
-              <Button Content="{Binding Localization[Discard]}" Command="{Binding DiscardWarningsCommand}" Margin="0,0,8,8" />
-            </WrapPanel>
-            <TextBlock Text="{Binding Localization[BatchExplicitResume]}" TextWrapping="Wrap" />
-          </StackPanel>
-        </Border>
-        <TextBlock Text="{Binding Localization[CleanupHeading]}" TextWrapping="Wrap" IsVisible="{Binding HasCleanupIssue}" />
-        <TextBlock Text="{Binding Localization[PersistenceFailure]}" TextWrapping="Wrap" IsVisible="{Binding WritesBlocked}" />
-        <Expander Header="{Binding Localization[Diagnostics]}" IsVisible="{Binding HasDiagnostics}">
-          <TextBox Text="{Binding Diagnostics}" IsReadOnly="True" TextWrapping="Wrap" MaxHeight="200" />
-        </Expander>
-        <TextBlock Text="{Binding Localization[BatchQueuePolicy]}" TextWrapping="Wrap" Opacity="0.8" />
-        <TextBlock Text="{Binding Localization[OriginalNotice]}" TextWrapping="Wrap" Opacity="0.8" />
-      </StackPanel>
-    </ScrollViewer>
+      </Grid>
+    </Grid>
   </DockPanel>
+  <Border x:Name="RulesPanel" Classes="panel" IsVisible="{Binding IsRulesOpen}">
+    <DockPanel>
+      <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" ColumnSpacing="12" Margin="0,0,0,12">
+        <TextBlock Classes="heading" Text="{Binding Localization[WorkspaceRules]}" VerticalAlignment="Center" />
+        <Button Grid.Column="1" Content="{Binding Localization[WorkspaceClose]}" Click="OnCloseRules" />
+      </Grid>
+      <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="16">
+          <views:RulePresetsView x:Name="WorkspacePresets" DataContext="{Binding Presets}" />
+          <views:BatchLanguageRulesView DataContext="{Binding LanguageRules}" />
+        </StackPanel>
+      </ScrollViewer>
+    </DockPanel>
+  </Border>
+  <views:BatchReviewView x:Name="StructuredReview" DataContext="{Binding}" IsVisible="{Binding IsReviewOpen}" />
+  </Grid>
 </UserControl>

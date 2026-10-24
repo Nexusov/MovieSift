@@ -1,0 +1,69 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:appearance="using:TrackTrim.Desktop.Appearance"
+             x:Class="TrackTrim.Desktop.Views.AppearanceView" x:DataType="appearance:AppearanceViewModel">
+  <StackPanel Spacing="12">
+    <TextBlock Classes="heading" Text="{Binding Localization[AppearanceTitle]}" />
+    <TextBlock Classes="muted" Text="{Binding Localization[AppearanceHelp]}" TextWrapping="Wrap" />
+    <TextBlock Text="{Binding Localization[AppearanceTheme]}" />
+    <ComboBox x:Name="AppearanceTheme" ItemsSource="{Binding ThemeOptions}" SelectedIndex="{Binding ThemeIndex, Mode=TwoWay}" HorizontalAlignment="Stretch"
+              AutomationProperties.Name="{Binding Localization[AppearanceTheme]}">
+      <ComboBox.ItemTemplate><DataTemplate x:DataType="appearance:AppearanceOptionViewModel"><TextBlock Text="{Binding Text}" /></DataTemplate></ComboBox.ItemTemplate>
+    </ComboBox>
+    <TextBlock Text="{Binding Localization[AppearanceAccent]}" />
+    <WrapPanel>
+      <Button Content="{Binding Localization[AppearanceIndigo]}" Command="{Binding SetAccentCommand}" CommandParameter="#5B6CDA" Margin="0,0,6,6" />
+      <Button Content="{Binding Localization[AppearanceTeal]}" Command="{Binding SetAccentCommand}" CommandParameter="#168272" Margin="0,0,6,6" />
+      <Button Content="{Binding Localization[AppearanceRose]}" Command="{Binding SetAccentCommand}" CommandParameter="#C64165" Margin="0,0,6,6" />
+      <Button Content="{Binding Localization[AppearanceAmber]}" Command="{Binding SetAccentCommand}" CommandParameter="#A56A13" Margin="0,0,6,6" />
+    </WrapPanel>
+    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+      <ColorPicker x:Name="AppearanceAccentPicker" Color="{Binding AccentColor, Mode=TwoWay}" IsAlphaEnabled="False" IsAlphaVisible="False"
+                   IsColorSpectrumVisible="True" IsColorPaletteVisible="False" IsColorComponentsVisible="False" IsColorModelVisible="False"
+                   IsColorPreviewVisible="True" AutomationProperties.Name="{Binding Localization[AppearanceAccent]}" MinWidth="70" />
+      <TextBox x:Name="AppearanceAccentHex" Grid.Column="1" Text="{Binding AccentHex, Mode=TwoWay}" PlaceholderText="#RRGGBB"
+               AutomationProperties.Name="{Binding Localization[AppearanceAccentHex]}" />
+    </Grid>
+    <Expander Header="{Binding Localization[AppearanceCustomColors]}">
+      <StackPanel Spacing="10">
+        <TextBlock Classes="muted" Text="{Binding Localization[AppearanceCustomHelp]}" TextWrapping="Wrap" />
+        <TextBlock Text="{Binding Localization[AppearanceLight]}" FontWeight="SemiBold" />
+        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="8">
+          <TextBlock Text="{Binding Localization[AppearancePage]}" VerticalAlignment="Center" TextWrapping="Wrap" />
+          <TextBox Grid.Column="1" Text="{Binding LightPage, Mode=TwoWay}" PlaceholderText="#RRGGBB" AutomationProperties.Name="{Binding Localization[AppearancePage]}" />
+          <TextBlock Grid.Row="1" Text="{Binding Localization[AppearanceSurface]}" VerticalAlignment="Center" TextWrapping="Wrap" />
+          <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding LightSurface, Mode=TwoWay}" PlaceholderText="#RRGGBB" AutomationProperties.Name="{Binding Localization[AppearanceSurface]}" />
+          <TextBlock Grid.Row="2" Text="{Binding Localization[AppearancePrimaryText]}" VerticalAlignment="Center" TextWrapping="Wrap" />
+          <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding LightText, Mode=TwoWay}" PlaceholderText="#RRGGBB" AutomationProperties.Name="{Binding Localization[AppearancePrimaryText]}" />
+          <TextBlock Grid.Row="3" Text="{Binding Localization[AppearanceSecondaryText]}" VerticalAlignment="Center" TextWrapping="Wrap" />
+          <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding LightMuted, Mode=TwoWay}" PlaceholderText="#RRGGBB" AutomationProperties.Name="{Binding Localization[AppearanceSecondaryText]}" />
+          <TextBlock Grid.Row="4" Text="{Binding Localization[AppearanceBorder]}" VerticalAlignment="Center" TextWrapping="Wrap" />
+          <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding LightBorder, Mode=TwoWay}" PlaceholderText="#RRGGBB" AutomationProperties.Name="{Binding Localization[AppearanceBorder]}" />
+        </Grid>
+        <TextBlock Text="{Binding Localization[AppearanceDark]}" FontWeight="SemiBold" />
+        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="8">
+          <TextBlock Text="{Binding Localization[AppearancePage]}" VerticalAlignment="Center" TextWrapping="Wrap" />
+          <TextBox Grid.Column="1" Text="{Binding DarkPage, Mode=TwoWay}" PlaceholderText="#RRGGBB" AutomationProperties.Name="{Binding Localization[AppearancePage]}" />
+          <TextBlock Grid.Row="1" Text="{Binding Localization[AppearanceSurface]}" VerticalAlignment="Center" TextWrapping="Wrap" />
+          <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding DarkSurface, Mode=TwoWay}" PlaceholderText="#RRGGBB" AutomationProperties.Name="{Binding Localization[AppearanceSurface]}" />
+          <TextBlock Grid.Row="2" Text="{Binding Localization[AppearancePrimaryText]}" VerticalAlignment="Center" TextWrapping="Wrap" />
+          <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding DarkText, Mode=TwoWay}" PlaceholderText="#RRGGBB" AutomationProperties.Name="{Binding Localization[AppearancePrimaryText]}" />
+          <TextBlock Grid.Row="3" Text="{Binding Localization[AppearanceSecondaryText]}" VerticalAlignment="Center" TextWrapping="Wrap" />
+          <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding DarkMuted, Mode=TwoWay}" PlaceholderText="#RRGGBB" AutomationProperties.Name="{Binding Localization[AppearanceSecondaryText]}" />
+          <TextBlock Grid.Row="4" Text="{Binding Localization[AppearanceBorder]}" VerticalAlignment="Center" TextWrapping="Wrap" />
+          <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding DarkBorder, Mode=TwoWay}" PlaceholderText="#RRGGBB" AutomationProperties.Name="{Binding Localization[AppearanceBorder]}" />
+        </Grid>
+      </StackPanel>
+    </Expander>
+    <TextBlock Text="{Binding Localization[AppearanceMotion]}" />
+    <ComboBox x:Name="AppearanceMotion" ItemsSource="{Binding MotionOptions}" SelectedIndex="{Binding MotionIndex, Mode=TwoWay}" HorizontalAlignment="Stretch"
+              AutomationProperties.Name="{Binding Localization[AppearanceMotion]}">
+      <ComboBox.ItemTemplate><DataTemplate x:DataType="appearance:AppearanceOptionViewModel"><TextBlock Text="{Binding Text}" /></DataTemplate></ComboBox.ItemTemplate>
+    </ComboBox>
+    <TextBlock Classes="muted" Text="{Binding MotionNotice}" TextWrapping="Wrap" />
+    <TextBlock x:Name="AppearanceError" Classes="warning" Text="{Binding ErrorText}" TextWrapping="Wrap" IsVisible="{Binding HasError}" />
+    <Expander Header="{Binding Localization[Diagnostics]}" IsVisible="{Binding HasDiagnostics}">
+      <TextBox Text="{Binding Diagnostics}" IsReadOnly="True" TextWrapping="Wrap" MaxHeight="120" />
+    </Expander>
+    <Button x:Name="AppearanceReset" Content="{Binding Localization[AppearanceReset]}" Command="{Binding ResetCommand}" HorizontalAlignment="Left" />
+  </StackPanel>
+</UserControl>

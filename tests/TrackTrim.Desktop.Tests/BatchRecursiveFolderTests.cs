@@ -23,19 +23,25 @@ public sealed class BatchRecursiveFolderTests
 
         try
         {
+            var options = view.FindControl<Button>("WorkspaceOptions")!;
+            options.Flyout!.ShowAt(options);
+            Dispatcher.UIThread.RunJobs();
             var control = view.FindControl<CheckBox>("IncludeSubfoldersCheckBox")!;
             Assert.False(fixture.Batch.IncludeSubfolders);
             Assert.False(control.IsChecked);
             Assert.Equal("Include subfolders", control.Content);
             fixture.Batch.IncludeSubfolders = true;
+            var outputFolder = fixture.Dialogs.OutputFolder;
+            fixture.Dialogs.OutputFolder = null;
             await fixture.Batch.AddFolderCommand.ExecuteAsync(null);
             Assert.Null(fixture.Discovery.LastRequest);
             Assert.Equal(0, fixture.Dialogs.InputFolderRequests);
-            Assert.True(fixture.Batch.HasError);
-            Assert.Equal(fixture.Localization["ErrorReasonRecursiveOutputRequired"], fixture.Batch.ErrorReasonText);
+            Assert.False(fixture.Batch.HasError);
+            Assert.True(fixture.Batch.HasPreparationNotice);
+            Assert.Equal(fixture.Localization["RecursiveOutputGuide"], fixture.Batch.PreparationNoticeText);
 
             SetFolderInputs(fixture);
-            await fixture.Batch.ChooseOutputCommand.ExecuteAsync(null);
+            fixture.Dialogs.OutputFolder = outputFolder;
             await fixture.Batch.AddFolderCommand.ExecuteAsync(null);
             Assert.Equal(BatchInputKind.RecursiveFolder, fixture.Discovery.LastRequest!.Kind);
             Assert.Equal(fixture.Batch.OutputFolder, fixture.Discovery.LastRequest.OutputRoot);
@@ -218,6 +224,9 @@ public sealed class BatchRecursiveFolderTests
         {
             fixture.Batch.IncludeSubfolders = true;
             fixture.Main.IsBusy = true;
+            Dispatcher.UIThread.RunJobs();
+            var options = view.FindControl<Button>("WorkspaceOptions")!;
+            options.Flyout!.ShowAt(options);
             Dispatcher.UIThread.RunJobs();
             var control = view.FindControl<CheckBox>("IncludeSubfoldersCheckBox")!;
             Assert.False(control.IsEffectivelyEnabled);

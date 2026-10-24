@@ -1,5 +1,6 @@
 using Serilog;
 using TrackTrim.Application.Ports;
+using TrackTrim.Desktop.Appearance;
 using TrackTrim.Desktop.Localization;
 
 namespace TrackTrim.Desktop.ViewModels;
@@ -11,4 +12,5 @@ public sealed record MainViewModelServices(
     LocalizationService Localization,
     bool DataWritable,
     ILogger Log,
-    BatchViewModel Batch);
+    BatchViewModel Batch,
+    AppearanceViewModel? Appearance = null);

@@ -1,0 +1,59 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:appearance="using:TrackTrim.Desktop.Appearance"
+             xmlns:viewModels="using:TrackTrim.Desktop.ViewModels"
+             x:Class="TrackTrim.Desktop.Views.BatchReviewView"
+             x:DataType="viewModels:BatchViewModel">
+  <Border appearance:SoftMotion.Enter="True" Classes="panel" BorderBrush="{DynamicResource TTAccentBrush}" BorderThickness="1">
+    <DockPanel>
+      <StackPanel DockPanel.Dock="Top" Spacing="10" Margin="0,0,0,12">
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+          <StackPanel Spacing="4">
+            <TextBlock x:Name="ReviewHeading" Focusable="True" Classes="heading" Text="{Binding Localization[WorkspaceReview]}" />
+            <TextBlock Text="{Binding ReviewSummaryText}" TextWrapping="Wrap" />
+          </StackPanel>
+          <Button Grid.Column="1" Content="{Binding Localization[WorkspaceBack]}" Command="{Binding CloseReviewCommand}" VerticalAlignment="Top" />
+        </Grid>
+        <TextBlock Classes="muted" Text="{Binding Localization[OriginalNotice]}" TextWrapping="Wrap" />
+        <WrapPanel>
+          <Button x:Name="StartBatchButton" Classes="primary" Content="{Binding RunActionText}" Command="{Binding RunCommand}" Margin="0,0,8,6" />
+          <Button x:Name="ReviewAgainButton" Content="{Binding Localization[BatchReviewRemaining]}" Command="{Binding ReviewCommand}" Margin="0,0,0,6" />
+        </WrapPanel>
+        <TextBlock Text="{Binding ErrorText}" IsVisible="{Binding HasError}" Foreground="{DynamicResource TTErrorBrush}" TextWrapping="Wrap" />
+      </StackPanel>
+      <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <ItemsControl ItemsSource="{Binding ReviewRows}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="viewModels:BatchReviewRowViewModel">
+              <Border Classes="card" Margin="0,0,0,10">
+                <StackPanel Spacing="8">
+                  <TextBlock FontWeight="SemiBold" Text="{Binding SourceName}" ToolTip.Tip="{Binding SourcePath}" TextWrapping="Wrap" />
+                  <TextBlock Classes="muted" Text="{Binding SourceContext}" TextWrapping="Wrap" />
+                  <TextBlock Text="{Binding DestinationPath}" TextWrapping="Wrap" />
+                  <TextBlock Text="{Binding Item.Localization[NoChange]}" IsVisible="{Binding NoChange}" TextWrapping="Wrap" />
+                  <StackPanel IsVisible="{Binding HasPlan}" Spacing="5">
+                    <TextBlock Text="{Binding Item.Localization[WorkspaceWillRemove]}" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding RemovedTracksText}" TextWrapping="Wrap" />
+                    <Expander Header="{Binding Item.Localization[WorkspaceWillKeep]}">
+                      <TextBlock Text="{Binding RetainedTracksText}" TextWrapping="Wrap" />
+                    </Expander>
+                    <TextBlock Text="{Binding DefaultAudioText}" TextWrapping="Wrap" />
+                    <TextBlock Text="{Binding Item.Localization[SelectionWarning]}" IsVisible="{Binding RemovesDefaultAudio}" Foreground="{DynamicResource TTWarningBrush}" TextWrapping="Wrap" />
+                  </StackPanel>
+                  <CheckBox IsVisible="{Binding NeedsZeroAudioConfirmation}" IsChecked="{Binding ZeroAudioConfirmed, Mode=TwoWay}" IsEnabled="{Binding Item.CanEditPlan}">
+                    <TextBlock Text="{Binding Item.Localization[ConfirmSilent]}" TextWrapping="Wrap" />
+                  </CheckBox>
+                  <StackPanel IsVisible="{Binding HasFailure}" Spacing="4">
+                    <TextBlock Text="{Binding FailureText}" Foreground="{DynamicResource TTErrorBrush}" TextWrapping="Wrap" />
+                    <TextBlock Text="{Binding FailureReasonText}" TextWrapping="Wrap" />
+                    <TextBlock Text="{Binding NextActionText}" TextWrapping="Wrap" />
+                  </StackPanel>
+                </StackPanel>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+    </DockPanel>
+  </Border>
+</UserControl>

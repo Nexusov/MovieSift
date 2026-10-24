@@ -55,7 +55,7 @@ public sealed class BatchEditorTests
             Dispatcher.UIThread.RunJobs();
 
             Assert.Equal("ru", fixture.Settings.Language);
-            Assert.Equal(fixture.Localization["BatchStart"], view.FindControl<Button>("StartBatchButton")!.Content);
+            Assert.Equal(fixture.Batch.RunActionText, Assert.Single(view.GetVisualDescendants().OfType<Button>(), button => button.Name == "StartBatchButton").Content);
             Assert.Equal(fixture.Localization["BatchAddFiles"], view.FindControl<Button>("AddBatchFilesButton")!.Content);
             Assert.Same(firstPlan, first.ApprovedPlan);
             Assert.Same(secondPlan, second.ApprovedPlan);

@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using TrackTrim.Application;
 using TrackTrim.Application.Ports;
 using TrackTrim.Core.Failures;
+using TrackTrim.Desktop.Appearance;
 using TrackTrim.Desktop.Localization;
 
 namespace TrackTrim.Desktop.ViewModels;
@@ -17,6 +18,10 @@ public sealed partial class MainViewModel : ObservableObject
     private Task cleanupOperation = Task.CompletedTask;
     private Failure? cleanupFailure;
     private long languageRevision;
+    private bool hadPendingMediaDecision;
+
+    [ObservableProperty]
+    private bool isAppearanceOpen;
 
     [ObservableProperty]
     private bool isBusy;
@@ -33,21 +38,31 @@ public sealed partial class MainViewModel : ObservableObject
         this.services = services;
         PersistenceFailed = !services.DataWritable;
         ChangeLanguageCommand = new AsyncRelayCommand<string>(ChangeLanguageAsync);
+        ToggleAppearanceCommand = new RelayCommand(() => IsAppearanceOpen = !IsAppearanceOpen);
         RemainInWarningReviewCommand = new RelayCommand(Batch.RemainInWarningReview, () => CanRespondToWarningClose);
         CleanInterruptedCommand = new AsyncRelayCommand(CleanInterruptedAsync, () => HasCleanableInterrupted && CanEdit);
         Localization.PropertyChanged += (_, _) => NotifyPresentation();
         Batch.PropertyChanged += (_, _) => NotifyPresentation();
+
+        if (Appearance is not null)
+        {
+            Appearance.PropertyChanged += (_, _) => OnPropertyChanged(nameof(HasActiveOperation));
+        }
     }
 
     public LocalizationService Localization => services.Localization;
     public BatchViewModel Batch => services.Batch;
+    public AppearanceViewModel? Appearance => services.Appearance;
+    public IRelayCommand ToggleAppearanceCommand { get; }
     public IAsyncRelayCommand<string> ChangeLanguageCommand { get; }
     public IRelayCommand RemainInWarningReviewCommand { get; }
     public IAsyncRelayCommand CleanInterruptedCommand { get; }
-    public bool HasActiveOperation => IsBusy || Batch.IsBusy || Batch.Presets.IsBusy || Batch.Recovery.HasPendingWork;
+    public bool HasOwnedOperation => IsBusy || Batch.IsBusy || Batch.Presets.IsBusy || Batch.Recovery.HasPendingWork;
+    public bool HasActiveOperation => HasOwnedOperation || Appearance?.HasPendingSave == true;
     public bool HasBlockingOperation => IsBusy || Batch.HasBlockingOperation || HasShellCleanupIssue;
     public bool CanEdit => !HasBlockingOperation;
     public bool RequiresCloseDecision => Batch.HasSafetyBlock || HasShellCleanupIssue;
+    public bool HasPendingMediaDecision => HasWarningCandidate || RequiresCloseDecision;
     public string CloseDecisionText => Batch.Snapshot.Items.Any(item =>
         item.Failure?.Code == ErrorCode.PublicationUncertain || item.Result?.Failure?.Code == ErrorCode.PublicationUncertain)
         ? Localization["ErrorPublicationUncertain"] : Batch.RequiresTerminationDecision
@@ -55,7 +70,7 @@ public sealed partial class MainViewModel : ObservableObject
     public bool HasWarningCandidate => Batch.HasWarningCandidate;
     public string WarningCloseSource => Batch.CurrentItemText;
     public bool HasWarningCloseDecision => Batch.HasWarningCloseDecision;
-    public bool CanRespondToWarningClose => HasWarningCloseDecision && !HasActiveOperation;
+    public bool CanRespondToWarningClose => HasWarningCloseDecision && !HasOwnedOperation;
     public bool HasInterrupted => !interrupted.IsDefaultOrEmpty;
     public bool HasCleanableInterrupted => interrupted.Any(entry => entry.CanClean && entry.Output is not null);
     public string InterruptedDetails => DescribeInterrupted();
@@ -98,6 +113,11 @@ public sealed partial class MainViewModel : ObservableObject
 
         await Batch.Presets.InitializeAsync();
         await Batch.Recovery.InitializeAsync();
+
+        if (Appearance is not null)
+        {
+            await Appearance.InitializeAsync();
+        }
         NotifyPresentation();
     }
 
@@ -113,13 +133,28 @@ public sealed partial class MainViewModel : ObservableObject
 
         await cleanupOperation;
         await batchShutdown;
+
+        if (Appearance is not null)
+        {
+            await Appearance.WhenIdleAsync();
+        }
     }
 
     /// <summary>Leaves the warning candidate with its existing batch owner until the user decides.</summary>
     public void RequestWarningCloseReview() => Batch.RequestWarningCloseReview();
 
     /// <summary>Awaits the existing explicit warning-discard lifecycle before allowing close.</summary>
-    public Task<bool> DiscardWarningsForCloseAsync() => Batch.DiscardWarningsForCloseAsync();
+    public async Task<bool> DiscardWarningsForCloseAsync()
+    {
+        var canClose = await Batch.DiscardWarningsForCloseAsync();
+
+        if (canClose && Appearance is not null)
+        {
+            await Appearance.WhenIdleAsync();
+        }
+
+        return canClose;
+    }
 
     /// <summary>Updates availability while shell-owned interrupted-storage cleanup is active.</summary>
     partial void OnIsBusyChanged(bool value) => NotifyPresentation();
@@ -204,7 +239,17 @@ public sealed partial class MainViewModel : ObservableObject
     private void NotifyPresentation()
     {
         Batch.SetWorkspaceAccess(new(IsBusy || HasShellCleanupIssue, PersistenceFailed));
+
+        var newlyPendingDecision = HasPendingMediaDecision && !hadPendingMediaDecision;
+        hadPendingMediaDecision = HasPendingMediaDecision;
+
+        if (newlyPendingDecision)
+        {
+            IsAppearanceOpen = false;
+        }
+
         OnPropertyChanged(string.Empty);
+        ToggleAppearanceCommand?.NotifyCanExecuteChanged();
         RemainInWarningReviewCommand?.NotifyCanExecuteChanged();
         CleanInterruptedCommand?.NotifyCanExecuteChanged();
     }

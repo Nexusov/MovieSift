@@ -1,6 +1,8 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using TrackTrim.Application.Appearance;
+using TrackTrim.Desktop.Appearance;
 using TrackTrim.Desktop.Bootstrap;
 
 namespace TrackTrim.Desktop;
@@ -12,6 +14,8 @@ public sealed partial class App : Avalonia.Application
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
+        var settings = AppearanceSettings.Default;
+        new AppearanceApplier(this).Apply(settings, AppearancePalettePolicy.Resolve(settings));
     }
 
     /// <summary>Creates the main window for a classic desktop lifetime.</summary>
