@@ -149,7 +149,7 @@
   <data name="BatchFiles" xml:space="preserve"><value>Исходные файлы</value></data>
   <data name="BatchInclusionHint" xml:space="preserve"><value>Включённые файлы проверяются вместе. Исправьте или явно исключите нерешённые файлы.</value></data>
   <data name="BatchInclude" xml:space="preserve"><value>Включить файл</value></data>
-  <data name="BatchSummary" xml:space="preserve"><value>Файлов: {0} · включено: {1} · завершено: {2}</value></data>
+  <data name="BatchSummary" xml:space="preserve"><value>Файлов: {0} · включено: {1} · завершено: {2}</value></data>
   <data name="BatchRemove" xml:space="preserve"><value>Убрать из списка</value></data>
   <data name="BatchInspectPending" xml:space="preserve"><value>Проверить ожидающие файлы</value></data>
   <data name="BatchInspectSelected" xml:space="preserve"><value>Проверить файл заново</value></data>
@@ -381,4 +381,11 @@
   <data name="WorkspaceOriginalShort" xml:space="preserve"><value>Исходные файлы не изменяются.</value></data>
   <data name="WorkspaceOptions" xml:space="preserve"><value>Параметры папки и очереди</value></data>
   <data name="AppearancePendingDecision" xml:space="preserve"><value>Ожидается решение по результату обработки или очистке. Закройте настройки, чтобы вернуться к нему.</value></data>
+  <data name="ReviewValidating" xml:space="preserve"><value>Проверяются исходные файлы и назначения… Обработка медиа не запускалась.</value></data>
+  <data name="ReviewCancelled" xml:space="preserve"><value>Проверка отменена. Создание копий не запускалось. Перед созданием файлов повторите проверку.</value></data>
+  <data name="ReviewNeedsAttention" xml:space="preserve"><value>Перед созданием файлов нужно исправить замечания.</value></data>
+  <data name="ReviewRequired" xml:space="preserve"><value>Проверьте текущий выбор перед созданием файлов.</value></data>
+  <data name="ReviewCheckAgain" xml:space="preserve"><value>Проверить заново</value></data>
+  <data name="ReviewNoCopy" xml:space="preserve"><value>Изменений дорожек нет. Новый файл не будет создан.</value></data>
+  <data name="ReviewSourceTracks" xml:space="preserve"><value>Дорожки исходного файла (инспекция)</value></data>
 </root>

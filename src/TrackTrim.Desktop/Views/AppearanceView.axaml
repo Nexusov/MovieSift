@@ -11,10 +11,38 @@
     </ComboBox>
     <TextBlock Text="{Binding Localization[AppearanceAccent]}" />
     <WrapPanel>
-      <Button Content="{Binding Localization[AppearanceIndigo]}" Command="{Binding SetAccentCommand}" CommandParameter="#5B6CDA" Margin="0,0,6,6" />
-      <Button Content="{Binding Localization[AppearanceTeal]}" Command="{Binding SetAccentCommand}" CommandParameter="#168272" Margin="0,0,6,6" />
-      <Button Content="{Binding Localization[AppearanceRose]}" Command="{Binding SetAccentCommand}" CommandParameter="#C64165" Margin="0,0,6,6" />
-      <Button Content="{Binding Localization[AppearanceAmber]}" Command="{Binding SetAccentCommand}" CommandParameter="#A56A13" Margin="0,0,6,6" />
+      <RadioButton x:Name="IndigoAccentChoice" Classes="accentChoice" GroupName="CuratedAccent"
+                   IsChecked="{Binding IsIndigoAccent, Mode=OneWay}" Command="{Binding SetAccentCommand}" CommandParameter="#5B6CDA"
+                   AutomationProperties.Name="{Binding Localization[AppearanceIndigo]}" Margin="0,0,6,6">
+        <StackPanel Orientation="Horizontal" Spacing="7">
+          <Ellipse Width="16" Height="16" Fill="#5B6CDA" Stroke="{DynamicResource TTBorderBrush}" StrokeThickness="1" VerticalAlignment="Center" />
+          <TextBlock Text="{Binding Localization[AppearanceIndigo]}" />
+        </StackPanel>
+      </RadioButton>
+      <RadioButton x:Name="TealAccentChoice" Classes="accentChoice" GroupName="CuratedAccent"
+                   IsChecked="{Binding IsTealAccent, Mode=OneWay}" Command="{Binding SetAccentCommand}" CommandParameter="#168272"
+                   AutomationProperties.Name="{Binding Localization[AppearanceTeal]}" Margin="0,0,6,6">
+        <StackPanel Orientation="Horizontal" Spacing="7">
+          <Ellipse Width="16" Height="16" Fill="#168272" Stroke="{DynamicResource TTBorderBrush}" StrokeThickness="1" VerticalAlignment="Center" />
+          <TextBlock Text="{Binding Localization[AppearanceTeal]}" />
+        </StackPanel>
+      </RadioButton>
+      <RadioButton x:Name="RoseAccentChoice" Classes="accentChoice" GroupName="CuratedAccent"
+                   IsChecked="{Binding IsRoseAccent, Mode=OneWay}" Command="{Binding SetAccentCommand}" CommandParameter="#C64165"
+                   AutomationProperties.Name="{Binding Localization[AppearanceRose]}" Margin="0,0,6,6">
+        <StackPanel Orientation="Horizontal" Spacing="7">
+          <Ellipse Width="16" Height="16" Fill="#C64165" Stroke="{DynamicResource TTBorderBrush}" StrokeThickness="1" VerticalAlignment="Center" />
+          <TextBlock Text="{Binding Localization[AppearanceRose]}" />
+        </StackPanel>
+      </RadioButton>
+      <RadioButton x:Name="AmberAccentChoice" Classes="accentChoice" GroupName="CuratedAccent"
+                   IsChecked="{Binding IsAmberAccent, Mode=OneWay}" Command="{Binding SetAccentCommand}" CommandParameter="#A56A13"
+                   AutomationProperties.Name="{Binding Localization[AppearanceAmber]}" Margin="0,0,6,6">
+        <StackPanel Orientation="Horizontal" Spacing="7">
+          <Ellipse Width="16" Height="16" Fill="#A56A13" Stroke="{DynamicResource TTBorderBrush}" StrokeThickness="1" VerticalAlignment="Center" />
+          <TextBlock Text="{Binding Localization[AppearanceAmber]}" />
+        </StackPanel>
+      </RadioButton>
     </WrapPanel>
     <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
       <ColorPicker x:Name="AppearanceAccentPicker" Color="{Binding AccentColor, Mode=TwoWay}" IsAlphaEnabled="False" IsAlphaVisible="False"

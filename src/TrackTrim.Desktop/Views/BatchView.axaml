@@ -63,8 +63,11 @@
       </WrapPanel>
       <Grid Grid.Row="1">
         <!-- One native collection remains alive when the responsive layout changes. -->
-        <Grid x:Name="WorkspaceColumns" ColumnDefinitions="270,*" ColumnSpacing="12" IsVisible="{Binding HasItems}">
-          <Expander x:Name="FileSidebar" Header="{Binding SummaryText}" IsExpanded="True" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid x:Name="WorkspaceColumns" ColumnDefinitions="330,*" ColumnSpacing="12" IsVisible="{Binding HasItems}">
+          <Expander x:Name="FileSidebar" IsExpanded="True" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" VerticalAlignment="Stretch">
+            <Expander.Header>
+              <TextBlock x:Name="FileCountSummary" Text="{Binding SummaryText}" TextWrapping="Wrap" FontWeight="SemiBold" />
+            </Expander.Header>
             <Border Classes="panel" Padding="6">
               <Grid RowDefinitions="Auto,*">
                 <Button Content="{Binding Localization[BatchInspectPending]}" Command="{Binding InspectPendingCommand}" IsVisible="{Binding HasPendingInspections}" Margin="4,4,4,8" />
@@ -74,16 +77,20 @@
                   </ListBox.Styles>
                   <ListBox.ItemTemplate>
                     <DataTemplate x:DataType="viewModels:BatchItemViewModel">
-                      <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8" Margin="3,6" ToolTip.Tip="{Binding SourcePath}">
-                        <CheckBox IsChecked="{Binding Included, Mode=TwoWay}" IsEnabled="{Binding CanChangeInclusion}" VerticalAlignment="Top" AutomationProperties.Name="{Binding SourcePath}" />
+                      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8" Margin="3,6" ToolTip.Tip="{Binding SourcePath}">
+                        <CheckBox x:Name="FileInclusionCheckBox" IsChecked="{Binding Included, Mode=TwoWay}" IsEnabled="{Binding CanChangeInclusion}" VerticalAlignment="Top" AutomationProperties.Name="{Binding SourcePath}" />
                         <StackPanel Grid.Column="1" Spacing="4">
-                          <TextBlock Text="{Binding FileName}" FontWeight="SemiBold" TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis" />
+                          <Button x:Name="FileDetailsNameButton" Classes="fileName" Click="OnFileDetails" Padding="0" MinHeight="0"
+                                  HorizontalContentAlignment="Left" HorizontalAlignment="Stretch"
+                                  AutomationProperties.Name="{Binding SourcePath}" AutomationProperties.HelpText="{Binding Localization[WorkspaceDetails]}"
+                                  ToolTip.Tip="{Binding SourcePath}">
+                            <TextBlock Text="{Binding FileName}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                          </Button>
                           <TextBlock Text="{Binding ContextPath}" Classes="muted" TextTrimming="PrefixCharacterEllipsis" />
                           <TextBlock Text="{Binding StateText}" Classes="muted" TextWrapping="Wrap" />
                           <TextBlock appearance:SoftMotion.ResultKey="{Binding PublishedPath}" Text="{Binding PublishedPath}" IsVisible="{Binding HasPublishedPath}" TextWrapping="Wrap" MaxLines="2" />
                           <TextBlock x:Name="BatchFileSizeDifferenceText" Text="{Binding SizeDifferenceText}" IsVisible="{Binding HasSizeDifference}" TextWrapping="Wrap" />
                         </StackPanel>
-                        <Button Grid.Column="2" Classes="icon" Content="⋯" Click="OnFileDetails" VerticalAlignment="Top" AutomationProperties.Name="{Binding Localization[WorkspaceDetails]}" />
                       </Grid>
                     </DataTemplate>
                   </ListBox.ItemTemplate>
@@ -149,7 +156,7 @@
       </Grid>
     </Grid>
   </DockPanel>
-  <Border x:Name="RulesPanel" Classes="panel" IsVisible="{Binding IsRulesOpen}">
+  <Border x:Name="RulesPanel" Classes="panel" appearance:SoftMotion.Enter="True" IsVisible="{Binding IsRulesOpen}">
     <DockPanel>
       <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" ColumnSpacing="12" Margin="0,0,0,12">
         <TextBlock Classes="heading" Text="{Binding Localization[WorkspaceRules]}" VerticalAlignment="Center" />
@@ -163,6 +170,6 @@
       </ScrollViewer>
     </DockPanel>
   </Border>
-  <views:BatchReviewView x:Name="StructuredReview" DataContext="{Binding}" IsVisible="{Binding IsReviewOpen}" />
+  <views:BatchReviewView x:Name="StructuredReview" appearance:SoftMotion.Enter="True" DataContext="{Binding}" IsVisible="{Binding IsReviewOpen}" />
   </Grid>
 </UserControl>

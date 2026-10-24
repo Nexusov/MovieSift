@@ -9,6 +9,10 @@ namespace TrackTrim.Desktop.Appearance;
 /// <summary>Edits live cosmetic preferences, rejecting invalid palettes and coalescing bounded asynchronous saves.</summary>
 public sealed class AppearanceViewModel : ObservableObject
 {
+    private const string IndigoAccent = "#5B6CDA";
+    private const string TealAccent = "#168272";
+    private const string RoseAccent = "#C64165";
+    private const string AmberAccent = "#A56A13";
     private static readonly TimeSpan SaveDebounce = TimeSpan.FromMilliseconds(250);
     private readonly AppearanceViewModelOptions options;
     private AppearanceSettings current = AppearanceSettings.Default;
@@ -52,6 +56,10 @@ public sealed class AppearanceViewModel : ObservableObject
 
     public LocalizationService Localization => options.Localization;
     public AppearanceSettings Current => current;
+    public bool IsIndigoAccent => SameColor(current.AccentHex, IndigoAccent);
+    public bool IsTealAccent => SameColor(current.AccentHex, TealAccent);
+    public bool IsRoseAccent => SameColor(current.AccentHex, RoseAccent);
+    public bool IsAmberAccent => SameColor(current.AccentHex, AmberAccent);
     public bool HasPendingSave => !loading.IsCompleted || savingActive;
     public bool HasError => inputError is not null || storageError is not null;
     public string ErrorText => inputError is { } invalid ? Localization[invalid] : storageError is { } unavailable ? Localization[unavailable] : string.Empty;
@@ -288,7 +296,8 @@ public sealed class AppearanceViewModel : ObservableObject
                     diagnostic = result.CleanupFailure?.Detail;
                 }
 
-                if (capturedRevision != revision)
+                // Invalid intermediate input changes editor revision, not the accepted configuration being saved.
+                if (!SameConfiguration(captured, current))
                 {
                     continue;
                 }

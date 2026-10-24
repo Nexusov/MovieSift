@@ -9,6 +9,8 @@ public sealed partial class BatchViewModel
     private bool isReviewOpen;
     private bool isDetailsOpen;
     private bool isRulesOpen;
+    private bool isReviewPending;
+    private bool isReviewCancelled;
     private string preparationNoticeKey = string.Empty;
 
     public bool HasItems => Items.Count != 0;
@@ -22,8 +24,19 @@ public sealed partial class BatchViewModel
     public string PreparationNoticeText => HasPreparationNotice ? Localization[preparationNoticeKey] : string.Empty;
     public int ReviewedCopyCount => Snapshot.Review?.Items.Count(item => !item.Plan.IsNoChange) ?? 0;
     public int ReviewedNoChangeCount => Snapshot.Review?.Items.Count(item => item.Plan.IsNoChange) ?? 0;
-    public string ReviewSummaryText => Localization.Format(new("ReviewSummary",
-        [FormatCount("ReviewChanged", ReviewedCopyCount), FormatCount("ReviewUnchanged", ReviewedNoChangeCount)]));
+    public bool IsReviewPending
+    {
+        get => isReviewPending;
+        private set => SetProperty(ref isReviewPending, value);
+    }
+    public bool IsReviewCancelled => isReviewCancelled;
+    public bool HasCurrentReview => HasReview && !IsReviewPending && !IsReviewCancelled;
+    public bool NeedsReview => !HasCurrentReview && !IsReviewPending;
+    public string ReviewSummaryText => IsReviewPending ? Localization["ReviewValidating"] :
+        IsReviewCancelled ? Localization["ReviewCancelled"] :
+        HasCurrentReview ? Localization.Format(new("ReviewSummary",
+            [FormatCount("ReviewChanged", ReviewedCopyCount), FormatCount("ReviewUnchanged", ReviewedNoChangeCount)])) :
+        Localization[HasError ? "ReviewNeedsAttention" : "ReviewRequired"];
     public string RunActionText => ReviewedCopyCount == 0 ? Localization["RunNoChanges"] :
         Snapshot.Items.Any(item => item.Result?.PublishedPath is not null) ? Localization["RunContinue"] :
         FormatCount("RunCopies", ReviewedCopyCount);

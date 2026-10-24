@@ -9,6 +9,7 @@ namespace TrackTrim.Desktop.Appearance;
 /// <summary>Updates semantic resources in place; never replaces workspace state or media authority.</summary>
 public sealed class AppearanceApplier
 {
+    private const double DecorativeBorderOpacity = 0.22;
     private readonly Avalonia.Application? application;
 
     /// <summary>Targets the already running Avalonia application, or a no-display test composition.</summary>
@@ -92,6 +93,7 @@ public sealed class AppearanceApplier
             resources[key] = palette.Accent;
         }
 
+        resources["TTDecorativeBorderBrush"] = new SolidColorBrush(palette.Border, DecorativeBorderOpacity);
         ApplyControlAliases(resources, palette);
         return resources;
     }
@@ -145,7 +147,7 @@ public sealed class AppearanceApplier
                 state == "Pressed" ? palette.Secondary : palette.Panel;
             resources[$"ExpanderHeaderBackground{state}"] = new SolidColorBrush(background);
             resources[$"ExpanderHeaderForeground{state}"] = new SolidColorBrush(foreground);
-            resources[$"ExpanderHeaderBorderBrush{state}"] = new SolidColorBrush(palette.Border);
+            resources[$"ExpanderHeaderBorderBrush{state}"] = new SolidColorBrush(palette.Border, DecorativeBorderOpacity);
             resources[$"ExpanderChevronBackground{state}"] = new SolidColorBrush(Colors.Transparent);
             resources[$"ExpanderChevronForeground{state}"] = new SolidColorBrush(foreground);
             resources[$"ExpanderChevronBorderBrush{state}"] = new SolidColorBrush(Colors.Transparent);
@@ -163,7 +165,7 @@ public sealed class AppearanceApplier
         }
 
         resources["ExpanderContentBackground"] = new SolidColorBrush(palette.Panel);
-        resources["ExpanderContentBorderBrush"] = new SolidColorBrush(palette.Border);
+        resources["ExpanderContentBorderBrush"] = new SolidColorBrush(palette.Border, DecorativeBorderOpacity);
         resources["ComboBoxDropDownBackground"] = new SolidColorBrush(palette.Panel);
         resources["ComboBoxDropDownBorderBrush"] = new SolidColorBrush(palette.Border);
         resources["ComboBoxPlaceHolderForeground"] = new SolidColorBrush(palette.Muted);

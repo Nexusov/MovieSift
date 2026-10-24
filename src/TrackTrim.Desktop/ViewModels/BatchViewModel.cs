@@ -101,7 +101,7 @@ public sealed partial class BatchViewModel : ObservableObject
         }
     }
     public bool CanEdit => IsWorkspaceAvailable && !HasNewBatchConfirmation && !Presets.IsBusy && Recovery.CanEditBatch;
-    public bool CanRun => CanEdit && !writesBlocked && Snapshot.Review is not null;
+    public bool CanRun => CanEdit && !writesBlocked && HasCurrentReview;
     public bool CanRemoveSelected => CanEdit && SelectedItem is { Snapshot.Result: null };
     public bool CanInspectSelected => CanEdit && SelectedItem is { } selected && selected.Snapshot.State is not (BatchItemState.Completed or BatchItemState.NoChange);
     public bool HasSafetyBlock => Snapshot.HasSafetyBlock;
@@ -220,6 +220,7 @@ public sealed partial class BatchViewModel : ObservableObject
         IsReviewOpen = false;
         IsDetailsOpen = false;
         IsRulesOpen = false;
+        isReviewCancelled = false;
         LanguageRules.ClearPreview();
         failure = null;
         reviewFailures = [];
@@ -418,6 +419,10 @@ public sealed partial class BatchViewModel : ObservableObject
         }
 
         IsRulesOpen = false;
+        isReviewCancelled = false;
+        IsReviewPending = true;
+        IsReviewOpen = true;
+        Refresh();
         var request = new BatchSelectionReviewRequest(Snapshot.Revision,
             Items.Where(item => item.Included && item.ZeroAudioConfirmed).Select(item => item.Id).ToImmutableArray());
         await ExecuteOwnedAsync(async cancellationToken =>
@@ -426,7 +431,8 @@ public sealed partial class BatchViewModel : ObservableObject
             reviewFailures = review.ItemFailures;
             failure = review.Failure;
         });
-        IsReviewOpen = true;
+        isReviewCancelled = EffectiveFailure?.Code == ErrorCode.Cancelled;
+        IsReviewPending = false;
         Refresh();
     }
 

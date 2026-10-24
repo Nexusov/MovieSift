@@ -27,6 +27,7 @@ public sealed class BatchReviewRowViewModel : ObservableObject
     public string DestinationPath => Plan?.DestinationPath ?? Item.OutputPath;
     public bool HasPlan => Plan is not null;
     public bool NoChange => Plan?.IsNoChange == true;
+    public bool HasCopyPlan => Plan is { IsNoChange: false };
     public bool HasFailure => Failure is { Code: not ErrorCode.Cancelled };
     public string FailureText => Failure is { } failure ? Localization[$"Error{failure.Code}"] : string.Empty;
     public string FailureReasonText => Failure is { Reason: not ErrorReason.None } failure

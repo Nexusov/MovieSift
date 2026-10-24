@@ -149,7 +149,7 @@
   <data name="BatchFiles" xml:space="preserve"><value>Input files</value></data>
   <data name="BatchInclusionHint" xml:space="preserve"><value>Included files are reviewed together. Correct or explicitly exclude unresolved files.</value></data>
   <data name="BatchInclude" xml:space="preserve"><value>Include file</value></data>
-  <data name="BatchSummary" xml:space="preserve"><value>{0} files · {1} included · {2} finished</value></data>
+  <data name="BatchSummary" xml:space="preserve"><value>{0} files · {1} included · {2} finished</value></data>
   <data name="BatchRemove" xml:space="preserve"><value>Remove from list</value></data>
   <data name="BatchInspectPending" xml:space="preserve"><value>Inspect pending files</value></data>
   <data name="BatchInspectSelected" xml:space="preserve"><value>Reinspect file</value></data>
@@ -381,4 +381,11 @@
   <data name="WorkspaceOriginalShort" xml:space="preserve"><value>Original files stay unchanged.</value></data>
   <data name="WorkspaceOptions" xml:space="preserve"><value>Folder options and queue</value></data>
   <data name="AppearancePendingDecision" xml:space="preserve"><value>A media review or cleanup decision is still pending. Close settings to return to it.</value></data>
+  <data name="ReviewValidating" xml:space="preserve"><value>Checking source files and destinations… No media processing has started.</value></data>
+  <data name="ReviewCancelled" xml:space="preserve"><value>Review cancelled. No copies were started. Review again before creating files.</value></data>
+  <data name="ReviewNeedsAttention" xml:space="preserve"><value>Some changes need attention before files can be created.</value></data>
+  <data name="ReviewRequired" xml:space="preserve"><value>Review the current choices before creating files.</value></data>
+  <data name="ReviewCheckAgain" xml:space="preserve"><value>Check again</value></data>
+  <data name="ReviewNoCopy" xml:space="preserve"><value>No track changes. No new file will be created.</value></data>
+  <data name="ReviewSourceTracks" xml:space="preserve"><value>Source tracks (inspection)</value></data>
 </root>

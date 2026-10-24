@@ -93,7 +93,10 @@ public static class AppearancePalettePolicy
         var pressed = AccentState(resolvedAccent, onAccent, surfaces, PressedAmount);
         var selection = Blend(panel.Value, resolvedAccent, SelectionAmount);
 
-        if (Contrast(text.Value, selection) < TextContrast)
+        var readableSelection = Contrast(text.Value, selection) >= TextContrast &&
+            Contrast(muted.Value, selection) >= TextContrast;
+
+        if (!readableSelection)
         {
             selection = panel.Value;
         }
