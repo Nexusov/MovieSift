@@ -35,13 +35,17 @@ public sealed class AggregateTrackGroupViewModel : ObservableObject
     public string LanguageText => group.Key.CanonicalLanguage ?? Localization["Unknown"];
     public string TitleText => string.IsNullOrWhiteSpace(group.Key.Title) ? Localization["Untitled"] : group.Key.Title;
     public string CodecText => group.Key.Codec;
+    public string FlagsText => TrackPresentation.DescribeGroupFlags(group.Members.Select(member => member.Track), Localization);
     public string ChannelsText => group.Key.Kind == TrackKind.Audio
         ? Localization.Format(new("AggregateChannels", [group.Key.AudioChannels?.ToString(CultureInfo.InvariantCulture) ?? Localization["Unknown"]]))
         : string.Empty;
     public string CoverageText => Localization.Format(new("AggregateCoverage", [group.FileCoverage, projection.IncludedFileCount, group.OccurrenceCount]));
     public bool HasLanguageIssue => group.LanguageIssue is not null;
     public string LanguageIssueText => group.LanguageIssue is { } issue ? Localization[$"RuleIssue{issue}"] : string.Empty;
-    public string KeepAccessibleName => $"{Localization["Keep"]}: {KindText}, {LanguageText}, {TitleText}, {CoverageText}";
+    public string KeepAccessibleName => string.Join(", ", new[]
+    {
+        $"{Localization["Keep"]}: {KindText}", LanguageText, TitleText, CodecText, ChannelsText, FlagsText, CoverageText
+    }.Where(value => !string.IsNullOrWhiteSpace(value)));
     public string ChoiceText => Localization[Keep is true ? "AggregateAllKept" : Keep is false ? "AggregateAllRemoved" : "AggregateMixed"];
     public IRelayCommand ToggleKeepCommand { get; }
 

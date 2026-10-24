@@ -64,12 +64,33 @@ public sealed class BatchItemViewModel : ObservableObject
         : string.Empty;
     public string PublishedPath => item.Result?.PublishedPath ?? string.Empty;
     public bool HasPublishedPath => item.Result?.PublishedPath is not null;
+    public bool HasSizeDifference => item.Inspection is not null && item.Result is { PublishedPath: not null, OutputLength: not null };
+    public string SizeDifferenceText => DescribeSizeDifference();
     public string PlanTracksText => PlanPresentation.DescribeTracks(item.ApprovedPlan, Localization);
     public string PlanDefaultAudioText => PlanPresentation.DescribeDefaultAudio(item.ApprovedPlan, Localization);
     public bool RemovesDefaultAudio => item.ApprovedPlan?.RemovesDefaultAudio == true;
     public bool NeedsZeroAudioConfirmation => item.Inspection?.Tracks.Any(track => track.Kind == TrackKind.Audio) == true &&
         !Tracks.Any(track => track.Track.Kind == TrackKind.Audio && track.Keep);
     private Failure? EffectiveFailure => planningFailure ?? item.Failure ?? item.Result?.Failure;
+
+    /// <summary>Reports recorded source/output sizes only for a known publication, independently of cleanup.</summary>
+    private string DescribeSizeDifference()
+    {
+        if (!HasSizeDifference)
+        {
+            return string.Empty;
+        }
+
+        var difference = item.Inspection!.Source.Length - item.Result!.OutputLength!.Value;
+
+        if (difference == 0)
+        {
+            return Localization["SizeEqual"];
+        }
+
+        var key = difference < 0 ? "SizeIncrease" : "SizeDifference";
+        return Localization.Format(new(key, [Math.Abs(difference)]));
+    }
 
     /// <summary>Keeps approved-warning publication visibly distinct from a clean result.</summary>
     private string GetStateKey()

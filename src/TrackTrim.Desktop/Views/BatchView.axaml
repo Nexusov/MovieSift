@@ -60,6 +60,7 @@
                   <TextBlock Text="{Binding RelativeSourcePath}" IsVisible="{Binding HasFolderOrigin}" TextWrapping="Wrap" />
                   <TextBlock Text="{Binding StateText}" TextWrapping="Wrap" />
                   <TextBlock Text="{Binding PublishedPath}" TextWrapping="Wrap" IsVisible="{Binding HasPublishedPath}" />
+                  <TextBlock x:Name="BatchFileSizeDifferenceText" Text="{Binding SizeDifferenceText}" TextWrapping="Wrap" IsVisible="{Binding HasSizeDifference}" />
                 </StackPanel>
               </Grid>
             </DataTemplate>
@@ -71,7 +72,7 @@
         </WrapPanel>
 
         <views:AggregateTracksView DataContext="{Binding AggregateTracks}" />
-        <Expander Header="{Binding Localization[BatchSelectedFile]}">
+        <Expander x:Name="SelectedFileDetails" Header="{Binding Localization[BatchSelectedFile]}">
           <ContentControl Content="{Binding SelectedItem}" HorizontalContentAlignment="Stretch">
             <ContentControl.ContentTemplate>
               <DataTemplate x:DataType="viewModels:BatchItemViewModel">
@@ -120,6 +121,7 @@
                     <TextBlock Text="{Binding ErrorText}" Foreground="Crimson" TextWrapping="Wrap" IsVisible="{Binding HasError}" />
                     <TextBlock Text="{Binding ErrorReasonText}" TextWrapping="Wrap" IsVisible="{Binding HasError}" />
                     <TextBlock Text="{Binding PublishedPath}" TextWrapping="Wrap" IsVisible="{Binding HasPublishedPath}" />
+                    <TextBlock x:Name="BatchDetailsSizeDifferenceText" Text="{Binding SizeDifferenceText}" TextWrapping="Wrap" IsVisible="{Binding HasSizeDifference}" />
                     <Expander Header="{Binding Localization[Diagnostics]}" IsVisible="{Binding HasDiagnostics}">
                       <TextBox Text="{Binding Diagnostics}" IsReadOnly="True" TextWrapping="Wrap" MaxHeight="200" />
                     </Expander>

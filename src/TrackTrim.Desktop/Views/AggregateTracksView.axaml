@@ -30,6 +30,7 @@
                     <TextBlock Text="{Binding ChannelsText}" />
                   </WrapPanel>
                   <TextBlock Text="{Binding TitleText}" TextWrapping="Wrap" />
+                  <TextBlock x:Name="AggregateGroupFlagsText" Text="{Binding FlagsText}" TextWrapping="Wrap" />
                   <TextBlock Text="{Binding CoverageText}" TextWrapping="Wrap" />
                   <TextBlock Text="{Binding ChoiceText}" TextWrapping="Wrap" />
                   <TextBlock Text="{Binding Localization[AlwaysKept]}" IsVisible="{Binding IsRequired}" />

@@ -313,4 +313,7 @@
   <data name="AggregateEditable" xml:space="preserve"><value>Individual file choice</value></data>
   <data name="AggregateAdvanced" xml:space="preserve"><value>Advanced: rules and portable presets</value></data>
   <data name="AggregateSilentFiles" xml:space="preserve"><value>Confirm each file that will have no audio</value></data>
+  <data name="AggregateFlags" xml:space="preserve"><value>Forced: {0}; default: {1}; enabled: {2}</value></data>
+  <data name="Varies" xml:space="preserve"><value>varies</value></data>
+  <data name="SizeEqual" xml:space="preserve"><value>New file has the same size as the source. The original remains on disk.</value></data>
 </root>

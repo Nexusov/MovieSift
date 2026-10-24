@@ -313,4 +313,7 @@
   <data name="AggregateEditable" xml:space="preserve"><value>Выбор для отдельного файла</value></data>
   <data name="AggregateAdvanced" xml:space="preserve"><value>Дополнительно: правила и переносимые пресеты</value></data>
   <data name="AggregateSilentFiles" xml:space="preserve"><value>Подтвердите каждый файл, который останется без аудио</value></data>
+  <data name="AggregateFlags" xml:space="preserve"><value>Принудительная: {0}; по умолчанию: {1}; включена: {2}</value></data>
+  <data name="Varies" xml:space="preserve"><value>различается</value></data>
+  <data name="SizeEqual" xml:space="preserve"><value>Новый файл имеет тот же размер, что и исходный. Оригинал остаётся на диске.</value></data>
 </root>
