@@ -176,5 +176,137 @@
     "Windows 11 and Ubuntu Desktop acceptance, real warning-fixture and other existing release/material limitations retain their prior status.",
     "Folder drops are not implemented; use Add folder and its explicit options.",
     "Normal required CI packages/inventories/relocation/container verification remain the runtime packaging gate; no candidate-retention dispatch or public release is authorized by this change."
-  ]
+  ],
+  "correctionPass": {
+    "comparisonBase": "94ae0805c85adaebd9b303468558a34811bf98fc",
+    "codeRevision": "104f664063b5f831e80e531fb21d85b48d4da70d",
+    "cleanCodeBuild": true,
+    "platform": "Windows 10 Home Single Language 22H2 x64, 19045.6456; Avalonia.Headless/Skia, not native desktop acceptance",
+    "reproducedBeforeFix": {
+      "normalBusySaveAfterInvalidHex": "failed: current accepted appearance lost its persistence failure",
+      "normalUnavailableSaveAfterInvalidHex": "failed: current accepted appearance lost its persistence failure",
+      "selectedSecondaryContrast": {
+        "accent": "#5B6CDA",
+        "lightSecondary": "#707070",
+        "selection": "#EBEDFB",
+        "observedRatio": 4.253918851373287,
+        "target": 4.5
+      }
+    },
+    "corrections": [
+      "Normal save outcomes bind to accepted configuration, retaining meaningful failure through invalid intermediate HEX; later success clears it.",
+      "Selection validates primary and muted text; fallback keeps usable custom colors and an essential selected outline.",
+      "Initial/repeated Review exposes validation status and direct Cancel; cancellation is explicit and grants no aggregate execution authority. Recheck is shown only when needed.",
+      "NoChange hides output/copy promises and offers source-inspection details. Revalidation and Run retain distinct positions and inert completion focus.",
+      "Review/rules entry is attached to actual visibility-changing controls. File names wrap and directly open details; checkbox inclusion stays independent. Help opens a keyboard-accessible flyout; curated accents expose samples and selected state. Decorative outlines remain separate from essential control/selection/focus boundaries."
+    ],
+    "localVerification": {
+      "lockedRestore": "passed",
+      "formatVerification": "passed",
+      "releaseBuild": "passed, zero warnings/errors",
+      "csharpPassed": 1097,
+      "windowsPlatformSkips": 28,
+      "desktopHeadlessPassed": 200,
+      "pythonPassed": 101,
+      "mandatoryMediaTools": true,
+      "scope": "Full unchanged mandatory media/preservation suites plus focused controlled asynchronous, actual-control keyboard/pointer and color tests; no native remux or cancellation claim."
+    },
+    "renders": {
+      "generated": 27,
+      "method": "Existing actual Avalonia/Skia harness; controlled similarly prefixed episode names, selected-row custom #707070, EN/RU; default 1040x800, wide 1200x850 and minimum 640x480; existing offscreen 1/1.5/2 densities.",
+      "states": [
+        "file selection",
+        "changed/NoChange review",
+        "pending/cancelled review",
+        "curated accent samples"
+      ],
+      "osScalingChanged": false,
+      "nativeAcceptance": false,
+      "motionScope": "Visibility/reopen bindings and reduced-motion behavior are checked; static renders do not establish native animation or visible-focus acceptance."
+    },
+    "images": [
+      {
+        "path": "docs/verification/screenshots/soft-workspace-corrections/files-en-default.png",
+        "sha256": "c264c980cdfbc8deee76b9b0ba3d74fb0b1820837f0516133828c2d71d667bf0",
+        "bytes": 84829,
+        "logicalSize": [
+          1040,
+          800
+        ],
+        "renderDensity": 1
+      },
+      {
+        "path": "docs/verification/screenshots/soft-workspace-corrections/files-ru-default.png",
+        "sha256": "581fad45d99fbfcc2df82f59d6e882d32d2e26a503352687a0bb3fdee5084305",
+        "bytes": 93601,
+        "logicalSize": [
+          1040,
+          800
+        ],
+        "renderDensity": 1
+      },
+      {
+        "path": "docs/verification/screenshots/soft-workspace-corrections/files-en-wide.png",
+        "sha256": "0765cb0184a3299f1e1695269f4352a79e99ebfe8c98ae7a0b6de15ba3fcd2bf",
+        "bytes": 91145,
+        "logicalSize": [
+          1200,
+          850
+        ],
+        "renderDensity": 1
+      },
+      {
+        "path": "docs/verification/screenshots/soft-workspace-corrections/review-changed-and-nochange.png",
+        "sha256": "274705739b071e5ded39c1e51c188585acb4d375cf6380984613182edc64a435",
+        "bytes": 56979,
+        "logicalSize": [
+          1200,
+          850
+        ],
+        "renderDensity": 1
+      },
+      {
+        "path": "docs/verification/screenshots/soft-workspace-corrections/review-ru-minimum.png",
+        "sha256": "77bbbd1d15bc1be7098683de03ed4e08e8d65c0023d3606a161420f37a9e98ea",
+        "bytes": 35965,
+        "logicalSize": [
+          640,
+          480
+        ],
+        "renderDensity": 1
+      },
+      {
+        "path": "docs/verification/screenshots/soft-workspace-corrections/review-pending.png",
+        "sha256": "91388dd1e4c9ffe2a9ef8ffe4758a0f9f6149bdcf2d033b814285ef2d52c0863",
+        "bytes": 56187,
+        "logicalSize": [
+          1040,
+          800
+        ],
+        "renderDensity": 1
+      },
+      {
+        "path": "docs/verification/screenshots/soft-workspace-corrections/review-cancelled-ru.png",
+        "sha256": "bf364be3b451ccbd0924572d71d8d5138a14603f5e31d8a8ffbb6995b1412724",
+        "bytes": 59900,
+        "logicalSize": [
+          1040,
+          800
+        ],
+        "renderDensity": 1
+      },
+      {
+        "path": "docs/verification/screenshots/soft-workspace-corrections/accent-samples.png",
+        "sha256": "35572f00d30a0bf2d3fb9513bf756f544e3faf7643cb8950ca9bc2dc9d166ec2",
+        "bytes": 101608,
+        "logicalSize": [
+          1040,
+          800
+        ],
+        "renderDensity": 1
+      }
+    ],
+    "ci": "Final pushed-source run, synthetic checkout and results are reported in draft PR #11; no CI-ID-only evidence commit.",
+    "limits": "Computer Use, recordings, W13-W15 and target-desktop/OS-scaling acceptance remain deferred. Earlier record/images retain their original code scope."
+  }
 }
