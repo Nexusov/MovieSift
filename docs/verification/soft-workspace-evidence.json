@@ -1,0 +1,180 @@
+{
+  "schemaVersion": 1,
+  "feature": "Soft workspace and portable appearance",
+  "comparisonBase": "000263460971e5385c7114988e2310f481d5c1ac",
+  "codeRevision": "0794cb2b06fe83a8c4292842b5ae90a7798a8f8b",
+  "worktreeAtLocalValidation": "Only the pending AGENTS/README/architecture/plan documentation differed; production code, resource and test files matched codeRevision.",
+  "platform": {
+    "os": "Windows 10 Home Single Language 22H2",
+    "build": "19045.6456",
+    "architecture": "x64",
+    "sdk": "10.0.402",
+    "avalonia": "12.1.4"
+  },
+  "execution": {
+    "method": "Avalonia.Headless + Skia, actual MainWindow/BatchView/AppearanceView; controlled UI media metadata; RenderTargetBitmap/VisualBrush",
+    "nativeDesktopAcceptance": false,
+    "osDisplayScalingChanged": false,
+    "normalAndMinimumLogicalSizes": [
+      [
+        1200,
+        850
+      ],
+      [
+        640,
+        480
+      ]
+    ],
+    "renderDensities": [
+      1,
+      1.5,
+      2
+    ],
+    "configurationCases": 9,
+    "viewsPerCase": [
+      "empty",
+      "selection",
+      "scrolled tracks",
+      "review",
+      "appearance"
+    ],
+    "generatedImages": 45,
+    "languages": [
+      "en",
+      "ru"
+    ],
+    "variants": [
+      "Light",
+      "Dark"
+    ]
+  },
+  "verification": {
+    "lockedRestore": "passed",
+    "formatVerification": "passed",
+    "releaseBuild": {
+      "status": "passed",
+      "warnings": 0,
+      "errors": 0
+    },
+    "csharp": {
+      "status": "passed",
+      "total": 1107,
+      "passed": 1079,
+      "failed": 0,
+      "windowsSkipped": 28,
+      "projects": {
+        "Core": {
+          "passed": 181,
+          "skipped": 0
+        },
+        "Application": {
+          "passed": 293,
+          "skipped": 4
+        },
+        "Infrastructure": {
+          "passed": 423,
+          "skipped": 24
+        },
+        "DesktopHeadless": {
+          "passed": 182,
+          "skipped": 0
+        }
+      },
+      "mandatoryMediaTools": true,
+      "skips": "23 existing Linux-only cases plus 5 appearance FIFO/symlink cases; Linux required CI exercises these platform-specific cases."
+    },
+    "python": {
+      "status": "passed",
+      "total": 101,
+      "includes": "Actual archive inventory and matching Filee notice bytes. Initial run without TRACKTRIM_TOOL_DIRECTORY failed its mandatory source-archive precondition; complete rerun with the documented verified tools succeeded."
+    },
+    "focusedCoverage": [
+      "Union scope, Spanish-only fourth episode, duplicates and member exceptions remain covered by existing aggregate suites.",
+      "Structured actual immutable plan rows, zero-audio correction, all-NoChange completion, stale review invalidation and rapid Space cannot launch Run.",
+      "Empty-batch rule/preset access, contextual reset/recursion controls and output-first recursive discovery.",
+      "Linearized-sRGB actual text/indicator contrast; real Fluent Expander/ToggleButton brushes in both variants.",
+      "Theme/motion/EN-RU changes during a gated active owned job preserve requests, progress, selections, review and Cancel.",
+      "Malformed/unsupported/unsafe appearance records, atomic failure preservation, interprocess exclusion, coalescing, delayed load/reset/save races and session-only failure.",
+      "Warning close/cleanup decisions remain available while cosmetic persistence is pending; a new decision closes settings without resolving or discarding it."
+    ],
+    "requiredCi": "Final pushed-HEAD run and checkout/parents are recorded in PR #11; required workflow and context names are unchanged."
+  },
+  "observedRenders": [
+    "Warm light/dark surfaces, readable compact aggregate groups and file coverage/roles/default-enabled summaries.",
+    "Long English/Cyrillic names with secondary directory context and full paths in details/tooltips.",
+    "At 640x480 the file shelf collapses, track/detail areas scroll, Review and destination remain reachable, and Review occupies the full workspace.",
+    "Separate settings/rules panels preserve the existing workspace; empty state keeps direct Add files/Add folder.",
+    "Higher-density offscreen rendering uses VisualBrush to avoid RenderTargetBitmap direct-root clip artifacts; this does not verify OS scaling."
+  ],
+  "adaptation": {
+    "reference": "https://github.com/KnifeLemon/Filee",
+    "revision": "e830916e7f02526bff6b7576edc22e51ecf9c126",
+    "scope": "Soft interaction/style patterns and cosmetic motion approach; no conversion lifecycle/assets/fonts",
+    "license": "docs/third-party/Filee-LICENSE.txt"
+  },
+  "images": [
+    {
+      "path": "docs/verification/screenshots/soft-workspace/light-en-empty.png",
+      "sha256": "7447821d73af0040ae6166aa166114279cfd60c1eb513ec9d70e8f64006d192c",
+      "bytes": 35390,
+      "logicalWidth": 1200,
+      "logicalHeight": 850,
+      "renderDensity": 1
+    },
+    {
+      "path": "docs/verification/screenshots/soft-workspace/light-en-workspace.png",
+      "sha256": "e05e58a8e3e32e06e34c3bc229910b7ca5328a337eebdc18e2c41d94560e6e7d",
+      "bytes": 85187,
+      "logicalWidth": 1200,
+      "logicalHeight": 850,
+      "renderDensity": 1
+    },
+    {
+      "path": "docs/verification/screenshots/soft-workspace/dark-ru-workspace.png",
+      "sha256": "72fe3dd851747109a5d44d517455236103b24bb3facd0ddb80ab25488b5c415d",
+      "bytes": 94115,
+      "logicalWidth": 1200,
+      "logicalHeight": 850,
+      "renderDensity": 1
+    },
+    {
+      "path": "docs/verification/screenshots/soft-workspace/light-en-review.png",
+      "sha256": "ad925cf901343d32e4adc474c03234fad7e5949f36d588b6f1c98d043f7d07ff",
+      "bytes": 66225,
+      "logicalWidth": 1200,
+      "logicalHeight": 850,
+      "renderDensity": 1
+    },
+    {
+      "path": "docs/verification/screenshots/soft-workspace/light-ru-minimum-review-200.png",
+      "sha256": "742094aa9addd9f684fd77b05970d85876c26c8643fd802802179f7b77e87b1b",
+      "bytes": 98246,
+      "logicalWidth": 640,
+      "logicalHeight": 480,
+      "renderDensity": 2
+    },
+    {
+      "path": "docs/verification/screenshots/soft-workspace/dark-en-appearance.png",
+      "sha256": "de9e3bc6a0299265e992642435054d1a9d8a44eeb84a9eee9a646dd3edb1ad9b",
+      "bytes": 105866,
+      "logicalWidth": 1200,
+      "logicalHeight": 850,
+      "renderDensity": 1
+    },
+    {
+      "path": "docs/verification/screenshots/soft-workspace/light-ru-minimum-empty.png",
+      "sha256": "6e6e5e7b00b12a9549ce2affb822c35cfb6447211c47c12c78e3c8dd54bb5a9b",
+      "bytes": 32058,
+      "logicalWidth": 640,
+      "logicalHeight": 480,
+      "renderDensity": 1
+    }
+  ],
+  "limits": [
+    "No Computer Use/native recording or W13-W15 retry.",
+    "No native desktop, actual 100/150/200 display scaling, visual focus or target-platform acceptance is inferred from these images.",
+    "Windows 11 and Ubuntu Desktop acceptance, real warning-fixture and other existing release/material limitations retain their prior status.",
+    "Folder drops are not implemented; use Add folder and its explicit options.",
+    "Normal required CI packages/inventories/relocation/container verification remain the runtime packaging gate; no candidate-retention dispatch or public release is authorized by this change."
+  ]
+}
