@@ -15,7 +15,7 @@ using Xunit;
 
 namespace TrackTrim.Desktop.Tests;
 
-/// <summary>Composes the actual batch and single workflow owners with file-specific deterministic UI ports.</summary>
+/// <summary>Composes the actual unified workspace owner with file-specific deterministic UI ports.</summary>
 internal sealed class BatchViewModelFixture
 {
     public static readonly TimeSpan TestTimeout = TimeSpan.FromSeconds(10);
@@ -33,7 +33,7 @@ internal sealed class BatchViewModelFixture
     public MainViewModel Main { get; }
     public Task QueueInitialization { get; }
 
-    /// <summary>Shares one job coordinator while keeping single and batch inspection revisions independent.</summary>
+    /// <summary>Shares one job coordinator for every file in the unified workspace.</summary>
     public BatchViewModelFixture(IRulePresetStore? presetStore = null, IQueueListStore? queueStore = null, bool initializeQueue = true)
     {
         Dialogs = new(Backend.Inspections.Keys.ToArray());
@@ -43,8 +43,7 @@ internal sealed class BatchViewModelFixture
         Coordinator = new(Session, new InspectionService(Backend, sourceAccess), jobs, sourceAccess);
         var logger = new LoggerConfiguration().CreateLogger();
         Batch = new(new(Session, Coordinator, Discovery, Dialogs, Localization, true, logger, new(presetStore ?? PresetStore), queueStore ?? QueueStore));
-        Main = new(new(new InspectionService(Backend, sourceAccess), jobs, Settings, Outputs, Dialogs,
-            Localization, true, logger, Batch));
+        Main = new(new(Settings, Outputs, Localization, true, logger, Batch));
 
         QueueInitialization = initializeQueue ? Batch.Recovery.InitializeAsync() : Task.CompletedTask;
     }
@@ -90,9 +89,6 @@ internal sealed class BatchUiDialogs(IReadOnlyList<string> sources) : IFileDialo
     public IReadOnlyList<string> Sources { get; set; } = sources;
     public string? OutputFolder { get; set; } = Path.Combine(Path.GetTempPath(), "TrackTrim batch UI output");
     public int InputFolderRequests { get; private set; }
-
-    /// <summary>Returns the single workflow's independent source selection.</summary>
-    public Task<string?> SelectSourceAsync() => Task.FromResult(Sources.FirstOrDefault());
 
     /// <summary>Returns the controlled explicit batch addition.</summary>
     public Task<IReadOnlyList<string>> SelectSourcesAsync() => Task.FromResult(Sources);

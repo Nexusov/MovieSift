@@ -187,9 +187,9 @@ public sealed class BatchTitleFilterTests
         Assert.Equal(0, fixture.Outputs.CleanupCount);
     }
 
-    /// <summary>Disables title inputs with the existing shared single-file workspace gate.</summary>
+    /// <summary>Disables title inputs with the existing shared discovery workspace gate.</summary>
     [AvaloniaFact]
-    public async Task ConflictingInspectionDisablesTitleControlsWithoutLosingTheirConfiguration()
+    public async Task ActiveDiscoveryDisablesTitleControlsWithoutLosingTheirConfiguration()
     {
         var fixture = CreateFixture();
         await fixture.LoadAsync();
@@ -199,12 +199,13 @@ public sealed class BatchTitleFilterTests
         var preview = rules.Preview;
         var entered = BatchViewModelFixture.Signal();
         var release = BatchViewModelFixture.Signal();
-        fixture.Backend.OnInspect = async request =>
+        fixture.Discovery.OnDiscover = async request =>
         {
             entered.TrySetResult();
             await release.Task.WaitAsync(request.CancellationToken);
+            return new([], []);
         };
-        var operation = fixture.Main.OpenSourceCommand.ExecuteAsync(null);
+        var operation = fixture.Batch.AddFilesCommand.ExecuteAsync(null);
 
         try
         {

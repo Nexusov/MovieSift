@@ -58,6 +58,10 @@ public sealed class BatchItemViewModel : ObservableObject
     }.Where(detail => !string.IsNullOrWhiteSpace(detail)).Distinct(StringComparer.Ordinal));
     public bool HasDiagnostics => !string.IsNullOrWhiteSpace(Diagnostics);
     public string StateText => Localization[GetStateKey()];
+    public string BackendDescription => item.Inspection is { } inspection ? $"{inspection.Backend.Name} {inspection.Backend.Version}" : string.Empty;
+    public string MediaFeaturesText => item.Inspection is { } inspection
+        ? Localization.Format(new("MediaFeatures", [inspection.Attachments.Length, Localization[inspection.HasChapters ? "Yes" : "No"], Localization[inspection.HasTags ? "Yes" : "No"]]))
+        : string.Empty;
     public string PublishedPath => item.Result?.PublishedPath ?? string.Empty;
     public bool HasPublishedPath => item.Result?.PublishedPath is not null;
     public string PlanTracksText => PlanPresentation.DescribeTracks(item.ApprovedPlan, Localization);

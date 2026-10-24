@@ -140,11 +140,11 @@
   <data name="ErrorReasonSegmentStructure" xml:space="preserve"><value>The Segment Info cannot be inspected within the supported bounds. Choose a standalone MKV with finite element sizes; streaming clusters and multiple segments are unsupported.</value></data>
   <data name="SingleWorkflow" xml:space="preserve"><value>One file</value></data>
   <data name="BatchWorkflow" xml:space="preserve"><value>Several files / folder</value></data>
-  <data name="BatchInstructions" xml:space="preserve"><value>Add MKV/MP4 files or one folder. Include subfolders only when requested. Inspect and approve each file independently, choose separate destinations, then review the batch.</value></data>
+  <data name="BatchInstructions" xml:space="preserve"><value>Add one or more MKV/MP4 files or a folder. Choose tracks across included files, choose destinations, then Review the individual plans before running.</value></data>
   <data name="BatchLimits" xml:space="preserve"><value>Limits: {0} files per queue; {1} examined entries across the whole folder scan. Exceeding a limit rejects the addition in full.</value></data>
-  <data name="BatchAddFiles" xml:space="preserve"><value>Add MKV / MP4 files…</value></data>
+  <data name="BatchAddFiles" xml:space="preserve"><value>Add files…</value></data>
   <data name="BatchAddFolder" xml:space="preserve"><value>Add a folder…</value></data>
-  <data name="BatchFilesDialogTitle" xml:space="preserve"><value>Select MKV/MP4 files for independent review</value></data>
+  <data name="BatchFilesDialogTitle" xml:space="preserve"><value>Select one or more MKV/MP4 files</value></data>
   <data name="BatchFolderDialogTitle" xml:space="preserve"><value>Choose one folder with MKV/MP4 files</value></data>
   <data name="BatchFiles" xml:space="preserve"><value>Batch files (full paths)</value></data>
   <data name="BatchInclusionHint" xml:space="preserve"><value>Included files must have an approved plan. Explicitly exclude or remove unwanted/failed entries; exclusion is shown in review.</value></data>
@@ -153,9 +153,9 @@
   <data name="BatchRemove" xml:space="preserve"><value>Remove selected unstarted entry</value></data>
   <data name="BatchInspectPending" xml:space="preserve"><value>Inspect pending files</value></data>
   <data name="BatchInspectSelected" xml:space="preserve"><value>Inspect selected file again</value></data>
-  <data name="BatchSelectedFile" xml:space="preserve"><value>Independent file selection</value></data>
+  <data name="BatchSelectedFile" xml:space="preserve"><value>Selected file: details and exceptions</value></data>
   <data name="BatchApproveItem" xml:space="preserve"><value>Approve this file’s plan</value></data>
-  <data name="BatchReviewRemaining" xml:space="preserve"><value>Review remaining batch</value></data>
+  <data name="BatchReviewRemaining" xml:space="preserve"><value>Review plans</value></data>
   <data name="BatchReviewedPlans" xml:space="preserve"><value>Reviewed immutable plans to run</value></data>
   <data name="BatchExcluded" xml:space="preserve"><value>Explicitly excluded files (will not run)</value></data>
   <data name="BatchStart" xml:space="preserve"><value>Start / resume reviewed items</value></data>
@@ -299,4 +299,18 @@
   <data name="QueueErrorLimitExceeded" xml:space="preserve"><value>The queue list exceeds its storage bounds. The previous file is preserved; reduce the list or path lengths.</value></data>
   <data name="QueueErrorPersistenceUnavailable" xml:space="preserve"><value>The queue list could not be stored or read. Existing data is preserved; restart recovery is not confirmed.</value></data>
   <data name="QueueErrorCancelled" xml:space="preserve"><value>Queue-list storage was cancelled. Restart recovery is not confirmed.</value></data>
+  <data name="AggregateHeading" xml:space="preserve"><value>Tracks across included files</value></data>
+  <data name="AggregateNotice" xml:space="preserve"><value>Groups use track metadata, not content identity. Expand a group for individual files and original flags. Highlighting a file does not change this scope.</value></data>
+  <data name="AggregateScope" xml:space="preserve"><value>{0} included files; {1} unresolved inspections.</value></data>
+  <data name="AggregateUnresolved" xml:space="preserve"><value>This track list is incomplete. Inspect, correct or explicitly exclude unresolved files before Review.</value></data>
+  <data name="AggregateMembers" xml:space="preserve"><value>Files and individual tracks</value></data>
+  <data name="AggregateCoverage" xml:space="preserve"><value>{0} of {1} files; {2} occurrences</value></data>
+  <data name="AggregateChannels" xml:space="preserve"><value>Channels: {0}</value></data>
+  <data name="AggregateAllKept" xml:space="preserve"><value>All editable occurrences kept</value></data>
+  <data name="AggregateAllRemoved" xml:space="preserve"><value>All editable occurrences removed</value></data>
+  <data name="AggregateMixed" xml:space="preserve"><value>Mixed Keep choices</value></data>
+  <data name="AggregateHistorical" xml:space="preserve"><value>Completed result — selection locked</value></data>
+  <data name="AggregateEditable" xml:space="preserve"><value>Individual file choice</value></data>
+  <data name="AggregateAdvanced" xml:space="preserve"><value>Advanced: rules and portable presets</value></data>
+  <data name="AggregateSilentFiles" xml:space="preserve"><value>Confirm each file that will have no audio</value></data>
 </root>

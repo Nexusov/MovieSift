@@ -28,7 +28,7 @@
         </StackPanel>
       </Border>
     </StackPanel>
-    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+    <ScrollViewer x:Name="WorkspaceScrollViewer" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
       <StackPanel Spacing="12" Margin="0,12,0,0">
         <TextBlock Text="{Binding Localization[BatchInstructions]}" TextWrapping="Wrap" />
         <TextBlock Text="{Binding LimitsText}" TextWrapping="Wrap" Opacity="0.8" />
@@ -47,8 +47,6 @@
         <TextBlock Text="{Binding SummaryText}" TextWrapping="Wrap" />
         <TextBlock x:Name="QueueCheckpointStatus" Text="{Binding Recovery.StatusText}" TextWrapping="Wrap" />
         <Button Content="{Binding Localization[QueueReload]}" Command="{Binding Recovery.ReloadCommand}" HorizontalAlignment="Left" />
-        <views:RulePresetsView DataContext="{Binding Presets}" />
-        <views:BatchLanguageRulesView DataContext="{Binding LanguageRules}" />
         <TextBlock Text="{Binding Localization[BatchInclusionHint]}" TextWrapping="Wrap" Opacity="0.8" />
         <ListBox x:Name="BatchFileList" ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
                  Height="200" ScrollViewer.HorizontalScrollBarVisibility="Disabled" AutomationProperties.Name="{Binding Localization[BatchFiles]}">
@@ -72,62 +70,87 @@
           <Button Content="{Binding Localization[BatchInspectSelected]}" Command="{Binding InspectSelectedCommand}" Margin="0,0,8,8" />
         </WrapPanel>
 
-        <ContentControl Content="{Binding SelectedItem}" HorizontalContentAlignment="Stretch">
-          <ContentControl.ContentTemplate>
-            <DataTemplate x:DataType="viewModels:BatchItemViewModel">
-              <Border Padding="12" BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="1" CornerRadius="4">
-                <StackPanel Spacing="8">
-                  <TextBlock Text="{Binding Localization[BatchSelectedFile]}" FontWeight="SemiBold" />
-                  <TextBlock x:Name="BatchSelectedSource" Text="{Binding SourcePath}" TextWrapping="Wrap" />
-                  <TextBlock Text="{Binding StateText}" TextWrapping="Wrap" />
-                  <TextBlock Text="{Binding Localization[Output]}" />
-                  <TextBox Text="{Binding OutputPath, Mode=TwoWay}" IsEnabled="{Binding CanEditPlan}" TextWrapping="Wrap"
-                           AutomationProperties.Name="{Binding Localization[Output]}" />
-                  <ItemsControl ItemsSource="{Binding Tracks}" IsEnabled="{Binding CanEditPlan}">
-                    <ItemsControl.ItemTemplate>
-                      <DataTemplate x:DataType="viewModels:TrackViewModel">
-                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" Margin="0,4">
-                          <CheckBox IsChecked="{Binding Keep, Mode=TwoWay}" IsEnabled="{Binding IsSelectable}"
-                                    Content="{Binding Localization[Keep]}" AutomationProperties.Name="{Binding KeepAccessibleName}" VerticalAlignment="Top" />
-                          <StackPanel Grid.Column="1" Spacing="3">
-                            <WrapPanel>
-                              <TextBlock Text="{Binding KindText}" FontWeight="SemiBold" Margin="0,0,8,0" />
-                              <TextBlock Text="{Binding Localization[TrackId]}" Margin="0,0,4,0" />
-                              <TextBlock Text="{Binding IdentifierText}" Margin="0,0,8,0" />
-                              <TextBlock Text="{Binding Track.Codec}" Margin="0,0,8,0" />
-                              <TextBlock Text="{Binding LanguageText}" />
-                            </WrapPanel>
-                            <TextBlock Text="{Binding TitleText}" TextWrapping="Wrap" />
-                            <TextBlock Text="{Binding FlagsText}" TextWrapping="Wrap" />
-                            <WrapPanel IsVisible="{Binding IsAudio}">
-                              <TextBlock Text="{Binding Localization[Channels]}" Margin="0,0,4,0" />
-                              <TextBlock Text="{Binding ChannelsText}" />
-                            </WrapPanel>
-                            <TextBlock Text="{Binding Localization[AlwaysKept]}" IsVisible="{Binding IsRequired}" />
-                          </StackPanel>
-                        </Grid>
-                      </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                  </ItemsControl>
-                  <CheckBox IsChecked="{Binding ZeroAudioConfirmed, Mode=TwoWay}" IsVisible="{Binding NeedsZeroAudioConfirmation}" IsEnabled="{Binding CanEditPlan}">
+        <views:AggregateTracksView DataContext="{Binding AggregateTracks}" />
+        <Expander Header="{Binding Localization[BatchSelectedFile]}">
+          <ContentControl Content="{Binding SelectedItem}" HorizontalContentAlignment="Stretch">
+            <ContentControl.ContentTemplate>
+              <DataTemplate x:DataType="viewModels:BatchItemViewModel">
+                <Border Padding="12" BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="1" CornerRadius="4">
+                  <StackPanel Spacing="8">
+                    <TextBlock Text="{Binding Localization[BatchSelectedFile]}" FontWeight="SemiBold" />
+                    <TextBlock x:Name="BatchSelectedSource" Text="{Binding SourcePath}" TextWrapping="Wrap" />
+                    <TextBlock Text="{Binding StateText}" TextWrapping="Wrap" />
+                    <TextBlock Text="{Binding BackendDescription}" TextWrapping="Wrap" />
+                    <TextBlock Text="{Binding MediaFeaturesText}" TextWrapping="Wrap" />
+                    <TextBlock Text="{Binding Localization[Output]}" />
+                    <TextBox Text="{Binding OutputPath, Mode=TwoWay}" IsEnabled="{Binding CanEditPlan}" TextWrapping="Wrap"
+                             AutomationProperties.Name="{Binding Localization[Output]}" />
+                    <ItemsControl ItemsSource="{Binding Tracks}" IsEnabled="{Binding CanEditPlan}">
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="viewModels:TrackViewModel">
+                          <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" Margin="0,4">
+                            <CheckBox IsChecked="{Binding Keep, Mode=TwoWay}" IsEnabled="{Binding IsSelectable}"
+                                      Content="{Binding Localization[Keep]}" AutomationProperties.Name="{Binding KeepAccessibleName}" VerticalAlignment="Top" />
+                            <StackPanel Grid.Column="1" Spacing="3">
+                              <WrapPanel>
+                                <TextBlock Text="{Binding KindText}" FontWeight="SemiBold" Margin="0,0,8,0" />
+                                <TextBlock Text="{Binding Localization[TrackId]}" Margin="0,0,4,0" />
+                                <TextBlock Text="{Binding IdentifierText}" Margin="0,0,8,0" />
+                                <TextBlock Text="{Binding Track.Codec}" Margin="0,0,8,0" />
+                                <TextBlock Text="{Binding LanguageText}" />
+                              </WrapPanel>
+                              <TextBlock Text="{Binding TitleText}" TextWrapping="Wrap" />
+                              <TextBlock Text="{Binding FlagsText}" TextWrapping="Wrap" />
+                              <WrapPanel IsVisible="{Binding IsAudio}">
+                                <TextBlock Text="{Binding Localization[Channels]}" Margin="0,0,4,0" />
+                                <TextBlock Text="{Binding ChannelsText}" />
+                              </WrapPanel>
+                              <TextBlock Text="{Binding Localization[AlwaysKept]}" IsVisible="{Binding IsRequired}" />
+                            </StackPanel>
+                          </Grid>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <CheckBox IsChecked="{Binding ZeroAudioConfirmed, Mode=TwoWay}" IsVisible="{Binding NeedsZeroAudioConfirmation}" IsEnabled="{Binding CanEditPlan}">
+                      <TextBlock Text="{Binding Localization[ConfirmSilent]}" TextWrapping="Wrap" />
+                    </CheckBox>
+                    <TextBlock Text="{Binding PlanTracksText}" TextWrapping="Wrap" IsVisible="{Binding HasPlan}" />
+                    <TextBlock Text="{Binding PlanDefaultAudioText}" TextWrapping="Wrap" IsVisible="{Binding HasPlan}" />
+                    <TextBlock Text="{Binding Localization[SelectionWarning]}" TextWrapping="Wrap" IsVisible="{Binding RemovesDefaultAudio}" />
+                    <TextBlock Text="{Binding ErrorText}" Foreground="Crimson" TextWrapping="Wrap" IsVisible="{Binding HasError}" />
+                    <TextBlock Text="{Binding ErrorReasonText}" TextWrapping="Wrap" IsVisible="{Binding HasError}" />
+                    <TextBlock Text="{Binding PublishedPath}" TextWrapping="Wrap" IsVisible="{Binding HasPublishedPath}" />
+                    <Expander Header="{Binding Localization[Diagnostics]}" IsVisible="{Binding HasDiagnostics}">
+                      <TextBox Text="{Binding Diagnostics}" IsReadOnly="True" TextWrapping="Wrap" MaxHeight="200" />
+                    </Expander>
+                  </StackPanel>
+                </Border>
+              </DataTemplate>
+            </ContentControl.ContentTemplate>
+          </ContentControl>
+
+        </Expander>
+        <Expander Header="{Binding Localization[AggregateAdvanced]}">
+          <StackPanel Spacing="12">
+            <views:RulePresetsView DataContext="{Binding Presets}" />
+            <views:BatchLanguageRulesView DataContext="{Binding LanguageRules}" />
+          </StackPanel>
+        </Expander>
+        <StackPanel IsVisible="{Binding HasZeroAudioItems}" Spacing="8">
+          <TextBlock Text="{Binding Localization[AggregateSilentFiles]}" FontWeight="SemiBold" TextWrapping="Wrap" />
+          <ItemsControl ItemsSource="{Binding ZeroAudioItems}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="viewModels:BatchItemViewModel">
+                <StackPanel Spacing="4">
+                  <TextBlock Text="{Binding SourcePath}" TextWrapping="Wrap" />
+                  <CheckBox IsChecked="{Binding ZeroAudioConfirmed, Mode=TwoWay}" IsEnabled="{Binding CanEditPlan}">
                     <TextBlock Text="{Binding Localization[ConfirmSilent]}" TextWrapping="Wrap" />
                   </CheckBox>
-                  <TextBlock Text="{Binding PlanTracksText}" TextWrapping="Wrap" IsVisible="{Binding HasPlan}" />
-                  <TextBlock Text="{Binding PlanDefaultAudioText}" TextWrapping="Wrap" IsVisible="{Binding HasPlan}" />
-                  <TextBlock Text="{Binding Localization[SelectionWarning]}" TextWrapping="Wrap" IsVisible="{Binding RemovesDefaultAudio}" />
-                  <TextBlock Text="{Binding ErrorText}" Foreground="Crimson" TextWrapping="Wrap" IsVisible="{Binding HasError}" />
-                  <TextBlock Text="{Binding ErrorReasonText}" TextWrapping="Wrap" IsVisible="{Binding HasError}" />
-                  <TextBlock Text="{Binding PublishedPath}" TextWrapping="Wrap" IsVisible="{Binding HasPublishedPath}" />
-                  <Expander Header="{Binding Localization[Diagnostics]}" IsVisible="{Binding HasDiagnostics}">
-                    <TextBox Text="{Binding Diagnostics}" IsReadOnly="True" TextWrapping="Wrap" MaxHeight="200" />
-                  </Expander>
                 </StackPanel>
-              </Border>
-            </DataTemplate>
-          </ContentControl.ContentTemplate>
-        </ContentControl>
-
-        <Button x:Name="ApproveBatchItemButton" Content="{Binding Localization[BatchApproveItem]}" Command="{Binding ApproveSelectedCommand}" HorizontalAlignment="Left" />
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
         <Button x:Name="ReviewBatchButton" Content="{Binding Localization[BatchReviewRemaining]}" Command="{Binding ReviewCommand}" HorizontalAlignment="Left" />
         <Border BorderBrush="{DynamicResource SystemControlHighlightAccentBrush}" BorderThickness="1" CornerRadius="4" Padding="12" IsVisible="{Binding HasReview}">
           <StackPanel Spacing="8">

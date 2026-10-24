@@ -140,11 +140,11 @@
   <data name="ErrorReasonSegmentStructure" xml:space="preserve"><value>Структуру Segment Info невозможно проверить в поддерживаемых пределах. Выберите самостоятельный MKV с конечными размерами элементов; потоковые кластеры и несколько сегментов не поддерживаются.</value></data>
   <data name="SingleWorkflow" xml:space="preserve"><value>Один файл</value></data>
   <data name="BatchWorkflow" xml:space="preserve"><value>Несколько файлов / папка</value></data>
-  <data name="BatchInstructions" xml:space="preserve"><value>Добавьте MKV/MP4 или одну папку. При необходимости включите вложенные папки. Проверьте и подтвердите отдельный план каждого файла, выберите пути результатов, затем проверьте очередь.</value></data>
+  <data name="BatchInstructions" xml:space="preserve"><value>Добавьте один или несколько MKV/MP4 либо папку. Выберите дорожки включённых файлов и назначения, затем проверьте отдельные планы перед запуском.</value></data>
   <data name="BatchLimits" xml:space="preserve"><value>Ограничения: {0} файлов в очереди; {1} просмотренных записей за весь обход папки. При превышении добавление отклоняется целиком.</value></data>
-  <data name="BatchAddFiles" xml:space="preserve"><value>Добавить MKV / MP4…</value></data>
+  <data name="BatchAddFiles" xml:space="preserve"><value>Добавить файлы…</value></data>
   <data name="BatchAddFolder" xml:space="preserve"><value>Добавить папку…</value></data>
-  <data name="BatchFilesDialogTitle" xml:space="preserve"><value>Выберите MKV/MP4 для отдельных планов</value></data>
+  <data name="BatchFilesDialogTitle" xml:space="preserve"><value>Выберите один или несколько файлов MKV/MP4</value></data>
   <data name="BatchFolderDialogTitle" xml:space="preserve"><value>Выберите одну папку с MKV/MP4</value></data>
   <data name="BatchFiles" xml:space="preserve"><value>Файлы очереди (полные пути)</value></data>
   <data name="BatchInclusionHint" xml:space="preserve"><value>У каждого включённого файла должен быть подтверждённый план. Явно исключите или удалите ненужные и ошибочные записи; исключения показаны в обзоре.</value></data>
@@ -153,9 +153,9 @@
   <data name="BatchRemove" xml:space="preserve"><value>Удалить выбранную незапущенную запись</value></data>
   <data name="BatchInspectPending" xml:space="preserve"><value>Проверить ожидающие файлы</value></data>
   <data name="BatchInspectSelected" xml:space="preserve"><value>Повторно проверить выбранный файл</value></data>
-  <data name="BatchSelectedFile" xml:space="preserve"><value>Отдельный выбор дорожек файла</value></data>
+  <data name="BatchSelectedFile" xml:space="preserve"><value>Выбранный файл: сведения и индивидуальные настройки</value></data>
   <data name="BatchApproveItem" xml:space="preserve"><value>Подтвердить план этого файла</value></data>
-  <data name="BatchReviewRemaining" xml:space="preserve"><value>Проверить оставшуюся очередь</value></data>
+  <data name="BatchReviewRemaining" xml:space="preserve"><value>Проверить планы</value></data>
   <data name="BatchReviewedPlans" xml:space="preserve"><value>Проверенные неизменяемые планы к запуску</value></data>
   <data name="BatchExcluded" xml:space="preserve"><value>Явно исключённые файлы (не будут запущены)</value></data>
   <data name="BatchStart" xml:space="preserve"><value>Запустить / продолжить проверенные планы</value></data>
@@ -299,4 +299,18 @@
   <data name="QueueErrorLimitExceeded" xml:space="preserve"><value>Список превышает ограничения хранения. Предыдущий файл сохранён; уменьшите список или длину путей.</value></data>
   <data name="QueueErrorPersistenceUnavailable" xml:space="preserve"><value>Не удалось сохранить или прочитать список. Существующие данные сохранены; восстановление после перезапуска не подтверждено.</value></data>
   <data name="QueueErrorCancelled" xml:space="preserve"><value>Операция со списком отменена. Восстановление после перезапуска не подтверждено.</value></data>
+  <data name="AggregateHeading" xml:space="preserve"><value>Дорожки включённых файлов</value></data>
+  <data name="AggregateNotice" xml:space="preserve"><value>Группы определяются метаданными, а не совпадением содержимого. Раскройте группу для отдельных файлов и исходных флагов. Выбор строки файла не меняет охват.</value></data>
+  <data name="AggregateScope" xml:space="preserve"><value>Включено файлов: {0}; незавершённых проверок: {1}.</value></data>
+  <data name="AggregateUnresolved" xml:space="preserve"><value>Список дорожек неполный. Проверьте, исправьте или явно исключите нерешённые файлы перед проверкой планов.</value></data>
+  <data name="AggregateMembers" xml:space="preserve"><value>Файлы и отдельные дорожки</value></data>
+  <data name="AggregateCoverage" xml:space="preserve"><value>Файлов: {0} из {1}; дорожек: {2}</value></data>
+  <data name="AggregateChannels" xml:space="preserve"><value>Каналы: {0}</value></data>
+  <data name="AggregateAllKept" xml:space="preserve"><value>Все доступные для изменения дорожки сохранены</value></data>
+  <data name="AggregateAllRemoved" xml:space="preserve"><value>Все доступные для изменения дорожки удалены</value></data>
+  <data name="AggregateMixed" xml:space="preserve"><value>Разные состояния сохранения</value></data>
+  <data name="AggregateHistorical" xml:space="preserve"><value>Завершённый результат — выбор заблокирован</value></data>
+  <data name="AggregateEditable" xml:space="preserve"><value>Выбор для отдельного файла</value></data>
+  <data name="AggregateAdvanced" xml:space="preserve"><value>Дополнительно: правила и переносимые пресеты</value></data>
+  <data name="AggregateSilentFiles" xml:space="preserve"><value>Подтвердите каждый файл, который останется без аудио</value></data>
 </root>

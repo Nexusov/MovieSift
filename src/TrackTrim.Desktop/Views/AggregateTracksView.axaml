@@ -1,0 +1,68 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:viewModels="using:TrackTrim.Desktop.ViewModels"
+             x:Class="TrackTrim.Desktop.Views.AggregateTracksView"
+             x:DataType="viewModels:AggregateTracksViewModel">
+  <StackPanel Spacing="8">
+    <TextBlock Text="{Binding Localization[AggregateHeading]}" FontWeight="SemiBold" />
+    <TextBlock Text="{Binding Localization[AggregateNotice]}" TextWrapping="Wrap" Opacity="0.8" />
+    <TextBlock x:Name="AggregateScopeText" Text="{Binding ScopeText}" TextWrapping="Wrap" />
+    <StackPanel IsVisible="{Binding HasUnresolved}" Spacing="4">
+      <TextBlock Text="{Binding Localization[AggregateUnresolved]}" TextWrapping="Wrap" Foreground="Crimson" />
+      <TextBlock Text="{Binding UnresolvedText}" TextWrapping="Wrap" />
+    </StackPanel>
+    <ItemsControl x:Name="AggregateTrackList" ItemsSource="{Binding Groups}">
+      <ItemsControl.ItemTemplate>
+        <DataTemplate x:DataType="viewModels:AggregateTrackGroupViewModel">
+          <Border Padding="10" Margin="0,4" BorderThickness="1" CornerRadius="4"
+                  BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}">
+            <StackPanel Spacing="6">
+              <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                <CheckBox IsChecked="{Binding Keep, Mode=OneWay}" IsThreeState="True"
+                          Command="{Binding ToggleKeepCommand}" IsEnabled="{Binding CanEdit}"
+                          Content="{Binding Localization[Keep]}" VerticalAlignment="Top"
+                          AutomationProperties.Name="{Binding KeepAccessibleName}" />
+                <StackPanel Grid.Column="1" Spacing="3">
+                  <WrapPanel>
+                    <TextBlock Text="{Binding KindText}" FontWeight="SemiBold" Margin="0,0,8,0" />
+                    <TextBlock Text="{Binding LanguageText}" Margin="0,0,8,0" />
+                    <TextBlock Text="{Binding CodecText}" Margin="0,0,8,0" />
+                    <TextBlock Text="{Binding ChannelsText}" />
+                  </WrapPanel>
+                  <TextBlock Text="{Binding TitleText}" TextWrapping="Wrap" />
+                  <TextBlock Text="{Binding CoverageText}" TextWrapping="Wrap" />
+                  <TextBlock Text="{Binding ChoiceText}" TextWrapping="Wrap" />
+                  <TextBlock Text="{Binding Localization[AlwaysKept]}" IsVisible="{Binding IsRequired}" />
+                  <TextBlock Text="{Binding LanguageIssueText}" IsVisible="{Binding HasLanguageIssue}" TextWrapping="Wrap" />
+                </StackPanel>
+              </Grid>
+              <Expander Header="{Binding Localization[AggregateMembers]}" IsExpanded="{Binding IsExpanded, Mode=TwoWay}">
+                <ItemsControl ItemsSource="{Binding Members}" HorizontalAlignment="Stretch">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="viewModels:AggregateTrackMemberViewModel">
+                      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" Margin="0,6">
+                        <CheckBox IsChecked="{Binding Keep, Mode=TwoWay}" IsEnabled="{Binding CanEdit}"
+                                  Content="{Binding Localization[Keep]}" VerticalAlignment="Top" />
+                        <StackPanel Grid.Column="1" Spacing="3">
+                          <TextBlock Text="{Binding SourcePath}" TextWrapping="Wrap" />
+                          <WrapPanel>
+                            <TextBlock Text="{Binding Localization[TrackId]}" Margin="0,0,4,0" />
+                            <TextBlock Text="{Binding IdentifierText}" Margin="0,0,8,0" />
+                            <TextBlock Text="{Binding LanguageText}" />
+                          </WrapPanel>
+                          <TextBlock Text="{Binding TitleText}" TextWrapping="Wrap" />
+                          <TextBlock Text="{Binding FlagsText}" TextWrapping="Wrap" />
+                          <TextBlock Text="{Binding StateText}" TextWrapping="Wrap" />
+                        </StackPanel>
+                      </Grid>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </Expander>
+            </StackPanel>
+          </Border>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+  </StackPanel>
+</UserControl>
