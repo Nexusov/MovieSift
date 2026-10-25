@@ -35,6 +35,9 @@ public sealed class BatchNewBatchTests
             var cleanupCount = fixture.Outputs.CleanupCount;
             var workerCount = fixture.Backend.RemuxRequests.Count;
             Assert.All(completed.Items, item => Assert.NotNull(item.Result!.PublishedPath));
+            var options = view.FindControl<Button>("WorkspaceOptions")!;
+            options.Flyout!.ShowAt(options);
+            Dispatcher.UIThread.RunJobs();
             var newBatch = view.FindControl<Button>("NewBatchButton")!;
             Assert.Equal(fixture.Localization["BatchNew"], newBatch.Content);
             Assert.True(newBatch.IsEffectivelyEnabled);
@@ -42,7 +45,7 @@ public sealed class BatchNewBatchTests
             Dispatcher.UIThread.RunJobs();
             Assert.True(view.FindControl<Border>("NewBatchConfirmation")!.IsVisible);
             Assert.Same(completed, fixture.Batch.Snapshot);
-            Assert.False(fixture.Main.OpenSourceCommand.CanExecute(null));
+            Assert.False(fixture.Batch.AddFilesCommand.CanExecute(null));
             Assert.False(fixture.Batch.AddFilesCommand.CanExecute(null));
             var confirm = view.FindControl<Button>("ConfirmNewBatchButton")!;
             Assert.Equal(fixture.Localization["BatchNewConfirm"], confirm.Content);
@@ -59,7 +62,7 @@ public sealed class BatchNewBatchTests
             Assert.False(fixture.Batch.IsProgressIndeterminate);
             Assert.False(fixture.Batch.RunCommand.CanExecute(null));
             Assert.True(fixture.Batch.AddFilesCommand.CanExecute(null));
-            Assert.True(fixture.Main.OpenSourceCommand.CanExecute(null));
+            Assert.True(fixture.Batch.AddFilesCommand.CanExecute(null));
             Assert.Equal(folder, fixture.Batch.OutputFolder);
             Assert.Equal(language, fixture.Localization.Language);
             Assert.Equal(language, fixture.Settings.Language);
@@ -74,9 +77,12 @@ public sealed class BatchNewBatchTests
                 Assert.All(item.Tracks, track => Assert.True(track.Keep));
                 Assert.Equal(folder, Path.GetDirectoryName(item.OutputPath));
             });
-            await fixture.Batch.ReviewCommand.ExecuteAsync(null);
             Assert.False(fixture.Batch.HasReview);
             Assert.False(fixture.Batch.RunCommand.CanExecute(null));
+            await fixture.Batch.ReviewCommand.ExecuteAsync(null);
+            Assert.True(fixture.Batch.HasReview);
+            Assert.True(fixture.Batch.RunCommand.CanExecute(null));
+            Assert.All(fixture.Batch.Items, item => Assert.True(item.ApprovedPlan!.IsNoChange));
             Assert.Equal(workerCount, fixture.Backend.RemuxRequests.Count);
         }
         finally
@@ -137,11 +143,11 @@ public sealed class BatchNewBatchTests
         Assert.Equal(0, fixture.Outputs.CleanupCount);
     }
 
-    /// <summary>Blocks reset during owned preparation and during a conflicting single-file operation.</summary>
+    /// <summary>Blocks reset during owned discovery and reinspection without detaching either operation.</summary>
     [AvaloniaTheory]
     [InlineData(false)]
     [InlineData(true)]
-    public async Task ActiveInspectionDisablesNewBatchWithoutDetachingWork(bool singleFile)
+    public async Task ActiveInspectionDisablesNewBatchWithoutDetachingWork(bool discovering)
     {
         var fixture = new BatchViewModelFixture();
         await fixture.PrepareAsync();
@@ -152,7 +158,13 @@ public sealed class BatchNewBatchTests
             entered.TrySetResult();
             await release.Task.WaitAsync(request.CancellationToken);
         };
-        var operation = singleFile ? fixture.Main.OpenSourceCommand.ExecuteAsync(null) : fixture.Batch.InspectSelectedCommand.ExecuteAsync(null);
+        fixture.Discovery.OnDiscover = async request =>
+        {
+            entered.TrySetResult();
+            await release.Task.WaitAsync(request.CancellationToken);
+            return new([], []);
+        };
+        var operation = discovering ? fixture.Batch.AddFilesCommand.ExecuteAsync(null) : fixture.Batch.InspectSelectedCommand.ExecuteAsync(null);
 
         try
         {
@@ -200,27 +212,28 @@ public sealed class BatchNewBatchTests
         Assert.Single(fixture.Backend.RemuxRequests);
     }
 
-    /// <summary>Keeps the shared workspace unavailable after uncertain single-file publication even if cleanup succeeds.</summary>
+    /// <summary>Keeps uncertain publication evidence in its unified queue until an explicit safety decision.</summary>
     [AvaloniaFact]
-    public async Task UncertainSinglePublicationBlocksResetOfExistingBatch()
+    public async Task UncertainPublicationBlocksResetOfExistingBatch()
     {
         var fixture = new BatchViewModelFixture();
         await fixture.PrepareAsync();
-        var batch = fixture.Batch.Snapshot;
-        await fixture.Main.OpenSourceCommand.ExecuteAsync(null);
-        fixture.Main.OutputPath = Path.Combine(fixture.Batch.OutputFolder, "single-publication.mkv");
-        fixture.Main.Tracks.Single(track => track.Track.Kind == TrackKind.Subtitles).Keep = false;
-        fixture.Main.ReviewPlanCommand.Execute(null);
+        var activeItem = fixture.Batch.Items[0];
+        activeItem.OutputPath = Path.Combine(fixture.Batch.OutputFolder, "uncertain-publication.mkv");
+        await fixture.Batch.ReviewCommand.ExecuteAsync(null);
         fixture.Outputs.PublicationFailure = new(ErrorCode.PublicationUncertain, "Synthetic publication uncertainty");
-        await fixture.Main.RunCommand.ExecuteAsync(null);
+        await fixture.Batch.RunCommand.ExecuteAsync(null);
+        var batch = fixture.Batch.Snapshot;
+
         Assert.False(fixture.Main.HasCleanupIssue);
         Assert.True(fixture.Main.RequiresCloseDecision);
         Assert.Equal(fixture.Localization["ErrorPublicationUncertain"], fixture.Main.CloseDecisionText);
-        Assert.Contains("Synthetic publication uncertainty", fixture.Main.Diagnostics);
+        Assert.Contains("Synthetic publication uncertainty", activeItem.Diagnostics);
         Assert.False(fixture.Batch.NewBatchCommand.CanExecute(null));
         fixture.Batch.NewBatchCommand.Execute(null);
         Assert.Same(batch, fixture.Batch.Snapshot);
         Assert.False(fixture.Batch.HasNewBatchConfirmation);
+        Assert.Equal(BatchItemState.Ready, fixture.Batch.Items[1].Snapshot.State);
         Assert.Single(fixture.Backend.RemuxRequests);
         Assert.Equal(1, fixture.Outputs.CleanupCount);
     }

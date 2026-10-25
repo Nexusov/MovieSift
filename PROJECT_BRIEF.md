@@ -10,7 +10,7 @@ Build a maintainable, open-source Windows/Linux desktop application that removes
 
 Use remuxing: copy the retained encoded streams into a new file without re-encoding. Preserve the input container type in supported workflows. Implement application logic around existing command-line tools; do not implement codecs, a muxer, or a media-player engine.
 
-The first public release is intended to support a documented subset of MKV and MP4, multiple-file/folder input, manual selections, reusable rules, preview, a sequential queue, cancellation, and new-file output. The current implementation task covers **Phase 0 and Phase 1 only**: a verified foundation and one complete MKV workflow. Roadmap requirements do not authorize implementing later phases early.
+The first public release is intended to support a documented subset of MKV and MP4, multiple-file/folder input, manual selections, reusable rules, preview, a sequential queue, cancellation, and new-file output. The initial implementation task covered **Phase 0 and Phase 1 only**. Later explicitly authorized deliveries completed the Phase 2/3 implementation; the current finite release-candidate scope is recorded in `docs/PLAN.md`. Roadmap requirements alone do not authorize new features or public publication.
 
 The application must ship as portable archives, without an installer, administrator rights, separately installed .NET, or separately installed media tools on the declared supported systems. English and Russian are mandatory UI languages. The first launch uses English regardless of operating-system language. Users can switch languages in the running application and persist their choice.
 
@@ -222,7 +222,7 @@ Native AOT, trimming, single-file publishing, and an application AppImage are la
 
 ## 10. Licensing and provenance
 
-Preserve an existing repository license. MIT remains a proposed simple choice for original application code; do not silently assign a new public license or invent author details. Unresolved license selection does not block ordinary local implementation, but it remains a public-release item.
+Preserve the repository's operative license. Following the explicit owner decision on 2026-10-23, original TrackTrim code uses MIT with `Copyright (c) 2026 Nexusov`; see `LICENSE` and `docs/license-decision.md`. Do not extend that grant to third-party material or invent further author details. Public release authorization and covered-source delivery remain separate requirements.
 
 MKVToolNix states GPL v2 licensing and lists included components separately. FFmpeg's effective license depends on its build configuration. Executing a separate tool does not remove obligations for redistributing that tool. Do not infer either that every shipped file is MIT or that launching a GPL executable automatically determines the original C# application's license.
 

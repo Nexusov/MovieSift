@@ -8,6 +8,10 @@
     "checksumUrl": "https://mkvtoolnix.download/sources/mkvtoolnix-102.0.tar.xz.sha256"
   },
   "win-x64": {
+    "kind": "source-build",
+    "buildLock": "mkv-source.lock.json",
+    "recipe": "build-mkv-windows.sh",
+    "historicalBinaryNote": "The following official ZIP identity is historical research only. Acquisition requires the verified same-version source-built worker/material directory; there is no binary fallback.",
     "url": "https://mkvtoolnix.download/windows/releases/102.0/mkvtoolnix-64-bit-102.0.zip",
     "sha256": "c02e918900f6d945d9307b426237e456378b79a200589ac6928de39064409a44",
     "checksumUrl": "https://mkvtoolnix.download/windows/releases/102.0/sha256sums.txt"

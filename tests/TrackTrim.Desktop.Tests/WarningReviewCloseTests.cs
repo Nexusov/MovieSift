@@ -41,7 +41,7 @@ public sealed class WarningReviewCloseTests
         }
         finally
         {
-            await viewModel.DiscardWarningsCommand.ExecuteAsync(null);
+            await fixture.Workspace.DiscardWarningsCommand.ExecuteAsync(null);
             window.Close();
         }
     }
@@ -63,7 +63,7 @@ public sealed class WarningReviewCloseTests
             discardButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             await fixture.Outputs.CleanupStarted.Task.WaitAsync(TimeSpan.FromSeconds(5));
             Assert.True(window.IsVisible);
-            Assert.True(fixture.ViewModel.IsBusy);
+            Assert.True(fixture.Workspace.IsBusy);
             window.Close();
             window.Close();
             discardButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
@@ -96,17 +96,17 @@ public sealed class WarningReviewCloseTests
         window.Close();
         var discardButton = window.FindControl<Button>("DiscardWarningsAndCloseButton")!;
         discardButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-        await viewModel.DiscardWarningsCommand.ExecutionTask!.WaitAsync(TimeSpan.FromSeconds(5));
+        await fixture.Workspace.DiscardWarningsCommand.ExecutionTask!.WaitAsync(TimeSpan.FromSeconds(5));
         Dispatcher.UIThread.RunJobs();
         Assert.True(window.IsVisible);
         Assert.True(viewModel.HasCleanupIssue);
-        Assert.Contains(failureDetail, viewModel.Diagnostics);
-        Assert.Contains("временные файлы удалены не полностью", viewModel.StatusText);
+        Assert.Contains(failureDetail, fixture.Item.Diagnostics);
+        Assert.True(fixture.Workspace.HasCleanupIssue);
         Assert.Equal(1, fixture.Outputs.CleanupCount);
         Assert.Equal(1, fixture.Backend.RemuxCount);
         discardButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
         Assert.Equal(1, fixture.Outputs.CleanupCount);
-        window.Close();
+        window.FindControl<Button>("CloseDespiteUncertaintyButton")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
     }
 
     /// <summary>Runs the real application coordinator into verified warning review using deterministic ports.</summary>
@@ -117,10 +117,15 @@ public sealed class WarningReviewCloseTests
         window.Show();
         await fixture.LoadAsync();
         fixture.Backend.ExitCode = 1;
-        viewModel.Tracks[1].Keep = false;
-        viewModel.ReviewPlanCommand.Execute(null);
-        await viewModel.RunCommand.ExecuteAsync(null);
+        fixture.Item.Tracks[1].Keep = false;
+        await fixture.Workspace.ReviewCommand.ExecuteAsync(null);
+        viewModel.ToggleAppearanceCommand.Execute(null);
+        Assert.True(viewModel.IsAppearanceOpen);
+        await fixture.Workspace.RunCommand.ExecuteAsync(null);
         Assert.True(viewModel.HasWarningCandidate);
+        Assert.False(viewModel.IsAppearanceOpen);
+        Assert.True(viewModel.HasPendingMediaDecision);
+        Assert.True(viewModel.ToggleAppearanceCommand.CanExecute(null));
         return window;
     }
 }

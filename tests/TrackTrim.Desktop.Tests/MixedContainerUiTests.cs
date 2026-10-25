@@ -38,7 +38,7 @@ public sealed class MixedContainerUiTests
         try
         {
             var add = view.FindControl<Button>("AddBatchFilesButton")!;
-            var approve = view.FindControl<Button>("ApproveBatchItemButton")!;
+            var reviewButton = view.FindControl<Button>("ReviewBatchButton")!;
 
             foreach (var language in new[] { "ru", "en" })
             {
@@ -47,8 +47,8 @@ public sealed class MixedContainerUiTests
                 Dispatcher.UIThread.RunJobs();
 
                 Assert.Equal(fixture.Localization["BatchAddFiles"], add.Content);
-                Assert.Equal(fixture.Localization["BatchApproveItem"], approve.Content);
-                Assert.Contains("MP4", add.Content!.ToString(), StringComparison.Ordinal);
+                Assert.Equal(fixture.Localization["BatchReviewRemaining"], reviewButton.Content);
+                Assert.Equal(MediaContainer.Mp4, fixture.Batch.Items[1].Snapshot.Inspection!.Container);
                 Assert.Same(review, fixture.Batch.Snapshot.Review);
                 Assert.Equal(paths, fixture.Batch.Items.Select(item => item.OutputPath));
 

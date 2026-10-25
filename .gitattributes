@@ -1,2 +1,5 @@
 * text=auto eol=lf
 *.png binary
+
+# Preserve hash-bound upstream notices/configuration, including their original whitespace.
+build/third-party-notices/** -text -whitespace

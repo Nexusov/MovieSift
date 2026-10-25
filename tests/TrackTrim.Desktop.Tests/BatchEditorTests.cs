@@ -55,7 +55,7 @@ public sealed class BatchEditorTests
             Dispatcher.UIThread.RunJobs();
 
             Assert.Equal("ru", fixture.Settings.Language);
-            Assert.Equal(fixture.Localization["BatchStart"], view.FindControl<Button>("StartBatchButton")!.Content);
+            Assert.Equal(fixture.Batch.RunActionText, Assert.Single(view.GetVisualDescendants().OfType<Button>(), button => button.Name == "StartBatchButton").Content);
             Assert.Equal(fixture.Localization["BatchAddFiles"], view.FindControl<Button>("AddBatchFilesButton")!.Content);
             Assert.Same(firstPlan, first.ApprovedPlan);
             Assert.Same(secondPlan, second.ApprovedPlan);
@@ -231,7 +231,7 @@ public sealed class BatchEditorTests
 
     /// <summary>Keeps failed evidence visible while an explicitly excluded item no longer blocks remaining work.</summary>
     [AvaloniaFact]
-    public async Task FailedRunRequiresExclusionAndCompletedRowsCannotBeEdited()
+    public async Task FailedRunCanBeExplicitlyExcludedAndCompletedRowsCannotBeEdited()
     {
         var fixture = new BatchViewModelFixture();
         await fixture.PrepareAsync();
@@ -244,8 +244,8 @@ public sealed class BatchEditorTests
         Assert.True(first.HasError);
         Assert.Equal(BatchItemState.Ready, second.Snapshot.State);
         Assert.Single(fixture.Backend.RemuxRequests);
-        await fixture.Batch.ReviewCommand.ExecuteAsync(null);
         Assert.False(fixture.Batch.HasReview);
+        Assert.False(fixture.Batch.RunCommand.CanExecute(null));
         first.Included = false;
         await fixture.Batch.ReviewCommand.ExecuteAsync(null);
         await fixture.Batch.RunCommand.ExecuteAsync(null);
@@ -417,7 +417,6 @@ public sealed class BatchEditorTests
             Height = MinimumWindowHeight
         };
         window.Show();
-        window.GetVisualDescendants().OfType<TabControl>().Single().SelectedIndex = 1;
         await fixture.Main.ChangeLanguageCommand.ExecuteAsync(language);
         var run = fixture.Batch.RunCommand.ExecuteAsync(null);
 
@@ -437,7 +436,7 @@ public sealed class BatchEditorTests
             Assert.DoesNotContain(cancel.GetVisualAncestors(), ancestor => ancestor is ScrollViewer);
             Assert.True(point.Value.Y >= 0);
             Assert.True(point.Value.Y + cancel.Bounds.Height <= window.ClientSize.Height + LayoutTolerance);
-            var scroll = view.GetVisualDescendants().OfType<ScrollViewer>().Single(viewer => viewer.Content is StackPanel);
+            var scroll = view.FindControl<ScrollViewer>("WorkspaceScrollViewer")!;
             Assert.True(scroll.Extent.Height > scroll.Viewport.Height);
         }
         finally
@@ -494,7 +493,10 @@ public sealed class BatchEditorTests
         Assert.False(fixture.Batch.HasReview);
         Assert.False(fixture.Batch.RunCommand.CanExecute(null));
         await fixture.Batch.ReviewCommand.ExecuteAsync(null);
-        Assert.False(fixture.Batch.HasReview);
+        Assert.True(fixture.Batch.HasReview);
+        Assert.True(fixture.Batch.RunCommand.CanExecute(null));
+        Assert.All(fixture.Batch.Items, item => Assert.Equal(BatchItemState.Ready, item.Snapshot.State));
+        Assert.All(fixture.Batch.Items, item => Assert.NotNull(item.ApprovedPlan));
         Assert.Single(fixture.Backend.RemuxRequests);
     }
 

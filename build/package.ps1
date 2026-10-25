@@ -8,6 +8,7 @@ param(
     [string] $Mp4FixturePath,
     [string] $ToolCacheDirectory = (Join-Path $PSScriptRoot '../artifacts/downloads'),
     [string] $Dotnet = 'dotnet',
+    [string] $WindowsMkvBuildDirectory = $env:TRACKTRIM_WINDOWS_MKV_BUILD_DIRECTORY,
     [switch] $Overwrite
 )
 
@@ -62,21 +63,25 @@ try {
         throw 'Self-contained publish failed.'
     }
 
-    & (Join-Path $PSScriptRoot 'acquire-tools.ps1') -RuntimeIdentifier $RuntimeIdentifier -Destination (Join-Path $packageRoot 'tools') -CacheDirectory $ToolCacheDirectory
+    & (Join-Path $PSScriptRoot 'acquire-tools.ps1') -RuntimeIdentifier $RuntimeIdentifier -Destination (Join-Path $packageRoot 'tools') -CacheDirectory $ToolCacheDirectory -WindowsMkvBuildDirectory $WindowsMkvBuildDirectory
     New-Item -ItemType Directory -Path (Join-Path $packageRoot 'data') -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $packageRoot 'portable.flag') -Value 'TrackTrim portable data policy version 1' -Encoding utf8NoBOM
     $licenseRoot = Join-Path $packageRoot 'licenses'
     New-Item -ItemType Directory -Path $licenseRoot -Force | Out-Null
 
-    foreach ($document in @('README.md', 'THIRD_PARTY_NOTICES.md', 'CONTRIBUTING.md')) {
+    foreach ($document in @('LICENSE', 'README.md', 'THIRD_PARTY_NOTICES.md', 'CONTRIBUTING.md')) {
         Copy-Item -LiteralPath (Join-Path $repositoryRoot $document) -Destination $packageRoot
     }
 
     Copy-Item -LiteralPath (Join-Path $repositoryRoot 'docs') -Destination $packageRoot -Recurse
     Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'tools.lock.json') -Destination (Join-Path $packageRoot 'tool-provenance.json')
-    Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'ffmpeg.lock.json') -Destination (Join-Path $packageRoot 'ffmpeg-provenance.json')
+
+    if ($WindowsMkvBuildDirectory) {
+        Copy-Item -LiteralPath (Join-Path $packageRoot 'tools/mkv-source-provenance.json') -Destination (Join-Path $packageRoot 'mkv-source-provenance.json')
+    }
+
+    Copy-Item -LiteralPath (Join-Path $packageRoot 'tools/ffmpeg-provenance.json') -Destination (Join-Path $packageRoot 'ffmpeg-provenance.json')
     & (Join-Path $PSScriptRoot 'collect-licenses.ps1') -AssetsFile (Join-Path $repositoryRoot 'src/TrackTrim.Desktop/obj/project.assets.json') -Destination (Join-Path $licenseRoot 'nuget') -AdditionalPackages @("Microsoft.NETCore.App.Runtime.$RuntimeIdentifier/$runtimeVersion") -CacheDirectory (Join-Path $ToolCacheDirectory 'license-materials')
-    Set-Content -LiteralPath (Join-Path $licenseRoot 'APPLICATION-LICENSE-PENDING.txt') -Encoding utf8NoBOM -Value 'No license for original TrackTrim code has been selected. These are review/test artifacts, not public release artifacts. Consult THIRD_PARTY_NOTICES.md for outstanding corresponding-source and redistribution work.'
     $runtimeConfiguration = Get-Content -LiteralPath (Join-Path $packageRoot 'TrackTrim.runtimeconfig.json') -Raw | ConvertFrom-Json
     $shippedRuntime = $runtimeConfiguration.runtimeOptions.includedFrameworks | Where-Object name -EQ 'Microsoft.NETCore.App'
 

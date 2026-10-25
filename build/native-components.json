@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "scope": "Pinned upstream byte/source observations checked on 2026-10-20. Reconcile with actual package inventory; this is not a complete source/build/license attestation.",
+  "scope": "Pinned upstream observations, extended by complete-byte RPM/SDK matches and exact CLI-only payload selection. Official Windows worker observations remain historical; replacement inventories use their actual mkvSourceBuildEvidence instead. Linux payload research is unchanged. Source/build provenance is not legal approval.",
   "pinnedTools": {
     "win-x64": "c02e918900f6d945d9307b426237e456378b79a200589ac6928de39064409a44",
     "linux-x64": "c66345b30d6d5fd640ea982ab5e202a99b9f541a20e42aa19edd90f3ddd5dc9b"
@@ -145,6 +145,7 @@
       "component": "mkvmerge.exe",
       "runtimeIdentifier": "win-x64",
       "kind": "tool-binary-observation",
+      "scope": "Historical official Windows ZIP only; not attributed to the source-built replacement.",
       "paths": [
         "tools/mkvmerge.exe"
       ],
@@ -220,6 +221,7 @@
       "component": "mkvextract.exe",
       "runtimeIdentifier": "win-x64",
       "kind": "tool-binary-observation",
+      "scope": "Historical official Windows ZIP only; not attributed to the source-built replacement.",
       "paths": [
         "tools/mkvextract.exe"
       ],
@@ -310,25 +312,46 @@
     },
     {
       "component": "FLAC library",
-      "version": "1.3.2",
-      "versionEvidence": "Embedded reference libFLAC1.3.2 20170101 banner.",
+      "version": "1.3.2-9.el8_8.1",
+      "versionEvidence": "Every listed shipped library is an exact complete-byte SHA256 match to this primary distribution binary RPM; its SourceRPM header identifies this complete source RPM containing upstream sources, downstream patches and RPM build specification.",
       "upstreamLicenseFamily": "BSD-3-Clause for libFLAC; other FLAC distribution files have other terms",
-      "primarySourceUrl": "https://github.com/xiph/flac/blob/1.3.2/COPYING.Xiph",
+      "primarySourceUrl": "https://repo.almalinux.org/vault/8/AppStream/Source/Packages/flac-1.3.2-9.el8_8.1.src.rpm",
       "runtimeIdentifier": "linux-x64",
       "kind": "tool-library-observation",
       "paths": [
         "tools/app-root/usr/lib/libFLAC.so.8"
       ],
-      "missing": [
-        "Exact source package/revision including distribution patches for this binary build.",
-        "Build/configuration material and applicable license/copyright notices for the retained build."
-      ],
+      "missing": [],
       "primaryLocationCheck": {
         "checkedUtc": "2026-10-19T21:35:06.180284+00:00",
         "httpStatus": 200,
         "result": "retrieved; not proof of exact binary source"
       },
-      "versionStatus": "Observed upstream/base version; exact downstream patches and build identity remain unresolved"
+      "versionStatus": "Exact downstream source RPM revision, established by complete shipped-file hash match to its primary binary RPM and SourceRPM header.",
+      "sourcePackageEvidence": {
+        "url": "https://repo.almalinux.org/vault/8/AppStream/Source/Packages/flac-1.3.2-9.el8_8.1.src.rpm",
+        "sha256": "102d79b5115f01993a9d9e4a9096b7f9609d76399400d35eaad5c34cefccb736",
+        "binaryEvidence": {
+          "url": "https://repo.almalinux.org/almalinux/8.10/AppStream/x86_64/os/Packages/flac-libs-1.3.2-9.el8_8.1.x86_64.rpm",
+          "sha256": "eb76f5c999ef91f886eb807b8619bb5edb96daa25d9b98421264ca03e84be79e",
+          "sourceRpmHeader": "flac-1.3.2-9.el8_8.1.src.rpm"
+        },
+        "shippedFiles": [
+          {
+            "path": "app-root/usr/lib/libFLAC.so.8",
+            "sha256": "fe38be45263368b5103c2d32f879c64cb6c410a7d4e935e6e4a373e86749d358",
+            "size": 372016
+          }
+        ]
+      },
+      "availableMaterials": [
+        "tools/licenses/corresponding-source/almalinux/flac-1.3.2-9.el8_8.1.src.rpm",
+        "tools/licenses/upstream-terms/almalinux/flac-libs/1.3.2-9.el8_8.1/COPYING.FDL",
+        "tools/licenses/upstream-terms/almalinux/flac-libs/1.3.2-9.el8_8.1/COPYING.GPL",
+        "tools/licenses/upstream-terms/almalinux/flac-libs/1.3.2-9.el8_8.1/COPYING.LGPL",
+        "tools/licenses/upstream-terms/almalinux/flac-libs/1.3.2-9.el8_8.1/COPYING.Xiph"
+      ],
+      "evidenceLimits": "The complete source RPM includes upstream sources, distribution patches and RPM build specification. No bit-for-bit rebuild is claimed; incidental compiler history is not treated as a separate blanket source obligation."
     },
     {
       "component": "libglvnd GLES wrapper",
@@ -377,7 +400,7 @@
     {
       "component": "Qt Core",
       "version": "6.6.1",
-      "versionEvidence": "QtCore's embedded build string identifies6.6.1; retained Qt modules carry .qtversion0x060601. Individual hash/build-ID recorded. This does not identify downstream patches.",
+      "versionEvidence": "Complete shipped QtCore SHA256/size matches official Qt6.6.1 SDK member, not only the SONAME. Actual SDK qconfig.pri and complete QtBase source are included.",
       "upstreamLicenseFamily": "Module/file-specific Qt commercial / LGPL-3.0-only / GPL-2.0-only / GPL-3.0-only alternatives; verify module",
       "primarySourceUrl": "https://raw.githubusercontent.com/qt/qtbase/v6.6.1/src/corelib/global/qglobal.h",
       "runtimeIdentifier": "linux-x64",
@@ -386,16 +409,43 @@
         "tools/app-root/usr/lib/libQt6Core.so.6"
       ],
       "missing": [
-        "Exact source package/revision including distribution patches for this binary build.",
-        "Build/configuration material and applicable license/copyright notices for the retained build.",
-        "Exact Qt build configure summary/features and Qt third-party attribution/source closure; Qt tag alone is not the binary build receipt."
+        "Deliver the collected complete QtBase source/build material and applicable notices with the eventual public release under Core's GPL2 alternative. No additional missing Core source, patch or relink-object artifact was identified; the SDK Enterprise label does not remove the source's alternative terms."
       ],
       "primaryLocationCheck": {
         "checkedUtc": "2026-10-19T21:35:07.395885+00:00",
         "httpStatus": 200,
         "result": "retrieved; not proof of exact binary source"
       },
-      "versionStatus": "Observed upstream/base version; exact downstream patches and build identity remain unresolved"
+      "versionStatus": "Exact official SDK binary match; complete QtBase source and SDK configuration collected. Selected GPL2 alternative and public material-delivery requirement recorded in release-distribution-closure.md.",
+      "sourcePackageEvidence": {
+        "component": "Qt Core",
+        "version": "6.6.1",
+        "runtimeIdentifier": "linux-x64",
+        "url": "https://download.qt.io/archive/qt/6.6/6.6.1/submodules/qtbase-everywhere-src-6.6.1.tar.xz",
+        "sha256": "450c5b4677b2fe40ed07954d7f0f40690068e80a94c9df86c2c905ccd59d02f7",
+        "path": "Qt-Core/6.6.1/qtbase-everywhere-src-6.6.1.tar.xz",
+        "outputDirectory": "corresponding-source",
+        "kind": "upstream-source-archive",
+        "relationship": "Complete upstream QtBase6.6.1 source/build material, including bundled third-party sources/notices. Shipped QtCore matches the official Qt6.6.1 SDK binary byte-for-byte. The candidate selects Core's GPL2 alternative with the GPL2 MKV worker; actual public source/notice delivery remains required. No additional missing Core source, patch or relink-object artifact was identified.",
+        "correspondsTo": [
+          {
+            "path": "app-root/usr/lib/libQt6Core.so.6",
+            "sha256": "1bf4d869aebd556e51eee1832f7ce534c219bfd5405b6a2e7999a4cd9293c134",
+            "size": 7069680
+          }
+        ],
+        "binaryEvidence": {
+          "url": "https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_661/qt.qt6.661.gcc_64/6.6.1-0-202311210527qtbase-Linux-RHEL_8_8-GCC-Linux-RHEL_8_8-X86_64.7z",
+          "sha256": "dc4ca5bc239e6bd3d0405e62a4e7cd080a2c0ae2a612f097fac9dab127168bdb",
+          "member": "6.6.1/gcc_64/lib/libQt6Core.so.6.6.1"
+        }
+      },
+      "availableMaterials": [
+        "tools/licenses/corresponding-source/Qt-Core/6.6.1/qtbase-everywhere-src-6.6.1.tar.xz",
+        "tools/licenses/upstream-terms/Qt-Core/6.6.1/sdk-qconfig.pri",
+        "tools/licenses/upstream-terms/Qt-Core/6.6.1/LICENSES/LGPL-3.0-only.txt",
+        "tools/licenses/upstream-terms/Qt-Core/6.6.1/LICENSES/GPL-2.0-only.txt"
+      ]
     },
     {
       "component": "Qt DBus",
@@ -798,15 +848,16 @@
         "tools/app-root/usr/lib/libboost_filesystem.a",
         "tools/app-root/usr/lib/libboost_system.a"
       ],
-      "missing": [
-        "Exact source package/revision including distribution patches for this binary build.",
-        "Build/configuration material and applicable license/copyright notices for the retained build."
-      ],
+      "missing": [],
       "primaryLocationCheck": {
         "checkedUtc": "2026-10-19T21:35:08.340801+00:00",
         "httpStatus": 200,
         "result": "retrieved; not proof of exact binary source"
-      }
+      },
+      "availableMaterials": [
+        "tools/licenses/upstream-terms/runtime-notices/Boost-1.85.0-LICENSE.txt"
+      ],
+      "evidenceLimits": "The exact Boost source-build revision is still unproved. BSL1.0 exempts solely machine-executable object code from its notice-copy condition; full corresponding source/compiler history is not a blanket binary obligation. Unused static archives are omitted by the exact payload policy."
     },
     {
       "component": "Boost",
@@ -824,17 +875,18 @@
         "tools/app-root/usr/lib/libboost_system.so",
         "tools/app-root/usr/lib/libboost_system.so.1.85.0"
       ],
-      "missing": [
-        "Exact source package/revision including distribution patches for this binary build.",
-        "Build/configuration material and applicable license/copyright notices for the retained build."
-      ],
+      "missing": [],
       "primaryLocationCheck": {
         "checkedUtc": "2026-10-19T21:35:08.340801+00:00",
         "httpStatus": 200,
         "result": "retrieved; not proof of exact binary source"
       },
       "reportedNameVersion": "1.85.0",
-      "versionStatus": "Filename/SONAME candidate only; exact component release is not authenticated"
+      "versionStatus": "Filename/SONAME candidate only; exact component release is not authenticated",
+      "availableMaterials": [
+        "tools/licenses/upstream-terms/runtime-notices/Boost-1.85.0-LICENSE.txt"
+      ],
+      "evidenceLimits": "The exact Boost source-build revision is still unproved. BSL1.0 exempts solely machine-executable object code from its notice-copy condition; full corresponding source/compiler history is not a blanket binary obligation. Unused static archives are omitted by the exact payload policy."
     },
     {
       "component": "bzip2",
@@ -889,17 +941,18 @@
       "paths": [
         "tools/app-root/usr/lib/libcmark.so.0.28.3"
       ],
-      "missing": [
-        "Exact source package/revision including distribution patches for this binary build.",
-        "Build/configuration material and applicable license/copyright notices for the retained build."
-      ],
+      "missing": [],
       "primaryLocationCheck": {
         "checkedUtc": "2026-10-19T21:35:05.048040+00:00",
         "httpStatus": 200,
         "result": "retrieved; not proof of exact binary source"
       },
       "reportedNameVersion": "0.28.3",
-      "versionStatus": "Filename/SONAME candidate only; exact component release is not authenticated"
+      "versionStatus": "Filename/SONAME candidate only; exact component release is not authenticated",
+      "availableMaterials": [
+        "tools/licenses/upstream-terms/runtime-notices/cmark-0.28.3-COPYING.txt"
+      ],
+      "evidenceLimits": "Exact downstream source-build revision remains unproved. The included upstream COPYING contains permissive and bundled-component notices; no blanket source/build-disclosure obligation is inferred."
     },
     {
       "component": "OpenSSL libcrypto",
@@ -947,45 +1000,83 @@
     },
     {
       "component": "libdvdread",
-      "version": null,
-      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "version": "5.0.3-9.el8",
+      "versionEvidence": "Every listed shipped library is an exact complete-byte SHA256 match to this primary distribution binary RPM; its SourceRPM header identifies this complete source RPM containing upstream sources, downstream patches and RPM build specification.",
       "upstreamLicenseFamily": "GPL-2.0-or-later",
-      "primarySourceUrl": "https://code.videolan.org/videolan/libdvdread",
+      "primarySourceUrl": "https://repo.almalinux.org/vault/8/AppStream/Source/Packages/libdvdread-5.0.3-9.el8.src.rpm",
       "runtimeIdentifier": "linux-x64",
       "kind": "tool-library-observation",
       "paths": [
         "tools/app-root/usr/lib/libdvdread.so.4"
       ],
-      "missing": [
-        "Exact source package/revision including distribution patches for this binary build.",
-        "Build/configuration material and applicable license/copyright notices for the retained build."
-      ],
+      "missing": [],
       "primaryLocationCheck": {
         "checkedUtc": "2026-10-19T21:35:04.557197+00:00",
         "httpStatus": 200,
         "result": "retrieved; not proof of exact binary source"
-      }
+      },
+      "versionStatus": "Exact downstream source RPM revision, established by complete shipped-file hash match to its primary binary RPM and SourceRPM header.",
+      "sourcePackageEvidence": {
+        "url": "https://repo.almalinux.org/vault/8/AppStream/Source/Packages/libdvdread-5.0.3-9.el8.src.rpm",
+        "sha256": "35a8087c5e750cdc3f60085c3baa152301d97fa96ed05aa05c9a8982b32f6fcd",
+        "binaryEvidence": {
+          "url": "https://repo.almalinux.org/almalinux/8.10/AppStream/x86_64/os/Packages/libdvdread-5.0.3-9.el8.x86_64.rpm",
+          "sha256": "454daabb48a214c434331ae717f879b9ff022e74cc20ac7a8f5b11a58aee7316",
+          "sourceRpmHeader": "libdvdread-5.0.3-9.el8.src.rpm"
+        },
+        "shippedFiles": [
+          {
+            "path": "app-root/usr/lib/libdvdread.so.4",
+            "sha256": "64e80fd6fc92a92ca62bab6a9f14a1923a590d3638fb3bd1b1e2525ac97ab1f4",
+            "size": 131296
+          }
+        ]
+      },
+      "availableMaterials": [
+        "tools/licenses/corresponding-source/almalinux/libdvdread-5.0.3-9.el8.src.rpm",
+        "tools/licenses/upstream-terms/almalinux/libdvdread/5.0.3-9.el8/COPYING"
+      ],
+      "evidenceLimits": "The complete source RPM includes upstream sources, distribution patches and RPM build specification. No bit-for-bit rebuild is claimed; incidental compiler history is not treated as a separate blanket source obligation."
     },
     {
       "component": "libffi",
-      "version": null,
-      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "version": "3.1-24.el8",
+      "versionEvidence": "Every listed shipped library is an exact complete-byte SHA256 match to this primary distribution binary RPM; its SourceRPM header identifies this complete source RPM containing upstream sources, downstream patches and RPM build specification.",
       "upstreamLicenseFamily": "MIT",
-      "primarySourceUrl": "https://github.com/libffi/libffi",
+      "primarySourceUrl": "https://repo.almalinux.org/vault/8/BaseOS/Source/Packages/libffi-3.1-24.el8.src.rpm",
       "runtimeIdentifier": "linux-x64",
       "kind": "tool-library-observation",
       "paths": [
         "tools/app-root/usr/lib/libffi.so.6"
       ],
-      "missing": [
-        "Exact source package/revision including distribution patches for this binary build.",
-        "Build/configuration material and applicable license/copyright notices for the retained build."
-      ],
+      "missing": [],
       "primaryLocationCheck": {
         "checkedUtc": "2026-10-19T21:35:05.140960+00:00",
         "httpStatus": 200,
         "result": "retrieved; not proof of exact binary source"
-      }
+      },
+      "versionStatus": "Exact downstream source RPM revision, established by complete shipped-file hash match to its primary binary RPM and SourceRPM header.",
+      "sourcePackageEvidence": {
+        "url": "https://repo.almalinux.org/vault/8/BaseOS/Source/Packages/libffi-3.1-24.el8.src.rpm",
+        "sha256": "50080c4dc79fed750d733e19708256405ce315a08ca81d9c2064ab09553a30cf",
+        "binaryEvidence": {
+          "url": "https://repo.almalinux.org/almalinux/8.10/BaseOS/x86_64/os/Packages/libffi-3.1-24.el8.x86_64.rpm",
+          "sha256": "baa22d471c0ab0d17ab1ba372a262df3c50d6430af4259a4065dfccf0529324a",
+          "sourceRpmHeader": "libffi-3.1-24.el8.src.rpm"
+        },
+        "shippedFiles": [
+          {
+            "path": "app-root/usr/lib/libffi.so.6",
+            "sha256": "3a37023ae042c3a8c49f4f6bd2c3ab8a1977138ecd93c30bcc0f5edf78d15532",
+            "size": 37248
+          }
+        ]
+      },
+      "availableMaterials": [
+        "tools/licenses/corresponding-source/almalinux/libffi-3.1-24.el8.src.rpm",
+        "tools/licenses/upstream-terms/almalinux/libffi/3.1-24.el8/LICENSE"
+      ],
+      "evidenceLimits": "The complete source RPM includes upstream sources, distribution patches and RPM build specification. No bit-for-bit rebuild is claimed; incidental compiler history is not treated as a separate blanket source obligation."
     },
     {
       "component": "Libgcrypt",
@@ -1010,24 +1101,48 @@
     },
     {
       "component": "GLib",
-      "version": null,
-      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "version": "2.56.4-177.el8_10",
+      "versionEvidence": "Every listed shipped library is an exact complete-byte SHA256 match to this primary distribution binary RPM; its SourceRPM header identifies this complete source RPM containing upstream sources, downstream patches and RPM build specification.",
       "upstreamLicenseFamily": "LGPL-2.1-or-later",
-      "primarySourceUrl": "https://gitlab.gnome.org/GNOME/glib",
+      "primarySourceUrl": "https://repo.almalinux.org/vault/8/BaseOS/Source/Packages/glib2-2.56.4-177.el8_10.src.rpm",
       "runtimeIdentifier": "linux-x64",
       "kind": "tool-library-observation",
       "paths": [
         "tools/app-root/usr/lib/libglib-2.0.so.0"
       ],
-      "missing": [
-        "Exact source package/revision including distribution patches for this binary build.",
-        "Build/configuration material and applicable license/copyright notices for the retained build."
-      ],
+      "missing": [],
       "primaryLocationCheck": {
         "checkedUtc": "2026-10-19T21:35:06.554182+00:00",
         "httpStatus": 200,
         "result": "retrieved; not proof of exact binary source"
-      }
+      },
+      "versionStatus": "Exact downstream source RPM revision, established by complete shipped-file hash match to its primary binary RPM and SourceRPM header.",
+      "sourcePackageEvidence": {
+        "url": "https://repo.almalinux.org/vault/8/BaseOS/Source/Packages/glib2-2.56.4-177.el8_10.src.rpm",
+        "sha256": "655907a3deb5c3ce9d5d5ef185409a4241e2e42f1277c5032e5e5c6ae2c233bf",
+        "binaryEvidence": {
+          "url": "https://repo.almalinux.org/almalinux/8.10/BaseOS/x86_64/os/Packages/glib2-2.56.4-177.el8_10.x86_64.rpm",
+          "sha256": "635709436f3ed4ee421edbda05cd3a9170e0b6112d01c7ffc90060a34040361a",
+          "sourceRpmHeader": "glib2-2.56.4-177.el8_10.src.rpm"
+        },
+        "shippedFiles": [
+          {
+            "path": "app-root/usr/lib/libglib-2.0.so.0",
+            "sha256": "91d8e59db911051b9fca6d708a111524b06230a700e228fc1ba1775620b297ae",
+            "size": 1171920
+          },
+          {
+            "path": "app-root/usr/lib/libgthread-2.0.so.0",
+            "sha256": "4f442672d6ddd19cedee66da96921ba226e208234b4c77de962b0123dea7dd62",
+            "size": 7640
+          }
+        ]
+      },
+      "availableMaterials": [
+        "tools/licenses/corresponding-source/almalinux/glib2-2.56.4-177.el8_10.src.rpm",
+        "tools/licenses/upstream-terms/almalinux/glib2/2.56.4-177.el8_10/COPYING"
+      ],
+      "evidenceLimits": "The complete source RPM includes upstream sources, distribution patches and RPM build specification. No bit-for-bit rebuild is claimed; incidental compiler history is not treated as a separate blanket source obligation."
     },
     {
       "component": "GLib GModule",
@@ -1052,24 +1167,45 @@
     },
     {
       "component": "GnuTLS",
-      "version": null,
-      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "version": "3.6.16-8.el8_10.6",
+      "versionEvidence": "Every listed shipped library is an exact complete-byte SHA256 match to this primary distribution binary RPM; its SourceRPM header identifies this complete source RPM containing upstream sources, downstream patches and RPM build specification.",
       "upstreamLicenseFamily": "LGPL-2.1-or-later library; bundled files can differ",
-      "primarySourceUrl": "https://www.gnutls.org/manual/html_node/Copying.html",
+      "primarySourceUrl": "https://repo.almalinux.org/vault/8/BaseOS/Source/Packages/gnutls-3.6.16-8.el8_10.6.src.rpm",
       "runtimeIdentifier": "linux-x64",
       "kind": "tool-library-observation",
       "paths": [
         "tools/app-root/usr/lib/libgnutls.so.30"
       ],
-      "missing": [
-        "Exact source package/revision including distribution patches for this binary build.",
-        "Build/configuration material and applicable license/copyright notices for the retained build."
-      ],
+      "missing": [],
       "primaryLocationCheck": {
         "checkedUtc": "2026-10-19T21:35:09.107557+00:00",
         "httpStatus": null,
         "result": "not retrieved; resolve exact source/material location before release"
-      }
+      },
+      "versionStatus": "Exact downstream source RPM revision, established by complete shipped-file hash match to its primary binary RPM and SourceRPM header.",
+      "sourcePackageEvidence": {
+        "url": "https://repo.almalinux.org/vault/8/BaseOS/Source/Packages/gnutls-3.6.16-8.el8_10.6.src.rpm",
+        "sha256": "7b4da609b57cf781709b62da2014f224caa0eb80fcb8af2556492692d9d0bb2c",
+        "binaryEvidence": {
+          "url": "https://repo.almalinux.org/almalinux/8.10/BaseOS/x86_64/os/Packages/gnutls-3.6.16-8.el8_10.6.x86_64.rpm",
+          "sha256": "9a62d8865eac6dfbbcdf5e8c52361fe10e7da56e1374c3779d2e4e62e0dbce62",
+          "sourceRpmHeader": "gnutls-3.6.16-8.el8_10.6.src.rpm"
+        },
+        "shippedFiles": [
+          {
+            "path": "app-root/usr/lib/libgnutls.so.30",
+            "sha256": "d61e6c0a2296e71384b947448bc545e4c1cd82e7c8b40b7b63bc58f758534fab",
+            "size": 2060016
+          }
+        ]
+      },
+      "availableMaterials": [
+        "tools/licenses/corresponding-source/almalinux/gnutls-3.6.16-8.el8_10.6.src.rpm",
+        "tools/licenses/upstream-terms/almalinux/gnutls/3.6.16-8.el8_10.6/COPYING",
+        "tools/licenses/upstream-terms/almalinux/gnutls/3.6.16-8.el8_10.6/COPYING.LESSER",
+        "tools/licenses/upstream-terms/almalinux/gnutls/3.6.16-8.el8_10.6/LICENSE"
+      ],
+      "evidenceLimits": "The complete source RPM includes upstream sources, distribution patches and RPM build specification. No bit-for-bit rebuild is claimed; incidental compiler history is not treated as a separate blanket source obligation."
     },
     {
       "component": "GLib GObject",
@@ -1168,52 +1304,101 @@
     },
     {
       "component": "GLib GThread",
-      "version": null,
-      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "version": "2.56.4-177.el8_10",
+      "versionEvidence": "Every listed shipped library is an exact complete-byte SHA256 match to this primary distribution binary RPM; its SourceRPM header identifies this complete source RPM containing upstream sources, downstream patches and RPM build specification.",
       "upstreamLicenseFamily": "LGPL-2.1-or-later",
-      "primarySourceUrl": "https://gitlab.gnome.org/GNOME/glib",
+      "primarySourceUrl": "https://repo.almalinux.org/vault/8/BaseOS/Source/Packages/glib2-2.56.4-177.el8_10.src.rpm",
       "runtimeIdentifier": "linux-x64",
       "kind": "tool-library-observation",
       "paths": [
         "tools/app-root/usr/lib/libgthread-2.0.so.0"
       ],
-      "missing": [
-        "Exact source package/revision including distribution patches for this binary build.",
-        "Build/configuration material and applicable license/copyright notices for the retained build."
-      ],
+      "missing": [],
       "primaryLocationCheck": {
         "checkedUtc": "2026-10-19T21:35:06.554182+00:00",
         "httpStatus": 200,
         "result": "retrieved; not proof of exact binary source"
-      }
+      },
+      "versionStatus": "Exact downstream source RPM revision, established by complete shipped-file hash match to its primary binary RPM and SourceRPM header.",
+      "sourcePackageEvidence": {
+        "url": "https://repo.almalinux.org/vault/8/BaseOS/Source/Packages/glib2-2.56.4-177.el8_10.src.rpm",
+        "sha256": "655907a3deb5c3ce9d5d5ef185409a4241e2e42f1277c5032e5e5c6ae2c233bf",
+        "binaryEvidence": {
+          "url": "https://repo.almalinux.org/almalinux/8.10/BaseOS/x86_64/os/Packages/glib2-2.56.4-177.el8_10.x86_64.rpm",
+          "sha256": "635709436f3ed4ee421edbda05cd3a9170e0b6112d01c7ffc90060a34040361a",
+          "sourceRpmHeader": "glib2-2.56.4-177.el8_10.src.rpm"
+        },
+        "shippedFiles": [
+          {
+            "path": "app-root/usr/lib/libglib-2.0.so.0",
+            "sha256": "91d8e59db911051b9fca6d708a111524b06230a700e228fc1ba1775620b297ae",
+            "size": 1171920
+          },
+          {
+            "path": "app-root/usr/lib/libgthread-2.0.so.0",
+            "sha256": "4f442672d6ddd19cedee66da96921ba226e208234b4c77de962b0123dea7dd62",
+            "size": 7640
+          }
+        ]
+      },
+      "availableMaterials": [
+        "tools/licenses/corresponding-source/almalinux/glib2-2.56.4-177.el8_10.src.rpm",
+        "tools/licenses/upstream-terms/almalinux/glib2/2.56.4-177.el8_10/COPYING"
+      ],
+      "evidenceLimits": "The complete source RPM includes upstream sources, distribution patches and RPM build specification. No bit-for-bit rebuild is claimed; incidental compiler history is not treated as a separate blanket source obligation."
     },
     {
       "component": "Nettle Hogweed",
-      "version": null,
-      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "version": "3.4.1-7.el8",
+      "versionEvidence": "Every listed shipped library is an exact complete-byte SHA256 match to this primary distribution binary RPM; its SourceRPM header identifies this complete source RPM containing upstream sources, downstream patches and RPM build specification.",
       "upstreamLicenseFamily": "Version-dependent LGPL/GPL alternatives; exact build version required",
-      "primarySourceUrl": "https://www.lysator.liu.se/~nisse/nettle/",
+      "primarySourceUrl": "https://repo.almalinux.org/vault/8/BaseOS/Source/Packages/nettle-3.4.1-7.el8.src.rpm",
       "runtimeIdentifier": "linux-x64",
       "kind": "tool-library-observation",
       "paths": [
         "tools/app-root/usr/lib/libhogweed.so.4"
       ],
-      "missing": [
-        "Exact source package/revision including distribution patches for this binary build.",
-        "Build/configuration material and applicable license/copyright notices for the retained build."
-      ],
+      "missing": [],
       "primaryLocationCheck": {
         "checkedUtc": "2026-10-19T21:35:09.362589+00:00",
         "httpStatus": 200,
         "result": "retrieved; not proof of exact binary source"
-      }
+      },
+      "versionStatus": "Exact downstream source RPM revision, established by complete shipped-file hash match to its primary binary RPM and SourceRPM header.",
+      "sourcePackageEvidence": {
+        "url": "https://repo.almalinux.org/vault/8/BaseOS/Source/Packages/nettle-3.4.1-7.el8.src.rpm",
+        "sha256": "354fc2ed6bf2208ac5e301913b96f0c60a21b9cd03a32bad2a31ee09b9af1eae",
+        "binaryEvidence": {
+          "url": "https://repo.almalinux.org/almalinux/8.10/BaseOS/x86_64/os/Packages/nettle-3.4.1-7.el8.x86_64.rpm",
+          "sha256": "fb4aaa22b2e2f2fc0c451b87ac464e8746d240397d64e79f6bfd38f4e9128a5a",
+          "sourceRpmHeader": "nettle-3.4.1-7.el8.src.rpm"
+        },
+        "shippedFiles": [
+          {
+            "path": "app-root/usr/lib/libhogweed.so.4",
+            "sha256": "cd4c53becbaddeebc0b6794084cb46449a98cd1dc7089c4a457b533e810d8401",
+            "size": 197704
+          },
+          {
+            "path": "app-root/usr/lib/libnettle.so.6",
+            "sha256": "37944285dc38aa729c0cbfa08c5b94e301701152db772e1577bc784501f15538",
+            "size": 239352
+          }
+        ]
+      },
+      "availableMaterials": [
+        "tools/licenses/corresponding-source/almalinux/nettle-3.4.1-7.el8.src.rpm",
+        "tools/licenses/upstream-terms/almalinux/nettle/3.4.1-7.el8/COPYING.LESSERv3",
+        "tools/licenses/upstream-terms/almalinux/nettle/3.4.1-7.el8/COPYINGv2"
+      ],
+      "evidenceLimits": "The complete source RPM includes upstream sources, distribution patches and RPM build specification. No bit-for-bit rebuild is claimed; incidental compiler history is not treated as a separate blanket source obligation."
     },
     {
       "component": "ICU",
-      "version": null,
-      "versionEvidence": "SONAME56 confirms ABI56 only; exact release/patch provenance unresolved.",
+      "version": "56.1",
+      "versionEvidence": "Complete SHA256 matches for all three shipped ICU libraries against the official Qt6.6.1 SDK ICU archive; source/data terms from the exact upstream release are supplied.",
       "upstreamLicenseFamily": "ICU/Unicode permissive license and data notices",
-      "primarySourceUrl": "https://unicode-org.github.io/icu/userguide/icu4c/faq.html",
+      "primarySourceUrl": "https://raw.githubusercontent.com/unicode-org/icu/release-56-1/icu4c/license.html",
       "runtimeIdentifier": "linux-x64",
       "kind": "tool-library-observation",
       "paths": [
@@ -1221,36 +1406,63 @@
         "tools/app-root/usr/lib/libicui18n.so.56",
         "tools/app-root/usr/lib/libicuuc.so.56"
       ],
-      "missing": [
-        "Exact source package/revision including distribution patches for this binary build.",
-        "Build/configuration material and applicable license/copyright notices for the retained build."
-      ],
+      "missing": [],
       "primaryLocationCheck": {
         "checkedUtc": "2026-10-19T21:35:07.916518+00:00",
         "httpStatus": 200,
         "result": "retrieved; not proof of exact binary source"
+      },
+      "availableMaterials": [
+        "tools/licenses/upstream-terms/runtime-notices/ICU-56.1-license.html"
+      ],
+      "evidenceLimits": "ICU has permissive copyright/data notice duties. Exact downstream compiler history is not treated as a copyleft corresponding-source obligation.",
+      "binaryEvidence": {
+        "url": "https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_661/qt.qt6.661.gcc_64/6.6.1-0-202311210527icu-linux-Rhel7.2-x64.7z",
+        "sha256": "712604a29c232f22d515f783956943b00c486b06fcc4bfd2f3e4ef07ac27330d"
       }
     },
     {
       "component": "libidn2",
-      "version": null,
-      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "version": "2.2.0-1.el8",
+      "versionEvidence": "Every listed shipped library is an exact complete-byte SHA256 match to this primary distribution binary RPM; its SourceRPM header identifies this complete source RPM containing upstream sources, downstream patches and RPM build specification.",
       "upstreamLicenseFamily": "LGPL/GPL alternatives plus Unicode data notices; exact version required",
-      "primarySourceUrl": "https://www.gnu.org/software/libidn/",
+      "primarySourceUrl": "https://repo.almalinux.org/vault/8/BaseOS/Source/Packages/libidn2-2.2.0-1.el8.src.rpm",
       "runtimeIdentifier": "linux-x64",
       "kind": "tool-library-observation",
       "paths": [
         "tools/app-root/usr/lib/libidn2.so.0"
       ],
-      "missing": [
-        "Exact source package/revision including distribution patches for this binary build.",
-        "Build/configuration material and applicable license/copyright notices for the retained build."
-      ],
+      "missing": [],
       "primaryLocationCheck": {
         "checkedUtc": "2026-10-19T21:35:08.353796+00:00",
         "httpStatus": null,
         "result": "not retrieved; resolve exact source/material location before release"
-      }
+      },
+      "versionStatus": "Exact downstream source RPM revision, established by complete shipped-file hash match to its primary binary RPM and SourceRPM header.",
+      "sourcePackageEvidence": {
+        "url": "https://repo.almalinux.org/vault/8/BaseOS/Source/Packages/libidn2-2.2.0-1.el8.src.rpm",
+        "sha256": "a32fe287ffa058a76d3a42aec8d5a0dcea8ee72d4910cf88100000326e1d396b",
+        "binaryEvidence": {
+          "url": "https://repo.almalinux.org/almalinux/8.10/BaseOS/x86_64/os/Packages/libidn2-2.2.0-1.el8.x86_64.rpm",
+          "sha256": "d4f112cb5782ecbc4873cdc4256badcbcdeef94928b3c7930c9e4b10134bd4a6",
+          "sourceRpmHeader": "libidn2-2.2.0-1.el8.src.rpm"
+        },
+        "shippedFiles": [
+          {
+            "path": "app-root/usr/lib/libidn2.so.0",
+            "sha256": "2f4a5893128a6142cc1c88442154ba2e2bf82f383bd25c91afbd1509837cf1ce",
+            "size": 131568
+          }
+        ]
+      },
+      "availableMaterials": [
+        "tools/licenses/corresponding-source/almalinux/libidn2-2.2.0-1.el8.src.rpm",
+        "tools/licenses/upstream-terms/almalinux/libidn2/2.2.0-1.el8/COPYING",
+        "tools/licenses/upstream-terms/almalinux/libidn2/2.2.0-1.el8/COPYING.LESSERv3",
+        "tools/licenses/upstream-terms/almalinux/libidn2/2.2.0-1.el8/COPYING.unicode",
+        "tools/licenses/upstream-terms/almalinux/libidn2/2.2.0-1.el8/COPYINGv2"
+      ],
+      "evidenceLimits": "The complete source RPM includes upstream sources, distribution patches and RPM build specification. No bit-for-bit rebuild is claimed; incidental compiler history is not treated as a separate blanket source obligation."
     },
     {
       "component": "keyutils library",
@@ -1338,45 +1550,89 @@
     },
     {
       "component": "Nettle",
-      "version": null,
-      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "version": "3.4.1-7.el8",
+      "versionEvidence": "Every listed shipped library is an exact complete-byte SHA256 match to this primary distribution binary RPM; its SourceRPM header identifies this complete source RPM containing upstream sources, downstream patches and RPM build specification.",
       "upstreamLicenseFamily": "Version-dependent LGPL/GPL alternatives; exact build version required",
-      "primarySourceUrl": "https://www.lysator.liu.se/~nisse/nettle/",
+      "primarySourceUrl": "https://repo.almalinux.org/vault/8/BaseOS/Source/Packages/nettle-3.4.1-7.el8.src.rpm",
       "runtimeIdentifier": "linux-x64",
       "kind": "tool-library-observation",
       "paths": [
         "tools/app-root/usr/lib/libnettle.so.6"
       ],
-      "missing": [
-        "Exact source package/revision including distribution patches for this binary build.",
-        "Build/configuration material and applicable license/copyright notices for the retained build."
-      ],
+      "missing": [],
       "primaryLocationCheck": {
         "checkedUtc": "2026-10-19T21:35:09.362589+00:00",
         "httpStatus": 200,
         "result": "retrieved; not proof of exact binary source"
-      }
+      },
+      "versionStatus": "Exact downstream source RPM revision, established by complete shipped-file hash match to its primary binary RPM and SourceRPM header.",
+      "sourcePackageEvidence": {
+        "url": "https://repo.almalinux.org/vault/8/BaseOS/Source/Packages/nettle-3.4.1-7.el8.src.rpm",
+        "sha256": "354fc2ed6bf2208ac5e301913b96f0c60a21b9cd03a32bad2a31ee09b9af1eae",
+        "binaryEvidence": {
+          "url": "https://repo.almalinux.org/almalinux/8.10/BaseOS/x86_64/os/Packages/nettle-3.4.1-7.el8.x86_64.rpm",
+          "sha256": "fb4aaa22b2e2f2fc0c451b87ac464e8746d240397d64e79f6bfd38f4e9128a5a",
+          "sourceRpmHeader": "nettle-3.4.1-7.el8.src.rpm"
+        },
+        "shippedFiles": [
+          {
+            "path": "app-root/usr/lib/libhogweed.so.4",
+            "sha256": "cd4c53becbaddeebc0b6794084cb46449a98cd1dc7089c4a457b533e810d8401",
+            "size": 197704
+          },
+          {
+            "path": "app-root/usr/lib/libnettle.so.6",
+            "sha256": "37944285dc38aa729c0cbfa08c5b94e301701152db772e1577bc784501f15538",
+            "size": 239352
+          }
+        ]
+      },
+      "availableMaterials": [
+        "tools/licenses/corresponding-source/almalinux/nettle-3.4.1-7.el8.src.rpm",
+        "tools/licenses/upstream-terms/almalinux/nettle/3.4.1-7.el8/COPYING.LESSERv3",
+        "tools/licenses/upstream-terms/almalinux/nettle/3.4.1-7.el8/COPYINGv2"
+      ],
+      "evidenceLimits": "The complete source RPM includes upstream sources, distribution patches and RPM build specification. No bit-for-bit rebuild is claimed; incidental compiler history is not treated as a separate blanket source obligation."
     },
     {
       "component": "libogg",
-      "version": null,
-      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "version": "1.3.2-10.el8",
+      "versionEvidence": "Every listed shipped library is an exact complete-byte SHA256 match to this primary distribution binary RPM; its SourceRPM header identifies this complete source RPM containing upstream sources, downstream patches and RPM build specification.",
       "upstreamLicenseFamily": "BSD-3-Clause",
-      "primarySourceUrl": "https://github.com/xiph/ogg",
+      "primarySourceUrl": "https://repo.almalinux.org/vault/8/AppStream/Source/Packages/libogg-1.3.2-10.el8.src.rpm",
       "runtimeIdentifier": "linux-x64",
       "kind": "tool-library-observation",
       "paths": [
         "tools/app-root/usr/lib/libogg.so.0"
       ],
-      "missing": [
-        "Exact source package/revision including distribution patches for this binary build.",
-        "Build/configuration material and applicable license/copyright notices for the retained build."
-      ],
+      "missing": [],
       "primaryLocationCheck": {
         "checkedUtc": "2026-10-19T21:35:06.223178+00:00",
         "httpStatus": 200,
         "result": "retrieved; not proof of exact binary source"
-      }
+      },
+      "versionStatus": "Exact downstream source RPM revision, established by complete shipped-file hash match to its primary binary RPM and SourceRPM header.",
+      "sourcePackageEvidence": {
+        "url": "https://repo.almalinux.org/vault/8/AppStream/Source/Packages/libogg-1.3.2-10.el8.src.rpm",
+        "sha256": "e2ef0d26c84d44a19019e1e2943e0d181ed0b5c5693d1bd5b4ac41436a113803",
+        "binaryEvidence": {
+          "url": "https://repo.almalinux.org/almalinux/8.10/AppStream/x86_64/os/Packages/libogg-1.3.2-10.el8.x86_64.rpm",
+          "sha256": "3e1fca6cb166d9974a3ef8de5ca201c72bfa1ea40225db8e64dfc663a779ab12",
+          "sourceRpmHeader": "libogg-1.3.2-10.el8.src.rpm"
+        },
+        "shippedFiles": [
+          {
+            "path": "app-root/usr/lib/libogg.so.0",
+            "sha256": "f16c849e3c2ac5e2f5893bae5354fd2a1c89869068edb84063281f98dbf98a6c",
+            "size": 29360
+          }
+        ]
+      },
+      "availableMaterials": [
+        "tools/licenses/corresponding-source/almalinux/libogg-1.3.2-10.el8.src.rpm",
+        "tools/licenses/upstream-terms/almalinux/libogg/1.3.2-10.el8/COPYING"
+      ],
+      "evidenceLimits": "The complete source RPM includes upstream sources, distribution patches and RPM build specification. No bit-for-bit rebuild is claimed; incidental compiler history is not treated as a separate blanket source obligation."
     },
     {
       "component": "ORC",
@@ -1401,46 +1657,85 @@
     },
     {
       "component": "p11-kit",
-      "version": null,
-      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "version": "0.23.22-2.el8",
+      "versionEvidence": "Every listed shipped library is an exact complete-byte SHA256 match to this primary distribution binary RPM; its SourceRPM header identifies this complete source RPM containing upstream sources, downstream patches and RPM build specification.",
       "upstreamLicenseFamily": "BSD-3-Clause and file-specific notices",
-      "primarySourceUrl": "https://p11-glue.github.io/p11-glue/p11-kit.html",
+      "primarySourceUrl": "https://repo.almalinux.org/vault/8/BaseOS/Source/Packages/p11-kit-0.23.22-2.el8.src.rpm",
       "runtimeIdentifier": "linux-x64",
       "kind": "tool-library-observation",
       "paths": [
         "tools/app-root/usr/lib/libp11-kit.so.0"
       ],
-      "missing": [
-        "Exact source package/revision including distribution patches for this binary build.",
-        "Build/configuration material and applicable license/copyright notices for the retained build."
-      ],
+      "missing": [],
       "primaryLocationCheck": {
         "checkedUtc": "2026-10-19T21:35:07.266487+00:00",
         "httpStatus": 200,
         "result": "retrieved; not proof of exact binary source"
-      }
+      },
+      "versionStatus": "Exact downstream source RPM revision, established by complete shipped-file hash match to its primary binary RPM and SourceRPM header.",
+      "sourcePackageEvidence": {
+        "url": "https://repo.almalinux.org/vault/8/BaseOS/Source/Packages/p11-kit-0.23.22-2.el8.src.rpm",
+        "sha256": "7c6807762f5761235a0cdb833fd48f35bb744c963d0ae713f57a5cc2cefefb41",
+        "binaryEvidence": {
+          "url": "https://repo.almalinux.org/almalinux/8.10/BaseOS/x86_64/os/Packages/p11-kit-0.23.22-2.el8.x86_64.rpm",
+          "sha256": "954dd788311886cc0d6e961ea1a23d01a5df067b211b0515f9a8dc67a80d81c7",
+          "sourceRpmHeader": "p11-kit-0.23.22-2.el8.src.rpm"
+        },
+        "shippedFiles": [
+          {
+            "path": "app-root/usr/lib/libp11-kit.so.0",
+            "sha256": "ac9dcd7e6ab7452bf8ee4ecfd36bd927a5812e7aa408fc766936ef02ad379610",
+            "size": 1259544
+          }
+        ]
+      },
+      "availableMaterials": [
+        "tools/licenses/corresponding-source/almalinux/p11-kit-0.23.22-2.el8.src.rpm",
+        "tools/licenses/upstream-terms/almalinux/p11-kit/0.23.22-2.el8/COPYING"
+      ],
+      "evidenceLimits": "The complete source RPM includes upstream sources, distribution patches and RPM build specification. No bit-for-bit rebuild is claimed; incidental compiler history is not treated as a separate blanket source obligation."
     },
     {
       "component": "PCRE/PCRE2",
-      "version": null,
-      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "version": "8.42-6.el8",
+      "versionEvidence": "Every listed shipped library is an exact complete-byte SHA256 match to this primary distribution binary RPM; its SourceRPM header identifies this complete source RPM containing upstream sources, downstream patches and RPM build specification.",
       "upstreamLicenseFamily": "BSD-3-Clause with PCRE exception and JIT notices; exact major/version required",
-      "primarySourceUrl": "https://www.pcre.org/",
+      "primarySourceUrl": "https://repo.almalinux.org/vault/8/BaseOS/Source/Packages/pcre-8.42-6.el8.src.rpm",
       "runtimeIdentifier": "linux-x64",
       "kind": "tool-library-observation",
       "paths": [
         "tools/app-root/usr/lib/libpcre.so.1",
         "tools/app-root/usr/lib/libpcre2-8.so.0"
       ],
-      "missing": [
-        "Exact source package/revision including distribution patches for this binary build.",
-        "Build/configuration material and applicable license/copyright notices for the retained build."
-      ],
+      "missing": [],
       "primaryLocationCheck": {
         "checkedUtc": "2026-10-19T21:35:09.776754+00:00",
         "httpStatus": 200,
         "result": "retrieved; not proof of exact binary source"
-      }
+      },
+      "versionStatus": "Exact downstream source RPM revision, established by complete shipped-file hash match to its primary binary RPM and SourceRPM header.",
+      "sourcePackageEvidence": {
+        "url": "https://repo.almalinux.org/vault/8/BaseOS/Source/Packages/pcre-8.42-6.el8.src.rpm",
+        "sha256": "dc672c4af96650afa398943512968dd55967605fd511fc0a621c32ebb2d640b4",
+        "binaryEvidence": {
+          "url": "https://repo.almalinux.org/almalinux/8.10/BaseOS/x86_64/os/Packages/pcre-8.42-6.el8.x86_64.rpm",
+          "sha256": "4be4dd7c2b6080dece762109d55a05d1683701e5d4d09fe2f54a4a303e5933f6",
+          "sourceRpmHeader": "pcre-8.42-6.el8.src.rpm"
+        },
+        "shippedFiles": [
+          {
+            "path": "app-root/usr/lib/libpcre.so.1",
+            "sha256": "0dd207b5a53568bd542da93dc1816f6fd1aca35817692467ac697b662512c616",
+            "size": 464840
+          }
+        ]
+      },
+      "availableMaterials": [
+        "tools/licenses/corresponding-source/almalinux/pcre-8.42-6.el8.src.rpm",
+        "tools/licenses/upstream-terms/almalinux/pcre/8.42-6.el8/COPYING",
+        "tools/licenses/upstream-terms/almalinux/pcre/8.42-6.el8/LICENCE"
+      ],
+      "evidenceLimits": "The complete source RPM includes upstream sources, distribution patches and RPM build specification. No bit-for-bit rebuild is claimed; incidental compiler history is not treated as a separate blanket source obligation."
     },
     {
       "component": "libpng",
@@ -1574,67 +1869,126 @@
     },
     {
       "component": "libtasn1",
-      "version": null,
-      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "version": "4.13-6.el8_10",
+      "versionEvidence": "Every listed shipped library is an exact complete-byte SHA256 match to this primary distribution binary RPM; its SourceRPM header identifies this complete source RPM containing upstream sources, downstream patches and RPM build specification.",
       "upstreamLicenseFamily": "LGPL-2.1-or-later library",
-      "primarySourceUrl": "https://www.gnu.org/software/libtasn1/",
+      "primarySourceUrl": "https://repo.almalinux.org/vault/8/BaseOS/Source/Packages/libtasn1-4.13-6.el8_10.src.rpm",
       "runtimeIdentifier": "linux-x64",
       "kind": "tool-library-observation",
       "paths": [
         "tools/app-root/usr/lib/libtasn1.so.6"
       ],
-      "missing": [
-        "Exact source package/revision including distribution patches for this binary build.",
-        "Build/configuration material and applicable license/copyright notices for the retained build."
-      ],
+      "missing": [],
       "primaryLocationCheck": {
         "checkedUtc": "2026-10-19T21:35:09.009599+00:00",
         "httpStatus": null,
         "result": "not retrieved; resolve exact source/material location before release"
-      }
+      },
+      "versionStatus": "Exact downstream source RPM revision, established by complete shipped-file hash match to its primary binary RPM and SourceRPM header.",
+      "sourcePackageEvidence": {
+        "url": "https://repo.almalinux.org/vault/8/BaseOS/Source/Packages/libtasn1-4.13-6.el8_10.src.rpm",
+        "sha256": "94e17fa3f921f6ea2ecfd181f5a38e2815b21acc002c61d34c11a5cc8eb6374c",
+        "binaryEvidence": {
+          "url": "https://repo.almalinux.org/almalinux/8.10/BaseOS/x86_64/os/Packages/libtasn1-4.13-6.el8_10.x86_64.rpm",
+          "sha256": "703fb3762d8b16f71da3e6e1c4fda0401888fe898ac0a99c5e51eee567cd2f97",
+          "sourceRpmHeader": "libtasn1-4.13-6.el8_10.src.rpm"
+        },
+        "shippedFiles": [
+          {
+            "path": "app-root/usr/lib/libtasn1.so.6",
+            "sha256": "ca03aa5eacd1e157e0a5c7e5d87789225bc6b3095ca0e180f2aba2452990974c",
+            "size": 78832
+          }
+        ]
+      },
+      "availableMaterials": [
+        "tools/licenses/corresponding-source/almalinux/libtasn1-4.13-6.el8_10.src.rpm",
+        "tools/licenses/upstream-terms/almalinux/libtasn1/4.13-6.el8_10/COPYING",
+        "tools/licenses/upstream-terms/almalinux/libtasn1/4.13-6.el8_10/COPYING.LIB"
+      ],
+      "evidenceLimits": "The complete source RPM includes upstream sources, distribution patches and RPM build specification. No bit-for-bit rebuild is claimed; incidental compiler history is not treated as a separate blanket source obligation."
     },
     {
       "component": "libunistring",
-      "version": null,
-      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "version": "0.9.9-3.el8",
+      "versionEvidence": "Every listed shipped library is an exact complete-byte SHA256 match to this primary distribution binary RPM; its SourceRPM header identifies this complete source RPM containing upstream sources, downstream patches and RPM build specification.",
       "upstreamLicenseFamily": "LGPL-3.0-or-later OR GPL-2.0-or-later (exact version/file proof required)",
-      "primarySourceUrl": "https://www.gnu.org/software/libunistring/",
+      "primarySourceUrl": "https://repo.almalinux.org/vault/8/BaseOS/Source/Packages/libunistring-0.9.9-3.el8.src.rpm",
       "runtimeIdentifier": "linux-x64",
       "kind": "tool-library-observation",
       "paths": [
         "tools/app-root/usr/lib/libunistring.so.2"
       ],
-      "missing": [
-        "Exact source package/revision including distribution patches for this binary build.",
-        "Build/configuration material and applicable license/copyright notices for the retained build."
-      ],
+      "missing": [],
       "primaryLocationCheck": {
         "checkedUtc": "2026-10-19T21:35:09.022273+00:00",
         "httpStatus": null,
         "result": "not retrieved; resolve exact source/material location before release"
-      }
+      },
+      "versionStatus": "Exact downstream source RPM revision, established by complete shipped-file hash match to its primary binary RPM and SourceRPM header.",
+      "sourcePackageEvidence": {
+        "url": "https://repo.almalinux.org/vault/8/BaseOS/Source/Packages/libunistring-0.9.9-3.el8.src.rpm",
+        "sha256": "6b4f1240ed02f10307ad547d4790e4a8375a37c69fb59d3f8ff3fb1450df0a18",
+        "binaryEvidence": {
+          "url": "https://repo.almalinux.org/almalinux/8.10/BaseOS/x86_64/os/Packages/libunistring-0.9.9-3.el8.x86_64.rpm",
+          "sha256": "0d1d497fe2b0eb54c88093c2aca92292fb4e94e6e1437af3bdefbb0f5adeb06b",
+          "sourceRpmHeader": "libunistring-0.9.9-3.el8.src.rpm"
+        },
+        "shippedFiles": [
+          {
+            "path": "app-root/usr/lib/libunistring.so.2",
+            "sha256": "05abdd40665a0f8759c91d19e0e5f4aa437002ab76aa9f9a3a790cdf47a34802",
+            "size": 1805368
+          }
+        ]
+      },
+      "availableMaterials": [
+        "tools/licenses/corresponding-source/almalinux/libunistring-0.9.9-3.el8.src.rpm",
+        "tools/licenses/upstream-terms/almalinux/libunistring/0.9.9-3.el8/COPYING",
+        "tools/licenses/upstream-terms/almalinux/libunistring/0.9.9-3.el8/COPYING.LIB"
+      ],
+      "evidenceLimits": "The complete source RPM includes upstream sources, distribution patches and RPM build specification. No bit-for-bit rebuild is claimed; incidental compiler history is not treated as a separate blanket source obligation."
     },
     {
       "component": "libvorbis",
-      "version": null,
-      "versionEvidence": "No exact binary component version established; SONAME/ABI is not an exact release.",
+      "version": "1.3.6-2.el8",
+      "versionEvidence": "Every listed shipped library is an exact complete-byte SHA256 match to this primary distribution binary RPM; its SourceRPM header identifies this complete source RPM containing upstream sources, downstream patches and RPM build specification.",
       "upstreamLicenseFamily": "BSD-3-Clause",
-      "primarySourceUrl": "https://github.com/xiph/vorbis",
+      "primarySourceUrl": "https://repo.almalinux.org/vault/8/AppStream/Source/Packages/libvorbis-1.3.6-2.el8.src.rpm",
       "runtimeIdentifier": "linux-x64",
       "kind": "tool-library-observation",
       "paths": [
         "tools/app-root/usr/lib/libvorbis.so.0",
         "tools/app-root/usr/lib/libvorbisenc.so.2"
       ],
-      "missing": [
-        "Exact source package/revision including distribution patches for this binary build.",
-        "Build/configuration material and applicable license/copyright notices for the retained build."
-      ],
+      "missing": [],
       "primaryLocationCheck": {
         "checkedUtc": "2026-10-19T21:35:06.296493+00:00",
         "httpStatus": 200,
         "result": "retrieved; not proof of exact binary source"
-      }
+      },
+      "versionStatus": "Exact downstream source RPM revision, established by complete shipped-file hash match to its primary binary RPM and SourceRPM header.",
+      "sourcePackageEvidence": {
+        "url": "https://repo.almalinux.org/vault/8/AppStream/Source/Packages/libvorbis-1.3.6-2.el8.src.rpm",
+        "sha256": "a9989dcb9cd8a5e192e35e9e6e23c5e9deabed16fe48b93431db9e26243c7edb",
+        "binaryEvidence": {
+          "url": "https://repo.almalinux.org/almalinux/8.10/AppStream/x86_64/os/Packages/libvorbis-1.3.6-2.el8.x86_64.rpm",
+          "sha256": "9ecabb1ee69662e028c90a90b24e094745849cda3f0bb6591450ad9194ded552",
+          "sourceRpmHeader": "libvorbis-1.3.6-2.el8.src.rpm"
+        },
+        "shippedFiles": [
+          {
+            "path": "app-root/usr/lib/libvorbis.so.0",
+            "sha256": "96eafd6a4d71a8f104f499002c84362d9dafd69b1987679e7a3a66633c674899",
+            "size": 193208
+          }
+        ]
+      },
+      "availableMaterials": [
+        "tools/licenses/corresponding-source/almalinux/libvorbis-1.3.6-2.el8.src.rpm",
+        "tools/licenses/upstream-terms/almalinux/libvorbis/1.3.6-2.el8/COPYING"
+      ],
+      "evidenceLimits": "The complete source RPM includes upstream sources, distribution patches and RPM build specification. No bit-for-bit rebuild is claimed; incidental compiler history is not treated as a separate blanket source obligation."
     },
     {
       "component": "Wayland",
@@ -1818,25 +2172,18 @@
   ],
   "unresolved": [
     {
-      "component": "Original TrackTrim code/assets",
-      "evidence": "No operative original-code license; four original assemblies and project assets are shipped.",
-      "missing": "Rights-holder identity/authority, policy choice and operative terms.",
-      "primaryLocationChecked": "docs/license-decision.md and PROJECT_BRIEF.md",
-      "nextAction": "Owner decides the original-code license after confirming rights; do not infer an owner from account metadata."
+      "component": "Windows MKVToolNix source delivery",
+      "evidence": "The same-version source-built CLI pair replaces the historical staticQt6.10.2/MXE workers. Actual DLL bytes match pinned UCRT64 packages; binary BUILDINFO recipe hashes bind their complete source/patch packages. QtCore6.12/GMP GPL2 alternatives, exact primary notices and configuration/compiler/build scripts are collected in mkvSourceBuildEvidence.",
+      "missing": "Actually deliver the collected applicable covered-source/build materials and notices alongside the matching public binaries. The old official binary closure remains unproven historical research, not a shipped replacement dependency.",
+      "primaryLocationChecked": "build/mkv-source.lock.json, build/build-mkv-windows.sh and actual worker/dependency/material receipts; primary package sources at https://repo.msys2.org/mingw/sources/",
+      "nextAction": "Retain the source-built closure and provide its bound materials through the eventual release's compliant source-delivery arrangement. A private bundle or expiring CI review artifact is not that public delivery."
     },
     {
-      "component": "Windows MKVToolNix static closure",
-      "evidence": "Pinned102.0 tools embed staticQt6.10.2 and compiler string; exact source tar includes generic build recipes.",
-      "missing": "Exact MXE commit, external dependency revisions/patches, configure/build records, selected Qt licensing path and applicable source/relink materials.",
-      "primaryLocationChecked": "https://mkvtoolnix.download/sources/mkvtoolnix-102.0.tar.xz",
-      "nextAction": "Obtain a binary-bound build/dependency/source manifest from upstream; prepare the question without sending it."
-    },
-    {
-      "component": "Retained Linux AppImage libraries and static archives",
-      "evidence": "Every retained file is inventoried, even outside the CLI loaded closure. QtVirtualKeyboard6.6.1 is module-specific GPL3/commercial.",
-      "missing": "Exact distro source package revisions/patches and module notices/build records, including unused libraries and three static Boost archives.",
-      "primaryLocationChecked": "https://mkvtoolnix.download/appimage/MKVToolNix_GUI-102.0-x86_64.AppImage",
-      "nextAction": "Map retained file buildIDs/hashes to the upstream build manifest and obtain exact source packages and applicable notices."
+      "component": "Retained Linux MKV CLI closure",
+      "evidence": "Exact payload policy retains22 libraries and omits83 unused libraries/static archives.15 retained libraries match13 complete primary source RPMs; QtCore and all3 ICU libraries match official Qt SDK bytes. Applicable collected notices are included.",
+      "missing": "Actually deliver the collected covered source/build material and notices with the eventual public release. Core's GPL2 alternative is selected and complete QtBase/SDK configuration material is collected; no additional Core source/patch/relink-object gap was identified. Custom Boost/cmark build details remain provenance unknowns, not automatic permissive-source blockers.",
+      "primaryLocationChecked": "Hash-bound build/tool-payload.lock.json, build/tool-materials.lock.json and official AlmaLinux/Qt archive members.",
+      "nextAction": "Retain Core's selected GPL2 alternative and provide the collected source/build/notices alongside the eventual release; do not demand source for omitted GUI payloads. See docs/verification/release-distribution-closure.md."
     },
     {
       "component": "NuGet native static subcomponents and generated apphost",
@@ -1852,5 +2199,10 @@
       "primaryLocationChecked": "https://www.gnu.org/licenses/gpl-faq.en.html#MereAggregation and https://www.apache.org/licenses/GPL-compatibility.html",
       "nextAction": "Review the exact combination and obligations separately from original-code license choice; a separate executable alone does not settle this."
     }
-  ]
+  ],
+  "releaseCandidateMaterialSummary": {
+    "ffmpeg": "Same exact source commit; minimal explicit static zlib source build replaces opaque optional-library closure. Actual recipes/configuration/toolchain/worker receipts plus FFmpeg/zlib source and compiler-runtime terms accompany both targets.",
+    "mkv": "Same102.0 source-built Windows CLI workers with actual DLL/source/recipe/notices; unchanged Linux executable bytes, exact AppImage omissions and complete matched source RPM/QtBase materials. Acquisition/inventory validate each route independently.",
+    "legalScope": "Provenance unknowns are recorded separately from affirmative license requirements. Full compiler history or optional reproducibility is not universally required by permissive licenses or the GCC Runtime Library Exception."
+  }
 }

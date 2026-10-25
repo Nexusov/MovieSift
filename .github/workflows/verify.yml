@@ -5,6 +5,12 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+    inputs:
+      retain_candidates:
+        description: Retain verified binary and matching material archives as publicly accessible workflow artifacts
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: read
@@ -46,7 +52,22 @@ jobs:
         shell: bash
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -y squashfs-tools file libx11-6 libice6 libsm6 libfontconfig1 libicu74 libssl3t64 libgssapi-krb5-2 libbrotli1 libgmp10 libgl1 libegl1 libxrandr2 libxcursor1 libxi6 libxinerama1
+          sudo apt-get install --no-install-recommends -y build-essential nasm squashfs-tools file libx11-6 libice6 libsm6 libfontconfig1 libicu74 libssl3t64 libgssapi-krb5-2 libbrotli1 libgmp10 libgl1 libegl1 libxrandr2 libxcursor1 libxi6 libxinerama1
+      - name: Restore the exact Windows MKV source build
+        if: runner.os == 'Windows'
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ${{ runner.temp }}/mkv-source-candidate
+          key: windows-mkv-source-${{ hashFiles('build/*mkv*', 'build/ffmpeg-runtime-dependencies.py') }}
+      - name: Build or validate the pinned Windows MKV workers and materials
+        if: runner.os == 'Windows'
+        run: |
+          $mkvBuildDirectory = Join-Path '${{ runner.temp }}' 'mkv-source-candidate'
+          ./build/provision-windows-mkv.ps1 -Destination $mkvBuildDirectory -CacheDirectory '${{ runner.temp }}/mkv-source-downloads'
+          ('TRACKTRIM_WINDOWS_MKV_BUILD_DIRECTORY=' + $mkvBuildDirectory) | Add-Content -LiteralPath $env:GITHUB_ENV -Encoding utf8NoBOM
+      - name: Provision pinned Windows source-build prerequisites
+        if: runner.os == 'Windows'
+        run: ./build/provision-windows-ffmpeg.ps1
       - name: Acquire the pinned MKV and MP4 backends (mandatory)
         run: ./build/acquire-tools.ps1 -RuntimeIdentifier '${{ matrix.runtime }}' -Destination '${{ github.workspace }}/tools'
       - name: Generate original real-media fixtures
@@ -74,10 +95,38 @@ jobs:
         run: ./build/package.ps1 -RuntimeIdentifier '${{ matrix.runtime }}' -FixturePath '${{ github.workspace }}/artifacts/fixtures/ordinary.mkv' -Mp4FixturePath '${{ github.workspace }}/artifacts/fixtures/mp4/ordinary.mp4'
       - name: Relocate archive and run the actual application workflow
         run: ./build/verify-package.ps1 -ArchivePath './artifacts/${{ matrix.archive }}' -FixturePath '${{ github.workspace }}/artifacts/fixtures/ordinary.mkv' -Mp4FixturePath '${{ github.workspace }}/artifacts/fixtures/mp4/ordinary.mp4'
+      - name: Prepare matching review source and build materials
+        run: |
+          python ./build/prepare-review-materials.py --repository . --archive './artifacts/${{ matrix.archive }}' --inventory './artifacts/distribution-reports/${{ matrix.runtime }}/distribution-${{ matrix.runtime }}.json' --output './artifacts/review-materials-${{ matrix.runtime }}'
+          if ($LASTEXITCODE -ne 0) { throw 'Matching review-material preparation failed.' }
+          Copy-Item -LiteralPath './artifacts/review-materials-${{ matrix.runtime }}/material-summary.json' -Destination './artifacts/distribution-reports/${{ matrix.runtime }}/review-materials.json'
       - name: Verify Linux CLI archive without installed SDK or media tools
         if: runner.os == 'Linux'
         shell: bash
         run: bash ./build/verify-clean-linux.sh ./artifacts/TrackTrim-linux-x64.tar.gz ./artifacts/fixtures/ordinary.mkv ./artifacts/fixtures/mp4/ordinary.mp4
+      - name: Validate and stage the explicitly requested candidate set
+        id: candidates
+        if: ${{ success() && github.event_name == 'workflow_dispatch' && inputs.retain_candidates == true }}
+        run: |
+          $selection = python ./build/prepare-candidate-retention.py --repository . --archive './artifacts/${{ matrix.archive }}' --inventory './artifacts/distribution-reports/${{ matrix.runtime }}/distribution-${{ matrix.runtime }}.json' --materials './artifacts/review-materials-${{ matrix.runtime }}' --runtime '${{ matrix.runtime }}' --source-revision '${{ github.sha }}' --run-id '${{ github.run_id }}' --run-attempt '${{ github.run_attempt }}' --output './artifacts/candidate-retention-${{ matrix.runtime }}'
+          if ($LASTEXITCODE -ne 0) { throw 'Candidate identity validation or staging failed.' }
+          $selection = $selection | ConvertFrom-Json
+          ('artifact_name=' + $selection.artifactName) | Add-Content -LiteralPath $env:GITHUB_OUTPUT -Encoding utf8NoBOM
+          ('materials_name=' + $selection.materialsName) | Add-Content -LiteralPath $env:GITHUB_OUTPUT -Encoding utf8NoBOM
+      - name: Retain the explicitly requested verified candidate set
+        if: ${{ success() && github.event_name == 'workflow_dispatch' && inputs.retain_candidates == true }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ${{ steps.candidates.outputs.artifact_name }}
+          path: |
+            artifacts/candidate-retention-${{ matrix.runtime }}/${{ matrix.archive }}
+            artifacts/candidate-retention-${{ matrix.runtime }}/${{ steps.candidates.outputs.materials_name }}
+            artifacts/candidate-retention-${{ matrix.runtime }}/distribution-${{ matrix.runtime }}.json
+            artifacts/candidate-retention-${{ matrix.runtime }}/material-summary.json
+            artifacts/candidate-retention-${{ matrix.runtime }}/SHA256SUMS
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
       - name: Upload test evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -93,6 +142,5 @@ jobs:
             artifacts/**/evidence/container-workflow.txt
           if-no-files-found: warn
           retention-days: 7
-      # Keep binary archives local to the runner until corresponding-source and
-      # original-application license obligations are resolved. Only test evidence
-      # is uploaded; successful package checks are still mandatory above.
+      # PRs, pushes and default manual runs retain evidence only. Candidate sets
+      # require explicit manual opt-in after every required platform check passes.

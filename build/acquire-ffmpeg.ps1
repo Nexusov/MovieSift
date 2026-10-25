@@ -10,24 +10,21 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
-$toolLock = Get-Content -LiteralPath (Join-Path $PSScriptRoot 'ffmpeg.lock.json') -Raw | ConvertFrom-Json
-$distribution = $toolLock.$RuntimeIdentifier
+$lockPath = Join-Path $PSScriptRoot 'ffmpeg.lock.json'
+$toolLock = Get-Content -LiteralPath $lockPath -Raw | ConvertFrom-Json
 $destinationPath = [IO.Path]::GetFullPath($Destination)
 $cachePath = [IO.Path]::GetFullPath($CacheDirectory)
 $materialDirectory = Join-Path $destinationPath 'licenses/ffmpeg'
+$recipePath = Join-Path $PSScriptRoot $toolLock.recipe
+$recipeHash = (Get-FileHash -LiteralPath $recipePath -Algorithm SHA256).Hash.ToLowerInvariant()
+. (Join-Path $PSScriptRoot 'ffmpeg-build-cache.ps1')
 New-Item -ItemType Directory -Path $cachePath, $materialDirectory -Force | Out-Null
 
-## Downloads one immutable artifact and rejects a changed cached or upstream payload.
-function Get-VerifiedArtifact {
+## Downloads an immutable source archive and rejects a changed cached payload.
+function Get-VerifiedSource {
     param([Parameter(Mandatory)] $Artifact)
 
-    $fileName = [IO.Path]::GetFileName(([Uri] $Artifact.url).AbsolutePath)
-
-    if ($Artifact.PSObject.Properties.Name -contains 'fileName') {
-        $fileName = $Artifact.fileName
-    }
-
-    $artifactPath = Join-Path $cachePath $fileName
+    $artifactPath = Join-Path $cachePath $Artifact.fileName
 
     if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf)) {
         Invoke-WebRequest -Uri $Artifact.url -OutFile $artifactPath -TimeoutSec 240
@@ -36,115 +33,103 @@ function Get-VerifiedArtifact {
     $actualHash = (Get-FileHash -LiteralPath $artifactPath -Algorithm SHA256).Hash.ToLowerInvariant()
 
     if ($actualHash -ne $Artifact.sha256) {
-        throw "FFmpeg artifact hash mismatch: $($Artifact.url); expected $($Artifact.sha256), received $actualHash."
+        $actualSize = (Get-Item -LiteralPath $artifactPath).Length
+        throw "Source hash mismatch: $($Artifact.url); expected=$($Artifact.sha256); actual=$actualHash; bytes=$actualSize. Preserve and inspect the incorrect cached file explicitly."
     }
 
     return $artifactPath
 }
 
-$archivePath = Get-VerifiedArtifact -Artifact $distribution
-$checksumPath = Get-VerifiedArtifact -Artifact $toolLock.checksums
-$sourcePath = Get-VerifiedArtifact -Artifact $toolLock.source
-$recipePath = Get-VerifiedArtifact -Artifact $toolLock.buildRecipes
-$archiveName = [IO.Path]::GetFileName($archivePath)
-$checksumLine = "$($distribution.sha256)  $archiveName"
+$sourcePath = Get-VerifiedSource -Artifact $toolLock.source
+$zlibPath = Get-VerifiedSource -Artifact $toolLock.zlib
+$identity = "$RuntimeIdentifier`n$($toolLock.source.sha256)`n$($toolLock.zlib.sha256)`n$recipeHash"
+$identityHash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes($identity))).ToLowerInvariant()
+$buildCache = Join-Path $cachePath ("ffmpeg-source-$RuntimeIdentifier-" + $identityHash.Substring(0, 20))
 
-if (-not ((Get-Content -LiteralPath $checksumPath) -ccontains $checksumLine)) {
-    throw 'The pinned FFmpeg artifact is absent from the verified publisher checksum list.'
+if (-not (Test-Path -LiteralPath $buildCache -PathType Container)) {
+    $buildDirectory = Join-Path $cachePath ('ffmpeg-build-' + [Guid]::NewGuid().ToString('N'))
+    $bash = 'bash'
+
+    if ($IsWindows) {
+        $bash = 'C:/msys64/usr/bin/bash.exe'
+
+        if (-not (Test-Path -LiteralPath $bash -PathType Leaf)) {
+            throw 'A source build requires MSYS2 Bash, GNU make, NASM and the documented MinGW-w64 compiler. A verified existing source-build cache may be reused without them.'
+        }
+    }
+
+    & $bash $recipePath $RuntimeIdentifier $sourcePath $zlibPath $buildDirectory
+
+    if ($LASTEXITCODE) {
+        throw "The pinned FFmpeg source build failed. Its owned diagnostics remain at $buildDirectory."
+    }
+
+    [IO.Directory]::Move((Join-Path $buildDirectory 'result'), $buildCache)
+    Remove-OwnedFfmpegBuild -CacheDirectory $cachePath -BuildDirectory $buildDirectory
 }
 
-$extractPayload = @'
-import json
-from pathlib import Path
-import sys
-import tarfile
-import zipfile
-
-archive_path, source_path, recipe_path, output_path, root_name, source_commit, recipe_commit, runtime_identifier = sys.argv[1:]
-output = Path(output_path)
-materials = output / "licenses/ffmpeg"
-origins = []
-
-def store(name, data, archive_kind, member):
-    """Write only explicitly selected regular members, without archive path extraction."""
-    destination = output / name
-    if destination.exists():
-        raise ValueError("FFmpeg acquisition never overwrites an existing file: " + name)
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    destination.write_bytes(data)
-    origins.append({"path": name, "artifactKind": archive_kind, "upstreamMember": member})
-
-extension = ".exe" if runtime_identifier == "win-x64" else ""
-selected = {f"{root_name}/bin/{tool}{extension}": tool + extension for tool in ("ffmpeg", "ffprobe")}
-selected[f"{root_name}/LICENSE.txt"] = "licenses/ffmpeg/LICENSE.txt"
-for name in ("ffmpeg.html", "ffprobe.html", "ffmpeg-formats.html", "ffmpeg-codecs.html", "ffmpeg-protocols.html", "default.css", "style.min.css", "bootstrap.min.css"):
-    selected[f"{root_name}/doc/{name}"] = "licenses/ffmpeg/doc/" + name
-found = set()
-if zipfile.is_zipfile(archive_path):
-    with zipfile.ZipFile(archive_path) as archive:
-        for member in archive.infolist():
-            if member.filename in selected and not member.is_dir():
-                if member.filename in found:
-                    raise ValueError("Duplicate selected FFmpeg archive member")
-                store(selected[member.filename], archive.read(member), "binary", member.filename)
-                found.add(member.filename)
-else:
-    with tarfile.open(archive_path, "r:xz") as archive:
-        for member in archive.getmembers():
-            if member.name in selected:
-                if not member.isfile() or member.name in found:
-                    raise ValueError("Unsafe or duplicate selected FFmpeg archive member")
-                store(selected[member.name], archive.extractfile(member).read(), "binary", member.name)
-                found.add(member.name)
-if found != set(selected):
-    raise ValueError("A selected FFmpeg executable, license or documentation member is absent")
-
-with tarfile.open(source_path, "r:gz") as archive:
-    prefix = "FFmpeg-" + source_commit + "/"
-    required = ("COPYING.LGPLv3", "COPYING.LGPLv2.1", "COPYING.GPLv2", "COPYING.GPLv3", "LICENSE.md", "configure")
-    for name in required:
-        member = archive.getmember(prefix + name)
-        if not member.isfile():
-            raise ValueError("A required FFmpeg source material is not regular")
-        store("licenses/ffmpeg/source-notices/" + name, archive.extractfile(member).read(), "source", member.name)
-
-with tarfile.open(recipe_path, "r:gz") as archive:
-    prefix = "FFmpeg-Builds-" + recipe_commit + "/"
-    recipes = []
-    required = ("LICENSE", "README.md", "build.sh", "generate.sh", "download.sh", "variants/defaults-lgpl.sh")
-    names = {member.name: member for member in archive.getmembers() if member.isfile()}
-    for name in required:
-        if prefix + name not in names:
-            raise ValueError("A required pinned build recipe is absent: " + name)
-    for full_name, member in names.items():
-        name = full_name.removeprefix(prefix)
-        if not full_name.startswith(prefix):
-            continue
-        if name in ("LICENSE", "README.md", "build.sh", "generate.sh", "download.sh") or name.startswith(("scripts.d/", "variants/", "addins/", "patches/", "images/", "util/", ".github/workflows/")):
-            data = archive.extractfile(member).read()
-            store("licenses/ffmpeg/build-recipes/" + name, data, "buildRecipes", member.name)
-            if name.startswith("scripts.d/") and name.endswith(".sh"):
-                recipes.append({"path": name, "declarations": [line.strip() for line in data.decode("utf-8").splitlines() if line.startswith(("SCRIPT_REPO=", "SCRIPT_COMMIT=", "SCRIPT_VERSION=", "SCRIPT_SHA256=", "SCRIPT_NAME="))]})
-(materials / "dependency-recipes.json").write_text(json.dumps({"purpose": "Pinned recipe declarations, not assertions of statically linked component versions", "buildRecipesCommit": recipe_commit, "recipes": recipes}, indent=2) + "\n", encoding="utf-8")
-(materials / "acquired-members.json").write_text(json.dumps(origins, indent=2) + "\n", encoding="utf-8")
-'@
-& python -c $extractPayload $archivePath $sourcePath $recipePath $destinationPath $distribution.archiveRoot $toolLock.source.commit $toolLock.buildRecipes.commit $RuntimeIdentifier
-
-if ($LASTEXITCODE) {
-    throw 'Could not extract the selected FFmpeg tools and pinned source/build materials.'
-}
-
-Copy-Item -LiteralPath $sourcePath, $recipePath -Destination $materialDirectory
-Copy-Item -LiteralPath $checksumPath -Destination (Join-Path $materialDirectory 'checksums.sha256')
-Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'ffmpeg.lock.json') -Destination (Join-Path $destinationPath 'ffmpeg-provenance.json')
+$receiptPath = Join-Path $buildCache 'build-receipt.json'
+$receipt = Read-VerifiedFfmpegBuild -CacheDirectory $buildCache -RuntimeIdentifier $RuntimeIdentifier -ToolLock $toolLock -RecipeHash $recipeHash
 $extension = ''
 
-if ($IsWindows) {
+if ($RuntimeIdentifier -eq 'win-x64') {
     $extension = '.exe'
 }
 
+$sourceBuildMaterials = Join-Path $materialDirectory 'source-build'
+New-Item -ItemType Directory -Path $sourceBuildMaterials -Force | Out-Null
+Copy-Item -LiteralPath $receiptPath -Destination $sourceBuildMaterials
+
+foreach ($file in $receipt.materials) {
+    Copy-Item -LiteralPath (Join-Path $buildCache $file.path) -Destination $sourceBuildMaterials
+}
+
+Copy-Item -LiteralPath $sourcePath, $zlibPath -Destination $materialDirectory
+$recipeMaterials = Join-Path $materialDirectory 'build-recipes'
+New-Item -ItemType Directory -Path $recipeMaterials -Force | Out-Null
+Copy-Item -LiteralPath $recipePath, $lockPath -Destination $recipeMaterials
+$provenance = Get-Content -LiteralPath $lockPath -Raw | ConvertFrom-Json -AsHashtable
+$provenance.recipeSha256 = $recipeHash
+$provenance.buildReceiptSha256 = (Get-FileHash -LiteralPath $receiptPath -Algorithm SHA256).Hash.ToLowerInvariant()
+$provenance | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath (Join-Path $destinationPath 'ffmpeg-provenance.json') -Encoding utf8NoBOM
+
+$extractNotices = @'
+from pathlib import Path
+import sys
+import tarfile
+
+source_path, zlib_path, output_path, commit = sys.argv[1:]
+output = Path(output_path)
+selections = [(source_path, "FFmpeg-" + commit + "/", "source-notices", ("COPYING.LGPLv2.1", "COPYING.LGPLv3", "COPYING.GPLv2", "COPYING.GPLv3", "LICENSE.md")),
+              (zlib_path, "zlib-1.3.2/", "zlib-notices", ("README", "zlib.h"))]
+for archive_path, prefix, directory, names in selections:
+    with tarfile.open(archive_path) as archive:
+        for name in names:
+            member = archive.getmember(prefix + name)
+            if not member.isfile():
+                raise ValueError("A required source notice is not regular")
+            target = output / directory / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(archive.extractfile(member).read())
+(output / "LICENSE.txt").write_bytes((output / "source-notices/COPYING.LGPLv2.1").read_bytes())
+'@
+& python -c $extractNotices $sourcePath $zlibPath $materialDirectory $toolLock.source.commit
+
+if ($LASTEXITCODE) {
+    throw 'Could not collect the pinned FFmpeg/zlib notices.'
+}
+
+$members = @()
+
 foreach ($tool in @('ffmpeg', 'ffprobe')) {
-    $executable = Join-Path $destinationPath ($tool + $extension)
+    $fileName = $tool + $extension
+    $executable = Join-Path $destinationPath $fileName
+
+    if (Test-Path -LiteralPath $executable) {
+        throw "Acquisition never overwrites an existing executable: $executable."
+    }
+
+    Copy-Item -LiteralPath (Join-Path $buildCache $fileName) -Destination $executable
 
     if ($IsLinux) {
         & chmod u+x $executable
@@ -155,26 +140,43 @@ foreach ($tool in @('ffmpeg', 'ffprobe')) {
     }
 
     $versionOutput = @(& $executable -version 2>&1 | ForEach-Object { "$_" })
+    $versionExitCode = $LASTEXITCODE
+    $configurationLines = @($versionOutput | Where-Object { $_.StartsWith('configuration: ', [StringComparison]::Ordinal) })
+    $configuration = ''
 
-    if ($LASTEXITCODE -or -not $versionOutput[0].StartsWith("$tool version $($toolLock.version) ", [StringComparison]::Ordinal)) {
-        throw "The acquired $tool failed its pinned version check."
+    if ($configurationLines.Count -eq 1) {
+        $configuration = $configurationLines[0]
     }
 
-    $configuration = $versionOutput | Where-Object { $_.StartsWith('configuration: ', [StringComparison]::Ordinal) }
-    $hasProhibitedBuild = $configuration.Contains('--enable-nonfree') -or $configuration.Contains('--enable-gpl')
+    $invalidConfiguration = $configuration.Contains('--enable-nonfree') -or $configuration.Contains('--enable-gpl') -or
+        $configuration.Contains('--enable-version3') -or $configuration.Contains('--enable-lib') -or
+        -not $configuration.Contains('--disable-autodetect') -or -not $configuration.Contains('--disable-network') -or
+        -not $configuration.Contains('--disable-everything') -or -not $configuration.Contains('--enable-zlib')
 
-    if ($hasProhibitedBuild -or -not $configuration.Contains('--enable-version3')) {
-        throw 'The acquired FFmpeg configuration is not the pinned LGPL version3 build.'
+    $firstVersionLine = '<no version output>'
+
+    if ($versionOutput.Count) {
+        $firstVersionLine = $versionOutput[0]
+    }
+
+    $hasExpectedVersion = $firstVersionLine.StartsWith("$tool version $($toolLock.version) ", [StringComparison]::Ordinal)
+
+    if ($versionExitCode -or -not $hasExpectedVersion -or $invalidConfiguration) {
+        $maximumDiagnosticCharacters = 512
+        $diagnosticLine = $firstVersionLine.Substring(0, [Math]::Min($firstVersionLine.Length, $maximumDiagnosticCharacters))
+        throw "The source-built $tool failed its exact version/configuration check: exit=$versionExitCode; expectedVersion=$hasExpectedVersion; configurationAccepted=$(-not $invalidConfiguration); firstLine='$diagnosticLine'."
     }
 
     $versionOutput | Set-Content -LiteralPath (Join-Path $materialDirectory ($tool + '-version.txt')) -Encoding utf8NoBOM
     $configuration | Set-Content -LiteralPath (Join-Path $materialDirectory ($tool + '-buildconf.txt')) -Encoding utf8NoBOM
+    $members += [ordered]@{ path = $fileName; artifactKind = 'sourceBuild'; upstreamMember = ''; buildReceiptSha256 = $provenance.buildReceiptSha256 }
 }
 
+$members | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath (Join-Path $materialDirectory 'acquired-members.json') -Encoding utf8NoBOM
 & python (Join-Path $PSScriptRoot 'ffmpeg-runtime-dependencies.py') --directory $destinationPath --runtime-identifier $RuntimeIdentifier --output (Join-Path $materialDirectory 'runtime-dependencies.json')
 
 if ($LASTEXITCODE) {
-    throw 'Could not establish the acquired FFmpeg runtime dependency closure.'
+    throw 'Could not establish the actual source-built FFmpeg runtime dependency closure.'
 }
 
-Write-Output "Acquired FFmpeg/ffprobe $($toolLock.version); exact source and complete pinned build recipes included. Static dependency source/build reconciliation remains a release gate."
+Write-Output "Built FFmpeg/ffprobe $($toolLock.version); exact FFmpeg/zlib sources, local build recipe, toolchain and worker receipts included."

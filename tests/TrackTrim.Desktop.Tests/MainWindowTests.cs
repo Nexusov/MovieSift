@@ -21,28 +21,27 @@ public sealed class MainWindowTests
         var window = new MainWindow { DataContext = viewModel };
         window.Show();
         await fixture.LoadAsync();
-        viewModel.ReviewPlanCommand.Execute(null);
-        Assert.Equal("Resulting default audio: retained track IDs 1 keep their existing default flags.", viewModel.PlanDefaultAudioText);
-        viewModel.Tracks[1].Keep = false;
-        Assert.False(viewModel.HasPlan);
-        Assert.Empty(viewModel.PlanDefaultAudioText);
-        viewModel.ReviewPlanCommand.Execute(null);
-        Assert.Contains("none of the retained audio tracks has the default flag", viewModel.PlanDefaultAudioText);
+        await fixture.Workspace.ReviewCommand.ExecuteAsync(null);
+        Assert.Equal("Resulting default audio: retained track IDs 1 keep their existing default flags.", fixture.Item.PlanDefaultAudioText);
+        fixture.Item.Tracks[1].Keep = false;
+        Assert.False(fixture.Item.HasPlan);
+        Assert.Empty(fixture.Item.PlanDefaultAudioText);
+        await fixture.Workspace.ReviewCommand.ExecuteAsync(null);
+        Assert.Contains("none of the retained audio tracks has the default flag", fixture.Item.PlanDefaultAudioText);
         await viewModel.ChangeLanguageCommand.ExecuteAsync("ru");
-        Assert.True(viewModel.HasPlan);
-        Assert.Contains("ни одна из сохранённых аудиодорожек не имеет флага по умолчанию", viewModel.PlanDefaultAudioText);
-        Assert.Equal(viewModel.PlanDefaultAudioText, window.FindControl<TextBlock>("PlanDefaultAudioStatus")!.Text);
-        Assert.True(window.FindControl<TextBlock>("DefaultAudioDisclaimer")!.IsVisible);
-        Assert.Contains("Выбор проигрывателя может отличаться", window.FindControl<TextBlock>("DefaultAudioDisclaimer")!.Text);
-        viewModel.Tracks[2].Keep = false;
-        viewModel.ZeroAudioConfirmed = true;
-        viewModel.ReviewPlanCommand.Execute(null);
-        Assert.Equal("В результате не останется аудиодорожек.", viewModel.PlanDefaultAudioText);
+        Assert.True(fixture.Item.HasPlan);
+        Assert.Contains("ни одна из сохранённых аудиодорожек не имеет флага по умолчанию", fixture.Item.PlanDefaultAudioText);
+        Assert.Contains(fixture.Item.PlanDefaultAudioText, fixture.Workspace.ReviewText);
+        Assert.True(fixture.Item.RemovesDefaultAudio);
+        fixture.Item.Tracks[2].Keep = false;
+        fixture.Item.ZeroAudioConfirmed = true;
+        await fixture.Workspace.ReviewCommand.ExecuteAsync(null);
+        Assert.Equal("В результате не останется аудиодорожек.", fixture.Item.PlanDefaultAudioText);
         await viewModel.ChangeLanguageCommand.ExecuteAsync("en");
-        Assert.Equal("Resulting audio: no audio tracks will remain.", viewModel.PlanDefaultAudioText);
-        viewModel.Tracks[1].Keep = true;
-        viewModel.ReviewPlanCommand.Execute(null);
-        Assert.Contains("retained track IDs 1 keep their existing default flags", viewModel.PlanDefaultAudioText);
+        Assert.Equal("Resulting audio: no audio tracks will remain.", fixture.Item.PlanDefaultAudioText);
+        fixture.Item.Tracks[1].Keep = true;
+        await fixture.Workspace.ReviewCommand.ExecuteAsync(null);
+        Assert.Contains("retained track IDs 1 keep their existing default flags", fixture.Item.PlanDefaultAudioText);
         window.Close();
     }
 
@@ -57,16 +56,16 @@ public sealed class MainWindowTests
         await viewModel.ChangeLanguageCommand.ExecuteAsync("ru");
         var window = new MainWindow { DataContext = viewModel };
         window.Show();
-        await viewModel.OpenSourceCommand.ExecuteAsync(null);
-        Assert.True(viewModel.HasError);
-        Assert.Contains("Связанные сегменты Matroska не поддерживаются", viewModel.ErrorDetail);
-        Assert.Equal(viewModel.ErrorDetail, window.FindControl<TextBlock>("ErrorDetailText")!.Text);
-        Assert.DoesNotContain(rawDetail, viewModel.ErrorDetail);
-        Assert.Equal(rawDetail, viewModel.Diagnostics);
+        await fixture.LoadAsync();
+        Assert.True(fixture.Item.HasError);
+        Assert.Contains("Связанные сегменты Matroska не поддерживаются", fixture.Item.ErrorReasonText);
+        Assert.NotEmpty(fixture.Item.ErrorReasonText);
+        Assert.DoesNotContain(rawDetail, fixture.Item.ErrorReasonText);
+        Assert.Equal(rawDetail, fixture.Item.Diagnostics);
         Assert.Equal("Техническая диагностика (исходный язык)", viewModel.Localization["Diagnostics"]);
         await viewModel.ChangeLanguageCommand.ExecuteAsync("en");
-        Assert.Contains("Linked Matroska segments are unsupported", viewModel.ErrorDetail);
-        Assert.Equal(rawDetail, viewModel.Diagnostics);
+        Assert.Contains("Linked Matroska segments are unsupported", fixture.Item.ErrorReasonText);
+        Assert.Equal(rawDetail, fixture.Item.Diagnostics);
         window.Close();
     }
 
@@ -79,12 +78,12 @@ public sealed class MainWindowTests
         fixture.Backend.InspectionException = new InvalidOperationException(rawDetail);
         var viewModel = fixture.ViewModel;
         await viewModel.ChangeLanguageCommand.ExecuteAsync("ru");
-        await viewModel.OpenSourceCommand.ExecuteAsync(null);
-        Assert.True(viewModel.HasError);
-        Assert.False(viewModel.HasErrorDetail);
-        Assert.Empty(viewModel.ErrorDetail);
-        Assert.DoesNotContain(rawDetail, viewModel.ErrorText);
-        Assert.Equal(rawDetail, viewModel.Diagnostics);
+        await fixture.LoadAsync();
+        Assert.True(fixture.Item.HasError);
+        Assert.True(string.IsNullOrWhiteSpace(fixture.Item.ErrorReasonText));
+        Assert.Empty(fixture.Item.ErrorReasonText);
+        Assert.DoesNotContain(rawDetail, fixture.Item.ErrorText);
+        Assert.Contains(rawDetail, fixture.Item.Diagnostics);
     }
 
     /// <summary>Retains publication evidence while exposing cleanup detail only under technical diagnostics.</summary>
@@ -97,15 +96,15 @@ public sealed class MainWindowTests
         await fixture.LoadAsync();
         var viewModel = fixture.ViewModel;
         await viewModel.ChangeLanguageCommand.ExecuteAsync("ru");
-        viewModel.Tracks[1].Keep = false;
-        viewModel.ReviewPlanCommand.Execute(null);
-        await viewModel.RunCommand.ExecuteAsync(null);
+        fixture.Item.Tracks[1].Keep = false;
+        await fixture.Workspace.ReviewCommand.ExecuteAsync(null);
+        await fixture.Workspace.RunCommand.ExecuteAsync(null);
         Assert.True(viewModel.HasCleanupIssue);
-        Assert.False(viewModel.HasError);
-        Assert.Contains(ViewModelFixture.OutputPath, viewModel.StatusText);
+        Assert.False(fixture.Item.HasError);
+        Assert.Equal(ViewModelFixture.OutputPath, fixture.Item.PublishedPath);
         Assert.Contains("Временные файлы удалены не полностью", viewModel.Localization["CleanupHeading"]);
         Assert.DoesNotContain(rawDetail, viewModel.Localization["CleanupHeading"]);
-        Assert.Contains(rawDetail, viewModel.Diagnostics);
+        Assert.Contains(rawDetail, fixture.Item.Diagnostics);
     }
 
     /// <summary>Shows no-change evidence without invoking a redundant remux from the UI.</summary>
@@ -115,11 +114,11 @@ public sealed class MainWindowTests
         var fixture = new ViewModelFixture();
         await fixture.LoadAsync();
         var viewModel = fixture.ViewModel;
-        viewModel.ReviewPlanCommand.Execute(null);
-        await viewModel.RunCommand.ExecuteAsync(null);
+        await fixture.Workspace.ReviewCommand.ExecuteAsync(null);
+        await fixture.Workspace.RunCommand.ExecuteAsync(null);
         Assert.Equal(0, fixture.Backend.RemuxCount);
-        Assert.Contains("No tracks removed", viewModel.StatusText);
-        Assert.False(viewModel.HasError);
+        Assert.Equal(fixture.Workspace.Localization["BatchItemNoChange"], fixture.Item.StateText);
+        Assert.False(fixture.Item.HasError);
     }
 
     /// <summary>Loads the real compiled XAML and refreshes its text without replacing inspection state.</summary>
@@ -131,16 +130,16 @@ public sealed class MainWindowTests
         var window = new MainWindow { DataContext = viewModel };
         window.Show();
         await fixture.LoadAsync();
-        viewModel.Tracks[1].Keep = false;
-        viewModel.ReviewPlanCommand.Execute(null);
-        var selectedTrack = viewModel.Tracks[2];
+        fixture.Item.Tracks[1].Keep = false;
+        await fixture.Workspace.ReviewCommand.ExecuteAsync(null);
+        var selectedTrack = fixture.Item.Tracks[2];
         await viewModel.ChangeLanguageCommand.ExecuteAsync("ru");
         Dispatcher.UIThread.RunJobs();
-        Assert.Equal("Открыть MKV / MP4…", window.FindControl<Button>("OpenButton")!.Content);
+        Assert.Equal(viewModel.Localization["BatchAddFiles"], window.FindControl<BatchView>("Workspace")!.FindControl<Button>("AddBatchFilesButton")!.Content);
         Assert.Equal("ru", fixture.Settings.Language);
-        Assert.False(viewModel.Tracks[1].Keep);
-        Assert.Same(selectedTrack, viewModel.Tracks[2]);
-        Assert.True(viewModel.HasPlan);
+        Assert.False(fixture.Item.Tracks[1].Keep);
+        Assert.Same(selectedTrack, fixture.Item.Tracks[2]);
+        Assert.True(fixture.Item.HasPlan);
         Assert.Equal("Аудио", selectedTrack.KindText);
         window.Close();
     }
@@ -152,17 +151,17 @@ public sealed class MainWindowTests
         var fixture = new ViewModelFixture();
         await fixture.LoadAsync();
         var viewModel = fixture.ViewModel;
-        Assert.All(viewModel.Tracks, track => Assert.True(track.Keep));
-        viewModel.ReviewPlanCommand.Execute(null);
-        Assert.True(viewModel.CanRun);
-        viewModel.Tracks[1].Keep = false;
-        Assert.False(viewModel.HasPlan);
-        Assert.False(viewModel.RunCommand.CanExecute(null));
-        viewModel.ReviewPlanCommand.Execute(null);
-        viewModel.OutputPath = "changed-output.mkv";
-        Assert.False(viewModel.HasPlan);
-        viewModel.Tracks[0].Keep = false;
-        Assert.True(viewModel.Tracks[0].Keep);
+        Assert.All(fixture.Item.Tracks, track => Assert.True(track.Keep));
+        await fixture.Workspace.ReviewCommand.ExecuteAsync(null);
+        Assert.True(fixture.Workspace.CanRun);
+        fixture.Item.Tracks[1].Keep = false;
+        Assert.False(fixture.Item.HasPlan);
+        Assert.False(fixture.Workspace.RunCommand.CanExecute(null));
+        await fixture.Workspace.ReviewCommand.ExecuteAsync(null);
+        fixture.Item.OutputPath = "changed-output.mkv";
+        Assert.False(fixture.Item.HasPlan);
+        fixture.Item.Tracks[0].Keep = false;
+        Assert.True(fixture.Item.Tracks[0].Keep);
     }
 
     /// <summary>Shows explicit confirmation before a plan can remove all existing audio.</summary>
@@ -172,15 +171,15 @@ public sealed class MainWindowTests
         var fixture = new ViewModelFixture();
         await fixture.LoadAsync();
         var viewModel = fixture.ViewModel;
-        viewModel.Tracks[1].Keep = false;
-        viewModel.Tracks[2].Keep = false;
-        Assert.True(viewModel.NeedsZeroAudioConfirmation);
-        viewModel.ReviewPlanCommand.Execute(null);
-        Assert.False(viewModel.HasPlan);
-        Assert.True(viewModel.HasError);
-        viewModel.ZeroAudioConfirmed = true;
-        viewModel.ReviewPlanCommand.Execute(null);
-        Assert.True(viewModel.HasPlan);
+        fixture.Item.Tracks[1].Keep = false;
+        fixture.Item.Tracks[2].Keep = false;
+        Assert.True(fixture.Item.NeedsZeroAudioConfirmation);
+        await fixture.Workspace.ReviewCommand.ExecuteAsync(null);
+        Assert.False(fixture.Item.HasPlan);
+        Assert.True(fixture.Workspace.HasError);
+        fixture.Item.ZeroAudioConfirmed = true;
+        await fixture.Workspace.ReviewCommand.ExecuteAsync(null);
+        Assert.True(fixture.Item.HasPlan);
     }
 
     /// <summary>Allows language switching during actual application coordination without cancelling its worker.</summary>
@@ -191,21 +190,21 @@ public sealed class MainWindowTests
         await fixture.LoadAsync();
         fixture.Backend.ContinueRemux = new(TaskCreationOptions.RunContinuationsAsynchronously);
         var viewModel = fixture.ViewModel;
-        viewModel.Tracks[1].Keep = false;
-        viewModel.ReviewPlanCommand.Execute(null);
-        var execution = viewModel.RunCommand.ExecuteAsync(null);
+        fixture.Item.Tracks[1].Keep = false;
+        await fixture.Workspace.ReviewCommand.ExecuteAsync(null);
+        var execution = fixture.Workspace.RunCommand.ExecuteAsync(null);
         await fixture.Backend.RemuxStarted.Task.WaitAsync(TimeSpan.FromSeconds(5));
         Dispatcher.UIThread.RunJobs();
-        var originalProgress = viewModel.ProgressValue;
+        var originalProgress = fixture.Workspace.ProgressValue;
         await viewModel.ChangeLanguageCommand.ExecuteAsync("ru");
-        Assert.True(viewModel.IsBusy);
+        Assert.True(fixture.Workspace.IsBusy);
         Assert.False(viewModel.CanEdit);
-        Assert.True(viewModel.HasPlan);
-        Assert.Equal(originalProgress, viewModel.ProgressValue);
+        Assert.True(fixture.Item.HasPlan);
+        Assert.Equal(originalProgress, fixture.Workspace.ProgressValue);
         fixture.Backend.ContinueRemux.TrySetResult();
         await execution;
-        Assert.Contains(ViewModelFixture.OutputPath, viewModel.StatusText);
-        Assert.False(viewModel.IsBusy);
+        Assert.Equal(ViewModelFixture.OutputPath, fixture.Item.PublishedPath);
+        Assert.False(fixture.Workspace.IsBusy);
         Assert.Equal(1, fixture.Backend.RemuxCount);
     }
 
@@ -217,17 +216,18 @@ public sealed class MainWindowTests
         await fixture.LoadAsync();
         fixture.Backend.ExitCode = 1;
         var viewModel = fixture.ViewModel;
-        viewModel.Tracks[1].Keep = false;
-        viewModel.ReviewPlanCommand.Execute(null);
-        await viewModel.RunCommand.ExecuteAsync(null);
+        fixture.Item.Tracks[1].Keep = false;
+        await fixture.Workspace.ReviewCommand.ExecuteAsync(null);
+        await fixture.Workspace.RunCommand.ExecuteAsync(null);
         Assert.True(viewModel.HasWarningCandidate);
         Assert.False(viewModel.CanEdit);
         await viewModel.ChangeLanguageCommand.ExecuteAsync("ru");
-        Assert.Contains("предупреждения", viewModel.StatusText);
-        await viewModel.PublishWarningsCommand.ExecuteAsync(null);
+        Assert.Contains("предупреждения", fixture.Item.StateText);
+        await fixture.Workspace.PublishWarningsCommand.ExecuteAsync(null);
         Assert.False(viewModel.HasWarningCandidate);
-        Assert.Contains(ViewModelFixture.OutputPath, viewModel.StatusText);
-        Assert.Contains("с предупреждениями", viewModel.StatusText);
+        Assert.Equal(ViewModelFixture.OutputPath, fixture.Item.PublishedPath);
+        Assert.Equal(viewModel.Localization["BatchItemCompletedWithWarnings"], fixture.Item.StateText);
+        Assert.Contains("simulated tool warning", fixture.Item.Diagnostics);
         Assert.Equal(1, fixture.Backend.RemuxCount);
     }
 
@@ -240,17 +240,17 @@ public sealed class MainWindowTests
         fixture.Backend.ExitCode = 1;
         fixture.Backend.VerificationPassed = false;
         var viewModel = fixture.ViewModel;
-        viewModel.Tracks[1].Keep = false;
-        viewModel.ReviewPlanCommand.Execute(null);
-        await viewModel.RunCommand.ExecuteAsync(null);
-        Assert.True(viewModel.HasError);
+        fixture.Item.Tracks[1].Keep = false;
+        await fixture.Workspace.ReviewCommand.ExecuteAsync(null);
+        await fixture.Workspace.RunCommand.ExecuteAsync(null);
+        Assert.True(fixture.Item.HasError);
         Assert.False(viewModel.HasWarningCandidate);
         await viewModel.ChangeLanguageCommand.ExecuteAsync("ru");
-        Assert.Contains("проверка не пройдена", viewModel.ErrorText);
-        Assert.Empty(viewModel.ErrorDetail);
-        Assert.Contains("simulated tool warning", viewModel.Diagnostics);
-        Assert.Contains("simulated verification", viewModel.Diagnostics);
-        Assert.False(viewModel.PublishWarningsCommand.CanExecute(null));
+        Assert.Contains("проверка не пройдена", fixture.Item.ErrorText);
+        Assert.Empty(fixture.Item.ErrorReasonText);
+        Assert.Contains("simulated tool warning", fixture.Item.Diagnostics);
+        Assert.Contains("simulated verification", fixture.Item.Diagnostics);
+        Assert.False(fixture.Workspace.PublishWarningsCommand.CanExecute(null));
     }
 
     /// <summary>Waits for owned cancellation before completing a close request.</summary>
@@ -263,16 +263,16 @@ public sealed class MainWindowTests
         var viewModel = fixture.ViewModel;
         var window = new MainWindow { DataContext = viewModel };
         window.Show();
-        viewModel.Tracks[1].Keep = false;
-        viewModel.ReviewPlanCommand.Execute(null);
-        var execution = viewModel.RunCommand.ExecuteAsync(null);
+        fixture.Item.Tracks[1].Keep = false;
+        await fixture.Workspace.ReviewCommand.ExecuteAsync(null);
+        var execution = fixture.Workspace.RunCommand.ExecuteAsync(null);
         await fixture.Backend.RemuxStarted.Task.WaitAsync(TimeSpan.FromSeconds(5));
         window.Close();
         await execution;
         Dispatcher.UIThread.RunJobs();
-        Assert.False(viewModel.IsBusy);
+        Assert.False(fixture.Workspace.IsBusy);
         Assert.False(window.IsVisible);
-        Assert.False(viewModel.HasError);
+        Assert.False(fixture.Item.HasError);
     }
 
     /// <summary>Requires an explicit close decision if worker termination cannot be confirmed.</summary>
@@ -285,9 +285,9 @@ public sealed class MainWindowTests
         var viewModel = fixture.ViewModel;
         var window = new MainWindow { DataContext = viewModel };
         window.Show();
-        viewModel.Tracks[1].Keep = false;
-        viewModel.ReviewPlanCommand.Execute(null);
-        await viewModel.RunCommand.ExecuteAsync(null);
+        fixture.Item.Tracks[1].Keep = false;
+        await fixture.Workspace.ReviewCommand.ExecuteAsync(null);
+        await fixture.Workspace.RunCommand.ExecuteAsync(null);
         Assert.True(viewModel.RequiresCloseDecision);
         Assert.False(viewModel.CanEdit);
         window.Close();

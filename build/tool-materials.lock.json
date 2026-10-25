@@ -72,46 +72,6 @@
       "relationship": "Official version-tag terms/header evidence for an observed component version; exact downstream patches, selected licensing path and complete corresponding source remain unverified."
     },
     {
-      "component": "Qt VirtualKeyboard",
-      "version": "6.6.1",
-      "runtimeIdentifier": "linux-x64",
-      "url": "https://raw.githubusercontent.com/qt/qtvirtualkeyboard/v6.6.1/src/virtualkeyboard/qvirtualkeyboardinputengine.cpp",
-      "sha256": "1720b5a64679c6cc996faa84543717417383903f37ff9837fae44aa152e28874",
-      "path": "Qt-VirtualKeyboard/6.6.1/src/virtualkeyboard/qvirtualkeyboardinputengine.cpp",
-      "kind": "source-build-evidence",
-      "relationship": "Official version-tag terms/header evidence for an observed component version; exact downstream patches, selected licensing path and complete corresponding source remain unverified."
-    },
-    {
-      "component": "Qt VirtualKeyboard",
-      "version": "6.6.1",
-      "runtimeIdentifier": "linux-x64",
-      "url": "https://raw.githubusercontent.com/qt/qtvirtualkeyboard/v6.6.1/LICENSES/GPL-3.0-only.txt",
-      "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
-      "path": "Qt-VirtualKeyboard/6.6.1/LICENSES/GPL-3.0-only.txt",
-      "kind": "license",
-      "relationship": "Official version-tag terms/header evidence for an observed component version; exact downstream patches, selected licensing path and complete corresponding source remain unverified."
-    },
-    {
-      "component": "Qt VirtualKeyboard",
-      "version": "6.6.1",
-      "runtimeIdentifier": "linux-x64",
-      "url": "https://raw.githubusercontent.com/qt/qtvirtualkeyboard/v6.6.1/.cmake.conf",
-      "sha256": "ef2142d3f0960408cee4f67a69eb6d9332d769a73a3c807b427d2756fd2b97f1",
-      "path": "Qt-VirtualKeyboard/6.6.1/.cmake.conf",
-      "kind": "source-build-evidence",
-      "relationship": "Official version-tag terms/header evidence for an observed component version; exact downstream patches, selected licensing path and complete corresponding source remain unverified."
-    },
-    {
-      "component": "OpenSSL",
-      "version": "1.1.1k",
-      "runtimeIdentifier": "linux-x64",
-      "url": "https://raw.githubusercontent.com/openssl/openssl/OpenSSL_1_1_1k/LICENSE",
-      "sha256": "c32913b33252e71190af2066f08115c69bc9fddadf3bf29296e20c835389841c",
-      "path": "OpenSSL/1.1.1k/LICENSE",
-      "kind": "license",
-      "relationship": "Official version-tag terms/header evidence for an observed component version; exact downstream patches, selected licensing path and complete corresponding source remain unverified."
-    },
-    {
       "component": "FLAC library",
       "version": "1.5.0",
       "runtimeIdentifier": "win-x64",
@@ -130,6 +90,914 @@
       "path": "FLAC/1.3.2/COPYING.Xiph",
       "kind": "license",
       "relationship": "Official release-tag FLAC library terms for the observed embedded version; exact downstream patches/build inputs and broader binary closure remain unverified."
+    },
+    {
+      "component": "flac-libs",
+      "version": "1.3.2-9.el8_8.1",
+      "runtimeIdentifier": "linux-x64",
+      "url": "https://repo.almalinux.org/vault/8/AppStream/Source/Packages/flac-1.3.2-9.el8_8.1.src.rpm",
+      "sha256": "102d79b5115f01993a9d9e4a9096b7f9609d76399400d35eaad5c34cefccb736",
+      "path": "almalinux/flac-1.3.2-9.el8_8.1.src.rpm",
+      "kind": "corresponding-source-rpm",
+      "relationship": "Every listed shipped library is an exact complete-byte SHA256 match to this primary distribution binary RPM; its SourceRPM header identifies this complete source RPM containing upstream sources, downstream patches and RPM build specification.",
+      "outputDirectory": "corresponding-source",
+      "correspondsTo": [
+        {
+          "path": "app-root/usr/lib/libFLAC.so.8",
+          "sha256": "fe38be45263368b5103c2d32f879c64cb6c410a7d4e935e6e4a373e86749d358",
+          "size": 372016
+        }
+      ],
+      "binaryEvidence": {
+        "url": "https://repo.almalinux.org/almalinux/8.10/AppStream/x86_64/os/Packages/flac-libs-1.3.2-9.el8_8.1.x86_64.rpm",
+        "sha256": "eb76f5c999ef91f886eb807b8619bb5edb96daa25d9b98421264ca03e84be79e",
+        "sourceRpmHeader": "flac-1.3.2-9.el8_8.1.src.rpm"
+      },
+      "packageLicenseDeclaration": "BSD and GPLv2+ and GFDL",
+      "sourcePayloadFiles": 6
+    },
+    {
+      "component": "flac-libs",
+      "version": "1.3.2-9.el8_8.1",
+      "runtimeIdentifier": "linux-x64",
+      "localFile": "third-party-notices/almalinux/flac-libs/1.3.2-9.el8_8.1/COPYING.FDL",
+      "sha256": "f45cc81b400a048b56c9edbd4c3317f7a8958463dfd55aa96f268ecfd6baa12c",
+      "path": "almalinux/flac-libs/1.3.2-9.el8_8.1/COPYING.FDL",
+      "kind": "license",
+      "relationship": "Unchanged license/notice member of the exact primary binary RPM whose shipped library bytes match; package-wide terms may cover additional unshipped source/programs.",
+      "sourceArtifact": {
+        "url": "https://repo.almalinux.org/almalinux/8.10/AppStream/x86_64/os/Packages/flac-libs-1.3.2-9.el8_8.1.x86_64.rpm",
+        "sha256": "eb76f5c999ef91f886eb807b8619bb5edb96daa25d9b98421264ca03e84be79e",
+        "member": "./usr/share/doc/flac-libs/COPYING.FDL"
+      }
+    },
+    {
+      "component": "flac-libs",
+      "version": "1.3.2-9.el8_8.1",
+      "runtimeIdentifier": "linux-x64",
+      "localFile": "third-party-notices/almalinux/flac-libs/1.3.2-9.el8_8.1/COPYING.GPL",
+      "sha256": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643",
+      "path": "almalinux/flac-libs/1.3.2-9.el8_8.1/COPYING.GPL",
+      "kind": "license",
+      "relationship": "Unchanged license/notice member of the exact primary binary RPM whose shipped library bytes match; package-wide terms may cover additional unshipped source/programs.",
+      "sourceArtifact": {
+        "url": "https://repo.almalinux.org/almalinux/8.10/AppStream/x86_64/os/Packages/flac-libs-1.3.2-9.el8_8.1.x86_64.rpm",
+        "sha256": "eb76f5c999ef91f886eb807b8619bb5edb96daa25d9b98421264ca03e84be79e",
+        "member": "./usr/share/doc/flac-libs/COPYING.GPL"
+      }
+    },
+    {
+      "component": "flac-libs",
+      "version": "1.3.2-9.el8_8.1",
+      "runtimeIdentifier": "linux-x64",
+      "localFile": "third-party-notices/almalinux/flac-libs/1.3.2-9.el8_8.1/COPYING.LGPL",
+      "sha256": "5df07007198989c622f5d41de8d703e7bef3d0e79d62e24332ee739a452af62a",
+      "path": "almalinux/flac-libs/1.3.2-9.el8_8.1/COPYING.LGPL",
+      "kind": "license",
+      "relationship": "Unchanged license/notice member of the exact primary binary RPM whose shipped library bytes match; package-wide terms may cover additional unshipped source/programs.",
+      "sourceArtifact": {
+        "url": "https://repo.almalinux.org/almalinux/8.10/AppStream/x86_64/os/Packages/flac-libs-1.3.2-9.el8_8.1.x86_64.rpm",
+        "sha256": "eb76f5c999ef91f886eb807b8619bb5edb96daa25d9b98421264ca03e84be79e",
+        "member": "./usr/share/doc/flac-libs/COPYING.LGPL"
+      }
+    },
+    {
+      "component": "flac-libs",
+      "version": "1.3.2-9.el8_8.1",
+      "runtimeIdentifier": "linux-x64",
+      "localFile": "third-party-notices/almalinux/flac-libs/1.3.2-9.el8_8.1/COPYING.Xiph",
+      "sha256": "fa27cb11f13f97b0c5f3ff363b1e2610c6efe87ed175779cb2a78e44eb19d34c",
+      "path": "almalinux/flac-libs/1.3.2-9.el8_8.1/COPYING.Xiph",
+      "kind": "license",
+      "relationship": "Unchanged license/notice member of the exact primary binary RPM whose shipped library bytes match; package-wide terms may cover additional unshipped source/programs.",
+      "sourceArtifact": {
+        "url": "https://repo.almalinux.org/almalinux/8.10/AppStream/x86_64/os/Packages/flac-libs-1.3.2-9.el8_8.1.x86_64.rpm",
+        "sha256": "eb76f5c999ef91f886eb807b8619bb5edb96daa25d9b98421264ca03e84be79e",
+        "member": "./usr/share/doc/flac-libs/COPYING.Xiph"
+      }
+    },
+    {
+      "component": "glib2",
+      "version": "2.56.4-177.el8_10",
+      "runtimeIdentifier": "linux-x64",
+      "url": "https://repo.almalinux.org/vault/8/BaseOS/Source/Packages/glib2-2.56.4-177.el8_10.src.rpm",
+      "sha256": "655907a3deb5c3ce9d5d5ef185409a4241e2e42f1277c5032e5e5c6ae2c233bf",
+      "path": "almalinux/glib2-2.56.4-177.el8_10.src.rpm",
+      "kind": "corresponding-source-rpm",
+      "relationship": "Every listed shipped library is an exact complete-byte SHA256 match to this primary distribution binary RPM; its SourceRPM header identifies this complete source RPM containing upstream sources, downstream patches and RPM build specification.",
+      "outputDirectory": "corresponding-source",
+      "correspondsTo": [
+        {
+          "path": "app-root/usr/lib/libglib-2.0.so.0",
+          "sha256": "91d8e59db911051b9fca6d708a111524b06230a700e228fc1ba1775620b297ae",
+          "size": 1171920
+        },
+        {
+          "path": "app-root/usr/lib/libgthread-2.0.so.0",
+          "sha256": "4f442672d6ddd19cedee66da96921ba226e208234b4c77de962b0123dea7dd62",
+          "size": 7640
+        }
+      ],
+      "binaryEvidence": {
+        "url": "https://repo.almalinux.org/almalinux/8.10/BaseOS/x86_64/os/Packages/glib2-2.56.4-177.el8_10.x86_64.rpm",
+        "sha256": "635709436f3ed4ee421edbda05cd3a9170e0b6112d01c7ffc90060a34040361a",
+        "sourceRpmHeader": "glib2-2.56.4-177.el8_10.src.rpm"
+      },
+      "packageLicenseDeclaration": "LGPLv2+",
+      "sourcePayloadFiles": 46
+    },
+    {
+      "component": "glib2",
+      "version": "2.56.4-177.el8_10",
+      "runtimeIdentifier": "linux-x64",
+      "localFile": "third-party-notices/almalinux/glib2/2.56.4-177.el8_10/COPYING",
+      "sha256": "dc626520dcd53a22f727af3ee42c770e56c97a64fe3adb063799d8ab032fe551",
+      "path": "almalinux/glib2/2.56.4-177.el8_10/COPYING",
+      "kind": "license",
+      "relationship": "Unchanged license/notice member of the exact primary binary RPM whose shipped library bytes match; package-wide terms may cover additional unshipped source/programs.",
+      "sourceArtifact": {
+        "url": "https://repo.almalinux.org/almalinux/8.10/BaseOS/x86_64/os/Packages/glib2-2.56.4-177.el8_10.x86_64.rpm",
+        "sha256": "635709436f3ed4ee421edbda05cd3a9170e0b6112d01c7ffc90060a34040361a",
+        "member": "./usr/share/licenses/glib2/COPYING"
+      }
+    },
+    {
+      "component": "gnutls",
+      "version": "3.6.16-8.el8_10.6",
+      "runtimeIdentifier": "linux-x64",
+      "url": "https://repo.almalinux.org/vault/8/BaseOS/Source/Packages/gnutls-3.6.16-8.el8_10.6.src.rpm",
+      "sha256": "7b4da609b57cf781709b62da2014f224caa0eb80fcb8af2556492692d9d0bb2c",
+      "path": "almalinux/gnutls-3.6.16-8.el8_10.6.src.rpm",
+      "kind": "corresponding-source-rpm",
+      "relationship": "Every listed shipped library is an exact complete-byte SHA256 match to this primary distribution binary RPM; its SourceRPM header identifies this complete source RPM containing upstream sources, downstream patches and RPM build specification.",
+      "outputDirectory": "corresponding-source",
+      "correspondsTo": [
+        {
+          "path": "app-root/usr/lib/libgnutls.so.30",
+          "sha256": "d61e6c0a2296e71384b947448bc545e4c1cd82e7c8b40b7b63bc58f758534fab",
+          "size": 2060016
+        }
+      ],
+      "binaryEvidence": {
+        "url": "https://repo.almalinux.org/almalinux/8.10/BaseOS/x86_64/os/Packages/gnutls-3.6.16-8.el8_10.6.x86_64.rpm",
+        "sha256": "9a62d8865eac6dfbbcdf5e8c52361fe10e7da56e1374c3779d2e4e62e0dbce62",
+        "sourceRpmHeader": "gnutls-3.6.16-8.el8_10.6.src.rpm"
+      },
+      "packageLicenseDeclaration": "GPLv3+ and LGPLv2+",
+      "sourcePayloadFiles": 42
+    },
+    {
+      "component": "gnutls",
+      "version": "3.6.16-8.el8_10.6",
+      "runtimeIdentifier": "linux-x64",
+      "localFile": "third-party-notices/almalinux/gnutls/3.6.16-8.el8_10.6/COPYING",
+      "sha256": "e79e9c8a0c85d735ff98185918ec94ed7d175efc377012787aebcf3b80f0d90b",
+      "path": "almalinux/gnutls/3.6.16-8.el8_10.6/COPYING",
+      "kind": "license",
+      "relationship": "Unchanged license/notice member of the exact primary binary RPM whose shipped library bytes match; package-wide terms may cover additional unshipped source/programs.",
+      "sourceArtifact": {
+        "url": "https://repo.almalinux.org/almalinux/8.10/BaseOS/x86_64/os/Packages/gnutls-3.6.16-8.el8_10.6.x86_64.rpm",
+        "sha256": "9a62d8865eac6dfbbcdf5e8c52361fe10e7da56e1374c3779d2e4e62e0dbce62",
+        "member": "./usr/share/licenses/gnutls/COPYING"
+      }
+    },
+    {
+      "component": "gnutls",
+      "version": "3.6.16-8.el8_10.6",
+      "runtimeIdentifier": "linux-x64",
+      "localFile": "third-party-notices/almalinux/gnutls/3.6.16-8.el8_10.6/COPYING.LESSER",
+      "sha256": "6095e9ffa777dd22839f7801aa845b31c9ed07f3d6bf8a26dc5d2dec8ccc0ef3",
+      "path": "almalinux/gnutls/3.6.16-8.el8_10.6/COPYING.LESSER",
+      "kind": "license",
+      "relationship": "Unchanged license/notice member of the exact primary binary RPM whose shipped library bytes match; package-wide terms may cover additional unshipped source/programs.",
+      "sourceArtifact": {
+        "url": "https://repo.almalinux.org/almalinux/8.10/BaseOS/x86_64/os/Packages/gnutls-3.6.16-8.el8_10.6.x86_64.rpm",
+        "sha256": "9a62d8865eac6dfbbcdf5e8c52361fe10e7da56e1374c3779d2e4e62e0dbce62",
+        "member": "./usr/share/licenses/gnutls/COPYING.LESSER"
+      }
+    },
+    {
+      "component": "gnutls",
+      "version": "3.6.16-8.el8_10.6",
+      "runtimeIdentifier": "linux-x64",
+      "localFile": "third-party-notices/almalinux/gnutls/3.6.16-8.el8_10.6/LICENSE",
+      "sha256": "3e043d77917e48e262301b8f880812fcd82236482630a421d555a38804eee643",
+      "path": "almalinux/gnutls/3.6.16-8.el8_10.6/LICENSE",
+      "kind": "license",
+      "relationship": "Unchanged license/notice member of the exact primary binary RPM whose shipped library bytes match; package-wide terms may cover additional unshipped source/programs.",
+      "sourceArtifact": {
+        "url": "https://repo.almalinux.org/almalinux/8.10/BaseOS/x86_64/os/Packages/gnutls-3.6.16-8.el8_10.6.x86_64.rpm",
+        "sha256": "9a62d8865eac6dfbbcdf5e8c52361fe10e7da56e1374c3779d2e4e62e0dbce62",
+        "member": "./usr/share/licenses/gnutls/LICENSE"
+      }
+    },
+    {
+      "component": "libdvdread",
+      "version": "5.0.3-9.el8",
+      "runtimeIdentifier": "linux-x64",
+      "url": "https://repo.almalinux.org/vault/8/AppStream/Source/Packages/libdvdread-5.0.3-9.el8.src.rpm",
+      "sha256": "35a8087c5e750cdc3f60085c3baa152301d97fa96ed05aa05c9a8982b32f6fcd",
+      "path": "almalinux/libdvdread-5.0.3-9.el8.src.rpm",
+      "kind": "corresponding-source-rpm",
+      "relationship": "Every listed shipped library is an exact complete-byte SHA256 match to this primary distribution binary RPM; its SourceRPM header identifies this complete source RPM containing upstream sources, downstream patches and RPM build specification.",
+      "outputDirectory": "corresponding-source",
+      "correspondsTo": [
+        {
+          "path": "app-root/usr/lib/libdvdread.so.4",
+          "sha256": "64e80fd6fc92a92ca62bab6a9f14a1923a590d3638fb3bd1b1e2525ac97ab1f4",
+          "size": 131296
+        }
+      ],
+      "binaryEvidence": {
+        "url": "https://repo.almalinux.org/almalinux/8.10/AppStream/x86_64/os/Packages/libdvdread-5.0.3-9.el8.x86_64.rpm",
+        "sha256": "454daabb48a214c434331ae717f879b9ff022e74cc20ac7a8f5b11a58aee7316",
+        "sourceRpmHeader": "libdvdread-5.0.3-9.el8.src.rpm"
+      },
+      "packageLicenseDeclaration": "GPLv2+",
+      "sourcePayloadFiles": 3
+    },
+    {
+      "component": "libdvdread",
+      "version": "5.0.3-9.el8",
+      "runtimeIdentifier": "linux-x64",
+      "localFile": "third-party-notices/almalinux/libdvdread/5.0.3-9.el8/COPYING",
+      "sha256": "d6cb0e9e560f51085556949a84af12b79a00f10ab8b66c752537faf7cd665572",
+      "path": "almalinux/libdvdread/5.0.3-9.el8/COPYING",
+      "kind": "license",
+      "relationship": "Unchanged license/notice member of the exact primary binary RPM whose shipped library bytes match; package-wide terms may cover additional unshipped source/programs.",
+      "sourceArtifact": {
+        "url": "https://repo.almalinux.org/almalinux/8.10/AppStream/x86_64/os/Packages/libdvdread-5.0.3-9.el8.x86_64.rpm",
+        "sha256": "454daabb48a214c434331ae717f879b9ff022e74cc20ac7a8f5b11a58aee7316",
+        "member": "./usr/share/licenses/libdvdread/COPYING"
+      }
+    },
+    {
+      "component": "libffi",
+      "version": "3.1-24.el8",
+      "runtimeIdentifier": "linux-x64",
+      "url": "https://repo.almalinux.org/vault/8/BaseOS/Source/Packages/libffi-3.1-24.el8.src.rpm",
+      "sha256": "50080c4dc79fed750d733e19708256405ce315a08ca81d9c2064ab09553a30cf",
+      "path": "almalinux/libffi-3.1-24.el8.src.rpm",
+      "kind": "corresponding-source-rpm",
+      "relationship": "Every listed shipped library is an exact complete-byte SHA256 match to this primary distribution binary RPM; its SourceRPM header identifies this complete source RPM containing upstream sources, downstream patches and RPM build specification.",
+      "outputDirectory": "corresponding-source",
+      "correspondsTo": [
+        {
+          "path": "app-root/usr/lib/libffi.so.6",
+          "sha256": "3a37023ae042c3a8c49f4f6bd2c3ab8a1977138ecd93c30bcc0f5edf78d15532",
+          "size": 37248
+        }
+      ],
+      "binaryEvidence": {
+        "url": "https://repo.almalinux.org/almalinux/8.10/BaseOS/x86_64/os/Packages/libffi-3.1-24.el8.x86_64.rpm",
+        "sha256": "baa22d471c0ab0d17ab1ba372a262df3c50d6430af4259a4065dfccf0529324a",
+        "sourceRpmHeader": "libffi-3.1-24.el8.src.rpm"
+      },
+      "packageLicenseDeclaration": "MIT",
+      "sourcePayloadFiles": 12
+    },
+    {
+      "component": "libffi",
+      "version": "3.1-24.el8",
+      "runtimeIdentifier": "linux-x64",
+      "localFile": "third-party-notices/almalinux/libffi/3.1-24.el8/LICENSE",
+      "sha256": "0f4d7a0bfb83c37465d42dc305f124189196cc0cc2cc8d6f8461103682aebbc5",
+      "path": "almalinux/libffi/3.1-24.el8/LICENSE",
+      "kind": "license",
+      "relationship": "Unchanged license/notice member of the exact primary binary RPM whose shipped library bytes match; package-wide terms may cover additional unshipped source/programs.",
+      "sourceArtifact": {
+        "url": "https://repo.almalinux.org/almalinux/8.10/BaseOS/x86_64/os/Packages/libffi-3.1-24.el8.x86_64.rpm",
+        "sha256": "baa22d471c0ab0d17ab1ba372a262df3c50d6430af4259a4065dfccf0529324a",
+        "member": "./usr/share/licenses/libffi/LICENSE"
+      }
+    },
+    {
+      "component": "libidn2",
+      "version": "2.2.0-1.el8",
+      "runtimeIdentifier": "linux-x64",
+      "url": "https://repo.almalinux.org/vault/8/BaseOS/Source/Packages/libidn2-2.2.0-1.el8.src.rpm",
+      "sha256": "a32fe287ffa058a76d3a42aec8d5a0dcea8ee72d4910cf88100000326e1d396b",
+      "path": "almalinux/libidn2-2.2.0-1.el8.src.rpm",
+      "kind": "corresponding-source-rpm",
+      "relationship": "Every listed shipped library is an exact complete-byte SHA256 match to this primary distribution binary RPM; its SourceRPM header identifies this complete source RPM containing upstream sources, downstream patches and RPM build specification.",
+      "outputDirectory": "corresponding-source",
+      "correspondsTo": [
+        {
+          "path": "app-root/usr/lib/libidn2.so.0",
+          "sha256": "2f4a5893128a6142cc1c88442154ba2e2bf82f383bd25c91afbd1509837cf1ce",
+          "size": 131568
+        }
+      ],
+      "binaryEvidence": {
+        "url": "https://repo.almalinux.org/almalinux/8.10/BaseOS/x86_64/os/Packages/libidn2-2.2.0-1.el8.x86_64.rpm",
+        "sha256": "d4f112cb5782ecbc4873cdc4256badcbcdeef94928b3c7930c9e4b10134bd4a6",
+        "sourceRpmHeader": "libidn2-2.2.0-1.el8.src.rpm"
+      },
+      "packageLicenseDeclaration": "(GPLv2+ or LGPLv3+) and GPLv3+",
+      "sourcePayloadFiles": 4
+    },
+    {
+      "component": "libidn2",
+      "version": "2.2.0-1.el8",
+      "runtimeIdentifier": "linux-x64",
+      "localFile": "third-party-notices/almalinux/libidn2/2.2.0-1.el8/COPYING",
+      "sha256": "73483f797a83373fca1b968c11785b98c4fc4803cdc7d3210811ca8b075d6d76",
+      "path": "almalinux/libidn2/2.2.0-1.el8/COPYING",
+      "kind": "license",
+      "relationship": "Unchanged license/notice member of the exact primary binary RPM whose shipped library bytes match; package-wide terms may cover additional unshipped source/programs.",
+      "sourceArtifact": {
+        "url": "https://repo.almalinux.org/almalinux/8.10/BaseOS/x86_64/os/Packages/libidn2-2.2.0-1.el8.x86_64.rpm",
+        "sha256": "d4f112cb5782ecbc4873cdc4256badcbcdeef94928b3c7930c9e4b10134bd4a6",
+        "member": "./usr/share/licenses/libidn2/COPYING"
+      }
+    },
+    {
+      "component": "libidn2",
+      "version": "2.2.0-1.el8",
+      "runtimeIdentifier": "linux-x64",
+      "localFile": "third-party-notices/almalinux/libidn2/2.2.0-1.el8/COPYING.LESSERv3",
+      "sha256": "da7eabb7bafdf7d3ae5e9f223aa5bdc1eece45ac569dc21b3b037520b4464768",
+      "path": "almalinux/libidn2/2.2.0-1.el8/COPYING.LESSERv3",
+      "kind": "license",
+      "relationship": "Unchanged license/notice member of the exact primary binary RPM whose shipped library bytes match; package-wide terms may cover additional unshipped source/programs.",
+      "sourceArtifact": {
+        "url": "https://repo.almalinux.org/almalinux/8.10/BaseOS/x86_64/os/Packages/libidn2-2.2.0-1.el8.x86_64.rpm",
+        "sha256": "d4f112cb5782ecbc4873cdc4256badcbcdeef94928b3c7930c9e4b10134bd4a6",
+        "member": "./usr/share/licenses/libidn2/COPYING.LESSERv3"
+      }
+    },
+    {
+      "component": "libidn2",
+      "version": "2.2.0-1.el8",
+      "runtimeIdentifier": "linux-x64",
+      "localFile": "third-party-notices/almalinux/libidn2/2.2.0-1.el8/COPYING.unicode",
+      "sha256": "01d621eef165cf4d3d3dbb737aa0699178d94c6f18cf87e9dde6db3ca7790f46",
+      "path": "almalinux/libidn2/2.2.0-1.el8/COPYING.unicode",
+      "kind": "license",
+      "relationship": "Unchanged license/notice member of the exact primary binary RPM whose shipped library bytes match; package-wide terms may cover additional unshipped source/programs.",
+      "sourceArtifact": {
+        "url": "https://repo.almalinux.org/almalinux/8.10/BaseOS/x86_64/os/Packages/libidn2-2.2.0-1.el8.x86_64.rpm",
+        "sha256": "d4f112cb5782ecbc4873cdc4256badcbcdeef94928b3c7930c9e4b10134bd4a6",
+        "member": "./usr/share/licenses/libidn2/COPYING.unicode"
+      }
+    },
+    {
+      "component": "libidn2",
+      "version": "2.2.0-1.el8",
+      "runtimeIdentifier": "linux-x64",
+      "localFile": "third-party-notices/almalinux/libidn2/2.2.0-1.el8/COPYINGv2",
+      "sha256": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643",
+      "path": "almalinux/libidn2/2.2.0-1.el8/COPYINGv2",
+      "kind": "license",
+      "relationship": "Unchanged license/notice member of the exact primary binary RPM whose shipped library bytes match; package-wide terms may cover additional unshipped source/programs.",
+      "sourceArtifact": {
+        "url": "https://repo.almalinux.org/almalinux/8.10/BaseOS/x86_64/os/Packages/libidn2-2.2.0-1.el8.x86_64.rpm",
+        "sha256": "d4f112cb5782ecbc4873cdc4256badcbcdeef94928b3c7930c9e4b10134bd4a6",
+        "member": "./usr/share/licenses/libidn2/COPYINGv2"
+      }
+    },
+    {
+      "component": "libogg",
+      "version": "1.3.2-10.el8",
+      "runtimeIdentifier": "linux-x64",
+      "url": "https://repo.almalinux.org/vault/8/AppStream/Source/Packages/libogg-1.3.2-10.el8.src.rpm",
+      "sha256": "e2ef0d26c84d44a19019e1e2943e0d181ed0b5c5693d1bd5b4ac41436a113803",
+      "path": "almalinux/libogg-1.3.2-10.el8.src.rpm",
+      "kind": "corresponding-source-rpm",
+      "relationship": "Every listed shipped library is an exact complete-byte SHA256 match to this primary distribution binary RPM; its SourceRPM header identifies this complete source RPM containing upstream sources, downstream patches and RPM build specification.",
+      "outputDirectory": "corresponding-source",
+      "correspondsTo": [
+        {
+          "path": "app-root/usr/lib/libogg.so.0",
+          "sha256": "f16c849e3c2ac5e2f5893bae5354fd2a1c89869068edb84063281f98dbf98a6c",
+          "size": 29360
+        }
+      ],
+      "binaryEvidence": {
+        "url": "https://repo.almalinux.org/almalinux/8.10/AppStream/x86_64/os/Packages/libogg-1.3.2-10.el8.x86_64.rpm",
+        "sha256": "3e1fca6cb166d9974a3ef8de5ca201c72bfa1ea40225db8e64dfc663a779ab12",
+        "sourceRpmHeader": "libogg-1.3.2-10.el8.src.rpm"
+      },
+      "packageLicenseDeclaration": "BSD",
+      "sourcePayloadFiles": 2
+    },
+    {
+      "component": "libogg",
+      "version": "1.3.2-10.el8",
+      "runtimeIdentifier": "linux-x64",
+      "localFile": "third-party-notices/almalinux/libogg/1.3.2-10.el8/COPYING",
+      "sha256": "d2ab5758336489da61c12cc5bb757da5339c4ae9001f9bb0562b4370249af814",
+      "path": "almalinux/libogg/1.3.2-10.el8/COPYING",
+      "kind": "license",
+      "relationship": "Unchanged license/notice member of the exact primary binary RPM whose shipped library bytes match; package-wide terms may cover additional unshipped source/programs.",
+      "sourceArtifact": {
+        "url": "https://repo.almalinux.org/almalinux/8.10/AppStream/x86_64/os/Packages/libogg-1.3.2-10.el8.x86_64.rpm",
+        "sha256": "3e1fca6cb166d9974a3ef8de5ca201c72bfa1ea40225db8e64dfc663a779ab12",
+        "member": "./usr/share/doc/libogg/COPYING"
+      }
+    },
+    {
+      "component": "libtasn1",
+      "version": "4.13-6.el8_10",
+      "runtimeIdentifier": "linux-x64",
+      "url": "https://repo.almalinux.org/vault/8/BaseOS/Source/Packages/libtasn1-4.13-6.el8_10.src.rpm",
+      "sha256": "94e17fa3f921f6ea2ecfd181f5a38e2815b21acc002c61d34c11a5cc8eb6374c",
+      "path": "almalinux/libtasn1-4.13-6.el8_10.src.rpm",
+      "kind": "corresponding-source-rpm",
+      "relationship": "Every listed shipped library is an exact complete-byte SHA256 match to this primary distribution binary RPM; its SourceRPM header identifies this complete source RPM containing upstream sources, downstream patches and RPM build specification.",
+      "outputDirectory": "corresponding-source",
+      "correspondsTo": [
+        {
+          "path": "app-root/usr/lib/libtasn1.so.6",
+          "sha256": "ca03aa5eacd1e157e0a5c7e5d87789225bc6b3095ca0e180f2aba2452990974c",
+          "size": 78832
+        }
+      ],
+      "binaryEvidence": {
+        "url": "https://repo.almalinux.org/almalinux/8.10/BaseOS/x86_64/os/Packages/libtasn1-4.13-6.el8_10.x86_64.rpm",
+        "sha256": "703fb3762d8b16f71da3e6e1c4fda0401888fe898ac0a99c5e51eee567cd2f97",
+        "sourceRpmHeader": "libtasn1-4.13-6.el8_10.src.rpm"
+      },
+      "packageLicenseDeclaration": "GPLv3+ and LGPLv2+",
+      "sourcePayloadFiles": 8
+    },
+    {
+      "component": "libtasn1",
+      "version": "4.13-6.el8_10",
+      "runtimeIdentifier": "linux-x64",
+      "localFile": "third-party-notices/almalinux/libtasn1/4.13-6.el8_10/COPYING",
+      "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+      "path": "almalinux/libtasn1/4.13-6.el8_10/COPYING",
+      "kind": "license",
+      "relationship": "Unchanged license/notice member of the exact primary binary RPM whose shipped library bytes match; package-wide terms may cover additional unshipped source/programs.",
+      "sourceArtifact": {
+        "url": "https://repo.almalinux.org/almalinux/8.10/BaseOS/x86_64/os/Packages/libtasn1-4.13-6.el8_10.x86_64.rpm",
+        "sha256": "703fb3762d8b16f71da3e6e1c4fda0401888fe898ac0a99c5e51eee567cd2f97",
+        "member": "./usr/share/licenses/libtasn1/COPYING"
+      }
+    },
+    {
+      "component": "libtasn1",
+      "version": "4.13-6.el8_10",
+      "runtimeIdentifier": "linux-x64",
+      "localFile": "third-party-notices/almalinux/libtasn1/4.13-6.el8_10/COPYING.LIB",
+      "sha256": "dc626520dcd53a22f727af3ee42c770e56c97a64fe3adb063799d8ab032fe551",
+      "path": "almalinux/libtasn1/4.13-6.el8_10/COPYING.LIB",
+      "kind": "license",
+      "relationship": "Unchanged license/notice member of the exact primary binary RPM whose shipped library bytes match; package-wide terms may cover additional unshipped source/programs.",
+      "sourceArtifact": {
+        "url": "https://repo.almalinux.org/almalinux/8.10/BaseOS/x86_64/os/Packages/libtasn1-4.13-6.el8_10.x86_64.rpm",
+        "sha256": "703fb3762d8b16f71da3e6e1c4fda0401888fe898ac0a99c5e51eee567cd2f97",
+        "member": "./usr/share/licenses/libtasn1/COPYING.LIB"
+      }
+    },
+    {
+      "component": "libunistring",
+      "version": "0.9.9-3.el8",
+      "runtimeIdentifier": "linux-x64",
+      "url": "https://repo.almalinux.org/vault/8/BaseOS/Source/Packages/libunistring-0.9.9-3.el8.src.rpm",
+      "sha256": "6b4f1240ed02f10307ad547d4790e4a8375a37c69fb59d3f8ff3fb1450df0a18",
+      "path": "almalinux/libunistring-0.9.9-3.el8.src.rpm",
+      "kind": "corresponding-source-rpm",
+      "relationship": "Every listed shipped library is an exact complete-byte SHA256 match to this primary distribution binary RPM; its SourceRPM header identifies this complete source RPM containing upstream sources, downstream patches and RPM build specification.",
+      "outputDirectory": "corresponding-source",
+      "correspondsTo": [
+        {
+          "path": "app-root/usr/lib/libunistring.so.2",
+          "sha256": "05abdd40665a0f8759c91d19e0e5f4aa437002ab76aa9f9a3a790cdf47a34802",
+          "size": 1805368
+        }
+      ],
+      "binaryEvidence": {
+        "url": "https://repo.almalinux.org/almalinux/8.10/BaseOS/x86_64/os/Packages/libunistring-0.9.9-3.el8.x86_64.rpm",
+        "sha256": "0d1d497fe2b0eb54c88093c2aca92292fb4e94e6e1437af3bdefbb0f5adeb06b",
+        "sourceRpmHeader": "libunistring-0.9.9-3.el8.src.rpm"
+      },
+      "packageLicenseDeclaration": "GPLv2+ or LGPLv3+",
+      "sourcePayloadFiles": 3
+    },
+    {
+      "component": "libunistring",
+      "version": "0.9.9-3.el8",
+      "runtimeIdentifier": "linux-x64",
+      "localFile": "third-party-notices/almalinux/libunistring/0.9.9-3.el8/COPYING",
+      "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+      "path": "almalinux/libunistring/0.9.9-3.el8/COPYING",
+      "kind": "license",
+      "relationship": "Unchanged license/notice member of the exact primary binary RPM whose shipped library bytes match; package-wide terms may cover additional unshipped source/programs.",
+      "sourceArtifact": {
+        "url": "https://repo.almalinux.org/almalinux/8.10/BaseOS/x86_64/os/Packages/libunistring-0.9.9-3.el8.x86_64.rpm",
+        "sha256": "0d1d497fe2b0eb54c88093c2aca92292fb4e94e6e1437af3bdefbb0f5adeb06b",
+        "member": "./usr/share/licenses/libunistring/COPYING"
+      }
+    },
+    {
+      "component": "libunistring",
+      "version": "0.9.9-3.el8",
+      "runtimeIdentifier": "linux-x64",
+      "localFile": "third-party-notices/almalinux/libunistring/0.9.9-3.el8/COPYING.LIB",
+      "sha256": "a853c2ffec17057872340eee242ae4d96cbf2b520ae27d903e1b2fef1a5f9d1c",
+      "path": "almalinux/libunistring/0.9.9-3.el8/COPYING.LIB",
+      "kind": "license",
+      "relationship": "Unchanged license/notice member of the exact primary binary RPM whose shipped library bytes match; package-wide terms may cover additional unshipped source/programs.",
+      "sourceArtifact": {
+        "url": "https://repo.almalinux.org/almalinux/8.10/BaseOS/x86_64/os/Packages/libunistring-0.9.9-3.el8.x86_64.rpm",
+        "sha256": "0d1d497fe2b0eb54c88093c2aca92292fb4e94e6e1437af3bdefbb0f5adeb06b",
+        "member": "./usr/share/licenses/libunistring/COPYING.LIB"
+      }
+    },
+    {
+      "component": "libvorbis",
+      "version": "1.3.6-2.el8",
+      "runtimeIdentifier": "linux-x64",
+      "url": "https://repo.almalinux.org/vault/8/AppStream/Source/Packages/libvorbis-1.3.6-2.el8.src.rpm",
+      "sha256": "a9989dcb9cd8a5e192e35e9e6e23c5e9deabed16fe48b93431db9e26243c7edb",
+      "path": "almalinux/libvorbis-1.3.6-2.el8.src.rpm",
+      "kind": "corresponding-source-rpm",
+      "relationship": "Every listed shipped library is an exact complete-byte SHA256 match to this primary distribution binary RPM; its SourceRPM header identifies this complete source RPM containing upstream sources, downstream patches and RPM build specification.",
+      "outputDirectory": "corresponding-source",
+      "correspondsTo": [
+        {
+          "path": "app-root/usr/lib/libvorbis.so.0",
+          "sha256": "96eafd6a4d71a8f104f499002c84362d9dafd69b1987679e7a3a66633c674899",
+          "size": 193208
+        }
+      ],
+      "binaryEvidence": {
+        "url": "https://repo.almalinux.org/almalinux/8.10/AppStream/x86_64/os/Packages/libvorbis-1.3.6-2.el8.x86_64.rpm",
+        "sha256": "9ecabb1ee69662e028c90a90b24e094745849cda3f0bb6591450ad9194ded552",
+        "sourceRpmHeader": "libvorbis-1.3.6-2.el8.src.rpm"
+      },
+      "packageLicenseDeclaration": "BSD",
+      "sourcePayloadFiles": 3
+    },
+    {
+      "component": "libvorbis",
+      "version": "1.3.6-2.el8",
+      "runtimeIdentifier": "linux-x64",
+      "localFile": "third-party-notices/almalinux/libvorbis/1.3.6-2.el8/COPYING",
+      "sha256": "29e9914e6173b7061b7d48c25e6159fc1438326738bc047cc7248abc01b271f6",
+      "path": "almalinux/libvorbis/1.3.6-2.el8/COPYING",
+      "kind": "license",
+      "relationship": "Unchanged license/notice member of the exact primary binary RPM whose shipped library bytes match; package-wide terms may cover additional unshipped source/programs.",
+      "sourceArtifact": {
+        "url": "https://repo.almalinux.org/almalinux/8.10/AppStream/x86_64/os/Packages/libvorbis-1.3.6-2.el8.x86_64.rpm",
+        "sha256": "9ecabb1ee69662e028c90a90b24e094745849cda3f0bb6591450ad9194ded552",
+        "member": "./usr/share/licenses/libvorbis/COPYING"
+      }
+    },
+    {
+      "component": "nettle",
+      "version": "3.4.1-7.el8",
+      "runtimeIdentifier": "linux-x64",
+      "url": "https://repo.almalinux.org/vault/8/BaseOS/Source/Packages/nettle-3.4.1-7.el8.src.rpm",
+      "sha256": "354fc2ed6bf2208ac5e301913b96f0c60a21b9cd03a32bad2a31ee09b9af1eae",
+      "path": "almalinux/nettle-3.4.1-7.el8.src.rpm",
+      "kind": "corresponding-source-rpm",
+      "relationship": "Every listed shipped library is an exact complete-byte SHA256 match to this primary distribution binary RPM; its SourceRPM header identifies this complete source RPM containing upstream sources, downstream patches and RPM build specification.",
+      "outputDirectory": "corresponding-source",
+      "correspondsTo": [
+        {
+          "path": "app-root/usr/lib/libhogweed.so.4",
+          "sha256": "cd4c53becbaddeebc0b6794084cb46449a98cd1dc7089c4a457b533e810d8401",
+          "size": 197704
+        },
+        {
+          "path": "app-root/usr/lib/libnettle.so.6",
+          "sha256": "37944285dc38aa729c0cbfa08c5b94e301701152db772e1577bc784501f15538",
+          "size": 239352
+        }
+      ],
+      "binaryEvidence": {
+        "url": "https://repo.almalinux.org/almalinux/8.10/BaseOS/x86_64/os/Packages/nettle-3.4.1-7.el8.x86_64.rpm",
+        "sha256": "fb4aaa22b2e2f2fc0c451b87ac464e8746d240397d64e79f6bfd38f4e9128a5a",
+        "sourceRpmHeader": "nettle-3.4.1-7.el8.src.rpm"
+      },
+      "packageLicenseDeclaration": "LGPLv3+ or GPLv2+",
+      "sourcePayloadFiles": 9
+    },
+    {
+      "component": "nettle",
+      "version": "3.4.1-7.el8",
+      "runtimeIdentifier": "linux-x64",
+      "localFile": "third-party-notices/almalinux/nettle/3.4.1-7.el8/COPYING.LESSERv3",
+      "sha256": "a853c2ffec17057872340eee242ae4d96cbf2b520ae27d903e1b2fef1a5f9d1c",
+      "path": "almalinux/nettle/3.4.1-7.el8/COPYING.LESSERv3",
+      "kind": "license",
+      "relationship": "Unchanged license/notice member of the exact primary binary RPM whose shipped library bytes match; package-wide terms may cover additional unshipped source/programs.",
+      "sourceArtifact": {
+        "url": "https://repo.almalinux.org/almalinux/8.10/BaseOS/x86_64/os/Packages/nettle-3.4.1-7.el8.x86_64.rpm",
+        "sha256": "fb4aaa22b2e2f2fc0c451b87ac464e8746d240397d64e79f6bfd38f4e9128a5a",
+        "member": "./usr/share/licenses/nettle/COPYING.LESSERv3"
+      }
+    },
+    {
+      "component": "nettle",
+      "version": "3.4.1-7.el8",
+      "runtimeIdentifier": "linux-x64",
+      "localFile": "third-party-notices/almalinux/nettle/3.4.1-7.el8/COPYINGv2",
+      "sha256": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643",
+      "path": "almalinux/nettle/3.4.1-7.el8/COPYINGv2",
+      "kind": "license",
+      "relationship": "Unchanged license/notice member of the exact primary binary RPM whose shipped library bytes match; package-wide terms may cover additional unshipped source/programs.",
+      "sourceArtifact": {
+        "url": "https://repo.almalinux.org/almalinux/8.10/BaseOS/x86_64/os/Packages/nettle-3.4.1-7.el8.x86_64.rpm",
+        "sha256": "fb4aaa22b2e2f2fc0c451b87ac464e8746d240397d64e79f6bfd38f4e9128a5a",
+        "member": "./usr/share/licenses/nettle/COPYINGv2"
+      }
+    },
+    {
+      "component": "p11-kit",
+      "version": "0.23.22-2.el8",
+      "runtimeIdentifier": "linux-x64",
+      "url": "https://repo.almalinux.org/vault/8/BaseOS/Source/Packages/p11-kit-0.23.22-2.el8.src.rpm",
+      "sha256": "7c6807762f5761235a0cdb833fd48f35bb744c963d0ae713f57a5cc2cefefb41",
+      "path": "almalinux/p11-kit-0.23.22-2.el8.src.rpm",
+      "kind": "corresponding-source-rpm",
+      "relationship": "Every listed shipped library is an exact complete-byte SHA256 match to this primary distribution binary RPM; its SourceRPM header identifies this complete source RPM containing upstream sources, downstream patches and RPM build specification.",
+      "outputDirectory": "corresponding-source",
+      "correspondsTo": [
+        {
+          "path": "app-root/usr/lib/libp11-kit.so.0",
+          "sha256": "ac9dcd7e6ab7452bf8ee4ecfd36bd927a5812e7aa408fc766936ef02ad379610",
+          "size": 1259544
+        }
+      ],
+      "binaryEvidence": {
+        "url": "https://repo.almalinux.org/almalinux/8.10/BaseOS/x86_64/os/Packages/p11-kit-0.23.22-2.el8.x86_64.rpm",
+        "sha256": "954dd788311886cc0d6e961ea1a23d01a5df067b211b0515f9a8dc67a80d81c7",
+        "sourceRpmHeader": "p11-kit-0.23.22-2.el8.src.rpm"
+      },
+      "packageLicenseDeclaration": "BSD-3-Clause",
+      "sourcePayloadFiles": 9
+    },
+    {
+      "component": "p11-kit",
+      "version": "0.23.22-2.el8",
+      "runtimeIdentifier": "linux-x64",
+      "localFile": "third-party-notices/almalinux/p11-kit/0.23.22-2.el8/COPYING",
+      "sha256": "2e1ba993904df807a10c3eda1e5c272338edc35674b679773a8b3ad460731054",
+      "path": "almalinux/p11-kit/0.23.22-2.el8/COPYING",
+      "kind": "license",
+      "relationship": "Unchanged license/notice member of the exact primary binary RPM whose shipped library bytes match; package-wide terms may cover additional unshipped source/programs.",
+      "sourceArtifact": {
+        "url": "https://repo.almalinux.org/almalinux/8.10/BaseOS/x86_64/os/Packages/p11-kit-0.23.22-2.el8.x86_64.rpm",
+        "sha256": "954dd788311886cc0d6e961ea1a23d01a5df067b211b0515f9a8dc67a80d81c7",
+        "member": "./usr/share/licenses/p11-kit/COPYING"
+      }
+    },
+    {
+      "component": "pcre",
+      "version": "8.42-6.el8",
+      "runtimeIdentifier": "linux-x64",
+      "url": "https://repo.almalinux.org/vault/8/BaseOS/Source/Packages/pcre-8.42-6.el8.src.rpm",
+      "sha256": "dc672c4af96650afa398943512968dd55967605fd511fc0a621c32ebb2d640b4",
+      "path": "almalinux/pcre-8.42-6.el8.src.rpm",
+      "kind": "corresponding-source-rpm",
+      "relationship": "Every listed shipped library is an exact complete-byte SHA256 match to this primary distribution binary RPM; its SourceRPM header identifies this complete source RPM containing upstream sources, downstream patches and RPM build specification.",
+      "outputDirectory": "corresponding-source",
+      "correspondsTo": [
+        {
+          "path": "app-root/usr/lib/libpcre.so.1",
+          "sha256": "0dd207b5a53568bd542da93dc1816f6fd1aca35817692467ac697b662512c616",
+          "size": 464840
+        }
+      ],
+      "binaryEvidence": {
+        "url": "https://repo.almalinux.org/almalinux/8.10/BaseOS/x86_64/os/Packages/pcre-8.42-6.el8.x86_64.rpm",
+        "sha256": "4be4dd7c2b6080dece762109d55a05d1683701e5d4d09fe2f54a4a303e5933f6",
+        "sourceRpmHeader": "pcre-8.42-6.el8.src.rpm"
+      },
+      "packageLicenseDeclaration": "BSD",
+      "sourcePayloadFiles": 11
+    },
+    {
+      "component": "pcre",
+      "version": "8.42-6.el8",
+      "runtimeIdentifier": "linux-x64",
+      "localFile": "third-party-notices/almalinux/pcre/8.42-6.el8/COPYING",
+      "sha256": "17abe1dbb92b21ab173cf9757dd57b0b15cd8d863b2ccdef635fdbef03077fb0",
+      "path": "almalinux/pcre/8.42-6.el8/COPYING",
+      "kind": "license",
+      "relationship": "Unchanged license/notice member of the exact primary binary RPM whose shipped library bytes match; package-wide terms may cover additional unshipped source/programs.",
+      "sourceArtifact": {
+        "url": "https://repo.almalinux.org/almalinux/8.10/BaseOS/x86_64/os/Packages/pcre-8.42-6.el8.x86_64.rpm",
+        "sha256": "4be4dd7c2b6080dece762109d55a05d1683701e5d4d09fe2f54a4a303e5933f6",
+        "member": "./usr/share/licenses/pcre/COPYING"
+      }
+    },
+    {
+      "component": "pcre",
+      "version": "8.42-6.el8",
+      "runtimeIdentifier": "linux-x64",
+      "localFile": "third-party-notices/almalinux/pcre/8.42-6.el8/LICENCE",
+      "sha256": "f998c0f52eb704eff28f503580cfca3f2547280aa212994f6cf2d8e317587c1c",
+      "path": "almalinux/pcre/8.42-6.el8/LICENCE",
+      "kind": "license",
+      "relationship": "Unchanged license/notice member of the exact primary binary RPM whose shipped library bytes match; package-wide terms may cover additional unshipped source/programs.",
+      "sourceArtifact": {
+        "url": "https://repo.almalinux.org/almalinux/8.10/BaseOS/x86_64/os/Packages/pcre-8.42-6.el8.x86_64.rpm",
+        "sha256": "4be4dd7c2b6080dece762109d55a05d1683701e5d4d09fe2f54a4a303e5933f6",
+        "member": "./usr/share/licenses/pcre/LICENCE"
+      }
+    },
+    {
+      "component": "Qt Core",
+      "version": "6.6.1",
+      "runtimeIdentifier": "linux-x64",
+      "url": "https://download.qt.io/archive/qt/6.6/6.6.1/submodules/qtbase-everywhere-src-6.6.1.tar.xz",
+      "sha256": "450c5b4677b2fe40ed07954d7f0f40690068e80a94c9df86c2c905ccd59d02f7",
+      "path": "Qt-Core/6.6.1/qtbase-everywhere-src-6.6.1.tar.xz",
+      "outputDirectory": "corresponding-source",
+      "kind": "upstream-source-archive",
+      "relationship": "Complete upstream QtBase6.6.1 source, including bundled third-party sources/notices. Shipped QtCore matches the official Qt6.6.1 SDK binary byte-for-byte. This is not a selected-license or full SDK build/relink compliance conclusion.",
+      "correspondsTo": [
+        {
+          "path": "app-root/usr/lib/libQt6Core.so.6",
+          "sha256": "1bf4d869aebd556e51eee1832f7ce534c219bfd5405b6a2e7999a4cd9293c134",
+          "size": 7069680
+        }
+      ],
+      "binaryEvidence": {
+        "url": "https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_661/qt.qt6.661.gcc_64/6.6.1-0-202311210527qtbase-Linux-RHEL_8_8-GCC-Linux-RHEL_8_8-X86_64.7z",
+        "sha256": "dc4ca5bc239e6bd3d0405e62a4e7cd080a2c0ae2a612f097fac9dab127168bdb",
+        "member": "6.6.1/gcc_64/lib/libQt6Core.so.6.6.1"
+      }
+    },
+    {
+      "component": "Compiler runtime licensing",
+      "version": "GCC Runtime Exception3.1 / MinGW-w64 stable runtime notices",
+      "runtimeIdentifier": "win-x64",
+      "url": "https://raw.githubusercontent.com/gcc-mirror/gcc/releases/gcc-15.2.0/COPYING.RUNTIME",
+      "sha256": "9d6b43ce4d8de0c878bf16b54d8e7a10d9bd42b75178153e3af6a815bdc90f74",
+      "path": "compiler-runtime/GCC-Runtime-Exception-3.1.txt",
+      "kind": "license",
+      "relationship": "GCC GPL/Runtime Library Exception and complete MinGW runtime notices for eligible compiled support. All collected MinGW notice texts were downloaded from both upstream v11.0.1 and v13.0.0 tags and match byte-for-byte; v11.0.1 is the actual local cross runtime. Each build records actual compiler/target/runtime macros; the target prefix alone does not establish a runtime version or every linked component."
+    },
+    {
+      "component": "Compiler runtime licensing",
+      "version": "GCC Runtime Exception3.1 / MinGW-w64 stable runtime notices",
+      "runtimeIdentifier": "linux-x64",
+      "url": "https://raw.githubusercontent.com/gcc-mirror/gcc/releases/gcc-15.2.0/COPYING.RUNTIME",
+      "sha256": "9d6b43ce4d8de0c878bf16b54d8e7a10d9bd42b75178153e3af6a815bdc90f74",
+      "path": "compiler-runtime/GCC-Runtime-Exception-3.1.txt",
+      "kind": "license",
+      "relationship": "GCC GPL/Runtime Library Exception and complete MinGW runtime notices for eligible compiled support. All collected MinGW notice texts were downloaded from both upstream v11.0.1 and v13.0.0 tags and match byte-for-byte; v11.0.1 is the actual local cross runtime. Each build records actual compiler/target/runtime macros; the target prefix alone does not establish a runtime version or every linked component."
+    },
+    {
+      "component": "Compiler runtime licensing",
+      "version": "GCC Runtime Exception3.1 / MinGW-w64 stable runtime notices",
+      "runtimeIdentifier": "win-x64",
+      "url": "https://raw.githubusercontent.com/gcc-mirror/gcc/releases/gcc-15.2.0/COPYING3",
+      "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+      "path": "compiler-runtime/GCC-GPL-3.0.txt",
+      "kind": "license",
+      "relationship": "GCC GPL/Runtime Library Exception and complete MinGW runtime notices for eligible compiled support. All collected MinGW notice texts were downloaded from both upstream v11.0.1 and v13.0.0 tags and match byte-for-byte; v11.0.1 is the actual local cross runtime. Each build records actual compiler/target/runtime macros; the target prefix alone does not establish a runtime version or every linked component."
+    },
+    {
+      "component": "Compiler runtime licensing",
+      "version": "GCC Runtime Exception3.1 / MinGW-w64 stable runtime notices",
+      "runtimeIdentifier": "linux-x64",
+      "url": "https://raw.githubusercontent.com/gcc-mirror/gcc/releases/gcc-15.2.0/COPYING3",
+      "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+      "path": "compiler-runtime/GCC-GPL-3.0.txt",
+      "kind": "license",
+      "relationship": "GCC GPL/Runtime Library Exception and complete MinGW runtime notices for eligible compiled support. All collected MinGW notice texts were downloaded from both upstream v11.0.1 and v13.0.0 tags and match byte-for-byte; v11.0.1 is the actual local cross runtime. Each build records actual compiler/target/runtime macros; the target prefix alone does not establish a runtime version or every linked component."
+    },
+    {
+      "component": "Compiler runtime licensing",
+      "version": "GCC Runtime Exception3.1 / MinGW-w64 stable runtime notices",
+      "runtimeIdentifier": "win-x64",
+      "url": "https://raw.githubusercontent.com/mingw-w64/mingw-w64/v13.0.0/COPYING",
+      "sha256": "99a69660981156c21336fdb5661f89341b013c94e4bf9e1c7467b4745718397f",
+      "path": "compiler-runtime/MinGW-w64-13.0.0-COPYING.txt",
+      "kind": "license",
+      "relationship": "GCC GPL/Runtime Library Exception and complete MinGW runtime notices for eligible compiled support. All collected MinGW notice texts were downloaded from both upstream v11.0.1 and v13.0.0 tags and match byte-for-byte; v11.0.1 is the actual local cross runtime. Each build records actual compiler/target/runtime macros; the target prefix alone does not establish a runtime version or every linked component.",
+      "equivalentNoticeEvidence": {
+        "url": "https://raw.githubusercontent.com/mingw-w64/mingw-w64/v11.0.1/COPYING",
+        "sha256": "99a69660981156c21336fdb5661f89341b013c94e4bf9e1c7467b4745718397f",
+        "comparison": "Complete downloaded bytes are identical at both source tags."
+      }
+    },
+    {
+      "component": "Compiler runtime licensing",
+      "version": "GCC Runtime Exception3.1 / MinGW-w64 stable runtime notices",
+      "runtimeIdentifier": "win-x64",
+      "url": "https://raw.githubusercontent.com/mingw-w64/mingw-w64/v13.0.0/COPYING.MinGW-w64-runtime/COPYING.MinGW-w64-runtime.txt",
+      "sha256": "e9b2dc02451ea29092a1f25fa0f3c07207ed421f1807dffb0c4e6dce69dee7bd",
+      "path": "compiler-runtime/MinGW-w64-13.0.0-COPYING.MinGW-w64-runtime.txt",
+      "kind": "license",
+      "relationship": "GCC GPL/Runtime Library Exception and complete MinGW runtime notices for eligible compiled support. All collected MinGW notice texts were downloaded from both upstream v11.0.1 and v13.0.0 tags and match byte-for-byte; v11.0.1 is the actual local cross runtime. Each build records actual compiler/target/runtime macros; the target prefix alone does not establish a runtime version or every linked component.",
+      "equivalentNoticeEvidence": {
+        "url": "https://raw.githubusercontent.com/mingw-w64/mingw-w64/v11.0.1/COPYING.MinGW-w64-runtime/COPYING.MinGW-w64-runtime.txt",
+        "sha256": "e9b2dc02451ea29092a1f25fa0f3c07207ed421f1807dffb0c4e6dce69dee7bd",
+        "comparison": "Complete downloaded bytes are identical at both source tags."
+      }
+    },
+    {
+      "component": "Compiler runtime licensing",
+      "version": "GCC Runtime Exception3.1 / MinGW-w64 stable runtime notices",
+      "runtimeIdentifier": "win-x64",
+      "url": "https://raw.githubusercontent.com/mingw-w64/mingw-w64/v13.0.0/COPYING.MinGW-w64/COPYING.MinGW-w64.txt",
+      "sha256": "f38e6194bd3bfa1b654f118e5acefe0aead437bbe669eee43957ccc65a7127f1",
+      "path": "compiler-runtime/MinGW-w64-13.0.0-COPYING.MinGW-w64.txt",
+      "kind": "license",
+      "relationship": "GCC GPL/Runtime Library Exception and complete MinGW runtime notices for eligible compiled support. All collected MinGW notice texts were downloaded from both upstream v11.0.1 and v13.0.0 tags and match byte-for-byte; v11.0.1 is the actual local cross runtime. Each build records actual compiler/target/runtime macros; the target prefix alone does not establish a runtime version or every linked component.",
+      "equivalentNoticeEvidence": {
+        "url": "https://raw.githubusercontent.com/mingw-w64/mingw-w64/v11.0.1/COPYING.MinGW-w64/COPYING.MinGW-w64.txt",
+        "sha256": "f38e6194bd3bfa1b654f118e5acefe0aead437bbe669eee43957ccc65a7127f1",
+        "comparison": "Complete downloaded bytes are identical at both source tags."
+      }
+    },
+    {
+      "component": "Compiler runtime licensing",
+      "version": "GCC Runtime Exception3.1 / MinGW-w64 stable runtime notices",
+      "runtimeIdentifier": "win-x64",
+      "url": "https://raw.githubusercontent.com/mingw-w64/mingw-w64/v13.0.0/AUTHORS",
+      "sha256": "8f308316e7a94b8410f871868bd3948f126526dc1775aeee97a0e365f9a0fd9f",
+      "path": "compiler-runtime/MinGW-w64-13.0.0-AUTHORS",
+      "kind": "license",
+      "relationship": "GCC GPL/Runtime Library Exception and complete MinGW runtime notices for eligible compiled support. All collected MinGW notice texts were downloaded from both upstream v11.0.1 and v13.0.0 tags and match byte-for-byte; v11.0.1 is the actual local cross runtime. Each build records actual compiler/target/runtime macros; the target prefix alone does not establish a runtime version or every linked component.",
+      "equivalentNoticeEvidence": {
+        "url": "https://raw.githubusercontent.com/mingw-w64/mingw-w64/v11.0.1/AUTHORS",
+        "sha256": "8f308316e7a94b8410f871868bd3948f126526dc1775aeee97a0e365f9a0fd9f",
+        "comparison": "Complete downloaded bytes are identical at both source tags."
+      }
+    },
+    {
+      "component": "Compiler runtime licensing",
+      "version": "GCC Runtime Exception3.1 / MinGW-w64 stable runtime notices",
+      "runtimeIdentifier": "win-x64",
+      "url": "https://raw.githubusercontent.com/mingw-w64/mingw-w64/v13.0.0/DISCLAIMER",
+      "sha256": "039ed6b4f31bb7fb97e733170b58cc435335352e4745734fcfd113877fdaf340",
+      "path": "compiler-runtime/MinGW-w64-13.0.0-DISCLAIMER",
+      "kind": "license",
+      "relationship": "GCC GPL/Runtime Library Exception and complete MinGW runtime notices for eligible compiled support. All collected MinGW notice texts were downloaded from both upstream v11.0.1 and v13.0.0 tags and match byte-for-byte; v11.0.1 is the actual local cross runtime. Each build records actual compiler/target/runtime macros; the target prefix alone does not establish a runtime version or every linked component.",
+      "equivalentNoticeEvidence": {
+        "url": "https://raw.githubusercontent.com/mingw-w64/mingw-w64/v11.0.1/DISCLAIMER",
+        "sha256": "039ed6b4f31bb7fb97e733170b58cc435335352e4745734fcfd113877fdaf340",
+        "comparison": "Complete downloaded bytes are identical at both source tags."
+      }
+    },
+    {
+      "component": "Compiler runtime licensing",
+      "version": "GCC Runtime Exception3.1 / MinGW-w64 stable runtime notices",
+      "runtimeIdentifier": "win-x64",
+      "url": "https://raw.githubusercontent.com/mingw-w64/mingw-w64/v13.0.0/DISCLAIMER.PD",
+      "sha256": "87f33608570312a0f2a9745edcb2527275df813b13982e8c3b3f893d88a4141a",
+      "path": "compiler-runtime/MinGW-w64-13.0.0-DISCLAIMER.PD",
+      "kind": "license",
+      "relationship": "GCC GPL/Runtime Library Exception and complete MinGW runtime notices for eligible compiled support. All collected MinGW notice texts were downloaded from both upstream v11.0.1 and v13.0.0 tags and match byte-for-byte; v11.0.1 is the actual local cross runtime. Each build records actual compiler/target/runtime macros; the target prefix alone does not establish a runtime version or every linked component.",
+      "equivalentNoticeEvidence": {
+        "url": "https://raw.githubusercontent.com/mingw-w64/mingw-w64/v11.0.1/DISCLAIMER.PD",
+        "sha256": "87f33608570312a0f2a9745edcb2527275df813b13982e8c3b3f893d88a4141a",
+        "comparison": "Complete downloaded bytes are identical at both source tags."
+      }
+    },
+    {
+      "component": "cmark",
+      "version": "0.28.3",
+      "runtimeIdentifier": "linux-x64",
+      "url": "https://raw.githubusercontent.com/commonmark/cmark/0.28.3/COPYING",
+      "sha256": "c22e885f33b821bddb24cf007145e5540655b6c0f403e49e6c76a93c28e6d9a9",
+      "path": "runtime-notices/cmark-0.28.3-COPYING.txt",
+      "kind": "license",
+      "relationship": "Complete primary versioned notice text for the observed permissively licensed runtime component. No full source/compiler-history obligation is inferred solely from a permissive license."
+    },
+    {
+      "component": "Boost",
+      "version": "1.85.0",
+      "runtimeIdentifier": "linux-x64",
+      "url": "https://raw.githubusercontent.com/boostorg/boost/boost-1.85.0/LICENSE_1_0.txt",
+      "sha256": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+      "path": "runtime-notices/Boost-1.85.0-LICENSE.txt",
+      "kind": "license",
+      "relationship": "Complete primary versioned notice text for the observed permissively licensed runtime component. No full source/compiler-history obligation is inferred solely from a permissive license."
+    },
+    {
+      "component": "ICU",
+      "version": "56.1",
+      "runtimeIdentifier": "linux-x64",
+      "url": "https://raw.githubusercontent.com/unicode-org/icu/release-56-1/icu4c/license.html",
+      "sha256": "a4fd81c0bb0aee44d90376562f53c62d17ce252b93190251d172ec837ee5c6c8",
+      "path": "runtime-notices/ICU-56.1-license.html",
+      "kind": "license",
+      "relationship": "Complete primary versioned notice text for the observed permissively licensed runtime component. No full source/compiler-history obligation is inferred solely from a permissive license."
+    },
+    {
+      "component": "Qt Core",
+      "version": "6.6.1",
+      "runtimeIdentifier": "linux-x64",
+      "path": "Qt-Core/6.6.1/sdk-qconfig.pri",
+      "localFile": "third-party-notices/Qt-Core/6.6.1/qconfig.pri",
+      "sha256": "f679fd64951af5e90f2a4f55e2ca4ffb7197fb246af7dd9db175ad510d2f401f",
+      "kind": "source-build-evidence",
+      "relationship": "Actual SDK qconfig.pri beside the byte-identical shipped QtCore: shared release, GCC10.3.1, reported Enterprise edition. This build label is not evidence of a selected redistribution license.",
+      "sourceArtifact": {
+        "url": "https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt6_661/qt.qt6.661.gcc_64/6.6.1-0-202311210527qtbase-Linux-RHEL_8_8-GCC-Linux-RHEL_8_8-X86_64.7z",
+        "sha256": "dc4ca5bc239e6bd3d0405e62a4e7cd080a2c0ae2a612f097fac9dab127168bdb",
+        "member": "6.6.1/gcc_64/mkspecs/qconfig.pri"
+      }
     }
   ]
 }

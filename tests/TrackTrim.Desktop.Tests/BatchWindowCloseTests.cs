@@ -8,14 +8,14 @@ using Xunit;
 
 namespace TrackTrim.Desktop.Tests;
 
-/// <summary>Checks global window ownership across single and batch tabs using deterministic ports.</summary>
+/// <summary>Checks global window ownership across all files in the unified workspace using deterministic ports.</summary>
 public sealed class BatchWindowCloseTests
 {
-    /// <summary>Routes warning review to its frozen batch owner while single-workflow actions stay disabled.</summary>
+    /// <summary>Routes warning review to its frozen batch owner while editing stays disabled.</summary>
     [AvaloniaTheory]
     [InlineData("en")]
     [InlineData("ru")]
-    public async Task BatchWarningOwnerRemainsGlobalAcrossSelectedRowsAndTabs(string language)
+    public async Task BatchWarningOwnerRemainsGlobalAcrossSelectedRows(string language)
     {
         var fixture = new BatchViewModelFixture();
         var window = await ShowBatchWarningAsync(fixture);
@@ -26,10 +26,7 @@ public sealed class BatchWindowCloseTests
             fixture.Batch.SelectedItem = fixture.Batch.Items[1];
             await fixture.Main.ChangeLanguageCommand.ExecuteAsync(language);
             Assert.True(fixture.Main.HasWarningCandidate);
-            Assert.False(fixture.Main.HasSingleWarningCandidate);
-            Assert.False(fixture.Main.PublishWarningsCommand.CanExecute(null));
-            Assert.False(fixture.Main.DiscardWarningsCommand.CanExecute(null));
-            Assert.False(fixture.Main.OpenSourceCommand.CanExecute(null));
+            Assert.False(fixture.Batch.AddFilesCommand.CanExecute(null));
             Assert.Equal(owner.SourcePath, fixture.Batch.CurrentItemText);
             window.Close();
             Assert.True(window.IsVisible);
@@ -178,7 +175,7 @@ public sealed class BatchWindowCloseTests
             await BatchViewModelFixture.Await(fixture.Outputs.CleanupStarted.Task);
             Assert.True(window.IsVisible);
             Assert.True(fixture.Batch.IsBusy);
-            Assert.False(fixture.Main.OpenSourceCommand.CanExecute(null));
+            Assert.False(fixture.Batch.AddFilesCommand.CanExecute(null));
             Assert.Equal(BatchItemState.Ready, fixture.Batch.Items[1].Snapshot.State);
             window.Close();
             Assert.Single(fixture.Backend.RemuxRequests);

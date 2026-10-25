@@ -1,35 +1,24 @@
 {
-  "schemaVersion": 1,
-  "version": "n9.0.2-17-g2a571b6068-20260930",
-  "releaseTag": "autobuild-2026-09-30-13-08",
-  "releaseUrl": "https://github.com/BtbN/FFmpeg-Builds/releases/tag/autobuild-2026-09-30-13-08",
-  "variant": "lgpl, static, version3; ffmpeg and ffprobe only; no ffplay",
-  "license": "LGPL-3.0-or-later for this FFmpeg configuration; compiled third-party libraries have separate terms",
-  "checksums": {
-    "url": "https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2026-09-30-13-08/checksums.sha256",
-    "fileName": "ffmpeg-20260930-checksums.sha256",
-    "sha256": "e45436a222ab0de3b436940f4dbc5bd6df4d5929d19ed6122ce9c6ae57dd1fe6"
-  },
+  "schemaVersion": 2,
+  "version": "9.0.2-TrackTrim-source-2a571b606854",
+  "variant": "Source-built static FFmpeg libraries and explicit static zlib; local file/pipe protocols; ffmpeg and ffprobe only. No GPL, nonfree or external optional codec libraries.",
+  "license": "LGPL-2.1-or-later for this FFmpeg configuration; zlib and compiler-runtime notices retain their own terms.",
   "source": {
     "commit": "2a571b606854520cf89804d8030c8b328e621689",
     "url": "https://codeload.github.com/FFmpeg/FFmpeg/tar.gz/2a571b606854520cf89804d8030c8b328e621689",
     "fileName": "ffmpeg-2a571b606854520cf89804d8030c8b328e621689.tar.gz",
     "sha256": "f02fc0809a13f37e3d4e1f74254d07e035a5ef01a6d91e727b915b1764d97540"
   },
-  "buildRecipes": {
-    "commit": "6c9aec5fc9a72ec3abedd1fa84db141fa18cf52b",
-    "url": "https://codeload.github.com/BtbN/FFmpeg-Builds/tar.gz/6c9aec5fc9a72ec3abedd1fa84db141fa18cf52b",
-    "fileName": "ffmpeg-builds-6c9aec5fc9a72ec3abedd1fa84db141fa18cf52b.tar.gz",
-    "sha256": "81da4f7c878dc0f60e6b8d0049a112e32178e20f025d468fe4e99e77b2dfe0ec"
+  "zlib": {
+    "version": "1.3.2",
+    "url": "https://github.com/madler/zlib/releases/download/v1.3.2/zlib-1.3.2.tar.xz",
+    "fileName": "zlib-1.3.2.tar.xz",
+    "sha256": "d7a0654783a4da529d1bb793b7ad9c3318020af77667bcae35f95d0e42a792f3"
   },
-  "win-x64": {
-    "url": "https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2026-09-30-13-08/ffmpeg-n9.0.2-17-g2a571b6068-win64-lgpl-9.0.zip",
-    "sha256": "6b264b9e6019103f601d98c292bd332fd87acf1c5e941ddff4fb71760fe63432",
-    "archiveRoot": "ffmpeg-n9.0.2-17-g2a571b6068-win64-lgpl-9.0"
-  },
-  "linux-x64": {
-    "url": "https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2026-09-30-13-08/ffmpeg-n9.0.2-17-g2a571b6068-linux64-lgpl-9.0.tar.xz",
-    "sha256": "2d41cbea0ca1a15029b638330740f78d6f5aeb062355bf425433fc938705350a",
-    "archiveRoot": "ffmpeg-n9.0.2-17-g2a571b6068-linux64-lgpl-9.0"
-  }
+  "recipe": "build-ffmpeg.sh",
+  "extraVersion": "TrackTrim-source-2a571b606854",
+  "supportedRuntimeIdentifiers": [
+    "win-x64",
+    "linux-x64"
+  ]
 }

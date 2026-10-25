@@ -3,7 +3,7 @@
              xmlns:viewModels="using:TrackTrim.Desktop.ViewModels"
              x:Class="TrackTrim.Desktop.Views.QueueRecoveryView"
              x:DataType="viewModels:QueueRecoveryViewModel">
-  <Border Padding="12" BorderThickness="1" BorderBrush="Orange" CornerRadius="4">
+  <Border Padding="12" BorderThickness="1" BorderBrush="{DynamicResource TTWarningBrush}" CornerRadius="4">
     <StackPanel Spacing="6">
       <TextBlock x:Name="QueueRecoveryStatus" Text="{Binding StatusText}" TextWrapping="Wrap" FontWeight="SemiBold" />
       <TextBlock Text="{Binding Localization[QueueRecoveryHelp]}" TextWrapping="Wrap" />

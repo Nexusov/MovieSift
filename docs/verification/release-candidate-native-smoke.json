@@ -1,0 +1,714 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Sanitized delivered-candidate native smoke and a distinct later owner-operated W13 attempt; historical observations keep their original sessions and scope",
+  "candidate": {
+    "sourceRevision": "b288be1d185c62157e7d1bd1249f2f925ffe3093",
+    "sourceTree": "6bbd076bd2853b6b6183e406f481c8174b67a6e6",
+    "buildWorktreeDirty": false,
+    "runtimeIdentifier": "win-x64",
+    "archive": {
+      "name": "TrackTrim-win-x64.zip",
+      "bytes": 535154654,
+      "sha256": "f406162e52c9de3a44c6c18d0eae620fce2a1d710694e614eda6847fe51562a3"
+    },
+    "handoff": {
+      "run": 40027855578,
+      "attempt": 1,
+      "artifactId": 12535170976,
+      "url": "https://github.com/Nexusov/TrackTrim/actions/runs/40027855578/artifacts/12535170976"
+    },
+    "executable": "package с пробелами/TrackTrim-win-x64/TrackTrim.exe",
+    "productVersion": "0.1.0-rc.1+b288be1d185c62157e7d1bd1249f2f925ffe3093",
+    "executableSha256": "5fd6143e199a3d559c0610e8af31e5716d7a54ae0ded5ead93b3d80533ee3ef1",
+    "inventoryFilesRecheckedUnchanged": 628,
+    "manifestEntriesRecheckedUnchanged": 627,
+    "runtimeDataException": "Only expected data/settings.json changed; portable data was empty before launch"
+  },
+  "platform": {
+    "os": "Windows 10 Home Single Language 22H2",
+    "build": "19045.6456",
+    "architecture": "x64",
+    "reportedDisplay": "1920x1080 at 60 Hz",
+    "configuredAppliedDpi": 96,
+    "effectiveApplicationScale": "not observed",
+    "runtimeContext": "Separate .NET present; no external media tools on PATH or developer tool-path overrides; not a clean target machine"
+  },
+  "nativeMethod": {
+    "status": "functional smoke passed; full desktop acceptance incomplete",
+    "method": "Documented Computer Use UIA and keyboard input in the packaged native window; independent read-only post-output checks",
+    "ownerAssistance": [
+      "Accepted actual file pickers for MKV, MP4 and existing C1GiB",
+      "Clicked Русский on the approved MKV plan"
+    ],
+    "checkboxLimit": "UIA did not expose ToggleState; approved plan text and verified output corroborate Keep choices, not checkbox captions",
+    "noFallbackAutomation": true
+  },
+  "functionalCases": {
+    "firstLaunchEnglish": {
+      "status": "passed",
+      "observation": "Fresh English Ready; no automatic media job"
+    },
+    "mkv": {
+      "status": "passed",
+      "keepSourceIds": [
+        0,
+        2,
+        3
+      ],
+      "removeSourceIds": [
+        1
+      ],
+      "output": "Results с пробелами/Smoke MKV/Обычный MKV.trimmed.mkv",
+      "method": "Complete pinned MKVToolNix 102.0 retained-track/attachment extractions, all frame timestamps and terminal boundaries; identification and chapter/tag comparison",
+      "tracks": [
+        {
+          "codec": "VP8",
+          "sourceId": 0,
+          "outputId": 0,
+          "retainedMatroskaUid": "12774094189724925210",
+          "payloadBytes": 1312,
+          "equalPayloadSha256": "6a290a6583f3b4269ac0c3eb32b27285dd7511abb6a632afeeaa7be61399d8dd",
+          "equalTimestampValuesIncludingTerminalBoundary": 21,
+          "maximumTimestampDifferenceMilliseconds": 0.0
+        },
+        {
+          "codec": "PCM",
+          "sourceId": 2,
+          "outputId": 1,
+          "retainedMatroskaUid": "15985661122095681775",
+          "payloadBytes": 192104,
+          "equalPayloadSha256": "df961853f7276107b6162929061318b051fecbbefa5263c548906bf286b69a8b",
+          "equalTimestampValuesIncludingTerminalBoundary": 51,
+          "maximumTimestampDifferenceMilliseconds": 0.0
+        },
+        {
+          "codec": "SubRip/SRT",
+          "sourceId": 3,
+          "outputId": 2,
+          "retainedMatroskaUid": "10803935449919660822",
+          "payloadBytes": 69,
+          "equalPayloadSha256": "1dde3885b740ce1c19ff31e13cba5e64c9a2c26a90ba7ebd1170277854876eac",
+          "equalTimestampValuesIncludingTerminalBoundary": 2,
+          "maximumTimestampDifferenceMilliseconds": 0.0
+        }
+      ],
+      "metadata": "Retained order/actual UIDs, codec properties, language/title/effective flags and container title equal; semantic chapters and global/retained-track tags equal; removed-track tags absent",
+      "attachment": {
+        "bytes": 40,
+        "equalSha256": "0363bb41bac06b4a38868abe4c72666e022773f7d0ce436d77c0832bfae1c601",
+        "metadataEqual": true
+      },
+      "workerLimit": "The short remux was not retained by the observer; output verification and post-job quiescence are separate evidence"
+    },
+    "EN-RU-EN": {
+      "status": "passed",
+      "baseline": "Approved MKV Keep 0/2/3, Remove 1; source and fresh destination visible; Run enabled",
+      "observed": "Same plan, paths, enabled Run and no-replacement-default explanation through EN to RU to EN, without another Review or an automatic job; application labels/help translated; original track titles and language metadata unchanged",
+      "limit": "Visible approval semantics through UIA; no pixel appearance or internal approval-object identity claim"
+    },
+    "mp4": {
+      "status": "passed",
+      "keepSourceIndexes": [
+        0,
+        2,
+        3,
+        7
+      ],
+      "removeSourceIndexes": [
+        1,
+        4,
+        5
+      ],
+      "output": "Results с пробелами/Smoke MP4/Обычный MP4.trimmed.mp4",
+      "probeVersion": "ffprobe version 9.0.2-TrackTrim-source-2a571b606854 Copyright (c) 2007-2026 the FFmpeg developers",
+      "method": "Ordered encoded packet SHA256/size comparison plus exact rational media timing, packet flags and skip/padding; codec/extradata/side-data, tags, dispositions, tkhd and chapters",
+      "equalPacketTotalIncludingArtwork": 241,
+      "streams": [
+        {
+          "codec": "h264",
+          "sourceIndex": 0,
+          "outputIndex": 0,
+          "equalPacketCount": 50,
+          "equalEncodedBytes": 1400,
+          "equalOrderedPacketSizesAndHashesSha256": "a0ecead37c6c1c07e5d9f38363a6c7ed4d44341a17a01d12cfdf6f58d04e8819",
+          "equalMediaTimingFlagsAndSkipEvidenceSha256": "40d983580f39213ba4731fed6587e88117a2a710d044db7ae26ab966438a07b7",
+          "equalMediaTimebase": "1/16000",
+          "equalTkhdFlags": 3,
+          "artworkTimingIgnoredAsUntimed": false
+        },
+        {
+          "codec": "aac",
+          "sourceIndex": 2,
+          "outputIndex": 1,
+          "equalPacketCount": 95,
+          "equalEncodedBytes": 8138,
+          "equalOrderedPacketSizesAndHashesSha256": "4e7d0ad3e9a3150f9a2e5690719285b6c42a9c7229eb20f616b44cb262d7c6ca",
+          "equalMediaTimingFlagsAndSkipEvidenceSha256": "d835826fb027ced42596c42fcc654d69556d21c5162fb739e80e1784de6f46db",
+          "equalMediaTimebase": "1/48000",
+          "equalTkhdFlags": 2,
+          "artworkTimingIgnoredAsUntimed": false
+        },
+        {
+          "codec": "aac",
+          "sourceIndex": 3,
+          "outputIndex": 2,
+          "equalPacketCount": 95,
+          "equalEncodedBytes": 8171,
+          "equalOrderedPacketSizesAndHashesSha256": "6a54bdb1d1457d0504de67ff6300f5b519820f89542b8ad1797d1de2cbcd5d01",
+          "equalMediaTimingFlagsAndSkipEvidenceSha256": "c808176deed9a00767802f08b9a671af280aa7537ccf14098935d4ad0154a830",
+          "equalMediaTimebase": "1/48000",
+          "equalTkhdFlags": 2,
+          "artworkTimingIgnoredAsUntimed": false
+        },
+        {
+          "codec": "png",
+          "sourceIndex": 7,
+          "outputIndex": 4,
+          "equalPacketCount": 1,
+          "equalEncodedBytes": 132,
+          "equalOrderedPacketSizesAndHashesSha256": "665dc7bc76ce1caf79d8f55649086b5fbedefa7a03276f1641c9d31c3024168d",
+          "equalMediaTimingFlagsAndSkipEvidenceSha256": null,
+          "equalMediaTimebase": null,
+          "equalTkhdFlags": null,
+          "artworkTimingIgnoredAsUntimed": true
+        }
+      ],
+      "aacSkipPadding": "Both retained AAC: initial skip 1008 samples at ordinal 0, terminal discard 16 at ordinal 94; unchanged",
+      "metadata": {
+        "supportedContainerTagsEqual": true,
+        "supportedContainerTags": {
+          "title": "TrackTrim original MP4",
+          "artist": "TrackTrim synthetic fixture",
+          "comment": "Original test content"
+        },
+        "chaptersEqual": true,
+        "chapters": [
+          {
+            "start": "0/1",
+            "end": "1/1",
+            "tags": {
+              "title": "First chapter"
+            }
+          },
+          {
+            "start": "1/1",
+            "end": "2/1",
+            "tags": {
+              "title": "Вторая глава"
+            }
+          }
+        ],
+        "artworkPacketBytesEqual": true,
+        "noDefaultAudioPromotion": true,
+        "noSubtitlesRemain": true
+      },
+      "chapterQualification": "Rational boundaries/titles equal; raw chapter timebases differ (1/1000000 to 1/720000). Source chapter stream 6 maps to output 3; artwork maps to 4",
+      "artworkQualification": "One identical 132-byte PNG packet; untimed artwork is deliberately excluded from media timeline equality",
+      "workerLimit": "No FFmpeg process handle was retained for this smoke; the MKV-only observer and post-job quiescence do not prove its exit interval",
+      "localVerifierCorrection": "Initial verifier expected an incorrect FFprobe version and stopped before probing; preserved receipt corrected from package provenance to 9.0.2-TrackTrim-source-2a571b606854 and verification passed. No application change"
+    }
+  },
+  "sources": [
+    {
+      "fixture": "Обычный MKV.mkv",
+      "bytes": 392464,
+      "equalBeforeAfterSha256": "055c7f3ebdc3c579dd6d7740c78a1e8ee0e2525f23542b5c6af9a0869ce4a0f8"
+    },
+    {
+      "fixture": "Обычный MP4.mp4",
+      "bytes": 34046,
+      "equalBeforeAfterSha256": "b5a94767353d2e895ea04f5f1650df1f561fc507b4cb2db277f556c6b9a77112"
+    },
+    {
+      "fixture": "Рабочая копия cancellation 1GiB.mkv",
+      "bytes": 1079470784,
+      "equalBeforeAfterSha256": "0565b34f5fc0965225bf45b8d37e5cb007fe20611b77f0f66c175c970e4307f9"
+    }
+  ],
+  "successfulOutputs": [
+    {
+      "path": "Results с пробелами/Smoke MKV/Обычный MKV.trimmed.mkv",
+      "bytes": 200137,
+      "sha256": "77bf8203830b96e4c7d930077bdff9d9eaa6930e1251da7cc2a9384bf2425607"
+    },
+    {
+      "path": "Results с пробелами/Smoke MP4/Обычный MP4.trimmed.mp4",
+      "bytes": 23137,
+      "sha256": "20c5cc018f5cfd68f952880477082dd4beb89c49804d3be2ace2d6cce381d0b8"
+    },
+    {
+      "path": "Results с пробелами/W13 Cancel/Рабочая копия cancellation 1GiB.trimmed.mkv",
+      "bytes": 1079278525,
+      "sha256": "5634b4463940199b78741ee55793480c1cd266cc917258af6d1560ff8f3c7801"
+    },
+    {
+      "path": "Results с пробелами/W14 single close/retry short input.trimmed.mkv",
+      "bytes": 1079278525,
+      "sha256": "92aef53cf1dc200d41aac348caf1293a75bf6a33eb068dcfd384fb8d281ec6a2"
+    },
+    {
+      "path": "Results с пробелами/W14 single close/Рабочая копия cancellation 1GiB.trimmed.mkv",
+      "bytes": 1079278525,
+      "sha256": "cae288cb093f8ba8444ba650a270559a8891149ab8d1908df5ae3d2c4f8c8063"
+    },
+    {
+      "path": "Results с пробелами/W15 verification close/Рабочая копия cancellation 1GiB.trimmed.mkv",
+      "bytes": 1079278525,
+      "sha256": "015deb35d8f4aff16a9d12563d49116b7fea0d9962f9682a9350fea4488daf01"
+    }
+  ],
+  "largeOutputScope": "Four C1GiB jobs completed normally because no active Cancel/Close was sent. Their complete output hashes were checked and outputs preserved; independent extracted-payload comparisons above cover only the two small smoke outputs",
+  "activeStageCases": {
+    "workerIdentityPolicy": "Retained app-owned path/start identity and handles; tools/mkvmerge.exe parented by tested GUI 34096, start 2026-10-23T23:00:50.3413241Z",
+    "attempts": [
+      {
+        "case": "W13",
+        "status": "not established",
+        "reason": "Remux exited before the next active-stage observation; Cancel was not sent",
+        "requiredInputSent": false,
+        "retainedWorkerIdentity": "17428:639283945279328159",
+        "operation": "RemuxCandidate",
+        "startUtc": "2026-10-23T23:22:07.9328159Z",
+        "exitUtc": "2026-10-23T23:22:15.1257082Z",
+        "exitCode": 0,
+        "durationSeconds": "7.1928923",
+        "nextStateOrGuardUtc": "2026-10-23T23:22:20.153Z",
+        "secondsAfterWorkerExit": "5.0272918"
+      },
+      {
+        "case": "W14.single-close.initial",
+        "status": "not established",
+        "reason": "Remux exited before the close guard; Close was not sent",
+        "requiredInputSent": false,
+        "retainedWorkerIdentity": "16348:639283946877140867",
+        "operation": "RemuxCandidate",
+        "startUtc": "2026-10-23T23:24:47.7140867Z",
+        "exitUtc": "2026-10-23T23:24:54.0227547Z",
+        "exitCode": 0,
+        "durationSeconds": "6.3086680",
+        "nextStateOrGuardUtc": "2026-10-23T23:25:02.491Z",
+        "secondsAfterWorkerExit": "8.4682453"
+      },
+      {
+        "case": "W14.single-close.corrected-retry",
+        "status": "not established",
+        "reason": "One shorter route still reached the guard after remux exit; Close was not sent",
+        "requiredInputSent": false,
+        "retainedWorkerIdentity": "34904:639283948368639534",
+        "operation": "RemuxCandidate",
+        "startUtc": "2026-10-23T23:27:16.8639534Z",
+        "exitUtc": "2026-10-23T23:27:23.3308716Z",
+        "exitCode": 0,
+        "durationSeconds": "6.4669182",
+        "nextStateOrGuardUtc": "2026-10-23T23:27:25.369Z",
+        "secondsAfterWorkerExit": "2.0381284"
+      },
+      {
+        "case": "W15",
+        "status": "not established",
+        "reason": "Verifier was retained alive earlier, but exited before the close guard; Close was not sent",
+        "requiredInputSent": false,
+        "retainedWorkerIdentity": "52400:639283950093268884",
+        "operation": "candidate identification verifier",
+        "startUtc": "2026-10-23T23:30:09.3268884Z",
+        "exitUtc": "2026-10-23T23:30:11.2213285Z",
+        "exitCode": 0,
+        "durationSeconds": "1.8944401",
+        "nextStateOrGuardUtc": "2026-10-23T23:30:20.112Z",
+        "secondsAfterWorkerExit": "8.8906715",
+        "earlierRetainedLiveBoundaryUtc": "2026-10-23T23:30:09.433Z",
+        "lastRetainedLiveReadCompletedUtc": "2026-10-23T23:30:11.2133856+00:00"
+      }
+    ],
+    "W14.repeated-close": {
+      "status": "blocked",
+      "execution": "not run",
+      "requiredInputSent": false,
+      "reason": "No active single-close input established here; unavailable click geometry and no reliable supported rapid-repeat route. No second close sent to another window"
+    },
+    "interpretation": "No active-stage Cancel or Close was sent. These missed intervals establish neither cancellation/close success nor an application failure"
+  },
+  "observer": {
+    "script": "../../build/observe-native-workers.ps1",
+    "operatorInputTimestampsRecorded": false,
+    "scope": "Read-only retained MKV tool path/start handles; no UI input, process termination or media mutation",
+    "localCopyDifference": "For this session only, liveness filter changed from RemuxCandidate-and-not-exited to all known not-exited workers, allowing verifier liveness; repository script unchanged",
+    "originalScriptSha256": "8b342628867912ed77ced5bd67938cb886cabfe5a3239b0b854a03a14d365d16",
+    "localCopySha256": "caa6c25d90f8e20920d80bb5de4a65700ac338a4462b309a2029d727012f1532",
+    "retainedGuiChildWorkers": 32,
+    "sameHandleExitRecords": 32,
+    "unclassifiedDiscoveryRaces": 3,
+    "qualification": "All 32 retained children exited 0; three unretained discovery races remain unclassified. Not a complete child-process trace. Native API time bounds are not exact input timestamps"
+  },
+  "finalState": {
+    "cleanupObservedUtc": "2026-10-23T23:37:12.547700+00:00",
+    "identifiedJobGroupsAbsent": 5,
+    "candidateEntries": [],
+    "ownershipEntries": [],
+    "inspectionScratchEntries": [],
+    "processSnapshotUtc": "2026-10-23T23:37:13.204110+00:00",
+    "matchingTestGuiOrMediaWorkerCount": 0,
+    "unidentifiableProcessCount": 0,
+    "idleClose": {
+      "status": "passed",
+      "nativeMethod": "Alt+F4 on the idle tested window",
+      "apiInterval": {
+        "kind": "NativeAction",
+        "action": "Idle close after all successful jobs; not an active-close test",
+        "startedUtc": "2026-10-23T23:31:34.800Z",
+        "completedUtc": "2026-10-23T23:31:34.900Z"
+      },
+      "retainedGuiExit": {
+        "ExitCode": 0,
+        "ExitUtc": "2026-10-23T23:31:35.2068224Z",
+        "ObservedUtc": "2026-10-23T23:31:35.2814176+00:00",
+        "Event": "GuiExited"
+      }
+    },
+    "observerStopped": {
+      "ObservedUtc": "2026-10-23T23:32:00.4352691+00:00",
+      "KnownWorkerCount": 32,
+      "GuiHasExited": true,
+      "Reason": "OwnerStopMarker",
+      "Event": "ObserverStopped"
+    },
+    "olderInstancePreserved": true,
+    "qualification": "Success/post-job cleanup and idle exit only; no cancellation cleanup claim. Verifier evidence intentionally remains outside app storage"
+  },
+  "remainingLimits": {
+    "visualFocusLayoutScaling": {
+      "status": "blocked",
+      "reason": "FrameArrived timed out: timed out waiting on channel; coordinate input geometry is unavailable. UIA is functional evidence only"
+    },
+    "pickerInput": "Cannot set a value for an element that is not settable; modal Tab did not confirm focus change and no separate targetable picker was available. Owner assistance recorded above",
+    "Windows11": {
+      "status": "not run",
+      "reason": "Declared target not available"
+    },
+    "UbuntuDesktop": {
+      "status": "not run",
+      "reason": "Declared target not available"
+    },
+    "realWarnings": {
+      "status": "not run"
+    },
+    "earlierInitialization": "Kernel-assets OS error 3 is historical with unknown cause; later minimal retry initialized successfully",
+    "releaseReadiness": "Not established by this smoke or expiring candidate handoff"
+  },
+  "manualContinuation": {
+    "procedure": "native-desktop-acceptance.md#delivered-candidate-owner-operated-continuation",
+    "completedScope": "One owner-operated W13; see ownerOperatedW13. No further Run/Cancel in this task.",
+    "remainingInputCorrelation": "Cancelled and cleanup are confirmed; displayed Cancel transition overlaps worker exit once timing uncertainty is included. Strict active-remux ordering remains not established.",
+    "laterRepeatedCloseGuard": "A second Close must target the same observed still-existing test window and PID/start identity while shutdown continues. Stop if that window disappears; never blind repeated Alt+F4 with the older instance open"
+  },
+  "receiptProvenance": {
+    "derivation": "Allowlisted values from preserved local receipts and read-only review of underlying extracted payload/probe evidence; no observations reconstructed from narrative prose",
+    "localReceiptIdentities": [
+      {
+        "localReceipt": "acceptance-results.json",
+        "bytes": 43662,
+        "sha256": "76bf8a9a1e151a6cda96d15459025f2d5f81dd8fe73c0daa365a2b33fb473253"
+      },
+      {
+        "localReceipt": "evidence/mkv-smoke-verification/result.json",
+        "bytes": 5560,
+        "sha256": "d4d93e5d282ac402ff54fc7a695b76b5b212e7791453b36f7aa13311cfeb9883"
+      },
+      {
+        "localReceipt": "evidence/mp4-smoke-verification/verified/result.json",
+        "bytes": 10912,
+        "sha256": "8bc444295ac772992eecf472089fde181945fac2b73467885ed5203790a5058c"
+      },
+      {
+        "localReceipt": "evidence/native-events-retry.json",
+        "bytes": 627892,
+        "sha256": "14d6f2f06ace52e7eb4ba6df9617f2bfdb656f762e1705268bf1edb0b694ac4b"
+      },
+      {
+        "localReceipt": "evidence/workers-retry-session-1.jsonl",
+        "bytes": 105218,
+        "sha256": "40f025600dd080d7cc2a488647f036b6d2e359f42340a248b4886e4fbae6de19"
+      },
+      {
+        "localReceipt": "evidence/transient-boundaries.json",
+        "bytes": 18783,
+        "sha256": "edff594562b56a9a87396db1058e6a89bd3db57ef6c36a7e19762a01b1bd1e25"
+      },
+      {
+        "localReceipt": "evidence/final-audit.json",
+        "bytes": 10815,
+        "sha256": "a1958322ab030e2f4841656e8995e856292f260214301233a3ffdf90a3990d6c"
+      },
+      {
+        "localReceipt": "evidence/retry-idle-close.json",
+        "bytes": 620,
+        "sha256": "db911d35a0bc2094b5290069a094a28bc04d351e4313f18a2c9ff5e3808858eb"
+      },
+      {
+        "localReceipt": "evidence/observer-local-adjustment.json",
+        "bytes": 889,
+        "sha256": "f0f7e713840e47039b98ccff8fb9d0d118e76fdc3da188ef2de875a2f23ef797"
+      }
+    ],
+    "omissions": "Private absolute workspace roots, raw UI trees/picker bookmarks, unrelated process identities, chat/permission history, captures and media omitted. Source paths reduced to task-owned fixture basenames; output paths remain task-relative. Raw receipts remain local; their hashes identify the originals, not redacted copies"
+  },
+  "ownerOperatedW13": {
+    "status": "not established",
+    "scope": "One owner-operated Run/Cancel attempt only. Native Cancelled, retained-worker exit and cleanup are confirmed; strict input-before-remux-exit ordering is not established. No application defect demonstrated.",
+    "sourceRevision": "b288be1d185c62157e7d1bd1249f2f925ffe3093",
+    "archiveSha256": "f406162e52c9de3a44c6c18d0eae620fce2a1d710694e614eda6847fe51562a3",
+    "platformReference": "#/platform",
+    "language": "English",
+    "testGui": {
+      "processId": 24984,
+      "startUtc": "2026-10-24T00:58:03.8375499Z",
+      "productVersion": "0.1.0-rc.1+b288be1d185c62157e7d1bd1249f2f925ffe3093",
+      "stillOpenAfterCheck": true,
+      "olderInstancePreserved": true
+    },
+    "fixture": {
+      "name": "C1GiB cancellation attachment fixture",
+      "bytes": 1079470784,
+      "sha256BeforeAndAfter": "0565b34f5fc0965225bf45b8d37e5cb007fe20611b77f0f66c175c970e4307f9"
+    },
+    "plan": {
+      "keepSourceIds": [
+        0,
+        2,
+        3
+      ],
+      "removeSourceIds": [
+        1
+      ],
+      "destination": "Results с пробелами/W13 Cancel/manual-W13-01.trimmed.mkv",
+      "explicitlyReviewedBeforeOwnerRun": true
+    },
+    "nativeMethod": {
+      "preparationAndPostState": "Documented Computer Use UIA/keyboard; no new capture attempt, fallback UI automation or programmatic cancellation",
+      "ownerActions": "Selected the existing source in the native picker, then physically activated Create separate output and Cancel while recording through ScreenReplay",
+      "automationInterruptions": "Physical Escape stopped Computer Use twice; app input stopped immediately each time. The final explicit continuation only observed the completed attempt; the earlier continuation resumed preparation. No second Run/Cancel.",
+      "attemptCount": 1,
+      "externalWorkerTerminationUsed": false
+    },
+    "recording": {
+      "method": "Owner-controlled ScreenReplay; no click marker or global input hook",
+      "bytes": 4083883,
+      "sha256": "2738e2e7cd46946aee4ab623909b451c5f9ea28c37ed22d36edcbec8b4f61e08",
+      "durationSeconds": "7.833317",
+      "frames": 470,
+      "frameRate": "60/1",
+      "resolution": "1920x1080",
+      "timebase": "1/60000",
+      "utcReference": "Read-only host UTC display; requested 50 ms timer, observed updates about 60-130 ms. Display/composition lag is not independently bounded; 1/60 s frames are not exact input UTC.",
+      "originalRemainsPrivate": true,
+      "visualExtract": {
+        "localReceipt": "images/delivered-candidate-w13-owner-controls.png",
+        "bytes": 115142,
+        "sha256": "d4b09c4ee723e4105507bb20364388d75b1dff68099bb2a42ee13749c429c895"
+      }
+    },
+    "inputCorrelation": {
+      "operatorInputTimestampsRecorded": false,
+      "reviewMethod": "Original 60-fps frames, 120-frame segment decoded after a 4 s input seek. No timing conclusion from filenames, filesystem times, owner message or exit code.",
+      "observedFrames": [
+        {
+          "segmentFrame": 95,
+          "displayedUtc": "2026-10-24T01:26:54.937Z",
+          "appearance": "Copying; Cancel before pressed appearance"
+        },
+        {
+          "segmentFrame": 96,
+          "displayedUtc": "2026-10-24T01:26:54.994Z",
+          "appearance": "Copying; Cancel pressed appearance begins"
+        },
+        {
+          "segmentFrame": 101,
+          "displayedUtc": "2026-10-24T01:26:55.058Z",
+          "appearance": "Copying; last sampled pressed appearance"
+        },
+        {
+          "segmentFrame": 102,
+          "displayedUtc": "2026-10-24T01:26:55.058Z",
+          "appearance": "Copying; Cancel returns from pressed appearance"
+        },
+        {
+          "segmentFrame": 107,
+          "displayedUtc": "2026-10-24T01:26:55.121Z",
+          "appearance": "First Cancelled; Cancel disabled"
+        },
+        {
+          "segmentFrame": 108,
+          "displayedUtc": "2026-10-24T01:26:55.185Z",
+          "appearance": "Cancelled; next visible clock update"
+        }
+      ],
+      "conservativeDisplayedEventEnvelopeUtc": {
+        "from": "2026-10-24T01:26:54.937Z",
+        "through": "2026-10-24T01:26:55.185Z"
+      },
+      "conclusion": "The displayed-event envelope already includes retained-worker exit at 01:26:55.0947517Z; refresh/render uncertainty only widens it. Mouse-down/appearance is not the exact command activation. Strict active-remux ordering remains not established."
+    },
+    "retainedRemux": {
+      "workerKey": "24808:639284020122757779",
+      "processId": 24808,
+      "parentProcessId": 24984,
+      "executable": "tools/mkvmerge.exe",
+      "operation": "RemuxCandidate",
+      "startUtc": "2026-10-24T01:26:52.2757779Z",
+      "firstRetainedObservedUtc": "2026-10-24T01:26:52.6804517+00:00",
+      "firstRetainedHasExited": false,
+      "livenessReads": [
+        {
+          "readStartedUtc": "2026-10-24T01:26:52.6811115+00:00",
+          "readCompletedUtc": "2026-10-24T01:26:52.6811691+00:00",
+          "hasExited": false
+        },
+        {
+          "readStartedUtc": "2026-10-24T01:26:53.1007860+00:00",
+          "readCompletedUtc": "2026-10-24T01:26:53.1009203+00:00",
+          "hasExited": false
+        },
+        {
+          "readStartedUtc": "2026-10-24T01:26:53.3891903+00:00",
+          "readCompletedUtc": "2026-10-24T01:26:53.3892479+00:00",
+          "hasExited": false
+        },
+        {
+          "readStartedUtc": "2026-10-24T01:26:53.7528106+00:00",
+          "readCompletedUtc": "2026-10-24T01:26:53.7528743+00:00",
+          "hasExited": false
+        },
+        {
+          "readStartedUtc": "2026-10-24T01:26:54.1083154+00:00",
+          "readCompletedUtc": "2026-10-24T01:26:54.1083654+00:00",
+          "hasExited": false
+        },
+        {
+          "readStartedUtc": "2026-10-24T01:26:54.3570476+00:00",
+          "readCompletedUtc": "2026-10-24T01:26:54.3570912+00:00",
+          "hasExited": false
+        },
+        {
+          "readStartedUtc": "2026-10-24T01:26:54.6656264+00:00",
+          "readCompletedUtc": "2026-10-24T01:26:54.6657101+00:00",
+          "hasExited": false
+        },
+        {
+          "readStartedUtc": "2026-10-24T01:26:55.0102679+00:00",
+          "readCompletedUtc": "2026-10-24T01:26:55.0103170+00:00",
+          "hasExited": false
+        }
+      ],
+      "exitUtc": "2026-10-24T01:26:55.0947517Z",
+      "exitObservedUtc": "2026-10-24T01:26:55.3399729+00:00",
+      "exitCode": -1,
+      "durationSeconds": "2.8189738",
+      "jobIdentifier": "f56d7cb69a7546afb2bed2a43a595902"
+    },
+    "observer": {
+      "script": "../../build/observe-native-workers.ps1",
+      "sha256": "8b342628867912ed77ced5bd67938cb886cabfe5a3239b0b854a03a14d365d16",
+      "repositoryScriptUnchanged": true,
+      "startedUtc": "2026-10-24T01:23:45.4175521+00:00",
+      "operatorInputTimestampsRecorded": false,
+      "retainedWorkers": 2,
+      "unretainedDiscoveryRaces": 1,
+      "qualification": "One short child could not be retained; its operation/exit remain unclassified. Not a complete child-process trace.",
+      "stoppedUtc": "2026-10-24T01:32:33.7705739+00:00",
+      "stopReason": "OwnerStopMarker",
+      "scopeOfStop": "Own observer/display stop markers only, after retained exits; no media process control or deletion"
+    },
+    "result": {
+      "functionalCancellationStatus": "passed",
+      "nativeStatus": "Operation cancelled. The original is preserved.",
+      "postStateObservedUtc": "2026-10-24T01:32:05.544Z",
+      "reviewEnabled": true,
+      "runEnabled": false,
+      "cancelEnabled": false,
+      "guiResponding": true,
+      "sourceAndDestinationStillCorrect": true,
+      "sameRetainedWorkerExitConfirmed": true,
+      "sourceHashUnchanged": true,
+      "finalOutputExists": false,
+      "exactCandidateAndMarkerDirectoryAbsent": true,
+      "exactJournalAbsent": true,
+      "ownershipEntries": [],
+      "inspectionScratchEntries": [],
+      "matchingPackagedMediaWorkers": 0,
+      "unidentifiableProcesses": 0,
+      "cleanupObservedUtc": "2026-10-24T01:36:12.889970+00:00",
+      "quiescenceObservedUtc": "2026-10-24T01:36:13.780438+00:00",
+      "previousPublishedOutputsRehashedUnchanged": 6,
+      "allSourceHashesRecheckedUnchanged": 3,
+      "deliveredArchiveRehashedUnchanged": true
+    },
+    "provenance": {
+      "localEvidenceDirectory": "evidence/manual-W13-20261024-005701-910c03",
+      "localReceipts": [
+        {
+          "localReceipt": "preparation.json",
+          "bytes": 2240,
+          "sha256": "3b3049ceb1d008f9015a770dbbdd40393b97b4ee226bcab678d497aa7a9464a9"
+        },
+        {
+          "localReceipt": "gui-identity.json",
+          "bytes": 481,
+          "sha256": "5bb6bf59aa6e7ed50a46eb69793dd7e881fcf83973d4fdc79d247b3d89b595ea"
+        },
+        {
+          "localReceipt": "extraction-integrity.json",
+          "bytes": 673,
+          "sha256": "c0002f6cce33b9b381cb9026829a01ded94eaa88c7f13fc52df3d381e5c26a5d"
+        },
+        {
+          "localReceipt": "approved-plan-and-preparation.json",
+          "bytes": 20918,
+          "sha256": "193e87df85b4079d5a5a8b1ec80713f6a3946fe84b303b78ab6454ef0f2a99b8"
+        },
+        {
+          "localReceipt": "recording-readiness.json",
+          "bytes": 1259,
+          "sha256": "190a9a90675a92762307d137d68d5296354b8fe1eebb281af7dbaadede5f7ca9"
+        },
+        {
+          "localReceipt": "workers-owner-01.jsonl",
+          "bytes": 6211,
+          "sha256": "7821f442f553067b43e4f89d99a36d1af1b475f2ec1407b2f1036d7e0a8736a6"
+        },
+        {
+          "localReceipt": "attempt-recording.json",
+          "bytes": 326,
+          "sha256": "466b4d56bbce79d82a8e3e3cd0cb912d2efb50772ce1fabee5f584168a19af02"
+        },
+        {
+          "localReceipt": "attempt-probe.json",
+          "bytes": 537,
+          "sha256": "6e5ee4f1ee91845dbf521b6bfe6da855fc81c8794d1ed6908d1b57aa3a209baa"
+        },
+        {
+          "localReceipt": "native-post-attempt.json",
+          "bytes": 4123,
+          "sha256": "db1bba22592688238a21c3eabdbc203b7bace63aca3268aa3a682c4fdc4a3aa1"
+        },
+        {
+          "localReceipt": "post-attempt-files.json",
+          "bytes": 797,
+          "sha256": "fa119ff191cec8f82471c11e1531b9ccb75bfaa4d184e7bf71f3353c419989a5"
+        },
+        {
+          "localReceipt": "filesystem-audit.json",
+          "bytes": 6215,
+          "sha256": "6b0df62b444a3ffb12eb8a83d2a38f778d728ace8329fcfc596b50c97a5e333a"
+        }
+      ],
+      "redactionsAndOmissions": "Private absolute roots, unrelated application identities, full UIA trees, original full-desktop recordings and raw frames remain local. The published PNG contains only UTC and TrackTrim status/buttons cropped from six original frames; all other pixels are omitted, with labels added above each unaltered crop. The two source crop rectangles are x1327/y47/w573/h53 and x240/y920/w600/h95 in the 1920x1080 recording.",
+      "independentReview": "Read-only second review agreed the visible event envelope overlaps worker exit; an independent full-file audit confirmed source/output preservation and cleanup."
+    },
+    "limits": [
+      "No W13 retry; no active-input-before-exit pass from this recording.",
+      "No W14/W15, warning, screenshot-capture, display-setting or target-desktop run.",
+      "No application, backend, dependency, workflow or package change; frozen candidate not rebuilt.",
+      "UIA and cropped owner recording establish this functional event only, not general layout/focus/scaling or clean Windows 11/Ubuntu acceptance."
+    ]
+  }
+}

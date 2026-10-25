@@ -36,7 +36,7 @@
         <Button Content="{Binding Localization[RuleDismiss]}" Command="{Binding DismissCommand}" Margin="0,0,8,8" />
       </WrapPanel>
       <TextBlock x:Name="LanguageRuleStatusText" Text="{Binding StatusText}" TextWrapping="Wrap" />
-      <TextBlock Text="{Binding ErrorText}" TextWrapping="Wrap" Foreground="Crimson" IsVisible="{Binding HasError}" />
+      <TextBlock Text="{Binding ErrorText}" TextWrapping="Wrap" Foreground="{DynamicResource TTErrorBrush}" IsVisible="{Binding HasError}" />
       <ScrollViewer MaxHeight="340" IsVisible="{Binding HasPreview}" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
         <ItemsControl ItemsSource="{Binding Files}">
           <ItemsControl.ItemTemplate>

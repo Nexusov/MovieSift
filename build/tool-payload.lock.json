@@ -1,0 +1,682 @@
+{
+  "schemaVersion": 1,
+  "version": "102.0",
+  "purpose": "Exact omissions from fixed upstream distributions for the two CLI-only workers. No source or library rewriting. Runtime dependency and packaged-workflow gates remain required.",
+  "linux-x64": {
+    "artifactSha256": "c66345b30d6d5fd640ea982ab5e202a99b9f541a20e42aa19edd90f3ddd5dc9b",
+    "sourceDirectory": "usr/lib",
+    "includedFiles": [
+      {
+        "sourceMember": "usr/lib/libFLAC.so.8",
+        "path": "app-root/usr/lib/libFLAC.so.8",
+        "size": 372016,
+        "sha256": "fe38be45263368b5103c2d32f879c64cb6c410a7d4e935e6e4a373e86749d358"
+      },
+      {
+        "sourceMember": "usr/lib/libQt6Core.so.6",
+        "path": "app-root/usr/lib/libQt6Core.so.6",
+        "size": 7069680,
+        "sha256": "1bf4d869aebd556e51eee1832f7ce534c219bfd5405b6a2e7999a4cd9293c134"
+      },
+      {
+        "sourceMember": "usr/lib/libboost_atomic.so.1.85.0",
+        "path": "app-root/usr/lib/libboost_atomic.so.1.85.0",
+        "size": 25480,
+        "sha256": "831518b70605b60f3743023484a30982bebe2ab96072b5c1f311a70b6623b965"
+      },
+      {
+        "sourceMember": "usr/lib/libboost_filesystem.so.1.85.0",
+        "path": "app-root/usr/lib/libboost_filesystem.so.1.85.0",
+        "size": 203136,
+        "sha256": "d932c9cf01d5a17411572b611fb86e9f8730bd95f51a1e2f291716e62540b0cd"
+      },
+      {
+        "sourceMember": "usr/lib/libcmark.so.0.28.3",
+        "path": "app-root/usr/lib/libcmark.so.0.28.3",
+        "size": 358840,
+        "sha256": "b656b217a5b319c220198e73b82241b33c1cb2636cc5fa61bb89f0ee8a9cf4d5"
+      },
+      {
+        "sourceMember": "usr/lib/libdvdread.so.4",
+        "path": "app-root/usr/lib/libdvdread.so.4",
+        "size": 131296,
+        "sha256": "64e80fd6fc92a92ca62bab6a9f14a1923a590d3638fb3bd1b1e2525ac97ab1f4"
+      },
+      {
+        "sourceMember": "usr/lib/libffi.so.6",
+        "path": "app-root/usr/lib/libffi.so.6",
+        "size": 37248,
+        "sha256": "3a37023ae042c3a8c49f4f6bd2c3ab8a1977138ecd93c30bcc0f5edf78d15532"
+      },
+      {
+        "sourceMember": "usr/lib/libglib-2.0.so.0",
+        "path": "app-root/usr/lib/libglib-2.0.so.0",
+        "size": 1171920,
+        "sha256": "91d8e59db911051b9fca6d708a111524b06230a700e228fc1ba1775620b297ae"
+      },
+      {
+        "sourceMember": "usr/lib/libgnutls.so.30",
+        "path": "app-root/usr/lib/libgnutls.so.30",
+        "size": 2060016,
+        "sha256": "d61e6c0a2296e71384b947448bc545e4c1cd82e7c8b40b7b63bc58f758534fab"
+      },
+      {
+        "sourceMember": "usr/lib/libgthread-2.0.so.0",
+        "path": "app-root/usr/lib/libgthread-2.0.so.0",
+        "size": 7640,
+        "sha256": "4f442672d6ddd19cedee66da96921ba226e208234b4c77de962b0123dea7dd62"
+      },
+      {
+        "sourceMember": "usr/lib/libhogweed.so.4",
+        "path": "app-root/usr/lib/libhogweed.so.4",
+        "size": 197704,
+        "sha256": "cd4c53becbaddeebc0b6794084cb46449a98cd1dc7089c4a457b533e810d8401"
+      },
+      {
+        "sourceMember": "usr/lib/libicudata.so.56",
+        "path": "app-root/usr/lib/libicudata.so.56",
+        "size": 25048256,
+        "sha256": "2860f210ddd5363c13aa941c4ff4838bcbfa35b4f3afde5cfc424406dd712d4e"
+      },
+      {
+        "sourceMember": "usr/lib/libicui18n.so.56",
+        "path": "app-root/usr/lib/libicui18n.so.56",
+        "size": 3368288,
+        "sha256": "5ecff006af5dfa3c0fce2fa29e2e579aa4439085753f18b927a0e44155827ab6"
+      },
+      {
+        "sourceMember": "usr/lib/libicuuc.so.56",
+        "path": "app-root/usr/lib/libicuuc.so.56",
+        "size": 2069136,
+        "sha256": "9ee010e3cfda386831f158630ae53c57a311541800dc7e03151cd299713f6383"
+      },
+      {
+        "sourceMember": "usr/lib/libidn2.so.0",
+        "path": "app-root/usr/lib/libidn2.so.0",
+        "size": 131568,
+        "sha256": "2f4a5893128a6142cc1c88442154ba2e2bf82f383bd25c91afbd1509837cf1ce"
+      },
+      {
+        "sourceMember": "usr/lib/libnettle.so.6",
+        "path": "app-root/usr/lib/libnettle.so.6",
+        "size": 239352,
+        "sha256": "37944285dc38aa729c0cbfa08c5b94e301701152db772e1577bc784501f15538"
+      },
+      {
+        "sourceMember": "usr/lib/libogg.so.0",
+        "path": "app-root/usr/lib/libogg.so.0",
+        "size": 29360,
+        "sha256": "f16c849e3c2ac5e2f5893bae5354fd2a1c89869068edb84063281f98dbf98a6c"
+      },
+      {
+        "sourceMember": "usr/lib/libp11-kit.so.0",
+        "path": "app-root/usr/lib/libp11-kit.so.0",
+        "size": 1259544,
+        "sha256": "ac9dcd7e6ab7452bf8ee4ecfd36bd927a5812e7aa408fc766936ef02ad379610"
+      },
+      {
+        "sourceMember": "usr/lib/libpcre.so.1",
+        "path": "app-root/usr/lib/libpcre.so.1",
+        "size": 464840,
+        "sha256": "0dd207b5a53568bd542da93dc1816f6fd1aca35817692467ac697b662512c616"
+      },
+      {
+        "sourceMember": "usr/lib/libtasn1.so.6",
+        "path": "app-root/usr/lib/libtasn1.so.6",
+        "size": 78832,
+        "sha256": "ca03aa5eacd1e157e0a5c7e5d87789225bc6b3095ca0e180f2aba2452990974c"
+      },
+      {
+        "sourceMember": "usr/lib/libunistring.so.2",
+        "path": "app-root/usr/lib/libunistring.so.2",
+        "size": 1805368,
+        "sha256": "05abdd40665a0f8759c91d19e0e5f4aa437002ab76aa9f9a3a790cdf47a34802"
+      },
+      {
+        "sourceMember": "usr/lib/libvorbis.so.0",
+        "path": "app-root/usr/lib/libvorbis.so.0",
+        "size": 193208,
+        "sha256": "96eafd6a4d71a8f104f499002c84362d9dafd69b1987679e7a3a66633c674899"
+      }
+    ],
+    "omittedFiles": [
+      {
+        "sourceMember": "usr/lib/libGLESv2.so.2",
+        "previousPackagePath": "app-root/usr/lib/libGLESv2.so.2",
+        "size": 72104,
+        "sha256": "ed5eda4f53895d981b7ac8dd48caacd8834e13e26954b14a9f4453b032180070"
+      },
+      {
+        "sourceMember": "usr/lib/libQt6Concurrent.so.6",
+        "previousPackagePath": "app-root/usr/lib/libQt6Concurrent.so.6",
+        "size": 31400,
+        "sha256": "e206ca52a66e4295dff33a414c056142cfae6318b27faba3b5cc52923c55449d"
+      },
+      {
+        "sourceMember": "usr/lib/libQt6DBus.so.6",
+        "previousPackagePath": "app-root/usr/lib/libQt6DBus.so.6",
+        "size": 807416,
+        "sha256": "8982a43adb5eb414aac0bb25cd8ddc5db21b94ef59abca6b0a390469e7078536"
+      },
+      {
+        "sourceMember": "usr/lib/libQt6Gui.so.6",
+        "previousPackagePath": "app-root/usr/lib/libQt6Gui.so.6",
+        "size": 10246008,
+        "sha256": "5f3ff6d2fecc3dc97e713272448d6f0f07fe93a841dca6c6b011198512021887"
+      },
+      {
+        "sourceMember": "usr/lib/libQt6Multimedia.so.6",
+        "previousPackagePath": "app-root/usr/lib/libQt6Multimedia.so.6",
+        "size": 966488,
+        "sha256": "667abd05ad779b152a861a393acf123d9d8c48af3270a2315f4768130bd49d23"
+      },
+      {
+        "sourceMember": "usr/lib/libQt6Network.so.6",
+        "previousPackagePath": "app-root/usr/lib/libQt6Network.so.6",
+        "size": 1733080,
+        "sha256": "f407569649175da06c497dabf2fdb1c6ccf905bb2bced95bf6a849c10da3ae7f"
+      },
+      {
+        "sourceMember": "usr/lib/libQt6OpenGL.so.6",
+        "previousPackagePath": "app-root/usr/lib/libQt6OpenGL.so.6",
+        "size": 677016,
+        "sha256": "27704f6140a40a5ced293b5769805ea1e577bf3bb3379284990f101a847c2c24"
+      },
+      {
+        "sourceMember": "usr/lib/libQt6Qml.so.6",
+        "previousPackagePath": "app-root/usr/lib/libQt6Qml.so.6",
+        "size": 5958768,
+        "sha256": "3518c75705aabe5c1ae8e6b5d9823cd92d3f0212367f5f5682dd50f58db49a44"
+      },
+      {
+        "sourceMember": "usr/lib/libQt6QmlModels.so.6",
+        "previousPackagePath": "app-root/usr/lib/libQt6QmlModels.so.6",
+        "size": 856216,
+        "sha256": "c7f4c2df1aba6271e4b76a27a5b355903ea661550b4eb3233d7c192f784c7036"
+      },
+      {
+        "sourceMember": "usr/lib/libQt6Quick.so.6",
+        "previousPackagePath": "app-root/usr/lib/libQt6Quick.so.6",
+        "size": 6908568,
+        "sha256": "aed8841e341a95412c02a59442677f3bf793ce50da749089333abb7ed6da2a01"
+      },
+      {
+        "sourceMember": "usr/lib/libQt6Svg.so.6",
+        "previousPackagePath": "app-root/usr/lib/libQt6Svg.so.6",
+        "size": 395416,
+        "sha256": "c8403e7fd232b62dfe7f7df442d778757b0db703db532c32123e705bd6749ddc"
+      },
+      {
+        "sourceMember": "usr/lib/libQt6VirtualKeyboard.so.6",
+        "previousPackagePath": "app-root/usr/lib/libQt6VirtualKeyboard.so.6",
+        "size": 566336,
+        "sha256": "1db7b08c89af7c378982c16779ba06a5e2f4b72bc7c76a9d95a7ae351a6e88e6"
+      },
+      {
+        "sourceMember": "usr/lib/libQt6WaylandClient.so.6",
+        "previousPackagePath": "app-root/usr/lib/libQt6WaylandClient.so.6",
+        "size": 996416,
+        "sha256": "d1376ce6dd6c02edf5189318ca3e813c1e549e4fca91147551a1bbcd39857033"
+      },
+      {
+        "sourceMember": "usr/lib/libQt6WaylandEglClientHwIntegration.so.6",
+        "previousPackagePath": "app-root/usr/lib/libQt6WaylandEglClientHwIntegration.so.6",
+        "size": 60848,
+        "sha256": "91a6733a9e5cdb5c9c2a0126bc0b6b9b44f35e28fa1e0fb7b7549c36a5b5a593"
+      },
+      {
+        "sourceMember": "usr/lib/libQt6Widgets.so.6",
+        "previousPackagePath": "app-root/usr/lib/libQt6Widgets.so.6",
+        "size": 7558232,
+        "sha256": "78a14cad7c7a665ceb35be794baaa9a8d5ed1292f6649c53a3e992fbfd3165ca"
+      },
+      {
+        "sourceMember": "usr/lib/libQt6XcbQpa.so.6",
+        "previousPackagePath": "app-root/usr/lib/libQt6XcbQpa.so.6",
+        "size": 712216,
+        "sha256": "f47af9dfc1e5f9e422b8bd1944e84435f9760ad797330bb35f4b61f4a2969733"
+      },
+      {
+        "sourceMember": "usr/lib/libXau.so.6",
+        "previousPackagePath": "app-root/usr/lib/libXau.so.6",
+        "size": 16416,
+        "sha256": "154567c4fde177111c7970ac5ade35d570017c1d5b89d5f1f30e3871de890340"
+      },
+      {
+        "sourceMember": "usr/lib/libXext.so.6",
+        "previousPackagePath": "app-root/usr/lib/libXext.so.6",
+        "size": 80720,
+        "sha256": "05374969d789aa1918b3cd28ee542da38ad3fb2f6b7643142123b627277e785f"
+      },
+      {
+        "sourceMember": "usr/lib/libXi.so.6",
+        "previousPackagePath": "app-root/usr/lib/libXi.so.6",
+        "size": 70736,
+        "sha256": "9178a6bdf0f859f20e17e66c6cac0035f939db528584c8d3911d66992428a4b8"
+      },
+      {
+        "sourceMember": "usr/lib/libXtst.so.6",
+        "previousPackagePath": "app-root/usr/lib/libXtst.so.6",
+        "size": 29272,
+        "sha256": "cf9797fccf8a4e326789d7e411e3892fa3d788876cccace3f67b8c8cb931238c"
+      },
+      {
+        "sourceMember": "usr/lib/libasyncns.so.0",
+        "previousPackagePath": "app-root/usr/lib/libasyncns.so.0",
+        "size": 24392,
+        "sha256": "5faaea61e8d3490d52bc91b7ad775a9e64f7318452717fb8019d38ac0ffa4798"
+      },
+      {
+        "sourceMember": "usr/lib/libblkid.so.1",
+        "previousPackagePath": "app-root/usr/lib/libblkid.so.1",
+        "size": 343608,
+        "sha256": "922f90882c939bd882a2db492efa4122d5daba9008d413831c3d9e544a54e5d2"
+      },
+      {
+        "sourceMember": "usr/lib/libboost_atomic.a",
+        "previousPackagePath": "app-root/usr/lib/libboost_atomic.a",
+        "size": 14040,
+        "sha256": "2c3c7ff5921c37a8dff619d1dd878e738dc8a5173788fb5703395fe4eb379904"
+      },
+      {
+        "sourceMember": "usr/lib/libboost_atomic.so",
+        "previousPackagePath": "app-root/usr/lib/libboost_atomic.so",
+        "size": 25480,
+        "sha256": "831518b70605b60f3743023484a30982bebe2ab96072b5c1f311a70b6623b965"
+      },
+      {
+        "sourceMember": "usr/lib/libboost_filesystem.a",
+        "previousPackagePath": "app-root/usr/lib/libboost_filesystem.a",
+        "size": 418946,
+        "sha256": "7b991590fc6d06217fdfe0233e6c2e561b055278b7de54f45854d27f03781c66"
+      },
+      {
+        "sourceMember": "usr/lib/libboost_filesystem.so",
+        "previousPackagePath": "app-root/usr/lib/libboost_filesystem.so",
+        "size": 203136,
+        "sha256": "d932c9cf01d5a17411572b611fb86e9f8730bd95f51a1e2f291716e62540b0cd"
+      },
+      {
+        "sourceMember": "usr/lib/libboost_system.a",
+        "previousPackagePath": "app-root/usr/lib/libboost_system.a",
+        "size": 1444,
+        "sha256": "c0fb23df793b4bb739004fc525d2bcd4f0f9d700f10bd7bd9967b252862d3392"
+      },
+      {
+        "sourceMember": "usr/lib/libboost_system.so",
+        "previousPackagePath": "app-root/usr/lib/libboost_system.so",
+        "size": 15624,
+        "sha256": "8e15b51a7ac6231df4d741199f4c626d8e8a7a2531f526f0e2f2b7d834211f0c"
+      },
+      {
+        "sourceMember": "usr/lib/libboost_system.so.1.85.0",
+        "previousPackagePath": "app-root/usr/lib/libboost_system.so.1.85.0",
+        "size": 15624,
+        "sha256": "8e15b51a7ac6231df4d741199f4c626d8e8a7a2531f526f0e2f2b7d834211f0c"
+      },
+      {
+        "sourceMember": "usr/lib/libbz2.so.1",
+        "previousPackagePath": "app-root/usr/lib/libbz2.so.1",
+        "size": 73160,
+        "sha256": "a1e77c99cc558042331fa883c78b05d866e5457dad100f6f46d8a44275840ea9"
+      },
+      {
+        "sourceMember": "usr/lib/libcap.so.2",
+        "previousPackagePath": "app-root/usr/lib/libcap.so.2",
+        "size": 33768,
+        "sha256": "142e8ef5c5fb6f27d16c91600c73ebd34ba3646d242c1c737029e68380e016a0"
+      },
+      {
+        "sourceMember": "usr/lib/libcrypto.so.1.1",
+        "previousPackagePath": "app-root/usr/lib/libcrypto.so.1.1",
+        "size": 3088144,
+        "sha256": "a324fe28d08751edd909010a35c5f39735973249d039a57330cf6550aec6024b"
+      },
+      {
+        "sourceMember": "usr/lib/libcrypto.so.1.1.1k",
+        "previousPackagePath": "app-root/usr/lib/libcrypto.so.1.1.1k",
+        "size": 3088144,
+        "sha256": "a324fe28d08751edd909010a35c5f39735973249d039a57330cf6550aec6024b"
+      },
+      {
+        "sourceMember": "usr/lib/libdbus-1.so.3",
+        "previousPackagePath": "app-root/usr/lib/libdbus-1.so.3",
+        "size": 351584,
+        "sha256": "63b8d7b66c0e08f92e9faac3d502af8b7e4071c6ca795a6639c06987ed37df6b"
+      },
+      {
+        "sourceMember": "usr/lib/libgcrypt.so.20",
+        "previousPackagePath": "app-root/usr/lib/libgcrypt.so.20",
+        "size": 1187344,
+        "sha256": "1eba53de549b65c4ab40f957e0b6a174d0470f2c9311a8457d77209295316599"
+      },
+      {
+        "sourceMember": "usr/lib/libgmodule-2.0.so.0",
+        "previousPackagePath": "app-root/usr/lib/libgmodule-2.0.so.0",
+        "size": 16064,
+        "sha256": "1b86732a655ba9559bafb7079bb3c65d4be09e2d5150528b5fe4720c872dcaad"
+      },
+      {
+        "sourceMember": "usr/lib/libgobject-2.0.so.0",
+        "previousPackagePath": "app-root/usr/lib/libgobject-2.0.so.0",
+        "size": 347416,
+        "sha256": "89c897861abd4c9754a8b53ec14da413244083e7f802f0ec6a58e32aadf3560e"
+      },
+      {
+        "sourceMember": "usr/lib/libgsm.so.1",
+        "previousPackagePath": "app-root/usr/lib/libgsm.so.1",
+        "size": 56632,
+        "sha256": "6a620b60f5abad9037b15161b80633a01f04c25ba657dbfd8a6f23e993b64d98"
+      },
+      {
+        "sourceMember": "usr/lib/libgssapi_krb5.so.2",
+        "previousPackagePath": "app-root/usr/lib/libgssapi_krb5.so.2",
+        "size": 355984,
+        "sha256": "abc338f97252499b028b90eeaae7597668191f4f42f5d536ca1560c91533e82b"
+      },
+      {
+        "sourceMember": "usr/lib/libgstallocators-1.0.so.0",
+        "previousPackagePath": "app-root/usr/lib/libgstallocators-1.0.so.0",
+        "size": 20584,
+        "sha256": "d6549336ee765209d0a96bc201c5fdf54894e43c2c37350667a0ca50bdaf035d"
+      },
+      {
+        "sourceMember": "usr/lib/libgstapp-1.0.so.0",
+        "previousPackagePath": "app-root/usr/lib/libgstapp-1.0.so.0",
+        "size": 66424,
+        "sha256": "d4cb291f976c045a8ab979f151958745b6746114e90836ab08077fdb76b070e8"
+      },
+      {
+        "sourceMember": "usr/lib/libgstaudio-1.0.so.0",
+        "previousPackagePath": "app-root/usr/lib/libgstaudio-1.0.so.0",
+        "size": 508800,
+        "sha256": "b868d35224a07a5a7c129993c629cf3e1e94bdbede3cc2601713a7c2add159bd"
+      },
+      {
+        "sourceMember": "usr/lib/libgstbase-1.0.so.0",
+        "previousPackagePath": "app-root/usr/lib/libgstbase-1.0.so.0",
+        "size": 514208,
+        "sha256": "47c584342017948c6b996d658c4f8620e9d5ecdfef09eadb9a71be8393c73de1"
+      },
+      {
+        "sourceMember": "usr/lib/libgstgl-1.0.so.0",
+        "previousPackagePath": "app-root/usr/lib/libgstgl-1.0.so.0",
+        "size": 460528,
+        "sha256": "44252dc1261c511faf0b55a8681df8494041926cf29528a4ba66b407b9d71573"
+      },
+      {
+        "sourceMember": "usr/lib/libgstpbutils-1.0.so.0",
+        "previousPackagePath": "app-root/usr/lib/libgstpbutils-1.0.so.0",
+        "size": 251832,
+        "sha256": "e6412eacf9cbf4103ba0dd86a28f0af0cb2b10f104af1568b99145cfcdaa5213"
+      },
+      {
+        "sourceMember": "usr/lib/libgstreamer-1.0.so.0",
+        "previousPackagePath": "app-root/usr/lib/libgstreamer-1.0.so.0",
+        "size": 1353944,
+        "sha256": "2fca83033e35f71c1cb09dd2ae6810534daf052a7206bee0a2e1842c8427b4f3"
+      },
+      {
+        "sourceMember": "usr/lib/libgsttag-1.0.so.0",
+        "previousPackagePath": "app-root/usr/lib/libgsttag-1.0.so.0",
+        "size": 252088,
+        "sha256": "a0b4e11f49c0ba27bf48ccb1c486b2b8b1399ed77dd678b4bc2e1ba4339d2ed5"
+      },
+      {
+        "sourceMember": "usr/lib/libgstvideo-1.0.so.0",
+        "previousPackagePath": "app-root/usr/lib/libgstvideo-1.0.so.0",
+        "size": 720224,
+        "sha256": "938608a884bd3c33758d0991884b5792461841d4efa4314890e0b6bf5e012a70"
+      },
+      {
+        "sourceMember": "usr/lib/libk5crypto.so.3",
+        "previousPackagePath": "app-root/usr/lib/libk5crypto.so.3",
+        "size": 96288,
+        "sha256": "b242bd1e7717bc19f8d59927642215fcc5e580acd87480c652852650f7f95588"
+      },
+      {
+        "sourceMember": "usr/lib/libkeyutils.so.1",
+        "previousPackagePath": "app-root/usr/lib/libkeyutils.so.1",
+        "size": 16160,
+        "sha256": "2777d33d48dd4c49fc2a34602034d381dc8a867b6803813a5ad2a8bd954fa75d"
+      },
+      {
+        "sourceMember": "usr/lib/libkrb5.so.3",
+        "previousPackagePath": "app-root/usr/lib/libkrb5.so.3",
+        "size": 975616,
+        "sha256": "d4b313c56d1cda5870bc5578bf6b962ff9acd1ee23313673713691585054dc8f"
+      },
+      {
+        "sourceMember": "usr/lib/libkrb5support.so.0",
+        "previousPackagePath": "app-root/usr/lib/libkrb5support.so.0",
+        "size": 71464,
+        "sha256": "7177f7df48fa7430a3b21eba0cd4d9821f583917419cc29626f95e3783ad30da"
+      },
+      {
+        "sourceMember": "usr/lib/liblz4.so.1",
+        "previousPackagePath": "app-root/usr/lib/liblz4.so.1",
+        "size": 119840,
+        "sha256": "c23f16fe846376f26575481e0301d5014e6d50503481a4be7e986dd7e766b631"
+      },
+      {
+        "sourceMember": "usr/lib/liblzma.so.5",
+        "previousPackagePath": "app-root/usr/lib/liblzma.so.5",
+        "size": 162192,
+        "sha256": "51a76f52979f141c5a7075252a3225348f0359ac92f309b57b3f892365b74745"
+      },
+      {
+        "sourceMember": "usr/lib/libmount.so.1",
+        "previousPackagePath": "app-root/usr/lib/libmount.so.1",
+        "size": 371400,
+        "sha256": "31ce996814b758c0efee2233ee0ab5f5e85127e3970b86e15ca2ac79ab7a24df"
+      },
+      {
+        "sourceMember": "usr/lib/liborc-0.4.so.0",
+        "previousPackagePath": "app-root/usr/lib/liborc-0.4.so.0",
+        "size": 528232,
+        "sha256": "e2e8ddc575ac1f6ec609aff5b5cdafb97b9a5ca4c7b2b72ce54af88a53c7f487"
+      },
+      {
+        "sourceMember": "usr/lib/libpcre2-8.so.0",
+        "previousPackagePath": "app-root/usr/lib/libpcre2-8.so.0",
+        "size": 543304,
+        "sha256": "516f4c9d9b415b565a9bbea79acbeb87333557f952346fbc69c3c80388b95e47"
+      },
+      {
+        "sourceMember": "usr/lib/libpng16.so.16",
+        "previousPackagePath": "app-root/usr/lib/libpng16.so.16",
+        "size": 221200,
+        "sha256": "ebd1fa42daa29afd30ce54986cc28262efd2d0ce0a1372cd48634265be13a1af"
+      },
+      {
+        "sourceMember": "usr/lib/libpulse.so.0",
+        "previousPackagePath": "app-root/usr/lib/libpulse.so.0",
+        "size": 352000,
+        "sha256": "da1840153f2cd86e0cb8362d7d0d786c94b58938c262d58af30a04154f3b24d2"
+      },
+      {
+        "sourceMember": "usr/lib/libpulsecommon-14.0.so",
+        "previousPackagePath": "app-root/usr/lib/libpulsecommon-14.0.so",
+        "size": 559496,
+        "sha256": "beb13e2694c5d88cff06c53b2d9932a27c300109223c8094f915c90b50fa7259"
+      },
+      {
+        "sourceMember": "usr/lib/libselinux.so.1",
+        "previousPackagePath": "app-root/usr/lib/libselinux.so.1",
+        "size": 172112,
+        "sha256": "81bdf5929d5e911a935cc71c847a44dc81a243bd53fdb63b224a3d4525a50dde"
+      },
+      {
+        "sourceMember": "usr/lib/libsndfile.so.1",
+        "previousPackagePath": "app-root/usr/lib/libsndfile.so.1",
+        "size": 470384,
+        "sha256": "d9ebaf0bec52bb41a877691130687ce114a243c3a3bf984d596febf487010032"
+      },
+      {
+        "sourceMember": "usr/lib/libssl.so.1.1",
+        "previousPackagePath": "app-root/usr/lib/libssl.so.1.1",
+        "size": 619912,
+        "sha256": "8248cfc95622fc81bdbc83ee809502b6cd5e8a097fbf0fdc005caec77c3cc121"
+      },
+      {
+        "sourceMember": "usr/lib/libssl.so.1.1.1k",
+        "previousPackagePath": "app-root/usr/lib/libssl.so.1.1.1k",
+        "size": 619912,
+        "sha256": "8248cfc95622fc81bdbc83ee809502b6cd5e8a097fbf0fdc005caec77c3cc121"
+      },
+      {
+        "sourceMember": "usr/lib/libsystemd.so.0",
+        "previousPackagePath": "app-root/usr/lib/libsystemd.so.0",
+        "size": 1391824,
+        "sha256": "a82ce8946e44531ab7c8a02073e7484a961c090f43227853b05015d75753ab0f"
+      },
+      {
+        "sourceMember": "usr/lib/libvorbisenc.so.2",
+        "previousPackagePath": "app-root/usr/lib/libvorbisenc.so.2",
+        "size": 692104,
+        "sha256": "7336ae7684a03706d4d6664dc13384061fdc97f3cfe80a647e2ed53daf8444e5"
+      },
+      {
+        "sourceMember": "usr/lib/libwayland-cursor.so.0",
+        "previousPackagePath": "app-root/usr/lib/libwayland-cursor.so.0",
+        "size": 33120,
+        "sha256": "446fadf032d5bdc11d39cd14cc6a586925e90f0807fb042020352de8aac68872"
+      },
+      {
+        "sourceMember": "usr/lib/libwayland-egl.so.1",
+        "previousPackagePath": "app-root/usr/lib/libwayland-egl.so.1",
+        "size": 7536,
+        "sha256": "4b8e444a07757e6db141964773fbf802ba628f5aed5b4ded6292563fca4eb195"
+      },
+      {
+        "sourceMember": "usr/lib/libxcb-cursor.so.0",
+        "previousPackagePath": "app-root/usr/lib/libxcb-cursor.so.0",
+        "size": 26832,
+        "sha256": "283f9e71cf0f8ed788a939384dca9333dbe455e8d87956b6529e6a1205cb9bca"
+      },
+      {
+        "sourceMember": "usr/lib/libxcb-icccm.so.4",
+        "previousPackagePath": "app-root/usr/lib/libxcb-icccm.so.4",
+        "size": 24064,
+        "sha256": "9453e4f7a69c77078627c49da0cafc033689384648723aa6d73a008976db2e7a"
+      },
+      {
+        "sourceMember": "usr/lib/libxcb-image.so.0",
+        "previousPackagePath": "app-root/usr/lib/libxcb-image.so.0",
+        "size": 20240,
+        "sha256": "c881c1c3774acb95a9e46bb0d525b6a04b36b4d8fed3255bdaaa9c9d3e6a6adc"
+      },
+      {
+        "sourceMember": "usr/lib/libxcb-keysyms.so.1",
+        "previousPackagePath": "app-root/usr/lib/libxcb-keysyms.so.1",
+        "size": 11936,
+        "sha256": "28f5419b1e01df8517b23d42cefd46836c35f04c95ab7d128e63e66ce9f1ef51"
+      },
+      {
+        "sourceMember": "usr/lib/libxcb-randr.so.0",
+        "previousPackagePath": "app-root/usr/lib/libxcb-randr.so.0",
+        "size": 91264,
+        "sha256": "562554c20b6156484a4d48227a1f3b0d5fa927a9c0d33cd49e4832ef56a34ebe"
+      },
+      {
+        "sourceMember": "usr/lib/libxcb-render-util.so.0",
+        "previousPackagePath": "app-root/usr/lib/libxcb-render-util.so.0",
+        "size": 16936,
+        "sha256": "f04ad2c54330bba8c31f41a34aa1b7bae14c69f72d24c8426f369f4e94c29a66"
+      },
+      {
+        "sourceMember": "usr/lib/libxcb-render.so.0",
+        "previousPackagePath": "app-root/usr/lib/libxcb-render.so.0",
+        "size": 73512,
+        "sha256": "161c0eb5d4de1abf2dc4f17c7f6a585a9c02bf6b566033fdbacc2b3b853ab9a0"
+      },
+      {
+        "sourceMember": "usr/lib/libxcb-shape.so.0",
+        "previousPackagePath": "app-root/usr/lib/libxcb-shape.so.0",
+        "size": 19768,
+        "sha256": "7716c8904ec7422a65b43821183f1b42d5d0229239e1b10ffb5b02d487cd33ca"
+      },
+      {
+        "sourceMember": "usr/lib/libxcb-shm.so.0",
+        "previousPackagePath": "app-root/usr/lib/libxcb-shm.so.0",
+        "size": 19008,
+        "sha256": "0be6dfbf6b7e58fd645f94936e725b54640672a1bf70f021206b014ea811b897"
+      },
+      {
+        "sourceMember": "usr/lib/libxcb-sync.so.1",
+        "previousPackagePath": "app-root/usr/lib/libxcb-sync.so.1",
+        "size": 35600,
+        "sha256": "e532c63bbb37b7e478ae6b3ac4da4ea013c22cdd33b101c5772484576b922183"
+      },
+      {
+        "sourceMember": "usr/lib/libxcb-util.so.1",
+        "previousPackagePath": "app-root/usr/lib/libxcb-util.so.1",
+        "size": 25104,
+        "sha256": "9255dd30d02728ff50716322dcf62ca59ba892a146d116405f3c48ef6f995c6b"
+      },
+      {
+        "sourceMember": "usr/lib/libxcb-xfixes.so.0",
+        "previousPackagePath": "app-root/usr/lib/libxcb-xfixes.so.0",
+        "size": 41208,
+        "sha256": "6de855b83fcd4057585c9f94aa1e75db73d6a3a4e68f89300dc3dc055998090d"
+      },
+      {
+        "sourceMember": "usr/lib/libxcb-xkb.so.1",
+        "previousPackagePath": "app-root/usr/lib/libxcb-xkb.so.1",
+        "size": 152160,
+        "sha256": "fd53f741085bc4ab7b27690a4d62563ddca4806800b626da8b7e997878e68756"
+      },
+      {
+        "sourceMember": "usr/lib/libxkbcommon-x11.so.0",
+        "previousPackagePath": "app-root/usr/lib/libxkbcommon-x11.so.0",
+        "size": 45576,
+        "sha256": "27b61ed070ac551e7da152aa73717e27f0c5ef76f10aafbc9720ae1e2d68ad93"
+      },
+      {
+        "sourceMember": "usr/lib/libxkbcommon.so.0",
+        "previousPackagePath": "app-root/usr/lib/libxkbcommon.so.0",
+        "size": 342552,
+        "sha256": "de59cad24a9a462036a7b622e479f1d26c778c30f2c6357588b102f222c0dbae"
+      }
+    ],
+    "reason": "Both CLI transitive ELF dependencies, pinned source startup paths and representative strace-backed identification/remux/extraction use these22 retained libraries. The83 omitted files comprise unused GUI/media/platform dependencies and unused static archives."
+  },
+  "win-x64": {
+    "artifactSha256": "c02e918900f6d945d9307b426237e456378b79a200589ac6928de39064409a44",
+    "sourceDirectory": "data",
+    "includedFiles": [],
+    "omittedFiles": [
+      {
+        "sourceMember": "data/portable-app",
+        "previousPackagePath": "licenses/data/portable-app",
+        "size": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "sourceMember": "data/qt_resources.rcc",
+        "previousPackagePath": "licenses/data/qt_resources.rcc",
+        "size": 11586653,
+        "sha256": "61cc13b854280b3026fb329359b5791fe4babd775f429defeeff662018c3e91a"
+      },
+      {
+        "sourceMember": "data/sounds/finished-1.webm",
+        "previousPackagePath": "licenses/data/sounds/finished-1.webm",
+        "size": 41022,
+        "sha256": "ec292c5c3f578adc2c732c8831be3b1fef0f548cee1ef3cab812be793607b5b1"
+      },
+      {
+        "sourceMember": "data/sounds/finished-2.webm",
+        "previousPackagePath": "licenses/data/sounds/finished-2.webm",
+        "size": 41102,
+        "sha256": "648aa848ac7bbbb8f51a4cdd49aa1de2f4c58a9976ecbcd3392b69ffb7a5f1d2"
+      },
+      {
+        "sourceMember": "data/sounds/finished-3.webm",
+        "previousPackagePath": "licenses/data/sounds/finished-3.webm",
+        "size": 38091,
+        "sha256": "34fac34cb35f8faedc00af9d93cce875254204adb8dcbdbe2854548b43613f74"
+      }
+    ],
+    "reason": "The five GUI resource/sound/portable-marker files were copied under licenses/data outside the runtime package-data lookup path. The GUI is not shipped; the CLI workers function without those copies. Required documents/notices/source remain."
+  }
+}

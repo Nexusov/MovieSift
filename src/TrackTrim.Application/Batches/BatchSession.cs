@@ -8,7 +8,7 @@ using TrackTrim.Core.Rules;
 namespace TrackTrim.Application.Batches;
 
 /// <summary>Stores live per-file authority separately from recoverable source and destination intentions.</summary>
-public sealed class BatchSession
+public sealed partial class BatchSession
 {
     public const int MaximumItems = BatchDiscoveryLimits.MaximumFiles;
     private readonly object synchronization = new();

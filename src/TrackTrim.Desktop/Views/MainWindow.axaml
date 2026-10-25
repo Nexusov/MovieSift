@@ -1,31 +1,30 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:appearance="using:TrackTrim.Desktop.Appearance"
         xmlns:viewModels="using:TrackTrim.Desktop.ViewModels"
         xmlns:views="using:TrackTrim.Desktop.Views"
         x:Class="TrackTrim.Desktop.Views.MainWindow"
         x:DataType="viewModels:MainViewModel"
         Title="TrackTrim" Width="1040" Height="800" MinWidth="640" MinHeight="480">
-  <DockPanel Margin="24" LastChildFill="True">
-    <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,20">
-      <StackPanel Spacing="4">
-        <TextBlock Text="TrackTrim" FontSize="28" FontWeight="Bold" />
-        <TextBlock Text="{Binding Localization[AppSubtitle]}" TextWrapping="Wrap" />
-      </StackPanel>
-      <StackPanel Grid.Column="1" Spacing="4" Margin="20,0,0,0">
-        <TextBlock Text="{Binding Localization[Language]}" />
-        <StackPanel Orientation="Horizontal" Spacing="6">
-          <Button x:Name="EnglishButton" Content="English" Command="{Binding ChangeLanguageCommand}" CommandParameter="en" />
-          <Button x:Name="RussianButton" Content="Русский" Command="{Binding ChangeLanguageCommand}" CommandParameter="ru" />
+  <DockPanel Margin="16" LastChildFill="True">
+    <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
+      <StackPanel Orientation="Horizontal" Spacing="12">
+        <Border CornerRadius="9" Background="{DynamicResource TTAccentBrush}" Width="38" Height="38">
+          <TextBlock Text="TT" Foreground="{DynamicResource TTOnAccentBrush}" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Border>
+        <StackPanel Spacing="2">
+          <TextBlock Text="TrackTrim" FontSize="20" FontWeight="Bold" />
+          <TextBlock Text="{Binding Localization[AppSubtitle]}" Classes="muted" FontSize="12" />
         </StackPanel>
       </StackPanel>
+      <Button Grid.Column="1" Content="{Binding Localization[WorkspaceSettings]}" Command="{Binding ToggleAppearanceCommand}" VerticalAlignment="Center" />
     </Grid>
-
-    <Border DockPanel.Dock="Top" Padding="12" BorderBrush="Orange" BorderThickness="1" CornerRadius="4"
+    <Border DockPanel.Dock="Top" Padding="12" BorderBrush="{DynamicResource TTWarningBrush}" BorderThickness="1" CornerRadius="9"
             Margin="0,0,0,16" IsVisible="{Binding HasWarningCloseDecision}">
       <StackPanel Spacing="8">
         <TextBlock Text="{Binding Localization[CloseWarningReview]}" TextWrapping="Wrap" />
         <TextBlock Text="{Binding WarningCloseSource}" TextWrapping="Wrap" />
-        <WrapPanel Orientation="Horizontal">
+        <WrapPanel>
           <Button x:Name="RemainInWarningReviewButton" Content="{Binding Localization[RemainInWarningReview]}"
                   Command="{Binding RemainInWarningReviewCommand}" Margin="0,0,8,8" />
           <Button x:Name="DiscardWarningsAndCloseButton" Content="{Binding Localization[DiscardWarningsAndClose]}"
@@ -33,145 +32,58 @@
         </WrapPanel>
       </StackPanel>
     </Border>
-
-    <Border DockPanel.Dock="Top" Margin="0,0,0,12" Padding="12" BorderBrush="Orange" BorderThickness="1" CornerRadius="4" IsVisible="{Binding RequiresCloseDecision}">
+    <Border DockPanel.Dock="Top" Margin="0,0,0,12" Padding="12" BorderBrush="{DynamicResource TTWarningBrush}" BorderThickness="1" CornerRadius="9"
+            IsVisible="{Binding RequiresCloseDecision}">
       <StackPanel Spacing="8">
         <TextBlock Text="{Binding CloseDecisionText}" TextWrapping="Wrap" />
         <Button x:Name="CloseDespiteUncertaintyButton" Click="OnCloseDespiteUncertainty" Content="{Binding Localization[CloseDespiteUncertainty]}" />
       </StackPanel>
     </Border>
-
-    <views:QueueRecoveryView DockPanel.Dock="Top" Margin="0,0,0,12"
-                             DataContext="{Binding Batch.Recovery}" IsVisible="{Binding HasNotice}" />
-
-    <TabControl>
-      <TabItem Header="{Binding Localization[SingleWorkflow]}">
-        <DockPanel LastChildFill="True">
-          <StackPanel DockPanel.Dock="Bottom" Spacing="8" Margin="0,16,0,0">
-            <TextBlock x:Name="StatusText" Text="{Binding StatusText}" TextWrapping="Wrap" FontWeight="SemiBold" />
-            <ProgressBar Minimum="0" Maximum="100" Value="{Binding ProgressValue}" IsIndeterminate="{Binding IsProgressIndeterminate}" IsVisible="{Binding IsBusy}" />
-            <WrapPanel Orientation="Horizontal">
-              <Button x:Name="ReviewButton" Content="{Binding Localization[ReviewPlan]}" Command="{Binding ReviewPlanCommand}" Margin="0,0,8,8" />
-              <Button Content="{Binding Localization[Run]}" Command="{Binding RunCommand}" Margin="0,0,8,8" />
-              <Button Content="{Binding Localization[Cancel]}" Command="{Binding CancelCommand}" Margin="0,0,8,8" />
-            </WrapPanel>
-          </StackPanel>
-
-          <ScrollViewer x:Name="MainScrollViewer" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-            <StackPanel Spacing="16">
-              <Border Padding="12" BorderBrush="Orange" BorderThickness="1" CornerRadius="4" IsVisible="{Binding PersistenceFailed}">
-                <TextBlock Text="{Binding Localization[PersistenceFailure]}" TextWrapping="Wrap" />
-              </Border>
-
-              <Border Padding="12" BorderBrush="Orange" BorderThickness="1" CornerRadius="4" IsVisible="{Binding HasInterrupted}">
-                <StackPanel Spacing="8">
-                  <TextBlock Text="{Binding Localization[Interrupted]}" TextWrapping="Wrap" />
-                  <TextBlock Text="{Binding InterruptedDetails}" TextWrapping="Wrap" />
-                  <Button Content="{Binding Localization[CleanInterrupted]}" Command="{Binding CleanInterruptedCommand}" IsVisible="{Binding HasCleanableInterrupted}" />
-                </StackPanel>
-              </Border>
-
-              <StackPanel Spacing="6">
-                <TextBlock Text="{Binding Localization[Source]}" FontWeight="SemiBold" />
-                <TextBox Text="{Binding SourcePath}" IsReadOnly="True" PlaceholderText="{Binding Localization[NoSource]}"
-                         TextWrapping="Wrap" AutomationProperties.Name="{Binding Localization[Source]}" />
-                <Button x:Name="OpenButton" Content="{Binding Localization[OpenFile]}" Command="{Binding OpenSourceCommand}" HorizontalAlignment="Left" />
-              </StackPanel>
-
-              <StackPanel Spacing="6">
-                <TextBlock Text="{Binding Localization[Output]}" FontWeight="SemiBold" />
-                <TextBox x:Name="OutputTextBox" Text="{Binding OutputPath, Mode=TwoWay}" IsEnabled="{Binding CanEdit}"
-                         PlaceholderText="{Binding Localization[NoOutput]}" TextWrapping="Wrap" AutomationProperties.Name="{Binding Localization[Output]}" />
-                <Button Content="{Binding Localization[ChooseOutput]}" Command="{Binding ChooseOutputCommand}" HorizontalAlignment="Left" />
-              </StackPanel>
-
-              <StackPanel Spacing="8" IsVisible="{Binding HasTracks}">
-                <TextBlock Classes="heading" Text="{Binding Localization[Tracks]}" />
-                <TextBlock Text="{Binding BackendDescription}" TextWrapping="Wrap" />
-                <TextBlock Text="{Binding MediaFeaturesText}" TextWrapping="Wrap" />
-                <TextBlock Text="{Binding Localization[LanguageTagNotice]}" TextWrapping="Wrap" Opacity="0.8" />
-                <ItemsControl x:Name="TrackList" ItemsSource="{Binding Tracks}" IsEnabled="{Binding CanEdit}">
-                  <ItemsControl.ItemTemplate>
-                    <DataTemplate x:DataType="viewModels:TrackViewModel">
-                      <Border BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="1" CornerRadius="4" Padding="12" Margin="0,0,0,6">
-                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
-                          <CheckBox IsChecked="{Binding Keep, Mode=TwoWay}" IsEnabled="{Binding IsSelectable}"
-                                    Content="{Binding Localization[Keep]}" AutomationProperties.Name="{Binding KeepAccessibleName}" VerticalAlignment="Top" />
-                          <StackPanel Grid.Column="1" Spacing="4">
-                            <WrapPanel Orientation="Horizontal">
-                              <TextBlock Text="{Binding KindText}" FontWeight="SemiBold" Margin="0,0,12,0" />
-                              <TextBlock Text="{Binding Localization[TrackId]}" Margin="0,0,4,0" />
-                              <TextBlock Text="{Binding IdentifierText}" Margin="0,0,12,0" />
-                              <TextBlock Text="{Binding Track.Codec}" />
-                              <TextBlock Text="{Binding Localization[AlwaysKept]}" IsVisible="{Binding IsRequired}" Margin="12,0,0,0" />
-                            </WrapPanel>
-                            <TextBlock Text="{Binding TitleText}" TextWrapping="Wrap" />
-                            <WrapPanel Orientation="Horizontal">
-                              <TextBlock Text="{Binding Localization[LanguageMetadata]}" Margin="0,0,4,0" />
-                              <TextBlock Text="{Binding LanguageText}" Margin="0,0,12,0" />
-                              <TextBlock Text="{Binding Localization[Channels]}" Margin="0,0,4,0" IsVisible="{Binding IsAudio}" />
-                              <TextBlock Text="{Binding ChannelsText}" Margin="0,0,12,0" IsVisible="{Binding IsAudio}" />
-                              <TextBlock Text="{Binding FlagsText}" />
-                            </WrapPanel>
-                          </StackPanel>
-                        </Grid>
-                      </Border>
-                    </DataTemplate>
-                  </ItemsControl.ItemTemplate>
-                </ItemsControl>
-                <CheckBox x:Name="ZeroAudioCheckBox" IsChecked="{Binding ZeroAudioConfirmed, Mode=TwoWay}"
-                          IsVisible="{Binding NeedsZeroAudioConfirmation}" IsEnabled="{Binding CanEdit}">
-                  <TextBlock Text="{Binding Localization[ConfirmSilent]}" TextWrapping="Wrap" />
-                </CheckBox>
-              </StackPanel>
-
-              <Border Padding="16" CornerRadius="4" BorderBrush="{DynamicResource SystemControlHighlightAccentBrush}" BorderThickness="1" IsVisible="{Binding HasPlan}">
-                <StackPanel Spacing="8">
-                  <TextBlock Classes="heading" Text="{Binding Localization[Plan]}" />
-                  <TextBlock Text="{Binding PlanDescription}" TextWrapping="Wrap" />
-                  <TextBlock Text="{Binding PlanTracksText}" TextWrapping="Wrap" />
-                  <TextBlock Text="{Binding PlanDestination}" TextWrapping="Wrap" />
-                  <TextBlock Text="{Binding Localization[PreservationSummary]}" TextWrapping="Wrap" />
-                  <TextBlock Text="{Binding Localization[PlanInstructions]}" TextWrapping="Wrap" />
-                  <TextBlock x:Name="PlanDefaultAudioStatus" Text="{Binding PlanDefaultAudioText}" TextWrapping="Wrap" />
-                  <TextBlock x:Name="DefaultAudioDisclaimer" Text="{Binding Localization[SelectionWarning]}" TextWrapping="Wrap" IsVisible="{Binding RemovesDefaultAudio}" />
-                </StackPanel>
-              </Border>
-
-              <Border Padding="16" BorderBrush="Orange" BorderThickness="1" CornerRadius="4" IsVisible="{Binding HasSingleWarningCandidate}">
-                <StackPanel Spacing="8">
-                  <TextBlock Text="{Binding Localization[WarningReview]}" TextWrapping="Wrap" />
-                  <WrapPanel Orientation="Horizontal">
-                    <Button Content="{Binding Localization[PublishWarnings]}" Command="{Binding PublishWarningsCommand}" Margin="0,0,8,8" />
-                    <Button Content="{Binding Localization[Discard]}" Command="{Binding DiscardWarningsCommand}" Margin="0,0,8,8" />
-                  </WrapPanel>
-                </StackPanel>
-              </Border>
-
-              <StackPanel Spacing="6" IsVisible="{Binding HasError}">
-                <TextBlock x:Name="ErrorText" Text="{Binding ErrorText}" TextWrapping="Wrap" Foreground="Crimson" FontWeight="SemiBold" />
-                <TextBlock x:Name="ErrorDetailText" Text="{Binding ErrorDetail}" TextWrapping="Wrap" IsVisible="{Binding HasErrorDetail}" />
-              </StackPanel>
-
-
-
-              <StackPanel Spacing="6" IsVisible="{Binding HasCleanupIssue}">
-                <TextBlock Text="{Binding Localization[CleanupHeading]}" TextWrapping="Wrap" />
-              </StackPanel>
-
-              <Expander Header="{Binding Localization[Diagnostics]}" IsVisible="{Binding HasDiagnostics}">
-                <TextBox Text="{Binding Diagnostics}" IsReadOnly="True" TextWrapping="Wrap" MaxHeight="240" />
-              </Expander>
-              <TextBlock Text="{Binding SizeDifferenceText}" TextWrapping="Wrap" IsVisible="{Binding HasSizeDifference}" />
-              <TextBlock Text="{Binding Localization[VerificationNotice]}" TextWrapping="Wrap" Opacity="0.8" />
-              <TextBlock Text="{Binding Localization[OriginalNotice]}" TextWrapping="Wrap" Opacity="0.8" />
+    <Border DockPanel.Dock="Top" Padding="12" BorderBrush="{DynamicResource TTWarningBrush}" BorderThickness="1" CornerRadius="9"
+            Margin="0,0,0,12" IsVisible="{Binding PersistenceFailed}">
+      <TextBlock Text="{Binding Localization[PersistenceFailure]}" TextWrapping="Wrap" />
+    </Border>
+    <Border DockPanel.Dock="Top" Padding="12" BorderBrush="{DynamicResource TTWarningBrush}" BorderThickness="1" CornerRadius="9"
+            Margin="0,0,0,12" IsVisible="{Binding HasInterrupted}">
+      <StackPanel Spacing="8">
+        <TextBlock Text="{Binding Localization[Interrupted]}" TextWrapping="Wrap" />
+        <TextBlock Text="{Binding InterruptedDetails}" TextWrapping="Wrap" />
+        <Button Content="{Binding Localization[CleanInterrupted]}" Command="{Binding CleanInterruptedCommand}" IsVisible="{Binding HasCleanableInterrupted}" />
+      </StackPanel>
+    </Border>
+    <StackPanel DockPanel.Dock="Top" Spacing="6" Margin="0,0,0,12" IsVisible="{Binding HasCleanupIssue}">
+      <TextBlock Text="{Binding Localization[CleanupHeading]}" TextWrapping="Wrap" />
+      <TextBlock Text="{Binding ErrorText}" TextWrapping="Wrap" IsVisible="{Binding HasError}" />
+      <Expander Header="{Binding Localization[Diagnostics]}" IsVisible="{Binding HasDiagnostics}">
+        <TextBox Text="{Binding Diagnostics}" IsReadOnly="True" TextWrapping="Wrap" MaxHeight="180" />
+      </Expander>
+    </StackPanel>
+    <Border DockPanel.Dock="Top" Margin="0,0,0,12" IsVisible="{Binding Batch.Recovery.HasNotice}">
+      <views:QueueRecoveryView DataContext="{Binding Batch.Recovery}" />
+    </Border>
+    <Grid>
+      <views:BatchView x:Name="Workspace" DataContext="{Binding Batch}" />
+      <Border Classes="panel" appearance:SoftMotion.Enter="True" IsVisible="{Binding IsAppearanceOpen}" HorizontalAlignment="Right" Width="460" MaxWidth="600" Margin="0,0,0,6" BoxShadow="{StaticResource TTPanelShadow}">
+        <DockPanel>
+          <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,10">
+            <TextBlock Text="{Binding Localization[WorkspaceSettings]}" Classes="heading" VerticalAlignment="Center" />
+            <Button Grid.Column="1" Content="{Binding Localization[WorkspaceClose]}" Command="{Binding ToggleAppearanceCommand}" />
+          </Grid>
+          <Border DockPanel.Dock="Top" Classes="secondary" IsVisible="{Binding HasPendingMediaDecision}" Margin="0,0,0,10">
+            <TextBlock Text="{Binding Localization[AppearancePendingDecision]}" Foreground="{DynamicResource TTWarningBrush}" TextWrapping="Wrap" />
+          </Border>
+          <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <StackPanel Spacing="14">
+              <TextBlock Text="{Binding Localization[Language]}" FontWeight="SemiBold" />
+              <WrapPanel>
+                <Button x:Name="EnglishButton" Content="English" Command="{Binding ChangeLanguageCommand}" CommandParameter="en" Margin="0,0,8,0" />
+                <Button x:Name="RussianButton" Content="Русский" Command="{Binding ChangeLanguageCommand}" CommandParameter="ru" />
+              </WrapPanel>
+              <views:AppearanceView DataContext="{Binding Appearance}" />
             </StackPanel>
           </ScrollViewer>
         </DockPanel>
-      </TabItem>
-      <TabItem Header="{Binding Localization[BatchWorkflow]}" IsVisible="{Binding HasBatch}">
-        <views:BatchView DataContext="{Binding Batch}" />
-      </TabItem>
-    </TabControl>
+      </Border>
+    </Grid>
   </DockPanel>
 </Window>

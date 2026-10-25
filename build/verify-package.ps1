@@ -97,6 +97,21 @@ if ($PSCmdlet.ParameterSetName -eq 'Archive') {
 }
 
 $PackageDirectory = [IO.Path]::GetFullPath($PackageDirectory)
+$applicationLicense = Join-Path $PackageDirectory 'LICENSE'
+$repositoryLicense = Join-Path $PSScriptRoot '../LICENSE'
+
+if (-not (Test-Path -LiteralPath $applicationLicense -PathType Leaf)) {
+    throw 'The operative application license is missing from the package.'
+}
+
+if ((Get-FileHash -LiteralPath $applicationLicense -Algorithm SHA256).Hash -ne (Get-FileHash -LiteralPath $repositoryLicense -Algorithm SHA256).Hash) {
+    throw 'The packaged application license differs from the operative repository license.'
+}
+
+if (Test-Path -LiteralPath (Join-Path $PackageDirectory 'licenses/APPLICATION-LICENSE-PENDING.txt')) {
+    throw 'The obsolete application-license-pending marker must not be packaged.'
+}
+
 $executableName = 'TrackTrim'
 
 if ($IsWindows) {

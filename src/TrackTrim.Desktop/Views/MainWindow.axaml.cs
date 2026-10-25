@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using TrackTrim.Desktop.Appearance;
 using TrackTrim.Desktop.ViewModels;
 
 namespace TrackTrim.Desktop.Views;
@@ -14,6 +15,7 @@ public sealed partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        AppearanceMotionPolicy.Track(this);
         Opened += OnOpened;
         Closing += OnClosing;
     }
@@ -41,7 +43,7 @@ public sealed partial class MainWindow : Window
             return;
         }
 
-        var needsWarningReview = !shutdownCompleted && DataContext is MainViewModel { HasWarningCandidate: true, HasActiveOperation: false };
+        var needsWarningReview = !shutdownCompleted && DataContext is MainViewModel { HasWarningCandidate: true, HasOwnedOperation: false };
 
         if (needsWarningReview)
         {

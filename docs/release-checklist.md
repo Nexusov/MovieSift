@@ -1,0 +1,28 @@
+# Final release checklist
+
+Features are frozen. The release-candidate PR remains unmerged and no public tag or assets are authorized by this milestone.
+
+1. **Original-code decision — completed.** The owner selected MIT with `Copyright (c) 2026 Nexusov` on 2026-10-23. The operative [LICENSE](../LICENSE) ships in new candidates and matching source/material sets; the obsolete pending marker is rejected. This closes the original-code choice, not third-party obligations or final publication review. Historical archives/evidence retain their original licensing state.
+2. **Covered-worker source delivery — distributor.** Preserve and actually deliver the collected corresponding source, patches, build scripts and notices for the same-version source-built Windows MKV pair, retained Linux closure and FFmpeg builds. The [closure record](verification/release-distribution-closure.md) binds each route to its actual binaries. The historical official Windows static closure is replaced, not attributed to approximate sources. Linux QtCore uses the recorded GPL2 alternative; no separate missing Core relink artifact was identified. Locally prepared bundles and expiring workflow artifacts support candidate handoff; they do not replace the eventual release distribution arrangement. The prepared upstream question has not been sent.
+3. **Declared desktop targets — test access.** Obtain Windows 11 x64 25H2 and Ubuntu 24.04 x64 Desktop/X11-XWayland access and complete the consolidated candidate matrix, including actual visual/focus/scrolling and supported 100%/150%/200% display combinations. Available Windows 10 functional observations and Linux CLI/container tests retain their actual scope. Preserve the recorded unverified active-cancellation and real-warning cases rather than relabeling them.
+4. **Final review/publication — owner.** Review the candidate PR, exact binary/source-material identities, complete required CI and the actual remaining acceptance/material outcomes. Authorize integration and public publication separately only after the preceding applicable requirements are satisfied. No public source-distribution assurance follows merely from generating the material bundle.
+
+Bit-for-bit build reproduction, full compiler history and source archives for every permissively licensed component are not universal release conditions. Applicable notice, corresponding-source and relinking conditions still apply to the actual distributed combination; the closure record distinguishes them from provenance preferences.
+
+## Optional candidate handoff
+
+The existing **Verify and package** workflow defaults `workflow_dispatch.inputs.retain_candidates` to boolean `false`. Pull requests, pushes and manual runs with that default retain only the existing compact evidence. Historical successful runs that uploaded reports only do not provide downloadable binary/material candidates.
+
+The separately authorized [run 40027855578, attempt 1](https://github.com/Nexusov/TrackTrim/actions/runs/40027855578) delivered both verified runtime/material sets from `b288be1d185c62157e7d1bd1249f2f925ffe3093`. The exact identities and completed download verification are in [PR #10](https://github.com/Nexusov/TrackTrim/pull/10). Any future run requires its own authorization; the opt-in command remains:
+
+```sh
+gh workflow run verify.yml --ref review/release-candidate -f retain_candidates=true
+```
+
+Each platform must first pass its complete verification, including actual MKV/MP4 package execution, relocation and the applicable Linux container check. Candidate preparation then checks the clean package revision/tree against the actual checkout, runtime, binary and material archive sizes/SHA256 values, and agreement between inventory and material summary. Missing or inconsistent required inputs fail the opted-in step. It stages unchanged archive bytes and only five named files: the binary archive, matching `prepare-review-materials.py` bundle, distribution inventory, material summary and `SHA256SUMS`. Staging is outside the evidence-only upload paths.
+
+One artifact per runtime is named `candidate-<runtime>-<full-checked-source-SHA>-run-<run-id>-attempt-<attempt>`, with **7-day retention**. Its source SHA is the actual checkout, including a synthetic merge if that is what was checked; rebuilding is not assumed to reproduce historical archive bytes. Both exact archives are retained together. The original `.zip`/`.tar.gz` files remain nested unchanged inside the Actions artifact.
+
+TrackTrim is public: these workflow artifacts are **not private**. Signed-in users with repository read access can [download them](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/download-workflow-artifacts) until expiry. This is an explicit candidate handoff, not a GitHub Release, permanent source hosting, redistribution assurance or authorization to publish a release. The material summary's `publicDeliveryPerformed: false` describes bundle preparation, before any optional upload.
+
+The delivered Windows archive's [native MKV/MP4 smoke and EN → RU → EN check passed](verification/release-candidate-native-smoke.json) on Windows 10 `19045.6456`. One later [owner-operated W13](verification/native-desktop-acceptance.md#delivered-candidate-owner-operated-continuation) confirmed Cancelled, worker exit, unchanged source and cleanup without publication. Its recorded activation envelope overlaps worker exit, leaving strict active-remux input correlation unverified. Active/repeated/verification-stage close, real warnings, visual/scaling and declared Windows 11/Ubuntu Desktop acceptance retain their recorded limits. The frozen candidate was not rebuilt and no second timing attempt was performed.

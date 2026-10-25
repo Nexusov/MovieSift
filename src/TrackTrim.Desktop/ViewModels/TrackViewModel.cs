@@ -28,7 +28,7 @@ public sealed class TrackViewModel : ObservableObject
     public string LanguageText => Track.LanguageIetf ?? Track.Language;
     public string ChannelsText => Track.Channels?.ToString(CultureInfo.InvariantCulture) ?? Localization["Unknown"];
     public string KeepAccessibleName => $"{Localization["Keep"]}: {KindText} {IdentifierText}, {TitleText}";
-    public string FlagsText => string.Join(", ", GetFlags());
+    public string FlagsText => TrackPresentation.DescribeFlags(Track, Localization);
 
     public bool Keep
     {
@@ -53,31 +53,5 @@ public sealed class TrackViewModel : ObservableObject
     public void RefreshLocalization()
     {
         OnPropertyChanged(string.Empty);
-    }
-
-    /// <summary>Lists the effective flags already resolved by the backend.</summary>
-    private IEnumerable<string> GetFlags()
-    {
-        if (Track.IsDefault)
-        {
-            yield return Localization["Default"];
-        }
-
-        if (Track.IsForced)
-        {
-            yield return Localization["Forced"];
-        }
-
-        yield return Localization[Track.IsEnabled ? "Enabled" : "Disabled"];
-
-        if (Track.Dispositions.IsDefaultOrEmpty)
-        {
-            yield break;
-        }
-
-        foreach (var disposition in Track.Dispositions)
-        {
-            yield return Localization[$"Disposition{disposition}"];
-        }
     }
 }

@@ -155,9 +155,9 @@ public sealed class BatchForcedSubtitleTests
         Assert.Equal(0, fixture.Outputs.CleanupCount);
     }
 
-    /// <summary>Uses the shared single-file operation gate for the new compiled control and proposal actions.</summary>
+    /// <summary>Uses the shared discovery operation gate for the new compiled control and proposal actions.</summary>
     [AvaloniaFact]
-    public async Task ConflictingInspectionDisablesTheForcedControlWithoutChangingItsProposal()
+    public async Task ActiveDiscoveryDisablesTheForcedControlWithoutChangingItsProposal()
     {
         var fixture = CreateFixture();
         await fixture.LoadAsync();
@@ -171,12 +171,13 @@ public sealed class BatchForcedSubtitleTests
         window.Show();
         var entered = BatchViewModelFixture.Signal();
         var release = BatchViewModelFixture.Signal();
-        fixture.Backend.OnInspect = async request =>
+        fixture.Discovery.OnDiscover = async request =>
         {
             entered.TrySetResult();
             await release.Task.WaitAsync(request.CancellationToken);
+            return new([], []);
         };
-        var operation = fixture.Main.OpenSourceCommand.ExecuteAsync(null);
+        var operation = fixture.Batch.AddFilesCommand.ExecuteAsync(null);
 
         try
         {

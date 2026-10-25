@@ -1,0 +1,47 @@
+name: Windows MKV source-build candidate
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: windows-mkv-candidate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  source-build:
+    name: Build and execute the Windows MKV candidate
+    runs-on: windows-2025
+    timeout-minutes: 75
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - name: Restore only this exact source-build input set
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ${{ runner.temp }}/mkv-source-candidate
+          key: windows-mkv-source-${{ hashFiles('build/*mkv*', 'build/ffmpeg-runtime-dependencies.py') }}
+      - name: Build the pinned CLI pair and collect its complete materials
+        run: ./build/provision-windows-mkv.ps1 -Destination '${{ runner.temp }}/mkv-source-candidate' -CacheDirectory '${{ runner.temp }}/mkv-source-downloads'
+      - name: Execute the actual workers on Windows
+        run: |
+          & '${{ runner.temp }}/mkv-source-candidate/mkvmerge.exe' --version
+          if ($LASTEXITCODE -ne 0) { throw 'The candidate mkvmerge could not execute on Windows.' }
+          & '${{ runner.temp }}/mkv-source-candidate/mkvextract.exe' --version
+          if ($LASTEXITCODE -ne 0) { throw 'The candidate mkvextract could not execute on Windows.' }
+      # These are review-only worker/material artifacts, never a public release
+      # or TrackTrim binary publication. They expire and cannot replace final
+      # covered-source delivery alongside an eventual release.
+      - name: Retain the candidate workers with their corresponding materials
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: windows-mkv-source-candidate
+          path: ${{ runner.temp }}/mkv-source-candidate/
+          # Original binary metadata is part of the hash-bound source evidence.
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 3

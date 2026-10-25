@@ -37,6 +37,8 @@ public sealed class BatchItemViewModel : ObservableObject
 
     public Guid Id => item.Id;
     public string SourcePath => item.SourcePath;
+    public string FileName => Path.GetFileName(item.SourcePath);
+    public string ContextPath => DescribeContextPath();
     public string RelativeSourcePath => item.FolderOrigin?.RelativePath ?? string.Empty;
     public bool HasFolderOrigin => item.FolderOrigin is not null;
     public LocalizationService Localization => options.Localization;
@@ -58,14 +60,52 @@ public sealed class BatchItemViewModel : ObservableObject
     }.Where(detail => !string.IsNullOrWhiteSpace(detail)).Distinct(StringComparer.Ordinal));
     public bool HasDiagnostics => !string.IsNullOrWhiteSpace(Diagnostics);
     public string StateText => Localization[GetStateKey()];
+    public string BackendDescription => item.Inspection is { } inspection ? $"{inspection.Backend.Name} {inspection.Backend.Version}" : string.Empty;
+    public string MediaFeaturesText => item.Inspection is { } inspection
+        ? Localization.Format(new("MediaFeatures", [inspection.Attachments.Length, Localization[inspection.HasChapters ? "Yes" : "No"], Localization[inspection.HasTags ? "Yes" : "No"]]))
+        : string.Empty;
     public string PublishedPath => item.Result?.PublishedPath ?? string.Empty;
     public bool HasPublishedPath => item.Result?.PublishedPath is not null;
+    public bool HasSizeDifference => item.Inspection is not null && item.Result is { PublishedPath: not null, OutputLength: not null };
+    public string SizeDifferenceText => DescribeSizeDifference();
     public string PlanTracksText => PlanPresentation.DescribeTracks(item.ApprovedPlan, Localization);
     public string PlanDefaultAudioText => PlanPresentation.DescribeDefaultAudio(item.ApprovedPlan, Localization);
     public bool RemovesDefaultAudio => item.ApprovedPlan?.RemovesDefaultAudio == true;
     public bool NeedsZeroAudioConfirmation => item.Inspection?.Tracks.Any(track => track.Kind == TrackKind.Audio) == true &&
         !Tracks.Any(track => track.Track.Kind == TrackKind.Audio && track.Keep);
     private Failure? EffectiveFailure => planningFailure ?? item.Failure ?? item.Result?.Failure;
+
+    /// <summary>Disambiguates folder-derived episodes by their selected root and relative parent without accessing disk.</summary>
+    private string DescribeContextPath()
+    {
+        if (item.FolderOrigin is not { } origin)
+        {
+            return Path.GetDirectoryName(item.SourcePath) ?? string.Empty;
+        }
+
+        var rootName = Path.GetFileName(Path.TrimEndingDirectorySeparator(origin.RootPath));
+        var rootLabel = rootName.Length == 0 ? origin.RootPath : rootName;
+        return Path.Combine(rootLabel, Path.GetDirectoryName(origin.RelativePath) ?? string.Empty);
+    }
+
+    /// <summary>Reports recorded source/output sizes only for a known publication, independently of cleanup.</summary>
+    private string DescribeSizeDifference()
+    {
+        if (!HasSizeDifference)
+        {
+            return string.Empty;
+        }
+
+        var difference = item.Inspection!.Source.Length - item.Result!.OutputLength!.Value;
+
+        if (difference == 0)
+        {
+            return Localization["SizeEqual"];
+        }
+
+        var key = difference < 0 ? "SizeIncrease" : "SizeDifference";
+        return Localization.Format(new(key, [Math.Abs(difference)]));
+    }
 
     /// <summary>Keeps approved-warning publication visibly distinct from a clean result.</summary>
     private string GetStateKey()
