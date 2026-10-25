@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/MovieSift.Application/MovieSift.Application.csproj" />
+    <Project Path="src/MovieSift.Core/MovieSift.Core.csproj" />
+    <Project Path="src/MovieSift.Desktop/MovieSift.Desktop.csproj" />
+    <Project Path="src/MovieSift.Infrastructure/MovieSift.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/MovieSift.Application.Tests/MovieSift.Application.Tests.csproj" />
+    <Project Path="tests/MovieSift.Core.Tests/MovieSift.Core.Tests.csproj" />
+    <Project Path="tests/MovieSift.Desktop.Tests/MovieSift.Desktop.Tests.csproj" />
+    <Project Path="tests/MovieSift.Infrastructure.Tests/MovieSift.Infrastructure.Tests.csproj" />
+    <Project Path="tests/MovieSift.ProcessTestWorker/MovieSift.ProcessTestWorker.csproj" />
+  </Folder>
+</Solution>

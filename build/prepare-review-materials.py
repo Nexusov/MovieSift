@@ -111,7 +111,7 @@ def copy_package(archive_path, inventory, records, target):
     seen = set()
     seen_files = set()
     copied = []
-    prefix = "TrackTrim-" + inventory["build"]["runtimeIdentifier"]
+    prefix = "MovieSift-" + inventory["build"]["runtimeIdentifier"]
 
     def accept_member(member_name, size, directory, regular, open_stream):
         """Reject unsafe, duplicate and nonregular members rather than extracting them."""
@@ -171,9 +171,9 @@ def prepare(repository, archive_path, inventory_path, output):
     target = staging / build["runtimeIdentifier"]
     copied = copy_package(archive_path, inventory, records, target)
     shutil.copyfile(inventory_path, target / "distribution-inventory.json")
-    source = staging / ("TrackTrim-source-" + revision[:12] + ".tar.gz")
+    source = staging / ("MovieSift-source-" + revision[:12] + ".tar.gz")
     subprocess.run(["git", "-C", str(repository), "archive", "--format=tar.gz",
-                    "--prefix=TrackTrim-source-" + revision[:12] + "/", "--output", str(source.resolve()), revision], check=True)
+                    "--prefix=MovieSift-source-" + revision[:12] + "/", "--output", str(source.resolve()), revision], check=True)
     license_evidence = {"spdxId": "MIT", "copyright": COPYRIGHT, "path": "LICENSE", "sha256": records["LICENSE"]["sha256"]}
     provenance = {
         "schemaVersion": 1, "purpose": "source/build-material review", "publicDeliveryPerformed": False,
@@ -185,15 +185,15 @@ def prepare(repository, archive_path, inventory_path, output):
     (staging / "READ-ME-FIRST.txt").write_text(
         "Review materials; preparing this bundle does not publish it.\n"
         "Workflow artifacts in a public repository are not private; check the run's visibility and retention.\n"
-        "Original TrackTrim code is MIT-licensed. Third-party components retain their own terms.\n"
+        "Original MovieSift code is MIT-licensed. Third-party components retain their own terms.\n"
         "Package materials match the identified binary inventory; no standalone runtime workers are copied.\n"
         "Deliver applicable covered-source/build materials and notices with any eventual authorized public binaries.\n",
         encoding="utf-8")
     files = sorted(path for path in staging.rglob("*") if path.is_file())
     (staging / "SHA256SUMS").write_text("".join(digest(path) + "  " + path.relative_to(staging).as_posix() + "\n" for path in files), encoding="utf-8")
-    archive = output / ("TrackTrim-" + build["runtimeIdentifier"] + "-materials-" + revision[:12] + ".tar.gz")
+    archive = output / ("MovieSift-" + build["runtimeIdentifier"] + "-materials-" + revision[:12] + ".tar.gz")
     with tarfile.open(archive, "w:gz") as bundle:
-        bundle.add(staging, arcname="TrackTrim-review-materials", recursive=True)
+        bundle.add(staging, arcname="MovieSift-review-materials", recursive=True)
     summary = {key: provenance[key] for key in ("schemaVersion", "sourceRevision", "sourceTree", "runtimeIdentifier", "binaryArchive",
                                                "originalApplicationLicense", "publicDeliveryPerformed", "completeRedistributionAssurance")}
     summary.update(archive=file_record(archive), sourceArchive=provenance["sourceArchive"], materialFiles=len(copied), manifestedFiles=len(files))

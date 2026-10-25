@@ -1,0 +1,175 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:appearance="using:MovieSift.Desktop.Appearance"
+             xmlns:viewModels="using:MovieSift.Desktop.ViewModels"
+             xmlns:views="using:MovieSift.Desktop.Views"
+             x:Class="MovieSift.Desktop.Views.BatchView"
+             x:DataType="viewModels:BatchViewModel">
+  <Grid>
+  <DockPanel LastChildFill="True" IsVisible="{Binding IsEditingSurfaceVisible}">
+    <!-- Destination, cancellation and Review remain outside the scrolling preparation panels. -->
+    <StackPanel x:Name="BatchRunControls" DockPanel.Dock="Bottom" Spacing="6" Margin="0,10,0,0">
+      <Border Classes="panel" Padding="12">
+        <StackPanel Spacing="8">
+          <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+            <Button x:Name="BatchOutputFolderButton" Content="{Binding Localization[ChooseOutput]}" Command="{Binding ChooseOutputCommand}" />
+            <TextBlock Grid.Column="1" Text="{Binding OutputFolder}" Classes="muted" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" ToolTip.Tip="{Binding OutputFolder}" />
+          </Grid>
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+            <StackPanel Spacing="3" VerticalAlignment="Center">
+              <TextBlock x:Name="BatchStatusText" Text="{Binding StatusText}" TextWrapping="Wrap" FontWeight="SemiBold" />
+              <TextBlock Classes="muted" Text="{Binding Localization[WorkspaceOriginalShort]}" TextWrapping="Wrap" />
+            </StackPanel>
+            <Button Grid.Column="1" x:Name="ReviewBatchButton" Classes="primary" Content="{Binding Localization[BatchReviewRemaining]}" Command="{Binding ReviewCommand}" IsVisible="{Binding !IsReviewOpen}" />
+          </Grid>
+          <StackPanel IsVisible="{Binding IsBusy}" Spacing="5">
+            <TextBlock Text="{Binding CurrentItemText}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding CurrentItemText}" />
+            <TextBlock Text="{Binding StageText}" />
+            <ProgressBar Minimum="0" Maximum="100" Value="{Binding ProgressValue}" IsIndeterminate="{Binding IsProgressIndeterminate}" />
+          </StackPanel>
+          <TextBlock Text="{Binding PauseText}" IsVisible="{Binding HasItems}" TextWrapping="Wrap" />
+          <WrapPanel>
+            <Button Content="{Binding Localization[BatchPauseAfterCurrent]}" Command="{Binding PauseCommand}" IsVisible="{Binding CanPause}" Margin="0,0,8,0" />
+            <Button x:Name="CancelBatchButton" Classes="danger" Content="{Binding Localization[BatchCancel]}" Command="{Binding CancelCommand}" IsVisible="{Binding CanCancel}" />
+          </WrapPanel>
+        </StackPanel>
+      </Border>
+      <Border x:Name="NewBatchConfirmation" Classes="panel" BorderBrush="{DynamicResource MovieSiftWarningBrush}" BorderThickness="1" IsVisible="{Binding HasNewBatchConfirmation}">
+        <StackPanel Spacing="8">
+          <TextBlock Text="{Binding Localization[BatchNewConfirmation]}" TextWrapping="Wrap" />
+          <WrapPanel>
+            <Button x:Name="ConfirmNewBatchButton" Content="{Binding Localization[BatchNewConfirm]}" Command="{Binding ConfirmNewBatchCommand}" Margin="0,0,8,0" />
+            <Button x:Name="KeepCurrentBatchButton" Content="{Binding Localization[BatchKeepCurrent]}" Command="{Binding KeepCurrentBatchCommand}" />
+          </WrapPanel>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+    <Grid RowDefinitions="Auto,*">
+      <WrapPanel Margin="0,0,0,10">
+        <Button x:Name="AddBatchFilesButton" Content="{Binding Localization[BatchAddFiles]}" Command="{Binding AddFilesCommand}" Margin="0,0,8,6" />
+        <Button x:Name="AddBatchFolderButton" Content="{Binding Localization[BatchAddFolder]}" Command="{Binding AddFolderCommand}" Margin="0,0,8,6" />
+        <Button x:Name="OpenRulesButton" Content="{Binding Localization[WorkspaceRules]}" Click="OnOpenRules" IsEnabled="{Binding CanEdit}" Margin="0,0,8,6" />
+        <Button x:Name="WorkspaceOptions" Content="⋯" AutomationProperties.Name="{Binding Localization[WorkspaceOptions]}" Margin="0,0,0,6">
+          <Button.Flyout>
+            <Flyout>
+              <StackPanel Spacing="10" MaxWidth="300">
+                <CheckBox x:Name="IncludeSubfoldersCheckBox" IsChecked="{Binding IncludeSubfolders, Mode=TwoWay}" IsEnabled="{Binding CanEdit}" Content="{Binding Localization[BatchIncludeSubfolders]}" />
+                <TextBlock Text="{Binding Localization[BatchFolderScopeHelp]}" Classes="muted" TextWrapping="Wrap" />
+                <Button x:Name="NewBatchButton" Click="OnNewQueue" Content="{Binding Localization[BatchNew]}" Command="{Binding NewBatchCommand}" IsVisible="{Binding ShowNewQueue}" />
+              </StackPanel>
+            </Flyout>
+          </Button.Flyout>
+        </Button>
+      </WrapPanel>
+      <Grid Grid.Row="1">
+        <!-- One native collection remains alive when the responsive layout changes. -->
+        <Grid x:Name="WorkspaceColumns" ColumnDefinitions="330,*" ColumnSpacing="12" IsVisible="{Binding HasItems}">
+          <Expander x:Name="FileSidebar" IsExpanded="True" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" VerticalAlignment="Stretch">
+            <Expander.Header>
+              <TextBlock x:Name="FileCountSummary" Text="{Binding SummaryText}" TextWrapping="Wrap" FontWeight="SemiBold" />
+            </Expander.Header>
+            <Border Classes="panel" Padding="6">
+              <Grid RowDefinitions="Auto,*">
+                <Button Content="{Binding Localization[BatchInspectPending]}" Command="{Binding InspectPendingCommand}" IsVisible="{Binding HasPendingInspections}" Margin="4,4,4,8" />
+                <ListBox Grid.Row="1" x:Name="BatchFileList" ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem, Mode=TwoWay}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" AutomationProperties.Name="{Binding Localization[BatchFiles]}" DoubleTapped="OnOpenFileDetails">
+                  <ListBox.Styles>
+                    <Style Selector="ListBoxItem"><Setter Property="HorizontalContentAlignment" Value="Stretch" /></Style>
+                  </ListBox.Styles>
+                  <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="viewModels:BatchItemViewModel">
+                      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8" Margin="3,6" ToolTip.Tip="{Binding SourcePath}">
+                        <CheckBox x:Name="FileInclusionCheckBox" IsChecked="{Binding Included, Mode=TwoWay}" IsEnabled="{Binding CanChangeInclusion}" VerticalAlignment="Top" AutomationProperties.Name="{Binding SourcePath}" />
+                        <StackPanel Grid.Column="1" Spacing="4">
+                          <Button x:Name="FileDetailsNameButton" Classes="fileName" Click="OnFileDetails" Padding="0" MinHeight="0"
+                                  HorizontalContentAlignment="Left" HorizontalAlignment="Stretch"
+                                  AutomationProperties.Name="{Binding SourcePath}" AutomationProperties.HelpText="{Binding Localization[WorkspaceDetails]}"
+                                  ToolTip.Tip="{Binding SourcePath}">
+                            <TextBlock Text="{Binding FileName}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                          </Button>
+                          <TextBlock Text="{Binding ContextPath}" Classes="muted" TextTrimming="PrefixCharacterEllipsis" />
+                          <TextBlock Text="{Binding StateText}" Classes="muted" TextWrapping="Wrap" />
+                          <TextBlock appearance:SoftMotion.ResultKey="{Binding PublishedPath}" Text="{Binding PublishedPath}" IsVisible="{Binding HasPublishedPath}" TextWrapping="Wrap" MaxLines="2" />
+                          <TextBlock x:Name="BatchFileSizeDifferenceText" Text="{Binding SizeDifferenceText}" IsVisible="{Binding HasSizeDifference}" TextWrapping="Wrap" />
+                        </StackPanel>
+                      </Grid>
+                    </DataTemplate>
+                  </ListBox.ItemTemplate>
+                </ListBox>
+              </Grid>
+            </Border>
+          </Expander>
+          <ScrollViewer Grid.Column="1" x:Name="WorkspaceScrollViewer" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <StackPanel Spacing="10">
+              <views:AggregateTracksView DataContext="{Binding AggregateTracks}" />
+              <Expander x:Name="SelectedFileDetails" Header="{Binding Localization[BatchSelectedFile]}" IsExpanded="{Binding IsDetailsOpen, Mode=TwoWay}">
+                <StackPanel Spacing="8">
+                  <WrapPanel>
+                    <Button Content="{Binding Localization[BatchInspectSelected]}" Command="{Binding InspectSelectedCommand}" Margin="0,0,8,4" />
+                    <Button Content="{Binding Localization[BatchRemove]}" Command="{Binding RemoveSelectedCommand}" Margin="0,0,0,4" />
+                  </WrapPanel>
+                  <ContentControl Content="{Binding SelectedItem}" HorizontalContentAlignment="Stretch">
+                    <ContentControl.ContentTemplate>
+                      <DataTemplate x:DataType="viewModels:BatchItemViewModel"><views:BatchFileDetailsView /></DataTemplate>
+                    </ContentControl.ContentTemplate>
+                  </ContentControl>
+                </StackPanel>
+              </Expander>
+              <TextBlock Text="{Binding ExcludedText}" IsVisible="{Binding HasExcluded}" Classes="muted" TextWrapping="Wrap" />
+              <Expander Header="{Binding Localization[Diagnostics]}" IsVisible="{Binding HasDiagnostics}">
+                <TextBox Text="{Binding Diagnostics}" IsReadOnly="True" TextWrapping="Wrap" MaxHeight="200" />
+              </Expander>
+              <TextBlock Text="{Binding LimitsText}" Classes="muted" TextWrapping="Wrap" />
+            </StackPanel>
+          </ScrollViewer>
+        </Grid>
+        <Border x:Name="EmptyDropTarget" Classes="panel dropTarget" IsVisible="{Binding IsEmpty}" DragDrop.AllowDrop="True" Padding="16">
+          <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8" MaxWidth="420">
+            <TextBlock Text="＋" FontSize="28" HorizontalAlignment="Center" Foreground="{DynamicResource MovieSiftAccentBrush}" />
+            <TextBlock Text="{Binding Localization[WorkspaceEmptyTitle]}" Classes="heading" TextWrapping="Wrap" TextAlignment="Center" />
+            <TextBlock Text="{Binding Localization[WorkspaceEmptyHelp]}" Classes="muted" TextWrapping="Wrap" TextAlignment="Center" />
+          </StackPanel>
+        </Border>
+        <!-- Persistent decisions are never temporary toasts. -->
+        <StackPanel VerticalAlignment="Bottom" Spacing="8" Margin="0,8" IsVisible="{Binding !IsReviewOpen}">
+          <Border Classes="panel" BorderBrush="{DynamicResource MovieSiftWarningBrush}" BorderThickness="1" IsVisible="{Binding HasWarningCandidate}">
+            <StackPanel Spacing="8">
+              <TextBlock Text="{Binding Localization[WarningReview]}" TextWrapping="Wrap" />
+              <TextBlock Text="{Binding CurrentItemText}" TextWrapping="Wrap" />
+              <WrapPanel>
+                <Button Content="{Binding Localization[PublishWarnings]}" Command="{Binding PublishWarningsCommand}" Margin="0,0,8,0" />
+                <Button Content="{Binding Localization[Discard]}" Command="{Binding DiscardWarningsCommand}" />
+              </WrapPanel>
+              <TextBlock Text="{Binding Localization[BatchExplicitResume]}" TextWrapping="Wrap" />
+            </StackPanel>
+          </Border>
+          <Border Classes="panel" BorderBrush="{DynamicResource MovieSiftErrorBrush}" BorderThickness="1" IsVisible="{Binding HasError}">
+            <StackPanel Spacing="4">
+              <TextBlock Text="{Binding ErrorText}" Foreground="{DynamicResource MovieSiftErrorBrush}" TextWrapping="Wrap" />
+              <TextBlock Text="{Binding ErrorReasonText}" TextWrapping="Wrap" />
+              <TextBlock Text="{Binding ReviewIssuesText}" TextWrapping="Wrap" />
+            </StackPanel>
+          </Border>
+          <TextBlock Text="{Binding PreparationNoticeText}" IsVisible="{Binding HasPreparationNotice}" TextWrapping="Wrap" />
+          <TextBlock Text="{Binding Localization[CleanupHeading]}" IsVisible="{Binding HasCleanupIssue}" Foreground="{DynamicResource MovieSiftWarningBrush}" TextWrapping="Wrap" />
+          <TextBlock Text="{Binding Localization[PersistenceFailure]}" IsVisible="{Binding WritesBlocked}" Foreground="{DynamicResource MovieSiftErrorBrush}" TextWrapping="Wrap" />
+        </StackPanel>
+      </Grid>
+    </Grid>
+  </DockPanel>
+  <Border x:Name="RulesPanel" Classes="panel" appearance:SoftMotion.Enter="True" IsVisible="{Binding IsRulesOpen}">
+    <DockPanel>
+      <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" ColumnSpacing="12" Margin="0,0,0,12">
+        <TextBlock Classes="heading" Text="{Binding Localization[WorkspaceRules]}" VerticalAlignment="Center" />
+        <Button Grid.Column="1" Content="{Binding Localization[WorkspaceClose]}" Click="OnCloseRules" />
+      </Grid>
+      <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="16">
+          <views:RulePresetsView x:Name="WorkspacePresets" DataContext="{Binding Presets}" />
+          <views:BatchLanguageRulesView DataContext="{Binding LanguageRules}" />
+        </StackPanel>
+      </ScrollViewer>
+    </DockPanel>
+  </Border>
+  <views:BatchReviewView x:Name="StructuredReview" appearance:SoftMotion.Enter="True" DataContext="{Binding}" IsVisible="{Binding IsReviewOpen}" />
+  </Grid>
+</UserControl>

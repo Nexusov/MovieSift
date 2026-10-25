@@ -13,7 +13,7 @@ SPECIFICATION = importlib.util.spec_from_file_location("review_materials", Path(
 MATERIALS = importlib.util.module_from_spec(SPECIFICATION)
 SPECIFICATION.loader.exec_module(MATERIALS)
 RUN_ID_PATTERN = re.compile(r"[1-9][0-9]*")
-ARCHIVE_NAMES = {"win-x64": "TrackTrim-win-x64.zip", "linux-x64": "TrackTrim-linux-x64.tar.gz"}
+ARCHIVE_NAMES = {"win-x64": "MovieSift-win-x64.zip", "linux-x64": "MovieSift-linux-x64.tar.gz"}
 SUMMARY_IDENTITIES = ("sourceRevision", "sourceTree", "runtimeIdentifier")
 
 
@@ -43,7 +43,7 @@ def prepare(repository, archive, inventory_path, materials, runtime, source_revi
     require_local_path(materials, directory=True)
     summary_path = materials / "material-summary.json"
     require_local_path(summary_path)
-    material_name = "TrackTrim-" + runtime + "-materials-" + source_revision[:12] + ".tar.gz"
+    material_name = "MovieSift-" + runtime + "-materials-" + source_revision[:12] + ".tar.gz"
     material_archive = materials / material_name
     require_local_path(material_archive)
     inventory, _ = MATERIALS.load_inputs(repository, archive, inventory_path)

@@ -27,14 +27,14 @@ class DistributionInventoryTests(unittest.TestCase):
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
         self.directory = Path(self.temporary.name)
-        self.root = self.directory / "TrackTrim-win-x64"
+        self.root = self.directory / "MovieSift-win-x64"
         self.root.mkdir()
-        self.archive = self.directory / "TrackTrim-win-x64.zip"
+        self.archive = self.directory / "MovieSift-win-x64.zip"
         self.assets = self.directory / "assets.json"
         self.profile = self.directory / "profile.json"
         self.output = self.directory / "evidence"
         self.write("Sample.dll", b"published sample assembly")
-        self.write("TrackTrim.dll", b"original application")
+        self.write("MovieSift.dll", b"original application")
         self.write("LICENSE", (Path(__file__).parents[2] / "LICENSE").read_bytes())
         self.write("unknown.dat", b"explicitly unknown")
         self.write("tools/licenses/corresponding-source/source.tar.xz", b"small source archive stand-in")
@@ -126,7 +126,7 @@ class DistributionInventoryTests(unittest.TestCase):
         self.write("SHA256SUMS", manifest.encode("utf-8"))
 
         if tar:
-            self.archive = self.directory / "TrackTrim-win-x64.tar.gz"
+            self.archive = self.directory / "MovieSift-win-x64.tar.gz"
             with tarfile.open(self.archive, "w:gz") as package:
                 package.add(self.root, arcname=self.root.name)
             return
@@ -277,7 +277,7 @@ class DistributionInventoryTests(unittest.TestCase):
         self.assertFalse(report["redistributionReady"])
 
     def test_filee_adaptation_notice_is_bound_to_reference_bytes(self):
-        """Keep the adapted style copyright separate from original TrackTrim documentation."""
+        """Keep the adapted style copyright separate from original MovieSift documentation."""
         notice = Path(__file__).parents[2] / "docs/third-party/Filee-LICENSE.txt"
         self.write("docs/third-party/Filee-LICENSE.txt", notice.read_bytes())
         self.pack()

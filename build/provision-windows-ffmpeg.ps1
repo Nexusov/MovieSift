@@ -94,7 +94,7 @@ function Initialize-WindowsFfmpegPrerequisites {
     }
 
     if (-not $CacheDirectory) {
-        $CacheDirectory = Join-Path $env:RUNNER_TEMP 'tracktrim-ffmpeg-prerequisites'
+        $CacheDirectory = Join-Path $env:RUNNER_TEMP 'moviesift-ffmpeg-prerequisites'
     }
 
     if (-not $EvidencePath) {
@@ -182,7 +182,7 @@ function Initialize-WindowsFfmpegPrerequisites {
 
     # Actions prepends GITHUB_PATH entries in reverse order on subsequent steps.
     @($plan.MsysDirectory, $plan.CompilerDirectory, $nasmDirectory) | Add-Content -LiteralPath $env:GITHUB_PATH -Encoding utf8NoBOM
-    ('TRACKTRIM_BUILD_MAKE=' + $plan.Make) | Add-Content -LiteralPath $env:GITHUB_ENV -Encoding utf8NoBOM
+    ('MOVIESIFT_BUILD_MAKE=' + $plan.Make) | Add-Content -LiteralPath $env:GITHUB_ENV -Encoding utf8NoBOM
     Write-Output 'Pinned Windows FFmpeg build prerequisites are ready; actual versions recorded.'
 }
 

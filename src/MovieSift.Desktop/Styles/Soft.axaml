@@ -1,0 +1,184 @@
+<!-- Rounded Soft interaction patterns adapted from Filee (MIT); see third-party notices. -->
+<Styles xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Styles.Resources>
+    <CornerRadius x:Key="MovieSiftPanelRadius">16</CornerRadius>
+    <CornerRadius x:Key="MovieSiftControlRadius">9</CornerRadius>
+    <BackEaseOut x:Key="MovieSiftPressEase" />
+    <BoxShadows x:Key="MovieSiftPanelShadow">0 2 8 0 #10000000</BoxShadows>
+  </Styles.Resources>
+  <Style Selector="Window">
+    <Setter Property="Background" Value="{DynamicResource MovieSiftWindowBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource MovieSiftTextBrush}" />
+    <Setter Property="FontSize" Value="14" />
+  </Style>
+  <Style Selector="TextBlock.heading">
+    <Setter Property="FontSize" Value="22" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+  <Style Selector="TextBlock.muted">
+    <Setter Property="Foreground" Value="{DynamicResource MovieSiftMutedBrush}" />
+  </Style>
+  <Style Selector="TextBlock.error">
+    <Setter Property="Foreground" Value="{DynamicResource MovieSiftErrorBrush}" />
+  </Style>
+  <Style Selector="TextBlock.warning">
+    <Setter Property="Foreground" Value="{DynamicResource MovieSiftWarningBrush}" />
+  </Style>
+  <Style Selector="Border.panel, Border.card">
+    <Setter Property="Background" Value="{DynamicResource MovieSiftPanelBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource MovieSiftDecorativeBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="{StaticResource MovieSiftPanelRadius}" />
+    <Setter Property="Padding" Value="16" />
+    <Setter Property="BoxShadow" Value="{StaticResource MovieSiftPanelShadow}" />
+  </Style>
+  <Style Selector="Border.secondary, Border.badge">
+    <Setter Property="Background" Value="{DynamicResource MovieSiftSecondaryBrush}" />
+    <Setter Property="CornerRadius" Value="{StaticResource MovieSiftControlRadius}" />
+    <Setter Property="Padding" Value="8,4" />
+  </Style>
+  <Style Selector="Button">
+    <Setter Property="MinHeight" Value="36" />
+    <Setter Property="Padding" Value="12,7" />
+    <Setter Property="CornerRadius" Value="{StaticResource MovieSiftControlRadius}" />
+    <Setter Property="Background" Value="{DynamicResource MovieSiftSecondaryBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource MovieSiftTextBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource MovieSiftBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="RenderTransform" Value="scale(1)" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <TransformOperationsTransition Property="RenderTransform" Duration="{DynamicResource MovieSiftPressDuration}" Easing="{StaticResource MovieSiftPressEase}" />
+      </Transitions>
+    </Setter>
+  </Style>
+  <Style Selector="Button:pressed">
+    <Setter Property="RenderTransform" Value="scale(0.95)" />
+  </Style>
+  <Style Selector="Button /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Transitions">
+      <Transitions><BrushTransition Property="Background" Duration="{DynamicResource MovieSiftHoverDuration}" /></Transitions>
+    </Setter>
+  </Style>
+  <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource MovieSiftSelectionBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource MovieSiftTextBrush}" />
+  </Style>
+  <Style Selector="Button:pressed /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource MovieSiftSecondaryBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource MovieSiftTextBrush}" />
+  </Style>
+  <Style Selector="Button.primary">
+    <Setter Property="Background" Value="{DynamicResource MovieSiftAccentBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource MovieSiftOnAccentBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource MovieSiftAccentBrush}" />
+  </Style>
+  <Style Selector="Button.primary:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource MovieSiftAccentHoverBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource MovieSiftOnAccentBrush}" />
+  </Style>
+  <Style Selector="Button.primary:pressed /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource MovieSiftAccentPressedBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource MovieSiftOnAccentBrush}" />
+  </Style>
+  <Style Selector="Button:focus-visible">
+    <Setter Property="BorderBrush" Value="{DynamicResource MovieSiftFocusBrush}" />
+    <Setter Property="BorderThickness" Value="2" />
+  </Style>
+  <Style Selector="Button.fileName">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="RenderTransform" Value="none" />
+  </Style>
+  <Style Selector="Button.fileName:focus-visible">
+    <Setter Property="BorderBrush" Value="{DynamicResource MovieSiftFocusBrush}" />
+    <Setter Property="BorderThickness" Value="2" />
+  </Style>
+  <Style Selector="RadioButton.accentChoice">
+    <Setter Property="Padding" Value="8,6" />
+    <Setter Property="CornerRadius" Value="{StaticResource MovieSiftControlRadius}" />
+    <Setter Property="Background" Value="{DynamicResource MovieSiftPanelBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource MovieSiftTextBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource MovieSiftDecorativeBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+  </Style>
+  <Style Selector="RadioButton.accentChoice:checked, RadioButton.accentChoice:focus-visible">
+    <Setter Property="BorderBrush" Value="{DynamicResource MovieSiftFocusBrush}" />
+    <Setter Property="Background" Value="{DynamicResource MovieSiftSelectionBrush}" />
+  </Style>
+  <Style Selector="Button.danger">
+    <Setter Property="Foreground" Value="{DynamicResource MovieSiftErrorBrush}" />
+  </Style>
+  <Style Selector="Button:disabled /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Foreground" Value="{DynamicResource MovieSiftMutedBrush}" />
+    <Setter Property="Background" Value="{DynamicResource MovieSiftSecondaryBrush}" />
+    <Setter Property="Opacity" Value="1" />
+  </Style>
+  <Style Selector="TextBox, ComboBox">
+    <Setter Property="CornerRadius" Value="{StaticResource MovieSiftControlRadius}" />
+    <Setter Property="Foreground" Value="{DynamicResource MovieSiftTextBrush}" />
+    <Setter Property="Background" Value="{DynamicResource MovieSiftPanelBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource MovieSiftBorderBrush}" />
+  </Style>
+  <Style Selector="TextBox">
+    <Setter Property="CaretBrush" Value="{DynamicResource MovieSiftTextBrush}" />
+    <Setter Property="SelectionBrush" Value="{DynamicResource MovieSiftAccentBrush}" />
+    <Setter Property="SelectionForegroundBrush" Value="{DynamicResource MovieSiftOnAccentBrush}" />
+  </Style>
+  <Style Selector="TextBox:focus, ComboBox:focus">
+    <Setter Property="BorderBrush" Value="{DynamicResource MovieSiftFocusBrush}" />
+  </Style>
+  <Style Selector="CheckBox">
+    <Setter Property="Foreground" Value="{DynamicResource MovieSiftTextBrush}" />
+  </Style>
+  <Style Selector="ListBox">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+  </Style>
+  <Style Selector="ListBoxItem, MenuItem, ComboBoxItem">
+    <Setter Property="CornerRadius" Value="{StaticResource MovieSiftControlRadius}" />
+    <Setter Property="Foreground" Value="{DynamicResource MovieSiftTextBrush}" />
+  </Style>
+  <Style Selector="ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter, ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource MovieSiftSelectionBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource MovieSiftTextBrush}" />
+  </Style>
+  <Style Selector="ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="BorderBrush" Value="{DynamicResource MovieSiftAccentBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+  </Style>
+  <Style Selector="MenuFlyoutPresenter, ToolTip">
+    <Setter Property="Background" Value="{DynamicResource MovieSiftPanelBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource MovieSiftTextBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource MovieSiftBorderBrush}" />
+    <Setter Property="CornerRadius" Value="{StaticResource MovieSiftControlRadius}" />
+  </Style>
+  <Style Selector="ProgressBar">
+    <Setter Property="Foreground" Value="{DynamicResource MovieSiftAccentBrush}" />
+    <Setter Property="Background" Value="{DynamicResource MovieSiftSecondaryBrush}" />
+    <Setter Property="MinHeight" Value="6" />
+    <Setter Property="CornerRadius" Value="{StaticResource MovieSiftControlRadius}" />
+  </Style>
+  <Style Selector="Border.dropTarget">
+    <Setter Property="Background" Value="{DynamicResource MovieSiftPanelBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource MovieSiftBorderBrush}" />
+    <Setter Property="BorderThickness" Value="2" />
+    <Setter Property="CornerRadius" Value="{StaticResource MovieSiftPanelRadius}" />
+    <Setter Property="RenderTransform" Value="scale(1)" />
+    <Setter Property="Transitions">
+      <Transitions><TransformOperationsTransition Property="RenderTransform" Duration="{DynamicResource MovieSiftDropDuration}" Easing="CubicEaseOut" /></Transitions>
+    </Setter>
+  </Style>
+  <Style Selector="Border.dropTarget.drag-over">
+    <Setter Property="BorderBrush" Value="{DynamicResource MovieSiftFocusBrush}" />
+    <Setter Property="Background" Value="{DynamicResource MovieSiftSelectionBrush}" />
+    <Setter Property="RenderTransform" Value="scale(1.015)" />
+  </Style>
+  <Style Selector="Window.reduced-motion Button, Window.reduced-motion Border.dropTarget">
+    <Setter Property="Transitions" Value="{x:Null}" />
+  </Style>
+  <Style Selector="Window.reduced-motion Button:pressed, Window.reduced-motion Border.dropTarget.drag-over">
+    <Setter Property="RenderTransform" Value="none" />
+  </Style>
+</Styles>

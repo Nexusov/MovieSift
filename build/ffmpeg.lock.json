@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "version": "9.0.2-TrackTrim-source-2a571b606854",
+  "version": "9.0.2-MovieSift-source-2a571b606854",
   "variant": "Source-built static FFmpeg libraries and explicit static zlib; local file/pipe protocols; ffmpeg and ffprobe only. No GPL, nonfree or external optional codec libraries.",
   "license": "LGPL-2.1-or-later for this FFmpeg configuration; zlib and compiler-runtime notices retain their own terms.",
   "source": {
@@ -16,7 +16,7 @@
     "sha256": "d7a0654783a4da529d1bb793b7ad9c3318020af77667bcae35f95d0e42a792f3"
   },
   "recipe": "build-ffmpeg.sh",
-  "extraVersion": "TrackTrim-source-2a571b606854",
+  "extraVersion": "MovieSift-source-2a571b606854",
   "supportedRuntimeIdentifiers": [
     "win-x64",
     "linux-x64"

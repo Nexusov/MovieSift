@@ -1,8 +1,8 @@
-# TrackTrim — Product and Engineering Brief
+# MovieSift — Product and Engineering Brief
 
 Status: reviewed implementation baseline; no implementation or runtime acceptance is claimed.
 Reviewed: 2026-10-18.
-Working name: TrackTrim. Reuse an existing repository's established name.
+Project name: MovieSift. Use this name consistently for the repository, application, projects, packages and documentation.
 
 ## 1. Product and delivery scope
 
@@ -38,10 +38,10 @@ Use one desktop application with four small production projects. External media 
 
 | Project | Responsibility | Dependency rule |
 | --- | --- | --- |
-| `TrackTrim.Core` | Media descriptions, selections, immutable plans, pure policy and validation | Base class library only; no UI, processes, filesystem operations, persistence, or logging |
-| `TrackTrim.Application` | Inspection and job use cases, lifecycle coordination, outcomes, narrow I/O ports | Depends on Core; no Avalonia or media-tool commands |
-| `TrackTrim.Infrastructure` | Backend adapters, tool DTOs, process ownership, filesystem publication, JSON persistence | Implements Application ports; depends inward on Application/Core |
-| `TrackTrim.Desktop` | Views, ViewModels, localization, UI interaction, composition | Uses Application/Core; an Infrastructure reference is permitted for `Bootstrap` composition only |
+| `MovieSift.Core` | Media descriptions, selections, immutable plans, pure policy and validation | Base class library only; no UI, processes, filesystem operations, persistence, or logging |
+| `MovieSift.Application` | Inspection and job use cases, lifecycle coordination, outcomes, narrow I/O ports | Depends on Core; no Avalonia or media-tool commands |
+| `MovieSift.Infrastructure` | Backend adapters, tool DTOs, process ownership, filesystem publication, JSON persistence | Implements Application ports; depends inward on Application/Core |
+| `MovieSift.Desktop` | Views, ViewModels, localization, UI interaction, composition | Uses Application/Core; an Infrastructure reference is permitted for `Bootstrap` composition only |
 
 Create corresponding test projects when they contain meaningful tests. Keep build scripts under `build` and documentation under `docs`. Organize code inside projects by current features such as inspection, planning, jobs, and media tools. Do not create empty folders, speculative modules, or test projects solely for symmetry.
 
@@ -195,14 +195,14 @@ Review-required files must not start automatically. Allow approved jobs to run w
 
 Ship separate self-contained archives:
 
-- `TrackTrim-win-x64.zip`
-- `TrackTrim-linux-x64.tar.gz`
+- `MovieSift-win-x64.zip`
+- `MovieSift-linux-x64.tar.gz`
 
 Portable means no application installer, elevation, separately installed .NET, or user-installed media tools on the declared baseline. It does not mean one universal executable, zero OS dependencies, or forensic absence of traces.
 
 Include the complete normal publish output, required Avalonia/native assets, `mkvmerge`, `mkvextract`, their redistributable dependency closure, notices, and provenance. Add FFmpeg/ffprobe when production features require them. Preserve Linux executable permissions.
 
-The Windows entry point is `TrackTrim.exe`; Linux uses `TrackTrim`. Use app-local `tools`, `data`, and `licenses` directories. A `portable.flag` may identify the data policy. Do not strip runtime files to make the archive appear simpler.
+The Windows entry point is `MovieSift.exe`; Linux uses `MovieSift`. Use app-local `tools`, `data`, and `licenses` directories. A `portable.flag` may identify the data policy. Do not strip runtime files to make the archive appear simpler.
 
 Settings, temporary-output records, and application-controlled logs use `data` relative to the application directory. If it is unwritable, explain the problem and offer a user-selected writable data directory or an honest non-persistent mode. Do not silently redirect to AppData or a home config directory. Non-persistent mode must not claim restart ownership recovery; disable media writes when required ownership records cannot be stored safely.
 
@@ -222,7 +222,7 @@ Native AOT, trimming, single-file publishing, and an application AppImage are la
 
 ## 10. Licensing and provenance
 
-Preserve the repository's operative license. Following the explicit owner decision on 2026-10-23, original TrackTrim code uses MIT with `Copyright (c) 2026 Nexusov`; see `LICENSE` and `docs/license-decision.md`. Do not extend that grant to third-party material or invent further author details. Public release authorization and covered-source delivery remain separate requirements.
+Preserve the repository's operative license. Following the explicit owner decision on 2026-10-23, original MovieSift code uses MIT with `Copyright (c) 2026 Nexusov`; see `LICENSE` and `docs/license-decision.md`. Do not extend that grant to third-party material or invent further author details. Public release authorization and covered-source delivery remain separate requirements.
 
 MKVToolNix states GPL v2 licensing and lists included components separately. FFmpeg's effective license depends on its build configuration. Executing a separate tool does not remove obligations for redistributing that tool. Do not infer either that every shipped file is MIT or that launching a GPL executable automatically determines the original C# application's license.
 

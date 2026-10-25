@@ -84,7 +84,7 @@ function Get-InvocationKind {
         }
 
         $hasGuiMode = $commandLine -match '(?i)(?:^|\s)--gui-mode(?:\s|$)'
-        $hasPrivateOutput = $commandLine -match '(?i)(?:^|\s)--output\s+(?:"[^"]*\.tracktrim-[0-9a-f]{32}[\\/]candidate\.mkv"|[^\s"]*\.tracktrim-[0-9a-f]{32}[\\/]candidate\.mkv)(?:\s|$)'
+        $hasPrivateOutput = $commandLine -match '(?i)(?:^|\s)--output\s+(?:"[^"]*\.moviesift-[0-9a-f]{32}[\\/]candidate\.mkv"|[^\s"]*\.moviesift-[0-9a-f]{32}[\\/]candidate\.mkv)(?:\s|$)'
 
         if ($hasGuiMode -and $hasPrivateOutput) {
             return 'RemuxCandidate'

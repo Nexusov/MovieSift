@@ -16,7 +16,7 @@ class WindowsFfmpegPrerequisiteTests(unittest.TestCase):
 
     def setUp(self):
         """Load helper function definitions without executing its CI-only installation entry point."""
-        self.temporary = tempfile.TemporaryDirectory(prefix="TrackTrim build prerequisites ")
+        self.temporary = tempfile.TemporaryDirectory(prefix="MovieSift build prerequisites ")
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
         self.helper = Path(__file__).parents[1] / "provision-windows-ffmpeg.ps1"

@@ -17,7 +17,7 @@ class FfmpegBuildVersionTests(unittest.TestCase):
         build_directory = Path(__file__).resolve().parents[1]
         repository_directory = build_directory.parent
         lock = json.loads((build_directory / "ffmpeg.lock.json").read_text(encoding="utf-8"))
-        tools = Path(os.environ.get("TRACKTRIM_TOOL_DIRECTORY", str(repository_directory / "tools")))
+        tools = Path(os.environ.get("MOVIESIFT_TOOL_DIRECTORY", str(repository_directory / "tools")))
         source_materials = tools / "licenses/ffmpeg"
         source_archive = source_materials / lock["source"]["fileName"]
         zlib_archive = source_materials / lock["zlib"]["fileName"]
@@ -44,13 +44,13 @@ class FfmpegBuildVersionTests(unittest.TestCase):
             make.write_text("""#!/usr/bin/env bash
 set -eu
 source_directory=$(CDPATH= cd -- ../ffmpeg-source && pwd)
-sh "$source_directory/ffbuild/version.sh" "$source_directory" "" "$TRACKTRIM_TEST_EXTRA_VERSION" > "$TRACKTRIM_TEST_VERSION_OUTPUT"
+sh "$source_directory/ffbuild/version.sh" "$source_directory" "" "$MOVIESIFT_TEST_EXTRA_VERSION" > "$MOVIESIFT_TEST_VERSION_OUTPUT"
 exit 86
 """, encoding="utf-8", newline="\n")
             make.chmod(0o755)
-            environment = dict(os.environ, TRACKTRIM_BUILD_MAKE=make.as_posix(),
-                               TRACKTRIM_TEST_EXTRA_VERSION=lock["extraVersion"],
-                               TRACKTRIM_TEST_VERSION_OUTPUT=observation.as_posix())
+            environment = dict(os.environ, MOVIESIFT_BUILD_MAKE=make.as_posix(),
+                               MOVIESIFT_TEST_EXTRA_VERSION=lock["extraVersion"],
+                               MOVIESIFT_TEST_VERSION_OUTPUT=observation.as_posix())
 
             for name in ("GIT_DIR", "GIT_WORK_TREE", "GIT_CEILING_DIRECTORIES", "revision"):
                 environment.pop(name, None)

@@ -46,7 +46,7 @@ def main():
     version = run([str(executable), "-version"])
     if not version.startswith(f"ffmpeg version {arguments.version}"):
         raise RuntimeError(f"Expected development FFmpeg {arguments.version}, received {version.splitlines()[0]}")
-    with tempfile.TemporaryDirectory(prefix="tracktrim-original-ffmpeg-") as temporary_path:
+    with tempfile.TemporaryDirectory(prefix="moviesift-original-ffmpeg-") as temporary_path:
         subtitle_path = pathlib.Path(temporary_path) / "original.srt"
         subtitle_path.write_text("1\n00:00:00,100 --> 00:00:01,700\nOriginal subtitle / Sous-titre / Untertitel.\n", encoding="utf-8")
         command = [str(executable), "-hide_banner", "-loglevel", "error", "-nostdin", "-y",
@@ -67,7 +67,7 @@ def main():
         recorded_command[0] = "<pinned-development-ffmpeg>"
         recorded_command[-1] = destination.name
     provenance = {
-        "origin": "Original synthetic color, two distinct sine tones, and subtitle text generated for TrackTrim tests.",
+        "origin": "Original synthetic color, two distinct sine tones, and subtitle text generated for MovieSift tests.",
         "normalization": "The checked-in input is the direct FFmpeg Matroska output. No mkvmerge remux or normalization was applied.",
         "developmentToolVersion": version.splitlines()[0],
         "developmentToolExecutableSha256": hashlib.sha256(executable.read_bytes()).hexdigest(),

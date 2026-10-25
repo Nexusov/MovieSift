@@ -34,7 +34,7 @@ jobs:
           & '${{ runner.temp }}/mkv-source-candidate/mkvextract.exe' --version
           if ($LASTEXITCODE -ne 0) { throw 'The candidate mkvextract could not execute on Windows.' }
       # These are review-only worker/material artifacts, never a public release
-      # or TrackTrim binary publication. They expire and cannot replace final
+      # or MovieSift binary publication. They expire and cannot replace final
       # covered-source delivery alongside an eventual release.
       - name: Retain the candidate workers with their corresponding materials
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

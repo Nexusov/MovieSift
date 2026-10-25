@@ -39,7 +39,7 @@ class ReviewMaterialTests(unittest.TestCase):
         self.git("-c", "user.name=Controlled fixture", "-c", "user.email=fixture@example.invalid", "commit", "--quiet", "-m", "Create controlled source")
         self.revision = self.git("rev-parse", "HEAD").strip()
         self.runtime = "win-x64"
-        self.archive = self.root / "TrackTrim-win-x64.zip"
+        self.archive = self.root / "MovieSift-win-x64.zip"
         self.inventory_path = self.root / "distribution.json"
         self.output = self.root / "materials"
         self.payloads = {name: ("controlled " + name).encode() for name in MATERIALS.REQUIRED_RECORDS}
@@ -48,7 +48,7 @@ class ReviewMaterialTests(unittest.TestCase):
             "mkv-source-provenance.json": b"controlled MKV provenance",
             "tools/licenses/source.tar.xz": b"controlled upstream source archive",
             "licenses/nuget/notice.txt": b"controlled upstream notice",
-            "TrackTrim.exe": b"standalone apphost must not be copied",
+            "MovieSift.exe": b"standalone apphost must not be copied",
             "tools/mkvmerge.exe": b"standalone worker must not be copied",
         })
         self.pack()
@@ -59,8 +59,8 @@ class ReviewMaterialTests(unittest.TestCase):
 
     def pack(self, tar=False):
         """Build a real small archive and matching complete inventory."""
-        self.archive = self.root / ("TrackTrim-" + self.runtime + (".tar.gz" if tar else ".zip"))
-        prefix = "TrackTrim-" + self.runtime + "/"
+        self.archive = self.root / ("MovieSift-" + self.runtime + (".tar.gz" if tar else ".zip"))
+        prefix = "MovieSift-" + self.runtime + "/"
 
         if tar:
             with tarfile.open(self.archive, "w:gz") as archive:
@@ -102,16 +102,16 @@ class ReviewMaterialTests(unittest.TestCase):
         bundle = self.output / summary["archive"]["name"]
         self.assertEqual(MATERIALS.file_record(bundle), summary["archive"])
         with tarfile.open(bundle, "r:gz") as archive:
-            prefix = "TrackTrim-review-materials/"
+            prefix = "MovieSift-review-materials/"
             names = set(archive.getnames())
             self.assertNotIn(prefix + self.runtime + "/tools/mkvmerge.exe", names)
-            self.assertNotIn(prefix + self.runtime + "/TrackTrim.exe", names)
+            self.assertNotIn(prefix + self.runtime + "/MovieSift.exe", names)
             self.assertEqual(LICENSE, archive.extractfile(prefix + self.runtime + "/LICENSE").read())
             self.assertIn(prefix + self.runtime + "/mkv-source-provenance.json", names)
             source = archive.extractfile(prefix + summary["sourceArchive"]["name"]).read()
             self.assertEqual(summary["sourceArchive"]["sha256"], hashlib.sha256(source).hexdigest())
             with tarfile.open(fileobj=io.BytesIO(source), mode="r:gz") as source_archive:
-                self.assertEqual(LICENSE, source_archive.extractfile("TrackTrim-source-" + self.revision[:12] + "/LICENSE").read())
+                self.assertEqual(LICENSE, source_archive.extractfile("MovieSift-source-" + self.revision[:12] + "/LICENSE").read())
             provenance = json.load(archive.extractfile(prefix + "materials-provenance.json"))
             instructions = archive.extractfile(prefix + "READ-ME-FIRST.txt").read().decode()
             self.assertIn("public repository are not private", instructions)
@@ -183,7 +183,7 @@ class ReviewMaterialTests(unittest.TestCase):
             with self.subTest(mode=mode):
                 self.output = self.root / ("materials-" + mode)
                 self.pack()
-                prefix = "TrackTrim-" + self.runtime + "/"
+                prefix = "MovieSift-" + self.runtime + "/"
                 with zipfile.ZipFile(self.archive, "w") as archive:
                     for name, contents in self.payloads.items():
 

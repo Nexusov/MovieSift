@@ -1,6 +1,6 @@
 You are implementing an open-source Windows/Linux desktop application for removing unwanted embedded audio and subtitle tracks from local video files without re-encoding.
 
-Read PROJECT_BRIEF.md in the repository root in full before changing code. It is the reviewed product and engineering baseline, not a claim that anything is implemented. Inspect the workspace, Git state, repository instructions, and installed toolchain first. Preserve unrelated work and reuse the established project name. For an empty repository, use TrackTrim.
+Read PROJECT_BRIEF.md in the repository root in full before changing code. It is the reviewed product and engineering baseline, not a claim that anything is implemented. Inspect the workspace, Git state, repository instructions, and installed toolchain first. Preserve unrelated work and reuse the established project name. For an empty repository, use MovieSift.
 
 SCOPE AND EXECUTION
 

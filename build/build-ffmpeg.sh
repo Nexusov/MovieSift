@@ -39,7 +39,7 @@ export GIT_CEILING_DIRECTORIES="$build_root"
 readonly result_directory="$build_root/result"
 readonly zlib_prefix="$build_root/zlib-install"
 readonly compiler="${cross_prefix}gcc"
-readonly make_command=${TRACKTRIM_BUILD_MAKE:-make}
+readonly make_command=${MOVIESIFT_BUILD_MAKE:-make}
 
 # Validate complete source archives before invoking the upstream extractors/build scripts.
 "$python_command" - "$script_directory/ffmpeg.lock.json" "$source_archive" "$zlib_archive" <<'PYTHON'

@@ -8,14 +8,14 @@ param(
     [string] $Mp4FixturePath,
     [string] $ToolCacheDirectory = (Join-Path $PSScriptRoot '../artifacts/downloads'),
     [string] $Dotnet = 'dotnet',
-    [string] $WindowsMkvBuildDirectory = $env:TRACKTRIM_WINDOWS_MKV_BUILD_DIRECTORY,
+    [string] $WindowsMkvBuildDirectory = $env:MOVIESIFT_WINDOWS_MKV_BUILD_DIRECTORY,
     [switch] $Overwrite
 )
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 $repositoryRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
-$desktopProject = Join-Path $repositoryRoot 'src/TrackTrim.Desktop/TrackTrim.Desktop.csproj'
+$desktopProject = Join-Path $repositoryRoot 'src/MovieSift.Desktop/MovieSift.Desktop.csproj'
 $runtimeVersion = '10.0.13'
 
 if (-not $OutputDirectory) {
@@ -24,7 +24,7 @@ if (-not $OutputDirectory) {
 
 $OutputDirectory = [IO.Path]::GetFullPath($OutputDirectory)
 New-Item -ItemType Directory -Path $OutputDirectory -Force | Out-Null
-$archiveName = "TrackTrim-$RuntimeIdentifier"
+$archiveName = "MovieSift-$RuntimeIdentifier"
 $archiveExtension = '.zip'
 
 if ($RuntimeIdentifier -eq 'linux-x64') {
@@ -65,7 +65,7 @@ try {
 
     & (Join-Path $PSScriptRoot 'acquire-tools.ps1') -RuntimeIdentifier $RuntimeIdentifier -Destination (Join-Path $packageRoot 'tools') -CacheDirectory $ToolCacheDirectory -WindowsMkvBuildDirectory $WindowsMkvBuildDirectory
     New-Item -ItemType Directory -Path (Join-Path $packageRoot 'data') -Force | Out-Null
-    Set-Content -LiteralPath (Join-Path $packageRoot 'portable.flag') -Value 'TrackTrim portable data policy version 1' -Encoding utf8NoBOM
+    Set-Content -LiteralPath (Join-Path $packageRoot 'portable.flag') -Value 'MovieSift portable data policy version 1' -Encoding utf8NoBOM
     $licenseRoot = Join-Path $packageRoot 'licenses'
     New-Item -ItemType Directory -Path $licenseRoot -Force | Out-Null
 
@@ -81,8 +81,8 @@ try {
     }
 
     Copy-Item -LiteralPath (Join-Path $packageRoot 'tools/ffmpeg-provenance.json') -Destination (Join-Path $packageRoot 'ffmpeg-provenance.json')
-    & (Join-Path $PSScriptRoot 'collect-licenses.ps1') -AssetsFile (Join-Path $repositoryRoot 'src/TrackTrim.Desktop/obj/project.assets.json') -Destination (Join-Path $licenseRoot 'nuget') -AdditionalPackages @("Microsoft.NETCore.App.Runtime.$RuntimeIdentifier/$runtimeVersion") -CacheDirectory (Join-Path $ToolCacheDirectory 'license-materials')
-    $runtimeConfiguration = Get-Content -LiteralPath (Join-Path $packageRoot 'TrackTrim.runtimeconfig.json') -Raw | ConvertFrom-Json
+    & (Join-Path $PSScriptRoot 'collect-licenses.ps1') -AssetsFile (Join-Path $repositoryRoot 'src/MovieSift.Desktop/obj/project.assets.json') -Destination (Join-Path $licenseRoot 'nuget') -AdditionalPackages @("Microsoft.NETCore.App.Runtime.$RuntimeIdentifier/$runtimeVersion") -CacheDirectory (Join-Path $ToolCacheDirectory 'license-materials')
+    $runtimeConfiguration = Get-Content -LiteralPath (Join-Path $packageRoot 'MovieSift.runtimeconfig.json') -Raw | ConvertFrom-Json
     $shippedRuntime = $runtimeConfiguration.runtimeOptions.includedFrameworks | Where-Object name -EQ 'Microsoft.NETCore.App'
 
     if ($shippedRuntime.version -ne $runtimeVersion) {
@@ -181,7 +181,7 @@ try {
 
     $archiveHash = (Get-FileHash -LiteralPath $archivePath -Algorithm SHA256).Hash.ToLowerInvariant()
     "$archiveHash  $([IO.Path]::GetFileName($archivePath))" | Set-Content -LiteralPath ($archivePath + '.sha256') -Encoding utf8NoBOM
-    & python (Join-Path $PSScriptRoot 'distribution-inventory.py') --package-root $packageRoot --archive $archivePath --assets (Join-Path $repositoryRoot 'src/TrackTrim.Desktop/obj/project.assets.json') --output (Join-Path $OutputDirectory "distribution-reports/$RuntimeIdentifier")
+    & python (Join-Path $PSScriptRoot 'distribution-inventory.py') --package-root $packageRoot --archive $archivePath --assets (Join-Path $repositoryRoot 'src/MovieSift.Desktop/obj/project.assets.json') --output (Join-Path $OutputDirectory "distribution-reports/$RuntimeIdentifier")
 
     if ($LASTEXITCODE -ne 0) {
         throw 'Distribution inventory failed; the archive is not accepted.'
