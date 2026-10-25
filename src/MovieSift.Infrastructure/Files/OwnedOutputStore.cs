@@ -11,7 +11,7 @@ using MovieSift.Infrastructure.Persistence;
 namespace MovieSift.Infrastructure.Files;
 
 /// <summary>Publishes only uniquely owned candidates and never overwrites a destination.</summary>
-public sealed class OwnedOutputStore(string dataDirectory) : IOutputStore
+public sealed class OwnedOutputStore : IOutputStore
 {
     private const int LegacyMatroskaRecordVersion = 1;
     private const int RecordVersion = 2;
@@ -21,7 +21,20 @@ public sealed class OwnedOutputStore(string dataDirectory) : IOutputStore
     private const string MarkerName = "owner.json";
     private const string ReservedStage = "Reserved";
     private const string PublishingStage = "Publishing";
-    private readonly string recordDirectory = Path.Combine(Path.GetFullPath(dataDirectory), "ownership");
+    private readonly string recordDirectory;
+    private readonly Action<ReservationBoundary, OwnedOutput>? reservationBoundary;
+
+    /// <summary>Uses the ordinary reservation lifecycle without development-only scheduling behavior.</summary>
+    public OwnedOutputStore(string dataDirectory) : this(dataDirectory, null)
+    {
+    }
+
+    /// <summary>Exposes exact storage boundaries to deterministic fault tests without changing the public media port.</summary>
+    internal OwnedOutputStore(string dataDirectory, Action<ReservationBoundary, OwnedOutput>? reservationBoundary)
+    {
+        recordDirectory = Path.Combine(Path.GetFullPath(dataDirectory), "ownership");
+        this.reservationBoundary = reservationBoundary;
+    }
 
     /// <summary>Records ownership before any media tool can write the candidate.</summary>
     public async Task<OwnedOutput> ReserveAsync(ReserveOutputRequest request)
@@ -40,6 +53,7 @@ public sealed class OwnedOutputStore(string dataDirectory) : IOutputStore
 
         var candidateName = CandidateStem + MediaContainerPolicy.Extension(container);
         var output = ValidateOutput(new(request.Plan.Id, directory, Path.Combine(directory, candidateName), destination, token, container));
+        using var partial = new PartialReservation();
 
         try
         {
@@ -52,21 +66,134 @@ public sealed class OwnedOutputStore(string dataDirectory) : IOutputStore
                 throw new OperationFailureException(new(ErrorCode.OwnershipInvalid, directory));
             }
 
-            Directory.CreateDirectory(directory);
+            partial.Directory = ReservationDirectory.CreateNew(directory);
             PathSafety.RejectReparsePoints(directory);
-            await using (var markerStream = new FileStream(Path.Combine(directory, MarkerName), FileMode.CreateNew, FileAccess.Write, FileShare.None))
+            reservationBoundary?.Invoke(ReservationBoundary.DirectoryCreated, output);
+            request.CancellationToken.ThrowIfCancellationRequested();
+            var markerPath = Path.Combine(directory, MarkerName);
+            await using (var markerStream = new FileStream(markerPath, FileMode.CreateNew, FileAccess.Write, FileShare.Read))
             {
+                partial.Marker = FileSourceAccess.ReadRegularRevision(new(markerPath, markerStream.SafeFileHandle));
+                reservationBoundary?.Invoke(ReservationBoundary.MarkerCreated, output);
+                request.CancellationToken.ThrowIfCancellationRequested();
                 await JsonSerializer.SerializeAsync(markerStream, new OwnerMarker(output.JobId, token), cancellationToken: request.CancellationToken);
                 await markerStream.FlushAsync(request.CancellationToken);
                 markerStream.Flush(flushToDisk: true);
+                partial.Marker = FileSourceAccess.ReadRegularRevision(new(markerPath, markerStream.SafeFileHandle));
+                partial.MarkerComplete = true;
             }
 
-            await WriteRecordAsync(new(output, ReservedStage));
+            reservationBoundary?.Invoke(ReservationBoundary.MarkerWritten, output);
+            request.CancellationToken.ThrowIfCancellationRequested();
+            partial.Journal = await WriteRecordAsync(new(output, ReservedStage), request.CancellationToken, overwrite: false);
+            reservationBoundary?.Invoke(ReservationBoundary.JournalPublished, output);
+            request.CancellationToken.ThrowIfCancellationRequested();
             return output;
         }
-        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        catch (Exception exception)
         {
-            throw new OperationFailureException(new(ErrorCode.PersistenceUnavailable, exception.Message));
+            var cleanupIssues = await RollbackReservationAsync(output, partial);
+            var failure = exception switch
+            {
+                OperationFailureException operation => operation.Failure,
+                OperationCanceledException => new(ErrorCode.Cancelled),
+                _ => new Failure(ErrorCode.PersistenceUnavailable, exception.Message)
+            };
+            var previousIssues = exception is OperationFailureException operationFailure ? operationFailure.CleanupIssues : [];
+            cleanupIssues = previousIssues.AddRange(cleanupIssues);
+
+            if (exception is OperationCanceledException && cleanupIssues.IsEmpty)
+            {
+                throw;
+            }
+
+            throw new OperationFailureException(failure, cleanupIssues, exception);
+        }
+    }
+
+    /// <summary>Rolls back only retained directory/file identities; incomplete ownership never grants normal cleanup authority.</summary>
+    private async Task<ImmutableArray<CleanupIssue>> RollbackReservationAsync(OwnedOutput output, PartialReservation partial)
+    {
+        if (partial.Directory is null)
+        {
+            return [];
+        }
+
+        var issues = ImmutableArray.CreateBuilder<CleanupIssue>();
+
+        try
+        {
+            partial.Directory.ValidateCurrent(output.DirectoryPath);
+            var markerPath = Path.Combine(output.DirectoryPath, MarkerName);
+            var unexpectedContents = Directory.EnumerateFileSystemEntries(output.DirectoryPath)
+                .Any(path => partial.Marker is null || path != markerPath);
+
+            if (unexpectedContents)
+            {
+                throw new IOException("Unexpected contents prevented rollback of the private reservation directory.");
+            }
+
+            await RemovePartialMarkerAsync(output, partial);
+            partial.Directory.ValidateCurrent(output.DirectoryPath);
+            Directory.Delete(output.DirectoryPath, recursive: false);
+        }
+        catch (Exception exception)
+        {
+            issues.Add(new(output.DirectoryPath, exception.Message));
+            return issues.ToImmutable();
+        }
+
+        if (partial.Journal is null)
+        {
+            return issues.ToImmutable();
+        }
+
+        try
+        {
+            await ValidatePartialFileAsync(partial.Journal);
+            var journal = await ReadRecordAsync(partial.Journal.FullPath);
+
+            if (journal.Output != output || journal.Stage != ReservedStage)
+            {
+                throw new IOException("The partial journal no longer matches this reservation; it was preserved.");
+            }
+
+            File.Delete(partial.Journal.FullPath);
+        }
+        catch (Exception exception)
+        {
+            issues.Add(new(partial.Journal.FullPath, exception.Message));
+        }
+
+        return issues.ToImmutable();
+    }
+
+    /// <summary>Removes only the created marker, retaining complete marker validation once its write succeeded.</summary>
+    private static async Task RemovePartialMarkerAsync(OwnedOutput output, PartialReservation partial)
+    {
+        if (partial.Marker is null)
+        {
+            return;
+        }
+
+        await ValidatePartialFileAsync(partial.Marker);
+
+        if (partial.MarkerComplete)
+        {
+            await ValidateMarkerAsync(output);
+        }
+
+        File.Delete(partial.Marker.FullPath);
+    }
+
+    /// <summary>Checks captured regular-file identity before deleting an operation-created partial marker or journal.</summary>
+    private static async Task ValidatePartialFileAsync(SourceRevision expected)
+    {
+        var current = await new FileSourceAccess().ReadRevisionAsync(new(expected.FullPath));
+
+        if (current.FileIdentity != expected.FileIdentity)
+        {
+            throw new IOException("The partial reservation path no longer identifies this operation's file; it was preserved.");
         }
     }
 
@@ -328,6 +455,17 @@ public sealed class OwnedOutputStore(string dataDirectory) : IOutputStore
     {
         var output = record.Output;
         PathSafety.RejectReparsePoints(output.DirectoryPath);
+        await ValidateMarkerAsync(output);
+
+        if (File.Exists(output.CandidatePath))
+        {
+            PathSafety.RejectReparsePoints(output.CandidatePath);
+        }
+    }
+
+    /// <summary>Requires the exact complete marker identity and token for normal and pre-handoff ownership checks.</summary>
+    private static async Task ValidateMarkerAsync(OwnedOutput output)
+    {
         var marker = await ReadOwnershipJsonAsync<OwnerMarker>(Path.Combine(output.DirectoryPath, MarkerName));
         var validMarker = marker is not null && marker.JobId == output.JobId &&
             IsOwnershipToken(marker.OwnershipToken) && marker.OwnershipToken == output.OwnershipToken;
@@ -337,10 +475,6 @@ public sealed class OwnedOutputStore(string dataDirectory) : IOutputStore
             throw InvalidOwnership("The ownership marker does not match the complete operation identity and token.");
         }
 
-        if (File.Exists(output.CandidatePath))
-        {
-            PathSafety.RejectReparsePoints(output.CandidatePath);
-        }
     }
 
     /// <summary>Turns malformed ownership JSON into a typed failure without deleting the original record.</summary>
@@ -360,12 +494,12 @@ public sealed class OwnedOutputStore(string dataDirectory) : IOutputStore
     private static OperationFailureException InvalidOwnership(string detail) => new(new(ErrorCode.OwnershipInvalid, detail));
 
     /// <summary>Writes the current owner identity and stage to a bounded local record.</summary>
-    private Task WriteRecordAsync(RecordWriteRequest request)
+    private Task<SourceRevision> WriteRecordAsync(RecordWriteRequest request, CancellationToken cancellationToken = default, bool overwrite = true)
     {
         using var process = Process.GetCurrentProcess();
         var record = new OwnershipRecord(RecordVersion, request.Output, request.Stage, process.Id, process.StartTime.ToUniversalTime().Ticks,
             request.Output.Container);
-        return BoundedJson.WriteAsync(new JsonWriteRequest<OwnershipRecord>(RecordPath(request.Output.JobId), record));
+        return BoundedJson.WriteAsync(new JsonWriteRequest<OwnershipRecord>(RecordPath(request.Output.JobId), record, cancellationToken, overwrite));
     }
 
     /// <summary>Maps an exact job identifier to its one journal file.</summary>
