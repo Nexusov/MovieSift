@@ -6,6 +6,11 @@ The records below predate the rename. Their original files, screenshots, version
 
 A successful historical automated job is not proof of a later renamed binary. Headless screenshots are actual offscreen renders of their identified revision, not native desktop or OS-scaling acceptance. New checks must identify their actual MovieSift commit and artifacts.
 
+## Current MovieSift quality evidence
+
+- [F1–F9 quality pass](final-quality-pass.json) records controlled/headless regressions and their bounded verification. Its renders are offscreen evidence, not native/scaling acceptance.
+- [Integrated rename baseline](https://github.com/Nexusov/MovieSift/blob/3ee89d45f1be64e80db92c5bdfb24b2aa31a1016/docs/PLAN.md) preserves the original rename verification; [main CI](https://github.com/Nexusov/MovieSift/actions/runs/40160031978) passed at that exact commit.
+
 ## Integrated baseline and handoff
 
 - [PR #11](https://github.com/Nexusov/MovieSift/pull/11) merged the unified workspace and appearance changes; [PR #10](https://github.com/Nexusov/MovieSift/pull/10) integrated the release-candidate branch into main.

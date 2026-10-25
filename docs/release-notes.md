@@ -6,10 +6,10 @@ MovieSift is the project and application name. The unified workspace and appeara
 
 - Remove selected embedded audio and subtitle tracks from MKV and the admitted H.264/AAC/mov_text MP4 subset without re-encoding or replacing originals. Retain every admitted video stream and supported attachment/artwork.
 - Add files or bounded local folders to one workspace. The common track list shows the union across all included files, including tracks present in one episode only, with per-file exceptions and duplicate occurrences preserved.
-- Review independent plans and destinations, then start a separate sequential run. Zero-audio consent remains file-specific; NoChange creates no copy; existing files are never overwritten.
+- Review independent plans and destinations, then start a separate sequential run. Zero-audio consent remains file-specific; NoChange creates no copy and ignores an unused destination; changed outputs never overwrite files or alias any source. Audio/subtitle sections include an explicit reversible Remove all subtitles from copies action.
 - Preview and explicitly apply exact language rules with optional literal-title and whole-track forced-subtitle constraints. Named portable presets store configuration only and require explicit Load.
 - Preserve relative output directories for optional recursive folders. Restore an unfinished path listing only by explicit choice, followed by fresh inspection, selections and Review.
-- Use English or Russian, responsive file/track panels, light/dark/system appearance, custom colors with contrast checks, and reduced motion. Appearance preferences are independent of media plans and language storage.
+- Use English or Russian, responsive file/track panels, light/dark/system appearance, custom colors with contrast checks, and reduced motion. Appearance preferences are independent of media plans and language storage. Settings use a keyboard-contained cosmetic overlay with Escape/return focus; preference-only faults do not block healthy media storage.
 - Report the measured size difference for published outputs when both lengths are known, including larger or equal results. Originals continue occupying disk space.
 
 ## Rename and portable upgrade
@@ -22,10 +22,10 @@ The FFmpeg/ffprobe custom version label is now `9.0.2-MovieSift-source-2a571b606
 
 ## Verification and distribution status
 
-[Current status](PLAN.md) records the local rename checks and distinguishes the integrated pre-rename baseline from the new revision. Both required Windows/Linux checks must pass on the renamed source before merge; their linked workflow results identify the exact checkout and generated packages. [Historical verification](verification/README.md) preserves exact original receipts without treating them as new MovieSift results.
+The rename is integrated at `3ee89d45f1be64e80db92c5bdfb24b2aa31a1016`; main CI `40160031978` passed both platforms. [Current status](PLAN.md) and the F1–F9 quality-pass PR identify subsequent source/check results. Required CI includes real media, packaging/materials, relocation and the Linux container. [Historical verification](verification/README.md) retains original receipts without assigning them to a later binary.
 
 Manual native/visual/scaling acceptance remains deferred, including the declared Windows 11 and Ubuntu Desktop targets and the recorded active-cancellation/close and real-warning gaps. Automated/headless or container checks do not establish those cases.
 
 The [supported-format contract](SUPPORTED_FORMATS.md), [distribution requirements](verification/release-distribution-closure.md) and [release checklist](release-checklist.md) define the supported subset and the remaining publication decisions. Binary release distribution must include the applicable exact matching source/build materials and notices; an expiring Actions artifact alone is not the durable release arrangement.
 
-No conversion, transcoding, playback, parallel remuxing, source replacement, automatic execution after restart, preset overwrite/import/export or additional matching mode is introduced by the rename.
+No conversion, transcoding, playback, parallel remuxing, source replacement, automatic execution after restart, preset overwrite/import/export or additional matching mode is introduced by the quality pass.
