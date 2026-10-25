@@ -73,7 +73,7 @@ def main():
     write_audio((destination / "low.wav", 440))
     write_audio((destination / "high.wav", 880))
     (destination / "captions.srt").write_text("1\n00:00:00,000 --> 00:00:01,700\nOriginal synthetic subtitle.\n", encoding="utf-8")
-    (destination / "attachment.txt").write_text("Original TrackTrim fixture attachment.\n", encoding="utf-8")
+    (destination / "attachment.txt").write_text("Original MovieSift fixture attachment.\n", encoding="utf-8")
     (destination / "chapters.xml").write_text(
         '<?xml version="1.0" encoding="UTF-8"?><Chapters><EditionEntry><EditionUID>3001</EditionUID>'
         '<EditionFlagHidden>0</EditionFlagHidden><EditionFlagDefault>1</EditionFlagDefault><EditionFlagOrdered>0</EditionFlagOrdered>'
@@ -93,8 +93,8 @@ def main():
         '</Tags>', encoding="utf-8")
     for multiple_video in (False, True):
         output = destination / ("multi-video.mkv" if multiple_video else "ordinary.mkv")
-        command = [str(executable), "--deterministic", "TrackTrim-fixture-v1", "--disable-track-statistics-tags",
-                   "--normalize-language-ietf", "off", "--output", str(output), "--title", "TrackTrim synthetic / Проверка",
+        command = [str(executable), "--deterministic", "MovieSift-fixture-v1", "--disable-track-statistics-tags",
+                   "--normalize-language-ietf", "off", "--output", str(output), "--title", "MovieSift synthetic / Проверка",
                    "--chapters", str(destination / "chapters.xml"),
                    "--attachment-name", "../untrusted attachment.txt", "--attachment-mime-type", "text/plain",
                    "--attachment-description", "Original attachment description / Описание",
@@ -118,17 +118,17 @@ def main():
             tags = tags.replace(f"<TrackUID>{placeholder}</TrackUID>", f'<TrackUID>{track["properties"]["uid"]}</TrackUID>')
         actual_tags = destination / f"{output.stem}.tags.xml"
         actual_tags.write_text(tags, encoding="utf-8")
-        run([str(executable), "--deterministic", "TrackTrim-fixture-tags-v1", "--disable-track-statistics-tags",
+        run([str(executable), "--deterministic", "MovieSift-fixture-tags-v1", "--disable-track-statistics-tags",
              "--normalize-language-ietf", "off", "--output", str(output), "--global-tags", str(actual_tags), str(preliminary)])
         preliminary.unlink()
         identification = run([str(executable), "-J", str(output)])
         (destination / f"{output.stem}.identification.json").write_text(identification, encoding="utf-8")
     cancellation_video = destination / "cancellation.ivf"
     write_video((cancellation_video, VP8_RED, CANCELLATION_FRAME_COUNT))
-    run([str(executable), "--deterministic", "TrackTrim-live-cancellation-v1", "--disable-track-statistics-tags",
+    run([str(executable), "--deterministic", "MovieSift-live-cancellation-v1", "--disable-track-statistics-tags",
          "--output", str(destination / "cancellation.mkv"), str(cancellation_video),
          str(destination / "low.wav"), str(destination / "high.wav"), str(destination / "captions.srt")])
-    manifest = {"generator": "TrackTrim original synthetic fixture v1", "tool": version,
+    manifest = {"generator": "MovieSift original synthetic fixture v1", "tool": version,
                 "files": {path.name: hashlib.sha256(path.read_bytes()).hexdigest()
                           for path in sorted(destination.glob("*.mkv"))}}
     (destination / "provenance.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")

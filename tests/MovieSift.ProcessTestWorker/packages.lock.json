@@ -1,0 +1,23 @@
+{
+  "version": 2,
+  "dependencies": {
+    "net10.0": {
+      "moviesift.application": {
+        "type": "Project",
+        "dependencies": {
+          "MovieSift.Core": "[0.1.0-rc.1, )"
+        }
+      },
+      "moviesift.core": {
+        "type": "Project"
+      },
+      "moviesift.infrastructure": {
+        "type": "Project",
+        "dependencies": {
+          "MovieSift.Application": "[0.1.0-rc.1, )",
+          "MovieSift.Core": "[0.1.0-rc.1, )"
+        }
+      }
+    }
+  }
+}

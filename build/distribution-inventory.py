@@ -82,7 +82,7 @@ def read_mkv_build_json(path):
 
 def mkv_windows_imports(path):
     """Reuse the existing bounded ordinary-PE reader for the independently built MKV workers."""
-    specification = importlib.util.spec_from_file_location("tracktrim_pe_evidence", Path(__file__).with_name("ffmpeg-runtime-dependencies.py"))
+    specification = importlib.util.spec_from_file_location("moviesift_pe_evidence", Path(__file__).with_name("ffmpeg-runtime-dependencies.py"))
     module = importlib.util.module_from_spec(specification)
     specification.loader.exec_module(module)
     return module.windows_imports(path)
@@ -290,7 +290,7 @@ def mkv_source_build_evidence(directory, records, lock_path, recipe_path, standa
     if len(imports) != len(payloads) or {row.get("path") for row in imports} != {row["path"] for row in payloads}:
         raise ValueError("MKV source-build import evidence does not cover the complete payload")
 
-    specification = importlib.util.spec_from_file_location("tracktrim_mkv_collector", Path(__file__).with_name("collect-mkv-build.py"))
+    specification = importlib.util.spec_from_file_location("moviesift_mkv_collector", Path(__file__).with_name("collect-mkv-build.py"))
     collector = importlib.util.module_from_spec(specification)
     specification.loader.exec_module(collector)
     for row in imports:
@@ -547,7 +547,7 @@ def classify(records, origins, components, tool_lock, profile):
                           origin="Filee e830916e7f02526bff6b7576edc22e51ecf9c126; MIT notice for adapted styles/motion")
             continue
 
-        original = name.startswith("TrackTrim") or name.startswith("docs/") or name == "ru/TrackTrim.resources.dll" or name in {
+        original = name.startswith("MovieSift") or name.startswith("docs/") or name == "ru/MovieSift.resources.dll" or name in {
             "LICENSE", "README.md", "CONTRIBUTING.md", "THIRD_PARTY_NOTICES.md", "portable.flag", "SHA256SUMS",
             "build-provenance.json", "tool-provenance.json", "ffmpeg-provenance.json", "mkv-source-provenance.json", "native-dependencies.txt",
         }
@@ -555,7 +555,7 @@ def classify(records, origins, components, tool_lock, profile):
         if original:
             record.update(category="original-or-generated-project-output", origin="Recorded build revision and packaging scripts")
 
-            if name in ("TrackTrim", "TrackTrim.exe"):
+            if name in ("MovieSift", "MovieSift.exe"):
                 record.update(origin="SDK-generated .NET apphost; SDK version in build-provenance.json", sourceCompleteness="Exact apphost template/source relationship requires review")
             continue
 
@@ -878,7 +878,7 @@ def generate(package_root, archive, assets_file, output, profile_file, mkv_lock_
         "redistributionReady": False, "build": build,
         "originalApplicationLicense": {"identifier": "MIT", "copyright": "Copyright (c) 2026 Nexusov",
                                        "path": "LICENSE", "sha256": license_record["sha256"],
-                                       "scope": "Original TrackTrim code; third-party terms remain independent"},
+                                       "scope": "Original MovieSift code; third-party terms remain independent"},
         "archive": {"name": archive.name, "size": archive.stat().st_size, "sha256": file_hash(archive)},
         "manifest": records["SHA256SUMS"], "toolProvenance": tool_lock, "ffmpegProvenance": ffmpeg_lock,
         "toolPayloadSelection": selection,
@@ -894,7 +894,7 @@ def generate(package_root, archive, assets_file, output, profile_file, mkv_lock_
             "NuGet match proves byte identity to a signed archive member, not complete source or legal compliance.",
             "Omissions are limited to the hash-pinned CLI selection, backed by source, dependency, representative runtime and mandatory packaged-workflow evidence.",
             "Third-party-notice inclusion alone does not prove which optional components were compiled.",
-            "Original TrackTrim code is MIT; combined-work analysis and actual covered-source/build delivery remain independent requirements.",
+            "Original MovieSift code is MIT; combined-work analysis and actual covered-source/build delivery remain independent requirements.",
         ],
     }
     output.mkdir(parents=True, exist_ok=True)

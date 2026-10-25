@@ -13,11 +13,11 @@ for unavailable_tool in dotnet mkvmerge mkvextract ffmpeg ffprobe; do
     fi
 done
 
-application='/check/app Кириллица/TrackTrim-linux-x64/TrackTrim'
+application='/check/app Кириллица/MovieSift-linux-x64/MovieSift'
 evidence='/check/evidence'
 
 mkdir -p "$evidence"
-cp /usr/local/share/tracktrim-smoke/environment.txt "$evidence/container-environment.txt"
+cp /usr/local/share/moviesift-smoke/environment.txt "$evidence/container-environment.txt"
 {
     printf 'Runtime user: %s:%s\n' "$(id -u)" "$(id -g)"
     printf 'Parent LANG: %s\nParent LC_ALL: %s\nParent LC_CTYPE: %s\n' "${LANG-<unset>}" "${LC_ALL-<unset>}" "${LC_CTYPE-<unset>}"

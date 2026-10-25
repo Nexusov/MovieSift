@@ -5,7 +5,7 @@ param(
     [Parameter(Mandatory)]
     [string] $Destination,
     [string] $CacheDirectory = (Join-Path $PSScriptRoot '../artifacts/downloads'),
-    [string] $WindowsMkvBuildDirectory = $env:TRACKTRIM_WINDOWS_MKV_BUILD_DIRECTORY
+    [string] $WindowsMkvBuildDirectory = $env:MOVIESIFT_WINDOWS_MKV_BUILD_DIRECTORY
 )
 
 $ErrorActionPreference = 'Stop'
@@ -18,7 +18,7 @@ $sourceBuiltWindows = $RuntimeIdentifier -eq 'win-x64' -and -not [string]::IsNul
 $requiresWindowsSourceBuild = $RuntimeIdentifier -eq 'win-x64' -and $distribution.PSObject.Properties.Name -contains 'kind' -and $distribution.kind -eq 'source-build'
 
 if ($requiresWindowsSourceBuild -and -not $sourceBuiltWindows) {
-    throw 'The pinned Windows MKV source build is required. Provide -WindowsMkvBuildDirectory (or TRACKTRIM_WINDOWS_MKV_BUILD_DIRECTORY) pointing to the complete verified worker/material directory; official binaries are not a fallback.'
+    throw 'The pinned Windows MKV source build is required. Provide -WindowsMkvBuildDirectory (or MOVIESIFT_WINDOWS_MKV_BUILD_DIRECTORY) pointing to the complete verified worker/material directory; official binaries are not a fallback.'
 }
 
 if ($WindowsMkvBuildDirectory -and $RuntimeIdentifier -ne 'win-x64') {

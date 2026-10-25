@@ -28,17 +28,17 @@ jobs:
         include:
           - os: windows-2025
             runtime: win-x64
-            archive: TrackTrim-win-x64.zip
+            archive: MovieSift-win-x64.zip
           - os: ubuntu-24.04
             runtime: linux-x64
-            archive: TrackTrim-linux-x64.tar.gz
+            archive: MovieSift-linux-x64.tar.gz
     runs-on: ${{ matrix.os }}
     timeout-minutes: 35
     env:
       DOTNET_NOLOGO: '1'
       DOTNET_CLI_TELEMETRY_OPTOUT: '1'
-      TRACKTRIM_REQUIRE_MEDIA_TOOLS: '1'
-      TRACKTRIM_TOOL_DIRECTORY: ${{ github.workspace }}/tools
+      MOVIESIFT_REQUIRE_MEDIA_TOOLS: '1'
+      MOVIESIFT_TOOL_DIRECTORY: ${{ github.workspace }}/tools
     defaults:
       run:
         shell: pwsh
@@ -64,7 +64,7 @@ jobs:
         run: |
           $mkvBuildDirectory = Join-Path '${{ runner.temp }}' 'mkv-source-candidate'
           ./build/provision-windows-mkv.ps1 -Destination $mkvBuildDirectory -CacheDirectory '${{ runner.temp }}/mkv-source-downloads'
-          ('TRACKTRIM_WINDOWS_MKV_BUILD_DIRECTORY=' + $mkvBuildDirectory) | Add-Content -LiteralPath $env:GITHUB_ENV -Encoding utf8NoBOM
+          ('MOVIESIFT_WINDOWS_MKV_BUILD_DIRECTORY=' + $mkvBuildDirectory) | Add-Content -LiteralPath $env:GITHUB_ENV -Encoding utf8NoBOM
       - name: Provision pinned Windows source-build prerequisites
         if: runner.os == 'Windows'
         run: ./build/provision-windows-ffmpeg.ps1
@@ -103,7 +103,7 @@ jobs:
       - name: Verify Linux CLI archive without installed SDK or media tools
         if: runner.os == 'Linux'
         shell: bash
-        run: bash ./build/verify-clean-linux.sh ./artifacts/TrackTrim-linux-x64.tar.gz ./artifacts/fixtures/ordinary.mkv ./artifacts/fixtures/mp4/ordinary.mp4
+        run: bash ./build/verify-clean-linux.sh ./artifacts/MovieSift-linux-x64.tar.gz ./artifacts/fixtures/ordinary.mkv ./artifacts/fixtures/mp4/ordinary.mp4
       - name: Validate and stage the explicitly requested candidate set
         id: candidates
         if: ${{ success() && github.event_name == 'workflow_dispatch' && inputs.retain_candidates == true }}

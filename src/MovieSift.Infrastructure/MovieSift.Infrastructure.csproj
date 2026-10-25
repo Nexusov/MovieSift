@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../MovieSift.Core/MovieSift.Core.csproj" />
+    <ProjectReference Include="../MovieSift.Application/MovieSift.Application.csproj" />
+  </ItemGroup>
+</Project>

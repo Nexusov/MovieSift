@@ -28,7 +28,7 @@ function Invoke-PackagedApplication {
     $startInfo.Environment.Remove('DOTNET_ROOT') | Out-Null
     $startInfo.Environment.Remove('DOTNET_ROOT_X64') | Out-Null
     $startInfo.Environment['DOTNET_MULTILEVEL_LOOKUP'] = '0'
-    $startInfo.Environment.Remove('TRACKTRIM_TOOL_DIRECTORY') | Out-Null
+    $startInfo.Environment.Remove('MOVIESIFT_TOOL_DIRECTORY') | Out-Null
 
     foreach ($argument in $Options.Arguments) {
         $startInfo.ArgumentList.Add($argument)
@@ -112,7 +112,7 @@ if (Test-Path -LiteralPath (Join-Path $PackageDirectory 'licenses/APPLICATION-LI
     throw 'The obsolete application-license-pending marker must not be packaged.'
 }
 
-$executableName = 'TrackTrim'
+$executableName = 'MovieSift'
 
 if ($IsWindows) {
     $executableName += '.exe'
@@ -125,7 +125,7 @@ if ($IsLinux) {
     $runtimeFiles = @('System.Private.CoreLib.dll', 'libhostfxr.so', 'libcoreclr.so')
 }
 
-foreach ($requiredPath in @($executablePath, (Join-Path $PackageDirectory 'portable.flag'), (Join-Path $PackageDirectory 'TrackTrim.runtimeconfig.json'), (Join-Path $PackageDirectory 'tool-provenance.json'), (Join-Path $PackageDirectory 'ffmpeg-provenance.json'), (Join-Path $PackageDirectory 'licenses/nuget/inventory.json')) + @($runtimeFiles | ForEach-Object { Join-Path $PackageDirectory $_ })) {
+foreach ($requiredPath in @($executablePath, (Join-Path $PackageDirectory 'portable.flag'), (Join-Path $PackageDirectory 'MovieSift.runtimeconfig.json'), (Join-Path $PackageDirectory 'tool-provenance.json'), (Join-Path $PackageDirectory 'ffmpeg-provenance.json'), (Join-Path $PackageDirectory 'licenses/nuget/inventory.json')) + @($runtimeFiles | ForEach-Object { Join-Path $PackageDirectory $_ })) {
 
     if (-not (Test-Path -LiteralPath $requiredPath -PathType Leaf)) {
         throw "Required packaged file is missing: $requiredPath"

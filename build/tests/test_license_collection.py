@@ -20,7 +20,7 @@ class LicenseCollectionTests(unittest.TestCase):
     def setUp(self):
         """Read the real pins and reserve all synthetic packages in one owned directory."""
         self.materials = json.loads((BUILD_DIRECTORY / "license-materials.lock.json").read_text(encoding="utf-8"))["materials"]
-        self.temporary = tempfile.TemporaryDirectory(prefix="TrackTrim notice checks ")
+        self.temporary = tempfile.TemporaryDirectory(prefix="MovieSift notice checks ")
         self.addCleanup(self.temporary.cleanup)
         self.directory = Path(self.temporary.name)
 

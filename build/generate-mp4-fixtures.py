@@ -51,7 +51,7 @@ def main():
     executable = arguments.ffmpeg.resolve()
     destination = arguments.destination.resolve()
     destination.mkdir(parents=True, exist_ok=True)
-    source = Path(__file__).resolve().parent.parent / "tests/TrackTrim.Infrastructure.Tests/Fixtures/h264-aac-no-default-duration.mkv"
+    source = Path(__file__).resolve().parent.parent / "tests/MovieSift.Infrastructure.Tests/Fixtures/h264-aac-no-default-duration.mkv"
     source_hash = digest(source)
     if source_hash != SOURCE_SHA256:
         raise RuntimeError("The original fixture identity changed.")
@@ -61,7 +61,7 @@ def main():
     subtitles = destination / "original forced.srt"
     subtitles.write_text("1\n00:00:00,200 --> 00:00:01,500\nOriginal forced caption / Проверка.\n", encoding="utf-8")
     chapters = destination / "original chapters.ffmetadata"
-    chapters.write_text(";FFMETADATA1\ntitle=TrackTrim original MP4\nartist=TrackTrim synthetic fixture\ncomment=Original test content\n"
+    chapters.write_text(";FFMETADATA1\ntitle=MovieSift original MP4\nartist=MovieSift synthetic fixture\ncomment=Original test content\n"
                         "[CHAPTER]\nTIMEBASE=1/1000\nSTART=0\nEND=1000\ntitle=First chapter\n"
                         "[CHAPTER]\nTIMEBASE=1/1000\nSTART=1000\nEND=2000\ntitle=Вторая глава\n", encoding="utf-8")
     commands = []
@@ -135,7 +135,7 @@ def main():
     chapter_variants = [write_chapter_reference_fixture(ordinary, multiple_chapter_tracks, distinct=True),
                         write_chapter_reference_fixture(ordinary, repeated_chapter_reference, distinct=False)]
     provenance = {
-        "origin": "Original TrackTrim synthetic H.264, distinguishable AAC tones, two captions, artwork and chapters.",
+        "origin": "Original MovieSift synthetic H.264, distinguishable AAC tones, two captions, artwork and chapters.",
         "source": source.name, "sourceSha256": source_hash,
         "ffmpegVersionAndConfiguration": version,
         "ffmpegExecutableSha256": digest(executable),

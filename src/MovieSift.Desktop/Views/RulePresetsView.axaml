@@ -1,0 +1,47 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:viewModels="using:MovieSift.Desktop.ViewModels"
+             xmlns:presets="using:MovieSift.Application.Presets"
+             x:Class="MovieSift.Desktop.Views.RulePresetsView"
+             x:DataType="viewModels:RulePresetsViewModel">
+  <Border Padding="12" BorderThickness="1" CornerRadius="4" BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}">
+    <StackPanel Spacing="8">
+      <TextBlock Text="{Binding Localization[PresetHeading]}" FontWeight="SemiBold" />
+      <TextBlock Text="{Binding Localization[PresetHint]}" TextWrapping="Wrap" />
+      <ComboBox x:Name="RulePresetList" ItemsSource="{Binding Presets}" SelectedItem="{Binding SelectedPreset, Mode=TwoWay}"
+                IsEnabled="{Binding CanSelect}" HorizontalAlignment="Stretch" MaxDropDownHeight="240"
+                AutomationProperties.Name="{Binding Localization[PresetChoose]}">
+        <ComboBox.ItemTemplate>
+          <DataTemplate x:DataType="presets:RulePreset">
+            <TextBlock Text="{Binding Name}" TextWrapping="Wrap" />
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
+      <TextBox x:Name="RulePresetNameTextBox" Text="{Binding PresetName, Mode=TwoWay}" IsEnabled="{Binding CanRead}"
+               PlaceholderText="{Binding Localization[PresetName]}" AutomationProperties.Name="{Binding Localization[PresetName]}" />
+      <TextBlock Text="{Binding Localization[PresetNameHelp]}" TextWrapping="Wrap" Opacity="0.8" />
+      <WrapPanel>
+        <Button x:Name="SaveRulePresetButton" Content="{Binding Localization[PresetSaveNew]}" Command="{Binding SaveAsNewCommand}" Margin="0,0,8,8" />
+        <Button x:Name="LoadRulePresetButton" Content="{Binding Localization[PresetLoad]}" Command="{Binding LoadCommand}" Margin="0,0,8,8" />
+        <Button x:Name="RenameRulePresetButton" Content="{Binding Localization[PresetRename]}" Command="{Binding RenameCommand}" Margin="0,0,8,8" />
+        <Button x:Name="DeleteRulePresetButton" Content="{Binding Localization[PresetDelete]}" Command="{Binding DeleteCommand}" Margin="0,0,8,8" />
+        <Button Content="{Binding Localization[PresetRefresh]}" Command="{Binding RefreshCatalogCommand}" Margin="0,0,8,8" />
+      </WrapPanel>
+      <Border IsVisible="{Binding HasDeleteConfirmation}" BorderThickness="1" Padding="12" CornerRadius="4"
+              BorderBrush="{DynamicResource SystemControlHighlightAccentBrush}">
+        <StackPanel Spacing="8">
+          <TextBlock Text="{Binding DeleteConfirmationText}" TextWrapping="Wrap" />
+          <WrapPanel>
+            <Button x:Name="ConfirmDeleteRulePresetButton" Content="{Binding Localization[PresetDeleteConfirm]}" Command="{Binding ConfirmDeleteCommand}" Margin="0,0,8,8" />
+            <Button x:Name="KeepRulePresetButton" Content="{Binding Localization[PresetDeleteDecline]}" Command="{Binding KeepPresetCommand}" Margin="0,0,8,8" />
+          </WrapPanel>
+        </StackPanel>
+      </Border>
+      <TextBlock x:Name="RulePresetStatusText" Text="{Binding StatusText}" TextWrapping="Wrap" />
+      <TextBlock Text="{Binding ErrorText}" TextWrapping="Wrap" Foreground="{DynamicResource MovieSiftErrorBrush}" IsVisible="{Binding HasError}" />
+      <Expander Header="{Binding Localization[Diagnostics]}" IsVisible="{Binding HasErrorDetails}">
+        <TextBlock Text="{Binding ErrorDetails}" TextWrapping="Wrap" />
+      </Expander>
+    </StackPanel>
+  </Border>
+</UserControl>

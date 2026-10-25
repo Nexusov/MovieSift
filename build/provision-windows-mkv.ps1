@@ -154,7 +154,7 @@ Get-VerifiedMkvTargetPackages -Artifacts $packageInputs -Directory $cachePath
 
 $packageList = Join-Path $cachePath 'package-files.txt'
 Write-MkvPackageFileList -Artifacts $packageInputs -Path $packageList
-& $bash --noprofile --norc -c 'set -euo pipefail; export PATH=/usr/bin:$PATH; cd "$(cygpath -u "$1")"; mapfile -t packages < package-files.txt; pacman -U --noconfirm --needed "${packages[@]}"' tracktrim-mkv-install $cachePath
+& $bash --noprofile --norc -c 'set -euo pipefail; export PATH=/usr/bin:$PATH; cd "$(cygpath -u "$1")"; mapfile -t packages < package-files.txt; pacman -U --noconfirm --needed "${packages[@]}"' moviesift-mkv-install $cachePath
 
 if ($LASTEXITCODE) {
     throw 'The exact locked UCRT64 package closure could not be installed.'
@@ -164,7 +164,7 @@ $workDirectory = Join-Path $cachePath ('compile-' + [Guid]::NewGuid().ToString('
 New-Item -ItemType Directory -Path $workDirectory | Out-Null
 # The pinned archive has exactly these two optional symlinks. Neither is needed by
 # the CLI targets; the complete original source archive is retained unchanged.
-& $bash --noprofile --norc -c 'set -euo pipefail; export PATH=/usr/bin:$PATH; tar -xJf "$(cygpath -u "$1")" --exclude=mkvtoolnix-102.0/drake --exclude=mkvtoolnix-102.0/doc/man/mkvtoolnix-doc.css -C "$(cygpath -u "$2")"' tracktrim-mkv-extract $sourceArchive $workDirectory
+& $bash --noprofile --norc -c 'set -euo pipefail; export PATH=/usr/bin:$PATH; tar -xJf "$(cygpath -u "$1")" --exclude=mkvtoolnix-102.0/drake --exclude=mkvtoolnix-102.0/doc/man/mkvtoolnix-doc.css -C "$(cygpath -u "$2")"' moviesift-mkv-extract $sourceArchive $workDirectory
 
 if ($LASTEXITCODE) {
     throw 'The pinned MKVToolNix source archive could not be extracted.'
