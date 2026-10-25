@@ -74,6 +74,18 @@ public sealed class PlanBuilderTests
         Assert.True(result.Plan?.IsNoChange);
     }
 
+    /// <summary>A no-copy selection has no output path, extension or directory-root requirement.</summary>
+    [Theory]
+    [InlineData("")]
+    [InlineData("unused.txt")]
+    public void NoChangeDoesNotValidateUnusedDestination(string destination)
+    {
+        var result = PlanBuilder.Build(new(Inspection, [0, 1, 2, 3], destination, false, "unrelated-root"));
+
+        Assert.Null(result.Failure);
+        Assert.True(result.Plan?.IsNoChange);
+    }
+
     /// <summary>Freezes the actual inspected container and permits no implicit container conversion.</summary>
     [Theory]
     [InlineData(MediaContainer.Matroska, "output.mkv", true)]

@@ -2,7 +2,6 @@ using System.Collections.Immutable;
 using MovieSift.Application.Batches;
 using MovieSift.Core.Failures;
 using MovieSift.Core.Media;
-using MovieSift.Core.Planning;
 using MovieSift.Core.Rules;
 using Xunit;
 
@@ -60,8 +59,8 @@ public sealed class BatchForcedSubtitleTests
         var harness = CreateHarness();
         await harness.Coordinator.InspectPendingAsync(TestContext.Current.CancellationToken);
         Assert.True(harness.Session.SetSelection(new(harness.Session.Snapshot.Items[1].Id, [10, 44, 11])).Applied);
-        ApproveCurrent(harness);
-        await harness.Coordinator.ReviewAsync(TestContext.Current.CancellationToken);
+        await ApproveCurrentAsync(harness);
+        await harness.Coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken));
         var before = harness.Session.Snapshot;
         var validationCount = harness.DestinationValidations.Count;
         var preview = harness.Coordinator.PreviewLanguageRules(ForcedRules).Preview!;
@@ -96,8 +95,8 @@ public sealed class BatchForcedSubtitleTests
         await harness.Coordinator.InspectPendingAsync(TestContext.Current.CancellationToken);
         var first = harness.Coordinator.PreviewLanguageRules(ForcedRules).Preview!;
         Assert.True(harness.Coordinator.ApplyLanguageRules(first).Applied);
-        ApproveCurrent(harness);
-        await harness.Coordinator.ReviewAsync(TestContext.Current.CancellationToken);
+        await ApproveCurrentAsync(harness);
+        await harness.Coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken));
         var before = harness.Session.Snapshot;
         var changes = 0;
         harness.Session.Changed += _ => changes++;
@@ -122,8 +121,8 @@ public sealed class BatchForcedSubtitleTests
         var harness = CreateHarness();
         await harness.Coordinator.InspectPendingAsync(TestContext.Current.CancellationToken);
         Assert.True(harness.Session.SetSelection(new(harness.Session.Snapshot.Items[0].Id, [0, 1, 17])).Applied);
-        ApproveCurrent(harness);
-        await harness.Coordinator.ReviewAsync(TestContext.Current.CancellationToken);
+        await ApproveCurrentAsync(harness);
+        await harness.Coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken));
         var before = harness.Session.Snapshot;
         var rules = new LanguageRules(new(LanguageRuleMode.KeepMatching, ["en"]),
             new(LanguageRuleMode.Unchanged, ["invalid"], new(true, " ")), KeepOnlyForcedSubtitles: true);
@@ -154,8 +153,8 @@ public sealed class BatchForcedSubtitleTests
                 ? track with { Language = "und", LanguageIetf = null, Title = "Unrelated title" } : track).ToImmutableArray()
         };
         await harness.Coordinator.InspectPendingAsync(TestContext.Current.CancellationToken);
-        ApproveCurrent(harness);
-        await harness.Coordinator.ReviewAsync(TestContext.Current.CancellationToken);
+        await ApproveCurrentAsync(harness);
+        await harness.Coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken));
         var before = harness.Session.Snapshot;
 
         var preview = harness.Coordinator.PreviewLanguageRules(ForcedRules).Preview!;
@@ -184,12 +183,12 @@ public sealed class BatchForcedSubtitleTests
 
         foreach (var item in original)
         {
-            harness.Approve(item);
+            await harness.SelectAndReviewAsync(item);
         }
 
         Assert.True(harness.Session.SetIncluded(original[1].Id, false).Applied);
         Assert.True(harness.Session.SetIncluded(original[2].Id, false).Applied);
-        var review = (await harness.Coordinator.ReviewAsync(TestContext.Current.CancellationToken)).Review!;
+        var review = (await harness.Coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken))).Review!;
         await harness.Coordinator.RunAsync(new(review.Id, CancellationToken: TestContext.Current.CancellationToken));
         Assert.True(harness.Session.SetIncluded(original[1].Id, true).Applied);
         var before = harness.Session.Snapshot;
@@ -262,7 +261,7 @@ public sealed class BatchForcedSubtitleTests
     {
         var harness = CreateHarness();
         await harness.Coordinator.InspectPendingAsync(TestContext.Current.CancellationToken);
-        ApproveCurrent(harness);
+        await ApproveCurrentAsync(harness);
         var item = harness.Session.Snapshot.Items[0];
         var preview = harness.Coordinator.PreviewLanguageRules(ForcedRules).Preview!;
 
@@ -378,14 +377,15 @@ public sealed class BatchForcedSubtitleTests
     }
 
     /// <summary>Approves current file-local selections explicitly without automatically accepting a rule proposal.</summary>
-    private static void ApproveCurrent(BatchTestHarness harness)
+    private static async Task ApproveCurrentAsync(BatchTestHarness harness)
     {
         foreach (var item in harness.Session.Snapshot.Items)
         {
-            var result = PlanBuilder.Build(new(item.Inspection!, item.CurrentRetainedTrackIds,
-                Path.ChangeExtension(item.SourcePath, ".forced-trimmed.mkv"), false));
-            Assert.NotNull(result.Plan);
-            Assert.True(harness.Session.ApprovePlan(new(item.Id, result.Plan)).Applied);
+            Assert.True(harness.Session.SetDestination(new(item.Id,
+                Path.ChangeExtension(item.SourcePath, ".forced-trimmed.mkv"))).Applied);
         }
+
+        var reviewed = await harness.Coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken));
+        Assert.NotNull(reviewed.Review);
     }
 }

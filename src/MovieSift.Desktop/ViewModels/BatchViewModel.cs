@@ -60,7 +60,6 @@ public sealed partial class BatchViewModel : ObservableObject
         InspectPendingCommand = new AsyncRelayCommand(InspectPendingAsync, () => CanEdit && Items.Any(item => item.Snapshot.State == BatchItemState.PendingInspection));
         InspectSelectedCommand = new AsyncRelayCommand(InspectSelectedAsync, () => CanInspectSelected);
         RemoveSelectedCommand = new RelayCommand(RemoveSelected, () => CanRemoveSelected);
-        ApproveSelectedCommand = new RelayCommand(ApproveSelected, () => SelectedItem?.CanEditPlan == true);
         CloseReviewCommand = new RelayCommand(CloseReview);
         OpenSelectedDetailsCommand = new RelayCommand(() => IsDetailsOpen = true, () => SelectedItem is not null);
         ReviewCommand = new AsyncRelayCommand(ReviewAsync, () => CanEdit && Items.Count != 0);
@@ -125,13 +124,6 @@ public sealed partial class BatchViewModel : ObservableObject
     public string StageText => activeProgress is { } progress ? Localization[PhaseKey(progress.Phase)] : string.Empty;
     public string SummaryText => Localization.Format(new("BatchSummary", [Items.Count, Items.Count(item => item.Included), Items.Count(item => item.Snapshot.State is BatchItemState.Completed or BatchItemState.NoChange)]));
     public string LimitsText => Localization.Format(new("BatchLimits", [BatchDiscoveryLimits.MaximumFiles, BatchDiscoveryLimits.MaximumExaminedEntries]));
-    public IReadOnlyList<BatchItemViewModel> ZeroAudioItems => Items.Where(item => item.Included &&
-        item.NeedsZeroAudioConfirmation && item.Snapshot.State is not (BatchItemState.Completed or BatchItemState.NoChange)).ToArray();
-    public bool HasZeroAudioItems => ZeroAudioItems.Count != 0;
-    public string ReviewText => string.Join(Environment.NewLine + Environment.NewLine, Snapshot.Review?.Items.Select(reviewed =>
-        $"{reviewed.Plan.Inspection.Source.FullPath}{Environment.NewLine}{Localization["Output"]}: {reviewed.Plan.DestinationPath}{Environment.NewLine}" +
-        $"{PlanPresentation.DescribeTracks(reviewed.Plan, Localization)}{Environment.NewLine}" +
-        $"{PlanPresentation.DescribeDefaultAudio(reviewed.Plan, Localization)}{Environment.NewLine}{(reviewed.Plan.IsNoChange ? Localization["NoChange"] : string.Empty)}") ?? []);
     public string ExcludedText => string.Join(Environment.NewLine, Items.Where(item => !item.Included).Select(item => $"{item.SourcePath} — {item.StateText}"));
     public bool HasExcluded => Items.Any(item => !item.Included);
     public string ReviewIssuesText => string.Join(Environment.NewLine, reviewFailures.Select(issue =>
@@ -152,7 +144,6 @@ public sealed partial class BatchViewModel : ObservableObject
     public IAsyncRelayCommand InspectPendingCommand { get; }
     public IAsyncRelayCommand InspectSelectedCommand { get; }
     public IRelayCommand RemoveSelectedCommand { get; }
-    public IRelayCommand ApproveSelectedCommand { get; }
     public IAsyncRelayCommand ReviewCommand { get; }
     public IAsyncRelayCommand RunCommand { get; }
     public IRelayCommand CancelCommand { get; }
@@ -407,8 +398,6 @@ public sealed partial class BatchViewModel : ObservableObject
         OnEditorChanged();
     }
 
-    /// <summary>Approves only the selected editor's immutable retention plan.</summary>
-    private void ApproveSelected() => SelectedItem?.Approve();
 
     /// <summary>Captures displayed consent and creates every independent plan in one explicit Review.</summary>
     private async Task ReviewAsync()
@@ -667,7 +656,6 @@ public sealed partial class BatchViewModel : ObservableObject
         InspectPendingCommand?.NotifyCanExecuteChanged();
         InspectSelectedCommand?.NotifyCanExecuteChanged();
         RemoveSelectedCommand?.NotifyCanExecuteChanged();
-        ApproveSelectedCommand?.NotifyCanExecuteChanged();
         ReviewCommand?.NotifyCanExecuteChanged();
         RunCommand?.NotifyCanExecuteChanged();
         CancelCommand?.NotifyCanExecuteChanged();

@@ -138,8 +138,6 @@
   <data name="DiscardWarningsAndClose" xml:space="preserve"><value>Удалить результат и закрыть</value></data>
   <data name="InterruptedInvalidRecord" xml:space="preserve"><value>Запись владения повреждена или неполна и требует ручной проверки. Автоматическая очистка и удаление для этой записи недоступны.</value></data>
   <data name="ErrorReasonSegmentStructure" xml:space="preserve"><value>Структуру Segment Info невозможно проверить в поддерживаемых пределах. Выберите самостоятельный MKV с конечными размерами элементов; потоковые кластеры и несколько сегментов не поддерживаются.</value></data>
-  <data name="SingleWorkflow" xml:space="preserve"><value>Один файл</value></data>
-  <data name="BatchWorkflow" xml:space="preserve"><value>Несколько файлов / папка</value></data>
   <data name="BatchInstructions" xml:space="preserve"><value>Добавьте один или несколько MKV/MP4 либо папку. Выберите дорожки включённых файлов и назначения, затем проверьте отдельные планы перед запуском.</value></data>
   <data name="BatchLimits" xml:space="preserve"><value>Ограничения: {0} файлов в очереди; {1} просмотренных записей за весь обход папки. При превышении добавление отклоняется целиком.</value></data>
   <data name="BatchAddFiles" xml:space="preserve"><value>Добавить файлы…</value></data>
@@ -154,9 +152,7 @@
   <data name="BatchInspectPending" xml:space="preserve"><value>Проверить ожидающие файлы</value></data>
   <data name="BatchInspectSelected" xml:space="preserve"><value>Проверить файл заново</value></data>
   <data name="BatchSelectedFile" xml:space="preserve"><value>Выбор дорожек отдельного файла</value></data>
-  <data name="BatchApproveItem" xml:space="preserve"><value>Подтвердить план этого файла</value></data>
   <data name="BatchReviewRemaining" xml:space="preserve"><value>Проверить изменения</value></data>
-  <data name="BatchReviewedPlans" xml:space="preserve"><value>Проверенные неизменяемые планы к запуску</value></data>
   <data name="BatchExcluded" xml:space="preserve"><value>Явно исключённые файлы (не будут запущены)</value></data>
   <data name="BatchStart" xml:space="preserve"><value>Запустить / продолжить проверенные планы</value></data>
   <data name="BatchNew" xml:space="preserve"><value>Новая очередь</value></data>

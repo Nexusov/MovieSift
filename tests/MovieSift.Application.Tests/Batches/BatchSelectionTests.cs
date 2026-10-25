@@ -17,8 +17,11 @@ public sealed class BatchSelectionTests
         await harness.Coordinator.InspectPendingAsync(TestContext.Current.CancellationToken);
         Assert.Equal([0, 1, 2], harness.Session.Snapshot.Items[0].CurrentRetainedTrackIds);
         Assert.Equal([10, 11, 12], harness.Session.Snapshot.Items[1].CurrentRetainedTrackIds);
-        Assert.All(harness.Session.Snapshot.Items, item => harness.Approve(item, noChange: true));
-        await harness.Coordinator.ReviewAsync(TestContext.Current.CancellationToken);
+        foreach (var item in harness.Session.Snapshot.Items)
+        {
+            harness.ConfigureSelection(item, noChange: true);
+        }
+        await harness.Coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken));
         var before = harness.Session.Snapshot;
         var changes = 0;
         harness.Session.Changed += _ => changes++;
@@ -97,8 +100,9 @@ public sealed class BatchSelectionTests
         Assert.Null(harness.Session.Snapshot.Items[0].ApprovedPlan);
         var unconfirmed = PlanBuilder.Build(new(item.Inspection!, [0], "output.mkv", false));
         Assert.Equal(ErrorCode.ZeroAudioConfirmationRequired, unconfirmed.Failure!.Code);
-        var approved = PlanBuilder.Build(new(item.Inspection!, [0, 1], "output.mkv", false)).Plan!;
-        Assert.True(harness.Session.ApprovePlan(new(item.Id, approved)).Applied);
+        Assert.True(harness.Session.SetSelection(new(item.Id, [0, 1])).Applied);
+        Assert.True(harness.Session.SetDestination(new(item.Id, "output.mkv")).Applied);
+        Assert.NotNull((await harness.Coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, []))).Review);
         Assert.Equal([0, 1], harness.Session.Snapshot.Items[0].CurrentRetainedTrackIds);
         Assert.True(harness.Session.InvalidatePlan(item.Id).Applied);
         Assert.Equal([0, 1], harness.Session.Snapshot.Items[0].CurrentRetainedTrackIds);

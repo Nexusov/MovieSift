@@ -56,7 +56,6 @@ public sealed class QueueRecoveryTests
             Assert.False(item.HasPlan);
             Assert.False(item.ZeroAudioConfirmed);
             item.Tracks.Single(track => track.Track.Kind == TrackKind.Subtitles).Keep = false;
-            fixture.Batch.ApproveSelectedCommand.Execute(null);
         }
 
         Assert.False(fixture.Batch.CanRun);

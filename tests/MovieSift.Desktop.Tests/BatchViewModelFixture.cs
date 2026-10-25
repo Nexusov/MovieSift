@@ -73,8 +73,6 @@ internal sealed class BatchViewModelFixture
             {
                 track.Keep = false;
             }
-
-            Batch.ApproveSelectedCommand.Execute(null);
         }
 
         await Batch.ReviewCommand.ExecuteAsync(null);

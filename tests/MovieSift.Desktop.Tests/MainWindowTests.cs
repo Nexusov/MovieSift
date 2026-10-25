@@ -31,7 +31,7 @@ public sealed class MainWindowTests
         await viewModel.ChangeLanguageCommand.ExecuteAsync("ru");
         Assert.True(fixture.Item.HasPlan);
         Assert.Contains("ни одна из сохранённых аудиодорожек не имеет флага по умолчанию", fixture.Item.PlanDefaultAudioText);
-        Assert.Contains(fixture.Item.PlanDefaultAudioText, fixture.Workspace.ReviewText);
+        Assert.Equal(fixture.Item.PlanDefaultAudioText, Assert.Single(fixture.Workspace.ReviewRows).DefaultAudioText);
         Assert.True(fixture.Item.RemovesDefaultAudio);
         fixture.Item.Tracks[2].Keep = false;
         fixture.Item.ZeroAudioConfirmed = true;

@@ -39,7 +39,7 @@ public sealed class BatchLanguageGuardTests
                 operation = coordinator.InspectItemAsync(new(first.Id, TestContext.Current.CancellationToken));
                 break;
             case "review":
-                operation = coordinator.ReviewAsync(TestContext.Current.CancellationToken);
+                operation = coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken));
                 break;
             case "verification":
                 harness.OnVerify = async request => { entered.TrySetResult(); await release.Task.WaitAsync(request.CancellationToken); };

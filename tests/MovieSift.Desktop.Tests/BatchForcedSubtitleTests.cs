@@ -19,7 +19,6 @@ public sealed class BatchForcedSubtitleTests
         var fixture = CreateFixture();
         await fixture.LoadAsync();
         fixture.Batch.Items[1].Tracks.Single(track => track.Track.Id == 99).Keep = false;
-        ApproveAll(fixture);
         await fixture.Batch.ReviewCommand.ExecuteAsync(null);
         var before = fixture.Session.Snapshot;
         var plans = fixture.Batch.Items.Select(item => item.ApprovedPlan).ToArray();
@@ -108,7 +107,6 @@ public sealed class BatchForcedSubtitleTests
             }
         }
 
-        ApproveAll(fixture);
         await fixture.Batch.ReviewCommand.ExecuteAsync(null);
         var before = fixture.Session.Snapshot;
         var rules = fixture.Batch.LanguageRules;
@@ -232,13 +230,4 @@ public sealed class BatchForcedSubtitleTests
         rules.SubtitleTitleContains = " Captions ";
     }
 
-    /// <summary>Creates independent approvals without changing any current file-local selection.</summary>
-    private static void ApproveAll(BatchViewModelFixture fixture)
-    {
-        foreach (var item in fixture.Batch.Items)
-        {
-            fixture.Batch.SelectedItem = item;
-            fixture.Batch.ApproveSelectedCommand.Execute(null);
-        }
-    }
 }

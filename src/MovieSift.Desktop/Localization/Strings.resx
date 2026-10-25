@@ -138,8 +138,6 @@
   <data name="DiscardWarningsAndClose" xml:space="preserve"><value>Discard output and close</value></data>
   <data name="InterruptedInvalidRecord" xml:space="preserve"><value>An ownership record is invalid or incomplete and needs manual review. Automatic cleanup and deletion are disabled for this entry.</value></data>
   <data name="ErrorReasonSegmentStructure" xml:space="preserve"><value>The Segment Info cannot be inspected within the supported bounds. Choose a standalone MKV with finite element sizes; streaming clusters and multiple segments are unsupported.</value></data>
-  <data name="SingleWorkflow" xml:space="preserve"><value>One file</value></data>
-  <data name="BatchWorkflow" xml:space="preserve"><value>Several files / folder</value></data>
   <data name="BatchInstructions" xml:space="preserve"><value>Add one or more MKV/MP4 files or a folder. Choose tracks across included files, choose destinations, then Review the individual plans before running.</value></data>
   <data name="BatchLimits" xml:space="preserve"><value>Limits: {0} files per queue; {1} examined entries across the whole folder scan. Exceeding a limit rejects the addition in full.</value></data>
   <data name="BatchAddFiles" xml:space="preserve"><value>Add files…</value></data>
@@ -154,9 +152,7 @@
   <data name="BatchInspectPending" xml:space="preserve"><value>Inspect pending files</value></data>
   <data name="BatchInspectSelected" xml:space="preserve"><value>Reinspect file</value></data>
   <data name="BatchSelectedFile" xml:space="preserve"><value>Individual file choices</value></data>
-  <data name="BatchApproveItem" xml:space="preserve"><value>Approve this file’s plan</value></data>
   <data name="BatchReviewRemaining" xml:space="preserve"><value>Review changes</value></data>
-  <data name="BatchReviewedPlans" xml:space="preserve"><value>Reviewed immutable plans to run</value></data>
   <data name="BatchExcluded" xml:space="preserve"><value>Explicitly excluded files (will not run)</value></data>
   <data name="BatchStart" xml:space="preserve"><value>Start / resume reviewed items</value></data>
   <data name="BatchNew" xml:space="preserve"><value>New queue</value></data>

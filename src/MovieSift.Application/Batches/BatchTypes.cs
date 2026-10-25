@@ -36,7 +36,6 @@ public sealed record BatchReview(Guid Id, long Revision, ImmutableArray<BatchRev
 public sealed record BatchItemFailure(Guid ItemId, Failure Failure);
 public sealed record BatchReviewResult(BatchReview? Review, ImmutableArray<BatchItemFailure> ItemFailures, Failure? Failure = null);
 public sealed record BatchEditResult(bool Applied, Failure? Failure = null);
-public sealed record BatchPlanApprovalRequest(Guid ItemId, RemuxPlan Plan);
 public sealed record BatchSelectionRequest(Guid ItemId, ImmutableArray<int> RetainedTrackIds);
 public sealed record BatchDestinationRequest(Guid ItemId, string DestinationPath, string? OutputDirectoryRoot = null);
 public sealed record BatchItemRequest(Guid ItemId, CancellationToken CancellationToken = default);

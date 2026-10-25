@@ -257,7 +257,6 @@ public sealed class BatchNewBatchTests
         previousEditor.Tracks.Single(track => track.Track.Kind == TrackKind.Subtitles).Keep = true;
         previousEditor.OutputPath = "previous-editor-output.mkv";
         previousEditor.ApplyOutputFolder("previous-editor-folder");
-        previousEditor.Approve();
         previousEditor.Included = false;
         Assert.Same(snapshot, fixture.Batch.Snapshot);
         Assert.Equal(error, fixture.Batch.ErrorReasonText);

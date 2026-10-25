@@ -20,7 +20,7 @@ internal static class BatchReviewValidator
 
         var sources = request.Snapshot.Items.Select(item => BatchSession.CanonicalPath(item.SourcePath))
             .ToHashSet(BatchSession.PathComparer);
-        var destinations = pending.Where(item => item.ApprovedPlan is not null)
+        var destinations = pending.Where(item => item.ApprovedPlan is { IsNoChange: false })
             .GroupBy(item => BatchSession.CanonicalPath(item.ApprovedPlan!.DestinationPath), BatchSession.PathComparer)
             .Where(group => group.Count() > 1).Select(group => group.Key).ToHashSet(BatchSession.PathComparer);
         var failures = ImmutableArray.CreateBuilder<BatchItemFailure>();
@@ -37,9 +37,7 @@ internal static class BatchReviewValidator
                 continue;
             }
 
-            var destination = BatchSession.CanonicalPath(plan!.DestinationPath);
-
-            if (sources.Contains(destination) || destinations.Contains(destination))
+            if (!plan!.IsNoChange && HasOutputConflict(plan.DestinationPath, sources, destinations))
             {
                 failures.Add(new(item.Id, new(ErrorCode.InvalidDestination)));
                 continue;
@@ -55,8 +53,12 @@ internal static class BatchReviewValidator
                     continue;
                 }
 
-                var allocation = plan.IsNoChange ? 0 : revision.Length;
-                await request.SourceAccess.ValidateDestinationAsync(new(revision, plan.DestinationPath, allocation,
+                if (plan.IsNoChange)
+                {
+                    continue;
+                }
+
+                await request.SourceAccess.ValidateDestinationAsync(new(revision, plan.DestinationPath, revision.Length,
                     request.CancellationToken, plan.OutputDirectoryRoot, plan.Inspection.Container));
             }
             catch (OperationFailureException exception)
@@ -76,6 +78,13 @@ internal static class BatchReviewValidator
 
         var reviewed = pending.Select(item => new BatchReviewItem(item.Id, item.ApprovedPlan!)).ToImmutableArray();
         return new(new(Guid.NewGuid(), request.Snapshot.Revision, reviewed), []);
+    }
+
+    /// <summary>Compares only destinations that will actually create an output against every source and output.</summary>
+    private static bool HasOutputConflict(string destination, HashSet<string> sources, HashSet<string> duplicates)
+    {
+        var canonical = BatchSession.CanonicalPath(destination);
+        return sources.Contains(canonical) || duplicates.Contains(canonical);
     }
 }
 

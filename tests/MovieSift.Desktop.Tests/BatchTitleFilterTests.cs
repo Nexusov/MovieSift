@@ -28,7 +28,6 @@ public sealed class BatchTitleFilterTests
         try
         {
             await fixture.LoadAsync();
-            ApproveAll(fixture);
             await fixture.Batch.ReviewCommand.ExecuteAsync(null);
             var before = fixture.Session.Snapshot;
             var plans = fixture.Batch.Items.Select(item => item.ApprovedPlan).ToArray();
@@ -84,7 +83,6 @@ public sealed class BatchTitleFilterTests
     {
         var fixture = CreateFixture();
         await fixture.LoadAsync();
-        ApproveAll(fixture);
         await fixture.Batch.ReviewCommand.ExecuteAsync(null);
         Configure(fixture);
         var rules = fixture.Batch.LanguageRules;
@@ -134,7 +132,6 @@ public sealed class BatchTitleFilterTests
     {
         var fixture = CreateFixture();
         await fixture.LoadAsync();
-        ApproveAll(fixture);
         await fixture.Batch.ReviewCommand.ExecuteAsync(null);
         await fixture.Main.ChangeLanguageCommand.ExecuteAsync(language);
         Configure(fixture);
@@ -257,13 +254,4 @@ public sealed class BatchTitleFilterTests
         rules.AudioTitleContains = " [en].+ ";
     }
 
-    /// <summary>Approves each current file separately without replacing any file-local Keep choices.</summary>
-    private static void ApproveAll(BatchViewModelFixture fixture)
-    {
-        foreach (var item in fixture.Batch.Items)
-        {
-            fixture.Batch.SelectedItem = item;
-            fixture.Batch.ApproveSelectedCommand.Execute(null);
-        }
-    }
 }

@@ -59,9 +59,9 @@ public sealed class BatchLanguageRulesTests
     {
         var harness = new BatchTestHarness();
         await harness.Coordinator.InspectPendingAsync(TestContext.Current.CancellationToken);
-        harness.Approve(harness.Session.Snapshot.Items[0], noChange: true);
-        harness.Approve(harness.Session.Snapshot.Items[1]);
-        await harness.Coordinator.ReviewAsync(TestContext.Current.CancellationToken);
+        await harness.SelectAndReviewAsync(harness.Session.Snapshot.Items[0], noChange: true);
+        await harness.SelectAndReviewAsync(harness.Session.Snapshot.Items[1]);
+        await harness.Coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken));
         var before = harness.Session.Snapshot;
         var destinationChecks = harness.DestinationValidations.Count;
         var preview = harness.Coordinator.PreviewLanguageRules(BatchLanguageTestData.KeepRussianSubtitles).Preview!;
@@ -79,7 +79,11 @@ public sealed class BatchLanguageRulesTests
         Assert.Same(before.Items[1], harness.Session.Snapshot.Items[1]);
         Assert.Equal(destinationChecks, harness.DestinationValidations.Count);
         Assert.Empty(harness.RemuxedPaths);
-        Assert.Null((await harness.Coordinator.ReviewAsync(TestContext.Current.CancellationToken)).Review);
+        var reviewed = await harness.Coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken));
+        Assert.NotNull(reviewed.Review);
+        Assert.NotEqual(before.Items[0].ApprovedPlan!.Id, reviewed.Review.Items[0].Plan.Id);
+        Assert.Same(before.Items[1].ApprovedPlan, reviewed.Review.Items[1].Plan);
+        Assert.Empty(harness.RemuxedPaths);
     }
 
     /// <summary>Preserves all approvals and the exact aggregate review when the proposal changes no Keep IDs.</summary>
@@ -116,8 +120,11 @@ public sealed class BatchLanguageRulesTests
                 ? track with { Language = "und", LanguageIetf = null } : track).ToImmutableArray()
         };
         await harness.Coordinator.InspectPendingAsync(TestContext.Current.CancellationToken);
-        Assert.All(harness.Session.Snapshot.Items, item => harness.Approve(item, noChange: true));
-        await harness.Coordinator.ReviewAsync(TestContext.Current.CancellationToken);
+        foreach (var item in harness.Session.Snapshot.Items)
+        {
+            harness.ConfigureSelection(item, noChange: true);
+        }
+        await harness.Coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken));
         var before = harness.Session.Snapshot;
         var rules = new LanguageRules(new(LanguageRuleMode.KeepMatching, ["eng"]),
             new(LanguageRuleMode.KeepMatching, ["rus"]));
@@ -151,16 +158,16 @@ public sealed class BatchLanguageRulesTests
 
         foreach (var item in originals)
         {
-            harness.Approve(item, noChange: item.Id == originals[0].Id || item.Id == originals[5].Id);
+            await harness.SelectAndReviewAsync(item, noChange: item.Id == originals[0].Id || item.Id == originals[5].Id);
         }
 
         harness.ExitCodes[originals[2].SourcePath] = 2;
-        var firstReview = (await harness.Coordinator.ReviewAsync(TestContext.Current.CancellationToken)).Review!;
+        var firstReview = (await harness.Coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken))).Review!;
         await harness.Coordinator.RunAsync(new(firstReview.Id, CancellationToken: TestContext.Current.CancellationToken));
         Assert.True(harness.Session.SetIncluded(originals[2].Id, false).Applied);
         using var cancellation = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
         harness.OnRemux = _ => { cancellation.Cancel(); return Task.CompletedTask; };
-        var nextReview = (await harness.Coordinator.ReviewAsync(TestContext.Current.CancellationToken)).Review!;
+        var nextReview = (await harness.Coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken))).Review!;
         await harness.Coordinator.RunAsync(new(nextReview.Id, CancellationToken: cancellation.Token));
         Assert.True(harness.Session.SetIncluded(originals[2].Id, true).Applied);
         Assert.True(harness.Session.SetIncluded(originals[4].Id, false).Applied);
@@ -217,7 +224,8 @@ public sealed class BatchLanguageRulesTests
                 Assert.True(harness.Session.SetIncluded(first.Id, false).Applied);
                 break;
             case "approval":
-                harness.Approve(first);
+                Assert.True(harness.Session.InvalidatePlan(first.Id).Applied);
+                await harness.SelectAndReviewAsync(first);
                 break;
             case "remove":
                 Assert.True(harness.Session.Remove(first.Id).Applied);

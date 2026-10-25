@@ -38,16 +38,21 @@ public static class PlanBuilder
             return new(null, new(ErrorCode.ZeroAudioConfirmationRequired));
         }
 
-        var invalidContainerDestination = !Enum.IsDefined(inspection.Container) ||
-            string.IsNullOrWhiteSpace(request.DestinationPath) ||
-            MediaContainerPolicy.FromExtension(request.DestinationPath) != inspection.Container;
+        if (!Enum.IsDefined(inspection.Container))
+        {
+            return new(null, new(ErrorCode.InvalidDestination));
+        }
+
+        var noChange = retainedTracks.Length == inspection.Tracks.Length;
+        var invalidContainerDestination = !noChange && (string.IsNullOrWhiteSpace(request.DestinationPath) ||
+            MediaContainerPolicy.FromExtension(request.DestinationPath) != inspection.Container);
 
         if (invalidContainerDestination)
         {
             return new(null, new(ErrorCode.InvalidDestination));
         }
 
-        var hasInvalidOutputRoot = request.OutputDirectoryRoot is not null &&
+        var hasInvalidOutputRoot = !noChange && request.OutputDirectoryRoot is not null &&
             (!OutputPathPolicy.IsWithinDirectory(request.OutputDirectoryRoot, request.DestinationPath) ||
                 Path.GetRelativePath(request.OutputDirectoryRoot, request.DestinationPath) == ".");
 

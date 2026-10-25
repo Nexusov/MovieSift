@@ -61,7 +61,7 @@ public sealed class MixedContainerUiTests
                 }
 
                 Assert.True(fixture.Batch.RunCommand.CanExecute(null));
-                Assert.Contains(".trimmed.mp4", fixture.Batch.ReviewText, StringComparison.Ordinal);
+                Assert.EndsWith(".trimmed.mp4", Assert.Single(fixture.Batch.ReviewRows, row => row.Plan!.Inspection.Container == MediaContainer.Mp4).DestinationPath, StringComparison.Ordinal);
                 Assert.Empty(fixture.Backend.RemuxRequests);
             }
         }

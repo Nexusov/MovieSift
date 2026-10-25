@@ -50,7 +50,7 @@ public sealed class BatchRecursiveFolderTests
                 fixture.Batch.Items.Select(item => item.RelativeSourcePath));
             Assert.All(fixture.Batch.Items, item => Assert.True(item.HasFolderOrigin));
             Assert.All(fixture.Batch.Items, item => Assert.Null(item.ApprovedPlan));
-            ApproveItems(fixture);
+            await ApproveItemsAsync(fixture);
             await fixture.Batch.ReviewCommand.ExecuteAsync(null);
             var before = fixture.Session.Snapshot;
             var paths = fixture.Batch.Items.Select(item => item.OutputPath).ToArray();
@@ -118,7 +118,7 @@ public sealed class BatchRecursiveFolderTests
         Assert.Null(explicitItem.Snapshot.FolderOrigin);
         var folderItem = fixture.Batch.Items[1];
         var origin = folderItem.Snapshot.FolderOrigin;
-        ApproveItems(fixture);
+        await ApproveItemsAsync(fixture);
         await fixture.Batch.ReviewCommand.ExecuteAsync(null);
         var reviewed = fixture.Session.Snapshot;
         await fixture.Batch.AddFolderCommand.ExecuteAsync(null);
@@ -132,7 +132,7 @@ public sealed class BatchRecursiveFolderTests
         Assert.All(fixture.Batch.Items, item => Assert.Null(item.ApprovedPlan));
         Assert.False(fixture.Batch.HasReview);
         Assert.Same(origin, folderItem.Snapshot.FolderOrigin);
-        ApproveItems(fixture);
+        await ApproveItemsAsync(fixture);
         await fixture.Batch.ReviewCommand.ExecuteAsync(null);
         var unchanged = fixture.Session.Snapshot;
         await fixture.Batch.ChooseOutputCommand.ExecuteAsync(null);
@@ -154,11 +154,11 @@ public sealed class BatchRecursiveFolderTests
         fixture.Batch.SelectedItem = item;
         item.Tracks.Single(track => track.Track.Kind == TrackKind.Subtitles).Keep = false;
         item.OutputPath = Path.Combine(Path.GetTempPath(), "manual separate episode.mkv");
-        fixture.Batch.ApproveSelectedCommand.Execute(null);
+        await fixture.Batch.ReviewCommand.ExecuteAsync(null);
         Assert.Null(item.ApprovedPlan!.OutputDirectoryRoot);
         item.OutputPath = Path.Combine(fixture.Batch.OutputFolder, "manual season", "different episode.mkv");
         Assert.Null(item.ApprovedPlan);
-        fixture.Batch.ApproveSelectedCommand.Execute(null);
+        await fixture.Batch.ReviewCommand.ExecuteAsync(null);
         Assert.Equal(fixture.Batch.OutputFolder, item.ApprovedPlan!.OutputDirectoryRoot);
         Assert.Equal(item.OutputPath, item.ApprovedPlan.DestinationPath);
         Assert.Empty(fixture.Backend.RemuxRequests);
@@ -266,14 +266,15 @@ public sealed class BatchRecursiveFolderTests
     }
 
     /// <summary>Approves one intentional subtitle removal from each file's actual local inspection.</summary>
-    private static void ApproveItems(BatchViewModelFixture fixture)
+    private static async Task ApproveItemsAsync(BatchViewModelFixture fixture)
     {
         foreach (var item in fixture.Batch.Items)
         {
             fixture.Batch.SelectedItem = item;
             item.Tracks.Single(track => track.Track.Kind == TrackKind.Subtitles).Keep = false;
-            fixture.Batch.ApproveSelectedCommand.Execute(null);
-            Assert.NotNull(item.ApprovedPlan);
         }
+
+        await fixture.Batch.ReviewCommand.ExecuteAsync(null);
+        Assert.All(fixture.Batch.Items, item => Assert.NotNull(item.ApprovedPlan));
     }
 }

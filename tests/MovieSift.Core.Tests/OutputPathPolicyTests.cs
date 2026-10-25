@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using MovieSift.Core.Failures;
 using MovieSift.Core.Media;
 using MovieSift.Core.Planning;
@@ -77,14 +78,16 @@ public sealed class OutputPathPolicyTests
     public void PlanCannotAuthorizeDirectoryCreationOutsideItsOutputRoot()
     {
         MediaInspection inspection = new(new("source.mkv", "source", 1, 1), new("mkvmerge", "102.0", 20),
-            [], [], "", false, false);
+            [new(0, 1, TrackKind.Video, "video", "eng", "en", "", null, true, false, true, ImmutableDictionary<string, string>.Empty),
+             new(1, 2, TrackKind.Subtitles, "text", "eng", "en", "", null, false, false, true, ImmutableDictionary<string, string>.Empty)],
+            [], "", false, false);
         var inside = Path.Combine(Root, "Season 1", "episode.trimmed.mkv");
-        var accepted = PlanBuilder.Build(new(inspection, [], inside, false, Root));
+        var accepted = PlanBuilder.Build(new(inspection, [0], inside, false, Root));
         Assert.Equal(Root, accepted.Plan?.OutputDirectoryRoot);
-        var escaped = PlanBuilder.Build(new(inspection, [], Root + " sibling.mkv", false, Root));
+        var escaped = PlanBuilder.Build(new(inspection, [0], Root + " sibling.mkv", false, Root));
         Assert.Equal(ErrorCode.InvalidDestination, escaped.Failure?.Code);
-        var rootItself = PlanBuilder.Build(new(inspection, [], Root, false, Root));
+        var rootItself = PlanBuilder.Build(new(inspection, [0], Root, false, Root));
         Assert.Equal(ErrorCode.InvalidDestination, rootItself.Failure?.Code);
-        Assert.True(PlanBuilder.Build(new(inspection, [], "ordinary-output.mkv", false)).IsSuccess);
+        Assert.True(PlanBuilder.Build(new(inspection, [0], "ordinary-output.mkv", false)).IsSuccess);
     }
 }

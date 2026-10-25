@@ -74,13 +74,13 @@ public sealed class BatchFolderProvenanceTests
         {
             var destination = OutputPathPolicy.DeriveFolderDestination(new(outputRoot, item.FolderOrigin!.RelativePath));
             Assert.Null(destination.Failure);
-            var plan = PlanBuilder.Build(new(item.Inspection!, item.Inspection!.Tracks
-                .Where(track => track.Kind != TrackKind.Subtitles).Select(track => track.Id).ToArray(),
-                destination.DestinationPath!, false, outputRoot)).Plan!;
-            Assert.True(harness.Session.ApprovePlan(new(item.Id, plan)).Applied);
+            var retained = item.Inspection!.Tracks.Where(track => track.Kind != TrackKind.Subtitles)
+                .Select(track => track.Id).ToImmutableArray();
+            Assert.True(harness.Session.SetSelection(new(item.Id, retained)).Applied);
+            Assert.True(harness.Session.SetDestination(new(item.Id, destination.DestinationPath!, outputRoot)).Applied);
         }
 
-        var review = await harness.Coordinator.ReviewAsync(TestContext.Current.CancellationToken);
+        var review = await harness.Coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken));
 
         Assert.Null(review.Review);
         Assert.Equal(2, review.ItemFailures.Length);
@@ -98,13 +98,11 @@ public sealed class BatchFolderProvenanceTests
         var before = harness.Session.Snapshot;
         var item = Assert.Single(before.Items);
         var outputRoot = Path.Combine(Path.GetTempPath(), "unapproved output root");
-        var plan = PlanBuilder.Build(new(item.Inspection!, item.CurrentRetainedTrackIds,
-            Path.Combine(outputRoot, "nested", "episode.trimmed.mkv"), false, outputRoot)).Plan!;
-
-        var result = harness.Session.ApprovePlan(new(item.Id, plan));
+        var destination = Path.Combine(outputRoot, "nested", "episode.trimmed.mkv");
+        var result = harness.Session.SetDestination(new(item.Id, destination, outputRoot));
 
         Assert.False(result.Applied);
-        Assert.Equal(ErrorCode.StalePlan, result.Failure!.Code);
+        Assert.Equal(ErrorCode.InvalidDestination, result.Failure!.Code);
         Assert.Same(before, harness.Session.Snapshot);
         Assert.Empty(harness.RemuxedPaths);
     }

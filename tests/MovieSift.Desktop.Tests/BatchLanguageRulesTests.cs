@@ -27,7 +27,6 @@ public sealed class BatchLanguageRulesTests
         try
         {
             await fixture.LoadAsync();
-            ApproveAll(fixture);
             await fixture.Batch.ReviewCommand.ExecuteAsync(null);
             var before = fixture.Session.Snapshot;
             var plans = fixture.Batch.Items.Select(item => item.ApprovedPlan).ToArray();
@@ -72,7 +71,6 @@ public sealed class BatchLanguageRulesTests
             Assert.Equal([0, 2], fixture.Session.Snapshot.Items[0].CurrentRetainedTrackIds);
             Assert.Equal([8, 61], fixture.Session.Snapshot.Items[1].CurrentRetainedTrackIds);
             Assert.True(rules.IsStale);
-            ApproveAll(fixture);
             await fixture.Batch.ReviewCommand.ExecuteAsync(null);
             Assert.True(fixture.Batch.RunCommand.CanExecute(null));
             await fixture.Batch.RunCommand.ExecuteAsync(null);
@@ -92,7 +90,6 @@ public sealed class BatchLanguageRulesTests
         var fixture = CreateLanguageFixture();
         await fixture.PrepareAsync();
         fixture.Batch.Items[1].Tracks.Single(track => track.Track.Id == 25).Keep = false;
-        ApproveAll(fixture);
         await fixture.Batch.ReviewCommand.ExecuteAsync(null);
         var before = fixture.Session.Snapshot;
         var rules = fixture.Batch.LanguageRules;
@@ -213,7 +210,7 @@ public sealed class BatchLanguageRulesTests
 
         first.ZeroAudioConfirmed = true;
         fixture.Batch.SelectedItem = first;
-        fixture.Batch.ApproveSelectedCommand.Execute(null);
+        await fixture.Batch.ReviewCommand.ExecuteAsync(null);
         Assert.NotNull(first.ApprovedPlan);
         var rules = fixture.Batch.LanguageRules;
         rules.SubtitleRuleEnabled = true;
@@ -223,11 +220,12 @@ public sealed class BatchLanguageRulesTests
         Assert.Equal([0], Kept(fixture, 0));
         Assert.False(first.ZeroAudioConfirmed);
         Assert.Null(first.ApprovedPlan);
-        fixture.Batch.ApproveSelectedCommand.Execute(null);
+        await fixture.Batch.ReviewCommand.ExecuteAsync(null);
         Assert.Null(first.ApprovedPlan);
-        Assert.Equal(fixture.Localization["ErrorZeroAudioConfirmationRequired"], first.ErrorText);
+        Assert.Equal(fixture.Localization["ErrorZeroAudioConfirmationRequired"],
+            Assert.Single(fixture.Batch.ReviewRows, row => row.Item.Id == first.Id).FailureText);
         first.ZeroAudioConfirmed = true;
-        fixture.Batch.ApproveSelectedCommand.Execute(null);
+        await fixture.Batch.ReviewCommand.ExecuteAsync(null);
         Assert.NotNull(first.ApprovedPlan);
         Assert.Empty(fixture.Backend.RemuxRequests);
     }
@@ -244,7 +242,6 @@ public sealed class BatchLanguageRulesTests
             Tracks = inspection.Tracks.Select(track => track.Id == 1 ? track with { Language = "und", LanguageIetf = "und" } : track).ToImmutableArray()
         };
         await fixture.LoadAsync();
-        ApproveAll(fixture);
         await fixture.Batch.ReviewCommand.ExecuteAsync(null);
         var manuallyApproved = fixture.Batch.Items[0].ApprovedPlan;
         ConfigureRules(fixture);
@@ -339,15 +336,6 @@ public sealed class BatchLanguageRulesTests
         rules.SubtitleLanguages = "eng";
     }
 
-    /// <summary>Approves each current editor independently without applying any cross-file IDs.</summary>
-    private static void ApproveAll(BatchViewModelFixture fixture)
-    {
-        foreach (var item in fixture.Batch.Items.Where(item => item.Included))
-        {
-            fixture.Batch.SelectedItem = item;
-            fixture.Batch.ApproveSelectedCommand.Execute(null);
-        }
-    }
 
     /// <summary>Reads observed Keep choices from one current file editor.</summary>
     private static IEnumerable<int> Kept(BatchViewModelFixture fixture, int index) =>

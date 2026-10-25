@@ -239,27 +239,6 @@ public sealed class BatchItemViewModel : ObservableObject
         Refresh();
     }
 
-    /// <summary>Snapshots only the current file's IDs and explicit zero-audio consent.</summary>
-    public void Approve()
-    {
-        if (!CanEditPlan || item.Inspection is null)
-        {
-            return;
-        }
-
-        var identifiers = Tracks.Where(track => track.Keep).Select(track => track.Track.Id).ToArray();
-        var result = PlanBuilder.Build(new(item.Inspection, identifiers, OutputPath, ZeroAudioConfirmed, outputDirectoryRoot));
-        planningFailure = result.Failure;
-
-        if (result.Plan is { } plan)
-        {
-            planningFailure = options.Session.ApprovePlan(new(Id, plan)).Failure;
-        }
-
-        Refresh();
-        options.Changed();
-    }
-
     /// <summary>Applies an explicit shared-folder change only to items that can still be planned.</summary>
     public void ApplyOutputFolder(string folder)
     {
