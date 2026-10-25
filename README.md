@@ -2,7 +2,11 @@
 
 MovieSift removes unwanted embedded audio and subtitle tracks from local **MKV and supported MP4** files without re-encoding. It creates a separate `.trimmed.mkv` or `.trimmed.mp4` copy and leaves the original untouched. Keeping both files does not free the original's disk space.
 
-The proposed version is **0.1.0-rc.1**. The implementation and MovieSift rename are integrated; there is no public release/tag. Earlier downloadable candidate sets are historical and retain their original names and binary identities. Current development checks do not establish clean Windows 11 or Ubuntu Desktop acceptance. See the [release checklist](docs/release-checklist.md) before distributing a build.
+[**MovieSift 0.1.0-rc.1**](https://github.com/Nexusov/MovieSift/releases/tag/v0.1.0-rc.1) is the first public **Pre-release**, for evaluation rather than a fully accepted stable release. Its frozen binary source is `a0ea505a6275f3b89e7b08ac4e6a7ae058c6ca5a`.
+
+**Portable downloads:** [Windows x64 ZIP](https://github.com/Nexusov/MovieSift/releases/download/v0.1.0-rc.1/MovieSift-win-x64.zip) · [Linux x64 tar.gz](https://github.com/Nexusov/MovieSift/releases/download/v0.1.0-rc.1/MovieSift-linux-x64.tar.gz). Extract the complete archive into a new writable folder, then launch `MovieSift.exe` on Windows or `./MovieSift` on Linux. No separately installed .NET or media tools are required; Linux still needs the documented [OS native libraries](docs/SUPPORTED_FORMATS.md#platform-and-native-requirements).
+
+[Windows matching materials](https://github.com/Nexusov/MovieSift/releases/download/v0.1.0-rc.1/MovieSift-win-x64-materials-a0ea505a6275.tar.gz), [Linux matching materials](https://github.com/Nexusov/MovieSift/releases/download/v0.1.0-rc.1/MovieSift-linux-x64-materials-a0ea505a6275.tar.gz), inventories, summaries and [SHA256SUMS](https://github.com/Nexusov/MovieSift/releases/download/v0.1.0-rc.1/SHA256SUMS) accompany the binaries. Current automated checks do not establish clean Windows 11 or Ubuntu Desktop, native visual/scaling or the recorded cancellation/close/warning acceptance gaps. See the [release checklist](docs/release-checklist.md).
 
 ## Remove tracks
 
@@ -56,4 +60,4 @@ Both required CI jobs run locked restore, formatting, Release build, mandatory r
 
 Portable targets are self-contained `MovieSift-win-x64.zip` and `MovieSift-linux-x64.tar.gz`, without an application installer or user-installed .NET/media tools. Declared desktop targets remain **Windows 11 x64 25H2** and **Ubuntu 24.04 x64 Desktop/X11-XWayland**; see [native requirements](docs/SUPPORTED_FORMATS.md#platform-and-native-requirements). Windows 10 observations, hosted runners and Linux container checks retain their actual scope.
 
-Original MovieSift code is [MIT](LICENSE), copyright (c) 2026 Nexusov. Bundled components retain their own [notices](THIRD_PARTY_NOTICES.md) and [distribution requirements](docs/verification/release-distribution-closure.md). Matching source/build-material delivery, deferred desktop acceptance and final publication review remain release requirements. No running-application downloads, telemetry or auto-updates are introduced.
+Original MovieSift code is [MIT](LICENSE), copyright (c) 2026 Nexusov. Bundled components retain their own [notices](THIRD_PARTY_NOTICES.md) and [distribution requirements](docs/verification/release-distribution-closure.md). This RC publishes its exact matching source/build materials alongside the binaries. Deferred desktop acceptance remains recorded; a stable release requires its own final review. No running-application downloads, telemetry or auto-updates are introduced.
