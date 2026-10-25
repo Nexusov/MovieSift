@@ -121,7 +121,7 @@ public static class LanguageRuleMatcher
     }
 
     /// <summary>Requires a known legacy code before accepting an authoritative, primary-consistent IETF tag.</summary>
-    private static ParsedLanguageTag ReadTrackLanguage(MediaTrack track)
+    internal static ParsedLanguageTag ReadTrackLanguage(MediaTrack track)
     {
         var legacy = LanguageRuleTagParser.ParsePlain(track.Language);
 

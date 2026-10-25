@@ -38,7 +38,7 @@ public sealed class RulePresetCatalogInitializationTests
             Assert.Equal(fixture.Localization["PresetErrorInvalidCatalog"], presets.ErrorText);
             Assert.Contains(view.GetVisualDescendants().OfType<TextBlock>(), text => text.IsVisible && text.Text == presets.ErrorText);
             Assert.False(fixture.Main.PersistenceFailed);
-            Assert.True(fixture.Main.OpenSourceCommand.CanExecute(null));
+            Assert.True(fixture.Batch.AddFilesCommand.CanExecute(null));
             Assert.True(editor.CanConfigure);
             editor.AudioRuleEnabled = true;
             editor.AudioLanguages = "en";

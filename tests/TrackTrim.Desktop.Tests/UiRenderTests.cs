@@ -5,8 +5,10 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using Serilog;
+using TrackTrim.Application.Batches;
 using TrackTrim.Application.Inspection;
 using TrackTrim.Application.Jobs;
+using TrackTrim.Application.Presets;
 using TrackTrim.Core.Media;
 using TrackTrim.Desktop.Localization;
 using TrackTrim.Desktop.ViewModels;
@@ -52,19 +54,21 @@ public sealed class UiRenderTests
             var viewModel = usesRealMedia ? CreateRealViewModel(new(sourcePath!, toolDirectory!, scratchDirectory, logger)) : new ViewModelFixture().ViewModel;
             window = new MainWindow { DataContext = viewModel, Width = width, Height = height };
             window.Show();
-            await viewModel.OpenSourceCommand.ExecuteAsync(null);
-            Assert.False(viewModel.HasError, viewModel.ErrorDetail);
-            Assert.True(viewModel.HasTracks);
-            viewModel.OutputPath = Path.Combine(scratchDirectory, "result.trimmed.mkv");
-            var removableTrack = viewModel.Tracks.First(track => track.Track.Kind == TrackKind.Audio);
+            await viewModel.Batch.Recovery.InitializeAsync();
+            await viewModel.Batch.AddFilesCommand.ExecuteAsync(null);
+            var item = Assert.Single(viewModel.Batch.Items);
+            Assert.False(item.HasError, item.ErrorReasonText);
+            Assert.True(item.HasTracks);
+            item.OutputPath = Path.Combine(scratchDirectory, "result.trimmed.mkv");
+            var removableTrack = item.Tracks.First(track => track.Track.Kind == TrackKind.Audio);
             removableTrack.Keep = false;
-            viewModel.ReviewPlanCommand.Execute(null);
+            await viewModel.Batch.ReviewCommand.ExecuteAsync(null);
             await viewModel.ChangeLanguageCommand.ExecuteAsync(language);
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
-            var scrollViewer = window.FindControl<ScrollViewer>("MainScrollViewer")!;
+            var scrollViewer = window.FindControl<BatchView>("Workspace")!.FindControl<ScrollViewer>("WorkspaceScrollViewer")!;
             Assert.True(scrollViewer.Extent.Width <= scrollViewer.Viewport.Width + LayoutTolerance);
-            Assert.True(viewModel.HasPlan, viewModel.ErrorDetail);
+            Assert.True(item.HasPlan, item.ErrorReasonText);
 
             if (!string.IsNullOrWhiteSpace(renderDirectory))
             {
@@ -94,8 +98,8 @@ public sealed class UiRenderTests
                     Language = language,
                     WindowWidth = width,
                     WindowHeight = height,
-                    TrackCount = viewModel.Tracks.Count,
-                    Backend = viewModel.BackendDescription
+                    TrackCount = item.Tracks.Count,
+                    Backend = item.Snapshot.Inspection!.Backend.Name
                 };
                 await File.WriteAllTextAsync($"{prefix}.json", JsonSerializer.Serialize(evidence, new JsonSerializerOptions { WriteIndented = true }));
             }
@@ -117,7 +121,13 @@ public sealed class UiRenderTests
             Path.Combine(request.ToolDirectory, $"mkvextract{executableExtension}"), IsDevelopmentOverride: true);
         var backend = new MkvBackend(new(sourceAccess, paths));
         var outputs = new OwnedOutputStore(request.DataDirectory);
-        return new(new(new InspectionService(backend, sourceAccess), new JobCoordinator(backend, sourceAccess, outputs),
-            new PortableSettingsStore(request.DataDirectory), outputs, new FakeDialogs(request.SourcePath), new LocalizationService(), true, request.Log));
+        var localization = new LocalizationService();
+        var session = new BatchSession();
+        var coordinator = new BatchCoordinator(session, new InspectionService(backend, sourceAccess),
+            new JobCoordinator(backend, sourceAccess, outputs), sourceAccess);
+        var workspace = new BatchViewModel(new(session, coordinator, new FileBatchInputDiscovery(sourceAccess, outputs, [request.DataDirectory]),
+            new FakeDialogs(request.SourcePath), localization, true, request.Log,
+            new RulePresetService(new BatchUiPresetStore()), new BatchUiQueueListStore()));
+        return new(new(new PortableSettingsStore(request.DataDirectory), outputs, localization, true, request.Log, workspace));
     }
 }

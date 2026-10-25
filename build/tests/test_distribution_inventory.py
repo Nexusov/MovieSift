@@ -276,6 +276,21 @@ class DistributionInventoryTests(unittest.TestCase):
         self.assertEqual(records["LICENSE"]["category"], "original-or-generated-project-output")
         self.assertFalse(report["redistributionReady"])
 
+    def test_filee_adaptation_notice_is_bound_to_reference_bytes(self):
+        """Keep the adapted style copyright separate from original TrackTrim documentation."""
+        notice = Path(__file__).parents[2] / "docs/third-party/Filee-LICENSE.txt"
+        self.write("docs/third-party/Filee-LICENSE.txt", notice.read_bytes())
+        self.pack()
+        report = self.generate()
+        record = next(item for item in report["files"] if item["path"] == "docs/third-party/Filee-LICENSE.txt")
+        self.assertEqual(record["category"], "third-party-notice")
+        self.assertEqual(record["sha256"], INVENTORY.file_hash(notice))
+        self.write("docs/third-party/Filee-LICENSE.txt", b"truncated notice")
+        self.pack()
+
+        with self.assertRaisesRegex(ValueError, "Filee"):
+            self.generate()
+
     def test_missing_application_license_is_rejected(self):
         """Manifest coverage cannot excuse a package without its operative license."""
         (self.root / "LICENSE").unlink()

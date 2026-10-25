@@ -3,6 +3,7 @@ using TrackTrim.Application.Batches;
 using TrackTrim.Application.Inspection;
 using TrackTrim.Application.Jobs;
 using TrackTrim.Application.Presets;
+using TrackTrim.Desktop.Appearance;
 using TrackTrim.Desktop.Interaction;
 using TrackTrim.Desktop.Localization;
 using TrackTrim.Desktop.ViewModels;
@@ -50,8 +51,9 @@ internal static class AppBootstrap
             new BatchCoordinator(batch, new InspectionService(backend, sourceAccess), jobs, sourceAccess),
             new FileBatchInputDiscovery(sourceAccess, outputs, [dataDirectory]), dialogs, localization, dataWritable, logger,
             new RulePresetService(new PortableRulePresetStore(dataDirectory)), new PortableQueueListStore(dataDirectory)));
-        window.DataContext = new MainViewModel(new(new InspectionService(backend, sourceAccess),
-            jobs, settings, outputs, dialogs, localization, dataWritable, logger, batchViewModel));
+        var appearance = new AppearanceViewModel(new(new PortableAppearanceStore(dataDirectory), localization,
+            new AppearanceApplier(Avalonia.Application.Current!)));
+        window.DataContext = new MainViewModel(new(settings, outputs, localization, dataWritable, logger, batchViewModel, appearance));
         window.Closed += (_, _) => logger.Dispose();
         return window;
     }

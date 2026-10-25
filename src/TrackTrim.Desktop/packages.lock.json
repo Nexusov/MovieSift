@@ -13,6 +13,16 @@
           "MicroCom.Runtime": "0.11.6"
         }
       },
+      "Avalonia.Controls.ColorPicker": {
+        "type": "Direct",
+        "requested": "[12.1.4, )",
+        "resolved": "12.1.4",
+        "contentHash": "3MX5FRPqA1ilB9+FTnxuMluH9Q4hFuTBprPMQtM4fVRwlgdrscsnoKrOR1HAQR1GC9QumZ5il1x5+RbX0wyTvA==",
+        "dependencies": {
+          "Avalonia": "12.1.4",
+          "Avalonia.Remote.Protocol": "12.1.4"
+        }
+      },
       "Avalonia.Desktop": {
         "type": "Direct",
         "requested": "[12.1.4, )",
@@ -213,7 +223,7 @@
       "tracktrim.application": {
         "type": "Project",
         "dependencies": {
-          "TrackTrim.Core": "[1.0.0, )"
+          "TrackTrim.Core": "[0.1.0-rc.1, )"
         }
       },
       "tracktrim.core": {
@@ -222,8 +232,8 @@
       "tracktrim.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "TrackTrim.Application": "[1.0.0, )",
-          "TrackTrim.Core": "[1.0.0, )"
+          "TrackTrim.Application": "[0.1.0-rc.1, )",
+          "TrackTrim.Core": "[0.1.0-rc.1, )"
         }
       }
     },

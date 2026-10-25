@@ -51,3 +51,7 @@ Only OS runtime dependencies are allowed: Windows OS/UCRT/API-set DLLs, or Linux
 - Recheck bundled runtime/tool security updates before releasing and rebuild when the self-contained runtime changes.
 
 The current scripts and recorded upstream links improve provenance but do not declare these outstanding steps complete. Do not publish release assets until they are resolved.
+
+## Filee Soft appearance reference
+
+TrackTrim’s Soft styles and render-only interaction timing are adapted from the MIT-licensed Filee visual reference at commit `e830916e7f02526bff6b7576edc22e51ecf9c126` ([source](https://github.com/KnifeLemon/Filee/tree/e830916e7f02526bff6b7576edc22e51ecf9c126)). Copyright (c) 2026 Myeonggu Kim (KnifeLemon) and Filee contributors. The complete [MIT notice](docs/third-party/Filee-LICENSE.txt) is included with the source and portable documentation. The palette validation, appearance storage and TrackTrim workflow remain TrackTrim implementations; no Filee conversion architecture, fonts or unrelated assets are bundled.

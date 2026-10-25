@@ -539,6 +539,14 @@ def classify(records, origins, components, tool_lock, profile):
                 record.update(category="generated-build-material", origin="build/acquire-tools.ps1 and build/tools.lock.json")
             continue
 
+        if name == "docs/third-party/Filee-LICENSE.txt":
+            notice = Path(__file__).parents[1] / name
+            if record["sha256"].lower() != file_hash(notice).lower():
+                raise ValueError("The adapted Filee Soft notice differs from the repository notice")
+            record.update(category="third-party-notice", component="Filee Soft visual reference",
+                          origin="Filee e830916e7f02526bff6b7576edc22e51ecf9c126; MIT notice for adapted styles/motion")
+            continue
+
         original = name.startswith("TrackTrim") or name.startswith("docs/") or name == "ru/TrackTrim.resources.dll" or name in {
             "LICENSE", "README.md", "CONTRIBUTING.md", "THIRD_PARTY_NOTICES.md", "portable.flag", "SHA256SUMS",
             "build-provenance.json", "tool-provenance.json", "ffmpeg-provenance.json", "mkv-source-provenance.json", "native-dependencies.txt",

@@ -265,9 +265,9 @@ public sealed class BatchLanguageRulesTests
         Assert.Empty(fixture.Backend.RemuxRequests);
     }
 
-    /// <summary>Disables rule operations while the shared workspace is owned by a single-file inspection.</summary>
+    /// <summary>Disables rule operations while the shared workspace is owned by an input-discovery operation.</summary>
     [AvaloniaFact]
-    public async Task ConflictingSingleFileWorkDisablesRulePreviewAndApplication()
+    public async Task ActiveDiscoveryDisablesRulePreviewAndApplication()
     {
         var fixture = CreateLanguageFixture();
         await fixture.LoadAsync();
@@ -278,12 +278,13 @@ public sealed class BatchLanguageRulesTests
         var snapshot = fixture.Session.Snapshot;
         var entered = BatchViewModelFixture.Signal();
         var release = BatchViewModelFixture.Signal();
-        fixture.Backend.OnInspect = async request =>
+        fixture.Discovery.OnDiscover = async request =>
         {
             entered.TrySetResult();
             await release.Task.WaitAsync(request.CancellationToken);
+            return new([], []);
         };
-        var work = fixture.Main.OpenSourceCommand.ExecuteAsync(null);
+        var work = fixture.Batch.AddFilesCommand.ExecuteAsync(null);
 
         try
         {

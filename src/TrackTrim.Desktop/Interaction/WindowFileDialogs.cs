@@ -9,18 +9,6 @@ namespace TrackTrim.Desktop.Interaction;
 /// <summary>Uses the active window's native storage provider for local paths.</summary>
 public sealed class WindowFileDialogs(WindowFileDialogsOptions options) : IFileDialogs
 {
-    /// <summary>Prompts for one local candidate whose actual container is inspected afterward.</summary>
-    public async Task<string?> SelectSourceAsync()
-    {
-        var files = await options.Window.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
-        {
-            Title = options.Localization["FileDialogTitle"],
-            AllowMultiple = false,
-            FileTypeFilter = [MediaFileType()]
-        });
-        return files.FirstOrDefault() is { } file ? RequireLocalPath(file, ErrorCode.InvalidSource) : null;
-    }
-
     /// <summary>Prompts for independently inspected local MKV/MP4 files.</summary>
     public async Task<IReadOnlyList<string>> SelectSourcesAsync()
     {

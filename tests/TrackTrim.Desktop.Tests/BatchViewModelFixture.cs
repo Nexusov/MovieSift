@@ -8,6 +8,7 @@ using TrackTrim.Application.Ports;
 using TrackTrim.Application.Presets;
 using TrackTrim.Core.Failures;
 using TrackTrim.Core.Media;
+using TrackTrim.Desktop.Appearance;
 using TrackTrim.Desktop.Interaction;
 using TrackTrim.Desktop.Localization;
 using TrackTrim.Desktop.ViewModels;
@@ -15,7 +16,7 @@ using Xunit;
 
 namespace TrackTrim.Desktop.Tests;
 
-/// <summary>Composes the actual batch and single workflow owners with file-specific deterministic UI ports.</summary>
+/// <summary>Composes the actual unified workspace owner with file-specific deterministic UI ports.</summary>
 internal sealed class BatchViewModelFixture
 {
     public static readonly TimeSpan TestTimeout = TimeSpan.FromSeconds(10);
@@ -29,22 +30,24 @@ internal sealed class BatchViewModelFixture
     public BatchUiDialogs Dialogs { get; }
     public BatchUiDiscovery Discovery { get; }
     public BatchCoordinator Coordinator { get; }
+    public BatchUiSourceAccess SourceAccess { get; }
     public BatchViewModel Batch { get; }
     public MainViewModel Main { get; }
+    public AppearanceViewModel Appearance { get; }
     public Task QueueInitialization { get; }
 
-    /// <summary>Shares one job coordinator while keeping single and batch inspection revisions independent.</summary>
+    /// <summary>Shares one job coordinator for every file in the unified workspace.</summary>
     public BatchViewModelFixture(IRulePresetStore? presetStore = null, IQueueListStore? queueStore = null, bool initializeQueue = true)
     {
         Dialogs = new(Backend.Inspections.Keys.ToArray());
         Discovery = new(Backend.Inspections.Values.Select(inspection => inspection.Source).ToImmutableArray());
-        var sourceAccess = new BatchUiSourceAccess(Backend);
-        var jobs = new JobCoordinator(Backend, sourceAccess, Outputs);
-        Coordinator = new(Session, new InspectionService(Backend, sourceAccess), jobs, sourceAccess);
+        SourceAccess = new(Backend);
+        var jobs = new JobCoordinator(Backend, SourceAccess, Outputs);
+        Coordinator = new(Session, new InspectionService(Backend, SourceAccess), jobs, SourceAccess);
         var logger = new LoggerConfiguration().CreateLogger();
         Batch = new(new(Session, Coordinator, Discovery, Dialogs, Localization, true, logger, new(presetStore ?? PresetStore), queueStore ?? QueueStore));
-        Main = new(new(new InspectionService(Backend, sourceAccess), jobs, Settings, Outputs, Dialogs,
-            Localization, true, logger, Batch));
+        Appearance = new(new(new WorkspaceAppearanceStore(), Localization, new AppearanceApplier(Avalonia.Application.Current)));
+        Main = new(new(Settings, Outputs, Localization, true, logger, Batch, Appearance));
 
         QueueInitialization = initializeQueue ? Batch.Recovery.InitializeAsync() : Task.CompletedTask;
     }
@@ -91,9 +94,6 @@ internal sealed class BatchUiDialogs(IReadOnlyList<string> sources) : IFileDialo
     public string? OutputFolder { get; set; } = Path.Combine(Path.GetTempPath(), "TrackTrim batch UI output");
     public int InputFolderRequests { get; private set; }
 
-    /// <summary>Returns the single workflow's independent source selection.</summary>
-    public Task<string?> SelectSourceAsync() => Task.FromResult(Sources.FirstOrDefault());
-
     /// <summary>Returns the controlled explicit batch addition.</summary>
     public Task<IReadOnlyList<string>> SelectSourcesAsync() => Task.FromResult(Sources);
 
@@ -133,6 +133,7 @@ internal sealed class BatchUiDiscovery(ImmutableArray<SourceRevision> sources) :
 /// <summary>Keeps candidate validation stable while preserving each source's actual fake identity.</summary>
 internal sealed class BatchUiSourceAccess(BatchUiBackend backend) : ISourceAccess
 {
+    public Func<ValidateDestinationRequest, Task>? OnValidateDestination { get; set; }
     /// <summary>Returns matching per-file revisions or the synthetic owned candidate revision.</summary>
     public Task<SourceRevision> ReadRevisionAsync(SourceRequest request)
     {
@@ -153,7 +154,7 @@ internal sealed class BatchUiSourceAccess(BatchUiBackend backend) : ISourceAcces
     public Task ValidateDestinationAsync(ValidateDestinationRequest request)
     {
         request.CancellationToken.ThrowIfCancellationRequested();
-        return Task.CompletedTask;
+        return OnValidateDestination?.Invoke(request) ?? Task.CompletedTask;
     }
 }
 

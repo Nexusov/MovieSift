@@ -48,7 +48,7 @@
   <data name="InspectionReady" xml:space="preserve"><value>Дорожки загружены. Выберите аудио и субтитры для сохранения.</value></data>
   <data name="PlanReady" xml:space="preserve"><value>План готов к выполнению.</value></data>
   <data name="PlanInvalidated" xml:space="preserve"><value>План изменился. Проверьте его повторно перед обработкой.</value></data>
-  <data name="NoChange" xml:space="preserve"><value>Дорожки не удаляются. Новый файл не требуется; обработка не запускалась.</value></data>
+  <data name="NoChange" xml:space="preserve"><value>Изменений дорожек нет. Новая копия и обработка не требуются.</value></data>
   <data name="Checking" xml:space="preserve"><value>Проверка исходного файла и пути результата…</value></data>
   <data name="Remuxing" xml:space="preserve"><value>Копирование выбранных потоков…</value></data>
   <data name="Verifying" xml:space="preserve"><value>Проверка временного результата…</value></data>
@@ -140,22 +140,22 @@
   <data name="ErrorReasonSegmentStructure" xml:space="preserve"><value>Структуру Segment Info невозможно проверить в поддерживаемых пределах. Выберите самостоятельный MKV с конечными размерами элементов; потоковые кластеры и несколько сегментов не поддерживаются.</value></data>
   <data name="SingleWorkflow" xml:space="preserve"><value>Один файл</value></data>
   <data name="BatchWorkflow" xml:space="preserve"><value>Несколько файлов / папка</value></data>
-  <data name="BatchInstructions" xml:space="preserve"><value>Добавьте MKV/MP4 или одну папку. При необходимости включите вложенные папки. Проверьте и подтвердите отдельный план каждого файла, выберите пути результатов, затем проверьте очередь.</value></data>
+  <data name="BatchInstructions" xml:space="preserve"><value>Добавьте один или несколько MKV/MP4 либо папку. Выберите дорожки включённых файлов и назначения, затем проверьте отдельные планы перед запуском.</value></data>
   <data name="BatchLimits" xml:space="preserve"><value>Ограничения: {0} файлов в очереди; {1} просмотренных записей за весь обход папки. При превышении добавление отклоняется целиком.</value></data>
-  <data name="BatchAddFiles" xml:space="preserve"><value>Добавить MKV / MP4…</value></data>
+  <data name="BatchAddFiles" xml:space="preserve"><value>Добавить файлы…</value></data>
   <data name="BatchAddFolder" xml:space="preserve"><value>Добавить папку…</value></data>
-  <data name="BatchFilesDialogTitle" xml:space="preserve"><value>Выберите MKV/MP4 для отдельных планов</value></data>
+  <data name="BatchFilesDialogTitle" xml:space="preserve"><value>Выберите один или несколько файлов MKV/MP4</value></data>
   <data name="BatchFolderDialogTitle" xml:space="preserve"><value>Выберите одну папку с MKV/MP4</value></data>
-  <data name="BatchFiles" xml:space="preserve"><value>Файлы очереди (полные пути)</value></data>
-  <data name="BatchInclusionHint" xml:space="preserve"><value>У каждого включённого файла должен быть подтверждённый план. Явно исключите или удалите ненужные и ошибочные записи; исключения показаны в обзоре.</value></data>
+  <data name="BatchFiles" xml:space="preserve"><value>Исходные файлы</value></data>
+  <data name="BatchInclusionHint" xml:space="preserve"><value>Включённые файлы проверяются вместе. Исправьте или явно исключите нерешённые файлы.</value></data>
   <data name="BatchInclude" xml:space="preserve"><value>Включить файл</value></data>
-  <data name="BatchSummary" xml:space="preserve"><value>Файлов: {0} · включено: {1} · завершено: {2}</value></data>
-  <data name="BatchRemove" xml:space="preserve"><value>Удалить выбранную незапущенную запись</value></data>
+  <data name="BatchSummary" xml:space="preserve"><value>Файлов: {0} · включено: {1} · завершено: {2}</value></data>
+  <data name="BatchRemove" xml:space="preserve"><value>Убрать из списка</value></data>
   <data name="BatchInspectPending" xml:space="preserve"><value>Проверить ожидающие файлы</value></data>
-  <data name="BatchInspectSelected" xml:space="preserve"><value>Повторно проверить выбранный файл</value></data>
-  <data name="BatchSelectedFile" xml:space="preserve"><value>Отдельный выбор дорожек файла</value></data>
+  <data name="BatchInspectSelected" xml:space="preserve"><value>Проверить файл заново</value></data>
+  <data name="BatchSelectedFile" xml:space="preserve"><value>Выбор дорожек отдельного файла</value></data>
   <data name="BatchApproveItem" xml:space="preserve"><value>Подтвердить план этого файла</value></data>
-  <data name="BatchReviewRemaining" xml:space="preserve"><value>Проверить оставшуюся очередь</value></data>
+  <data name="BatchReviewRemaining" xml:space="preserve"><value>Проверить изменения</value></data>
   <data name="BatchReviewedPlans" xml:space="preserve"><value>Проверенные неизменяемые планы к запуску</value></data>
   <data name="BatchExcluded" xml:space="preserve"><value>Явно исключённые файлы (не будут запущены)</value></data>
   <data name="BatchStart" xml:space="preserve"><value>Запустить / продолжить проверенные планы</value></data>
@@ -167,29 +167,29 @@
   <data name="BatchCancel" xml:space="preserve"><value>Отменить очередь</value></data>
   <data name="BatchExplicitResume" xml:space="preserve"><value>Решение по предупреждению не запускает следующий файл. Проверьте оставшуюся очередь и явно продолжите её.</value></data>
   <data name="BatchQueuePolicy" xml:space="preserve"><value>Незавершённый список исходников и назначений сохраняется локально для явного восстановления или отклонения после перезапуска. Нужны новая проверка файлов, выбор дорожек, подтверждение планов и обзор очереди. Автоповторов и продолжения с позиции нет. Готовые файлы сохраняются. Ошибки, предупреждения, отмена и проблемы очистки останавливают очередь; правила требуют предпросмотра и применения.</value></data>
-  <data name="BatchPreparing" xml:space="preserve"><value>Добавьте файлы и подтвердите их отдельные планы.</value></data>
+  <data name="BatchPreparing" xml:space="preserve"><value>Выберите дорожки, затем проверьте изменения.</value></data>
   <data name="BatchInspecting" xml:space="preserve"><value>Проверка каждого файла отдельно…</value></data>
-  <data name="BatchReviewing" xml:space="preserve"><value>Проверка всех исходников, назначений и планов…</value></data>
-  <data name="BatchReady" xml:space="preserve"><value>Очередь проверена. Явно запустите подтверждённые планы.</value></data>
+  <data name="BatchReviewing" xml:space="preserve"><value>Проверка изменений и назначений…</value></data>
+  <data name="BatchReady" xml:space="preserve"><value>Изменения проверены. Можно создать копии.</value></data>
   <data name="BatchRunning" xml:space="preserve"><value>Последовательная обработка подтверждённых файлов…</value></data>
   <data name="BatchPaused" xml:space="preserve"><value>Очередь приостановлена. Опубликованные результаты сохранены.</value></data>
   <data name="BatchCompleted" xml:space="preserve"><value>Все проверенные планы завершены. Исходные файлы сохранены.</value></data>
   <data name="BatchItemPendingInspection" xml:space="preserve"><value>Ожидает проверки</value></data>
   <data name="BatchItemInspecting" xml:space="preserve"><value>Проверка…</value></data>
-  <data name="BatchItemNeedsReview" xml:space="preserve"><value>Требуется отдельный подтверждённый план</value></data>
-  <data name="BatchItemReady" xml:space="preserve"><value>План подтверждён; ожидает запуска</value></data>
+  <data name="BatchItemNeedsReview" xml:space="preserve"><value>Готов к выбору дорожек</value></data>
+  <data name="BatchItemReady" xml:space="preserve"><value>Проверен · готов</value></data>
   <data name="BatchNoChangeReady" xml:space="preserve"><value>Подтверждено: изменений нет; копирования и результата не будет</value></data>
   <data name="BatchItemRunning" xml:space="preserve"><value>Выполняется</value></data>
   <data name="BatchItemAwaitingWarningReview" xml:space="preserve"><value>Проверенный кандидат ожидает решения по предупреждениям</value></data>
-  <data name="BatchItemCompleted" xml:space="preserve"><value>Завершено; опубликован отдельный результат</value></data>
+  <data name="BatchItemCompleted" xml:space="preserve"><value>Копия создана</value></data>
   <data name="BatchItemCompletedWithWarnings" xml:space="preserve"><value>Опубликовано с подтверждёнными предупреждениями</value></data>
-  <data name="BatchItemNoChange" xml:space="preserve"><value>Без изменений; копирования и результата нет</value></data>
+  <data name="BatchItemNoChange" xml:space="preserve"><value>Без изменений · копия не создана</value></data>
   <data name="BatchItemFailed" xml:space="preserve"><value>Ошибка; требуется решение</value></data>
   <data name="BatchItemCancelled" xml:space="preserve"><value>Отменено; следующие файлы не запускались</value></data>
   <data name="BatchPauseRequestedPending" xml:space="preserve"><value>Запрошена пауза. Текущий файл безопасно завершится, затем запуск остановится.</value></data>
   <data name="BatchPauseRequested" xml:space="preserve"><value>Остановлено на безопасной границе. Для явного продолжения проверьте оставшиеся планы.</value></data>
   <data name="BatchPauseWarningReview" xml:space="preserve"><value>Сначала примите решение по текущему кандидату с предупреждениями. Оставшиеся файлы не запустятся автоматически.</value></data>
-  <data name="BatchPauseItemFailed" xml:space="preserve"><value>Ошибка файла. Проверьте его заново и подтвердите план либо явно исключите перед проверкой оставшейся работы.</value></data>
+  <data name="BatchPauseItemFailed" xml:space="preserve"><value>Ошибка файла. Исправьте или исключите его, затем проверьте оставшиеся изменения.</value></data>
   <data name="BatchPauseCancelled" xml:space="preserve"><value>Отмена остановила дальнейший запуск. Примите решение по отменённому файлу и явно проверьте оставшуюся работу.</value></data>
   <data name="BatchPauseCleanupRequired" xml:space="preserve"><value>Очистка собственных временных файлов не завершена. Дальнейший запуск заблокирован; проверьте диагностику. Опубликованные результаты сохранены.</value></data>
   <data name="BatchPauseUnsafeOwnership" xml:space="preserve"><value>Завершение процесса или публикация не подтверждены. Дальнейший запуск заблокирован; данные владения сохранены.</value></data>
@@ -299,4 +299,93 @@
   <data name="QueueErrorLimitExceeded" xml:space="preserve"><value>Список превышает ограничения хранения. Предыдущий файл сохранён; уменьшите список или длину путей.</value></data>
   <data name="QueueErrorPersistenceUnavailable" xml:space="preserve"><value>Не удалось сохранить или прочитать список. Существующие данные сохранены; восстановление после перезапуска не подтверждено.</value></data>
   <data name="QueueErrorCancelled" xml:space="preserve"><value>Операция со списком отменена. Восстановление после перезапуска не подтверждено.</value></data>
+  <data name="AggregateHeading" xml:space="preserve"><value>Какие дорожки оставить</value></data>
+  <data name="AggregateNotice" xml:space="preserve"><value>Группы определяются метаданными, а не совпадением содержимого. Раскройте группу для отдельных файлов и исходных флагов. Выбор строки файла не меняет охват.</value></data>
+  <data name="AggregateScope" xml:space="preserve"><value>Включено файлов: {0}; незавершённых проверок: {1}.</value></data>
+  <data name="AggregateUnresolved" xml:space="preserve"><value>Список дорожек неполный. Проверьте, исправьте или явно исключите нерешённые файлы перед проверкой планов.</value></data>
+  <data name="AggregateMembers" xml:space="preserve"><value>Файлы и отдельные дорожки</value></data>
+  <data name="AggregateCoverage" xml:space="preserve"><value>Файлов: {0} из {1}; дорожек: {2}</value></data>
+  <data name="AggregateChannels" xml:space="preserve"><value>Каналы: {0}</value></data>
+  <data name="AggregateAllKept" xml:space="preserve"><value>Будут сохранены в копии</value></data>
+  <data name="AggregateAllRemoved" xml:space="preserve"><value>Будут удалены из копии</value></data>
+  <data name="AggregateMixed" xml:space="preserve"><value>Разный выбор в отдельных файлах</value></data>
+  <data name="AggregateHistorical" xml:space="preserve"><value>Завершённый результат — выбор заблокирован</value></data>
+  <data name="AggregateEditable" xml:space="preserve"><value>Выбор для отдельного файла</value></data>
+  <data name="AggregateAdvanced" xml:space="preserve"><value>Дополнительно: правила и переносимые пресеты</value></data>
+  <data name="AggregateSilentFiles" xml:space="preserve"><value>Подтвердите каждый файл, который останется без аудио</value></data>
+  <data name="AggregateFlags" xml:space="preserve"><value>Принудительная: {0}; по умолчанию: {1}; включена: {2}</value></data>
+  <data name="Varies" xml:space="preserve"><value>различается</value></data>
+  <data name="SizeEqual" xml:space="preserve"><value>Новый файл имеет тот же размер, что и исходный. Оригинал остаётся на диске.</value></data>
+  <data name="WorkspaceSettings" xml:space="preserve"><value>Вид и язык</value></data>
+  <data name="WorkspaceClose" xml:space="preserve"><value>Закрыть</value></data>
+  <data name="WorkspaceBack" xml:space="preserve"><value>К выбору дорожек</value></data>
+  <data name="WorkspaceRules" xml:space="preserve"><value>Правила и пресеты</value></data>
+  <data name="WorkspaceDetails" xml:space="preserve"><value>Сведения и выбор дорожек файла</value></data>
+  <data name="WorkspaceEmptyTitle" xml:space="preserve"><value>Оставьте нужное. Сохраните оригинал.</value></data>
+  <data name="WorkspaceEmptyHelp" xml:space="preserve"><value>Перетащите сюда локальные MKV или MP4 либо добавьте файлы или папку кнопками сверху. Параметры папки выбираются отдельно.</value></data>
+  <data name="WorkspaceReview" xml:space="preserve"><value>Проверка изменений</value></data>
+  <data name="WorkspaceWillRemove" xml:space="preserve"><value>Будет удалено из копии</value></data>
+  <data name="WorkspaceWillKeep" xml:space="preserve"><value>Будет сохранено в копии</value></data>
+  <data name="WorkspaceGroupingHelp" xml:space="preserve"><value>О группах дорожек</value></data>
+  <data name="ReviewSummary" xml:space="preserve"><value>{0} · {1}</value></data>
+  <data name="RunContinue" xml:space="preserve"><value>Продолжить обработку</value></data>
+  <data name="RunNoChanges" xml:space="preserve"><value>Завершить без создания копий</value></data>
+  <data name="ReviewNextInspect" xml:space="preserve"><value>Проверьте источник заново, затем проверьте изменения.</value></data>
+  <data name="ReviewNextConfirmAudio" xml:space="preserve"><value>Подтвердите копию этого файла без аудио, затем проверьте изменения ещё раз.</value></data>
+  <data name="ReviewNextDestination" xml:space="preserve"><value>Исправьте назначение в сведениях о файле, затем проверьте изменения ещё раз.</value></data>
+  <data name="ReviewNextSelection" xml:space="preserve"><value>Проверьте выбор дорожек этого файла, затем проверьте изменения ещё раз.</value></data>
+  <data name="ReviewNoRemovedTracks" xml:space="preserve"><value>Дорожки не будут удалены.</value></data>
+  <data name="ReviewNoRetainedTracks" xml:space="preserve"><value>Нужны новая проверка источника и проверка изменений.</value></data>
+  <data name="RecursiveOutputGuide" xml:space="preserve"><value>Для вложенных папок сначала выберите папку назначения.</value></data>
+  <data name="ReviewChangedOne" xml:space="preserve"><value>{0} файл будет изменён</value></data>
+  <data name="ReviewUnchangedOne" xml:space="preserve"><value>{0} без изменений</value></data>
+  <data name="RunCopiesOne" xml:space="preserve"><value>Создать {0} копию</value></data>
+  <data name="ReviewChangedFew" xml:space="preserve"><value>{0} файла будут изменены</value></data>
+  <data name="ReviewUnchangedFew" xml:space="preserve"><value>{0} без изменений</value></data>
+  <data name="RunCopiesFew" xml:space="preserve"><value>Создать {0} копии</value></data>
+  <data name="ReviewChangedMany" xml:space="preserve"><value>{0} файлов будут изменены</value></data>
+  <data name="ReviewUnchangedMany" xml:space="preserve"><value>{0} без изменений</value></data>
+  <data name="RunCopiesMany" xml:space="preserve"><value>Создать {0} копий</value></data>
+  <data name="ReviewChangedOther" xml:space="preserve"><value>{0} файлов будут изменены</value></data>
+  <data name="ReviewUnchangedOther" xml:space="preserve"><value>{0} без изменений</value></data>
+  <data name="RunCopiesOther" xml:space="preserve"><value>Создать {0} копий</value></data>
+  <data name="AppearanceTitle" xml:space="preserve"><value>Оформление</value></data>
+  <data name="AppearanceHelp" xml:space="preserve"><value>Настройте приложение без изменения файлов и проверенных планов.</value></data>
+  <data name="AppearanceTheme" xml:space="preserve"><value>Тема</value></data>
+  <data name="AppearanceSystem" xml:space="preserve"><value>Системная</value></data>
+  <data name="AppearanceLight" xml:space="preserve"><value>Светлая</value></data>
+  <data name="AppearanceDark" xml:space="preserve"><value>Тёмная</value></data>
+  <data name="AppearanceAccent" xml:space="preserve"><value>Акцент</value></data>
+  <data name="AppearanceAccentHex" xml:space="preserve"><value>HEX акцента</value></data>
+  <data name="AppearanceIndigo" xml:space="preserve"><value>Индиго</value></data>
+  <data name="AppearanceTeal" xml:space="preserve"><value>Бирюзовый</value></data>
+  <data name="AppearanceRose" xml:space="preserve"><value>Розовый</value></data>
+  <data name="AppearanceAmber" xml:space="preserve"><value>Янтарный</value></data>
+  <data name="AppearanceCustomColors" xml:space="preserve"><value>Свои цвета</value></data>
+  <data name="AppearanceCustomHelp" xml:space="preserve"><value>Используйте #RRGGBB. Пустые поля используют встроенные цвета. Контраст текста — не ниже 4,5:1, важных границ — 3:1.</value></data>
+  <data name="AppearancePage" xml:space="preserve"><value>Фон окна</value></data>
+  <data name="AppearanceSurface" xml:space="preserve"><value>Панель</value></data>
+  <data name="AppearancePrimaryText" xml:space="preserve"><value>Основной текст</value></data>
+  <data name="AppearanceSecondaryText" xml:space="preserve"><value>Вторичный текст</value></data>
+  <data name="AppearanceBorder" xml:space="preserve"><value>Граница</value></data>
+  <data name="AppearanceMotion" xml:space="preserve"><value>Анимация</value></data>
+  <data name="AppearanceReduced" xml:space="preserve"><value>Уменьшенная</value></data>
+  <data name="AppearanceFullMotion" xml:space="preserve"><value>Полная</value></data>
+  <data name="AppearanceReset" xml:space="preserve"><value>Сбросить оформление</value></data>
+  <data name="AppearanceInvalidHex" xml:space="preserve"><value>Введите непрозрачные цвета как #RRGGBB. Последнее подходящее оформление сохранено.</value></data>
+  <data name="AppearanceInvalidContrast" xml:space="preserve"><value>Контраст текста или границ недостаточен. Последнее подходящее оформление сохранено.</value></data>
+  <data name="AppearanceCatalogError" xml:space="preserve"><value>Не удалось безопасно прочитать оформление. Ручные настройки доступны для этого сеанса; сброс заменит некорректный файл оформления.</value></data>
+  <data name="AppearanceSessionOnly" xml:space="preserve"><value>Оформление применено для этого сеанса, но сохранить его не удалось.</value></data>
+  <data name="AppearanceMotionSystemAvailable" xml:space="preserve"><value>Системный режим учитывает настройку анимации Windows.</value></data>
+  <data name="AppearanceMotionSystemFallback" xml:space="preserve"><value>Системная настройка анимации недоступна. В системном режиме анимация уменьшена; полную можно выбрать явно.</value></data>
+  <data name="WorkspaceOriginalShort" xml:space="preserve"><value>Исходные файлы не изменяются.</value></data>
+  <data name="WorkspaceOptions" xml:space="preserve"><value>Параметры папки и очереди</value></data>
+  <data name="AppearancePendingDecision" xml:space="preserve"><value>Ожидается решение по результату обработки или очистке. Закройте настройки, чтобы вернуться к нему.</value></data>
+  <data name="ReviewValidating" xml:space="preserve"><value>Проверяются исходные файлы и назначения… Обработка медиа не запускалась.</value></data>
+  <data name="ReviewCancelled" xml:space="preserve"><value>Проверка отменена. Создание копий не запускалось. Перед созданием файлов повторите проверку.</value></data>
+  <data name="ReviewNeedsAttention" xml:space="preserve"><value>Перед созданием файлов нужно исправить замечания.</value></data>
+  <data name="ReviewRequired" xml:space="preserve"><value>Проверьте текущий выбор перед созданием файлов.</value></data>
+  <data name="ReviewCheckAgain" xml:space="preserve"><value>Проверить заново</value></data>
+  <data name="ReviewNoCopy" xml:space="preserve"><value>Изменений дорожек нет. Новый файл не будет создан.</value></data>
+  <data name="ReviewSourceTracks" xml:space="preserve"><value>Дорожки исходного файла (инспекция)</value></data>
 </root>

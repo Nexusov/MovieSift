@@ -1,11 +1,13 @@
 using System.Collections.Immutable;
 using Serilog;
 using TrackTrim.Application;
+using TrackTrim.Application.Batches;
 using TrackTrim.Application.Inspection;
 using TrackTrim.Application.Jobs;
 using TrackTrim.Application.Ports;
 using TrackTrim.Core.Failures;
 using TrackTrim.Core.Media;
+using TrackTrim.Desktop.Appearance;
 using TrackTrim.Desktop.Interaction;
 using TrackTrim.Desktop.Localization;
 using TrackTrim.Desktop.ViewModels;
@@ -28,12 +30,21 @@ internal sealed class ViewModelFixture
             CreateTrack(new(3, TrackKind.Subtitles, "Subtitle")));
         Backend = new FakeMediaBackend(new(source, new("MKVToolNix", "102.0", 20), tracks, [], "Fixture", false, false));
         var sourceAccess = new FakeSourceAccess(source);
-        var outputs = Outputs;
-        ViewModel = new(new(new InspectionService(Backend, sourceAccess), new JobCoordinator(Backend, sourceAccess, outputs),
-            Settings, outputs, new FakeDialogs(SourcePath), new LocalizationService(), true, new LoggerConfiguration().CreateLogger()));
+        var localization = new LocalizationService();
+        var logger = new LoggerConfiguration().CreateLogger();
+        var session = new BatchSession();
+        var coordinator = new BatchCoordinator(session, new InspectionService(Backend, sourceAccess),
+            new JobCoordinator(Backend, sourceAccess, Outputs), sourceAccess);
+        Workspace = new(new(session, coordinator, new BatchUiDiscovery([source]), new FakeDialogs(SourcePath),
+            localization, true, logger, new(new BatchUiPresetStore()), new BatchUiQueueListStore()));
+        Appearance = new(new(new WorkspaceAppearanceStore(), localization, new AppearanceApplier(Avalonia.Application.Current)));
+        ViewModel = new(new(Settings, Outputs, localization, true, logger, Workspace, Appearance));
     }
 
     public MainViewModel ViewModel { get; }
+    public AppearanceViewModel Appearance { get; }
+    public BatchViewModel Workspace { get; }
+    public BatchItemViewModel Item => Workspace.Items.Single();
     public FakeMediaBackend Backend { get; }
     public FakeSettingsStore Settings { get; } = new();
     public FakeOutputStore Outputs { get; } = new();
@@ -41,8 +52,9 @@ internal sealed class ViewModelFixture
     /// <summary>Loads the deterministic source through the same commands used by the UI.</summary>
     public async Task LoadAsync()
     {
-        await ViewModel.OpenSourceCommand.ExecuteAsync(null);
-        ViewModel.OutputPath = OutputPath;
+        await Workspace.Recovery.InitializeAsync();
+        await Workspace.AddFilesCommand.ExecuteAsync(null);
+        Item.OutputPath = OutputPath;
     }
 
     /// <summary>Creates distinguishable file-local track identities for selection tests.</summary>
@@ -84,9 +96,6 @@ internal sealed class FakeSettingsStore : ISettingsStore
 /// <summary>Returns preselected local paths without native dialogs in headless tests.</summary>
 internal sealed class FakeDialogs(string sourcePath) : IFileDialogs
 {
-    /// <summary>Returns the test's selected local source without opening native UI.</summary>
-    public Task<string?> SelectSourceAsync() => Task.FromResult<string?>(sourcePath);
-
     /// <summary>Returns selected paths for controlled batch presentation tests.</summary>
     public Task<IReadOnlyList<string>> SelectSourcesAsync() => Task.FromResult<IReadOnlyList<string>>([sourcePath]);
 

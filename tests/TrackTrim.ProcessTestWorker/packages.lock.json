@@ -5,7 +5,7 @@
       "tracktrim.application": {
         "type": "Project",
         "dependencies": {
-          "TrackTrim.Core": "[1.0.0, )"
+          "TrackTrim.Core": "[0.1.0-rc.1, )"
         }
       },
       "tracktrim.core": {
@@ -14,8 +14,8 @@
       "tracktrim.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "TrackTrim.Application": "[1.0.0, )",
-          "TrackTrim.Core": "[1.0.0, )"
+          "TrackTrim.Application": "[0.1.0-rc.1, )",
+          "TrackTrim.Core": "[0.1.0-rc.1, )"
         }
       }
     }

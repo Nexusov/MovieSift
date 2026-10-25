@@ -161,7 +161,7 @@ public sealed class RulePresetsTests
         var loading = presets.LoadCommand.ExecuteAsync(null);
         await BatchViewModelFixture.Await(entered.Task);
         Assert.False(fixture.Batch.NewBatchCommand.CanExecute(null));
-        Assert.False(fixture.Main.OpenSourceCommand.CanExecute(null));
+        Assert.False(fixture.Batch.AddFilesCommand.CanExecute(null));
 
         if (change == "editor")
         {
@@ -348,7 +348,7 @@ public sealed class RulePresetsTests
             inspectionEntered.TrySetResult();
             await inspectionRelease.Task.WaitAsync(request.CancellationToken);
         };
-        var inspecting = fixture.Main.OpenSourceCommand.ExecuteAsync(null);
+        var inspecting = fixture.Batch.AddFilesCommand.ExecuteAsync(null);
 
         try
         {
