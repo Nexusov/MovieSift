@@ -3,7 +3,7 @@
              xmlns:viewModels="using:MovieSift.Desktop.ViewModels"
              x:Class="MovieSift.Desktop.Views.BatchLanguageRulesView"
              x:DataType="viewModels:BatchLanguageRulesViewModel">
-  <Border Padding="12" BorderThickness="1" CornerRadius="4" BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}">
+  <Border Padding="12" BorderThickness="1" CornerRadius="4" BorderBrush="{DynamicResource MovieSiftDecorativeBorderBrush}">
     <StackPanel Spacing="8">
       <TextBlock Text="{Binding Localization[RuleHeading]}" FontWeight="SemiBold" />
       <TextBlock Text="{Binding Localization[RuleHint]}" TextWrapping="Wrap" />
@@ -27,9 +27,9 @@
                IsEnabled="{Binding CanEditSubtitleTitle}" AutomationProperties.Name="{Binding Localization[RuleSubtitleTitleContains]}" />
       <CheckBox x:Name="SubtitleForcedOnlyCheckBox" Content="{Binding Localization[RuleForcedSubtitlesOnly]}"
                 IsChecked="{Binding KeepOnlyForcedSubtitles, Mode=TwoWay}" IsEnabled="{Binding CanEditSubtitleLanguages}" />
-      <TextBlock Text="{Binding Localization[RuleForcedSubtitleHelp]}" TextWrapping="Wrap" Opacity="0.8" />
-      <TextBlock Text="{Binding Localization[RuleTagHelp]}" TextWrapping="Wrap" Opacity="0.8" />
-      <TextBlock Text="{Binding Localization[RuleTitleHelp]}" TextWrapping="Wrap" Opacity="0.8" />
+      <TextBlock Text="{Binding Localization[RuleForcedSubtitleHelp]}" TextWrapping="Wrap" Foreground="{DynamicResource MovieSiftMutedBrush}" />
+      <TextBlock Text="{Binding Localization[RuleTagHelp]}" TextWrapping="Wrap" Foreground="{DynamicResource MovieSiftMutedBrush}" />
+      <TextBlock Text="{Binding Localization[RuleTitleHelp]}" TextWrapping="Wrap" Foreground="{DynamicResource MovieSiftMutedBrush}" />
       <WrapPanel>
         <Button x:Name="PreviewLanguageRulesButton" Content="{Binding Localization[RulePreview]}" Command="{Binding PreviewCommand}" Margin="0,0,8,8" />
         <Button x:Name="ApplyLanguageRulesButton" Content="{Binding Localization[RuleApply]}" Command="{Binding ApplyCommand}" Margin="0,0,8,8" />
@@ -41,7 +41,7 @@
         <ItemsControl ItemsSource="{Binding Files}">
           <ItemsControl.ItemTemplate>
             <DataTemplate x:DataType="viewModels:LanguageRuleFilePreviewViewModel">
-              <Border BorderThickness="0,1,0,0" BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" Padding="0,10" Margin="0,4">
+              <Border BorderThickness="0,1,0,0" BorderBrush="{DynamicResource MovieSiftDecorativeBorderBrush}" Padding="0,10" Margin="0,4">
                 <StackPanel Spacing="6">
                   <TextBlock Text="{Binding SourcePath}" TextWrapping="Wrap" FontWeight="SemiBold" />
                   <TextBlock Text="{Binding StateText}" TextWrapping="Wrap" />

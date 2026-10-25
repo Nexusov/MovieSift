@@ -17,7 +17,7 @@
           <TextBlock Text="{Binding Localization[AppSubtitle]}" Classes="muted" FontSize="12" />
         </StackPanel>
       </StackPanel>
-      <Button Grid.Column="1" Content="{Binding Localization[WorkspaceSettings]}" Command="{Binding ToggleAppearanceCommand}" VerticalAlignment="Center" />
+      <Button x:Name="AppearanceButton" Grid.Column="1" Content="{Binding Localization[WorkspaceSettings]}" Command="{Binding ToggleAppearanceCommand}" VerticalAlignment="Center" />
     </Grid>
     <Border DockPanel.Dock="Top" Padding="12" BorderBrush="{DynamicResource MovieSiftWarningBrush}" BorderThickness="1" CornerRadius="9"
             Margin="0,0,0,16" IsVisible="{Binding HasWarningCloseDecision}">
@@ -51,6 +51,10 @@
         <Button Content="{Binding Localization[CleanInterrupted]}" Command="{Binding CleanInterruptedCommand}" IsVisible="{Binding HasCleanableInterrupted}" />
       </StackPanel>
     </Border>
+    <Border DockPanel.Dock="Top" Padding="12" BorderBrush="{DynamicResource MovieSiftWarningBrush}" BorderThickness="1" CornerRadius="9"
+            Margin="0,0,0,12" IsVisible="{Binding LanguagePreferenceFailed}">
+      <TextBlock Text="{Binding Localization[LanguagePreferenceFailure]}" TextWrapping="Wrap" />
+    </Border>
     <StackPanel DockPanel.Dock="Top" Spacing="6" Margin="0,0,0,12" IsVisible="{Binding HasCleanupIssue}">
       <TextBlock Text="{Binding Localization[CleanupHeading]}" TextWrapping="Wrap" />
       <TextBlock Text="{Binding ErrorText}" TextWrapping="Wrap" IsVisible="{Binding HasError}" />
@@ -62,12 +66,14 @@
       <views:QueueRecoveryView DataContext="{Binding Batch.Recovery}" />
     </Border>
     <Grid>
-      <views:BatchView x:Name="Workspace" DataContext="{Binding Batch}" />
-      <Border Classes="panel" appearance:SoftMotion.Enter="True" IsVisible="{Binding IsAppearanceOpen}" HorizontalAlignment="Right" Width="460" MaxWidth="600" Margin="0,0,0,6" BoxShadow="{StaticResource MovieSiftPanelShadow}">
+      <Border IsEnabled="{Binding !IsAppearanceOpen}" IsHitTestVisible="{Binding !IsAppearanceOpen}">
+        <views:BatchView x:Name="Workspace" DataContext="{Binding Batch}" />
+      </Border>
+      <Border x:Name="AppearancePanel" Classes="panel" appearance:SoftMotion.Enter="True" IsVisible="{Binding IsAppearanceOpen}" KeyboardNavigation.TabNavigation="Cycle" HorizontalAlignment="Right" Width="460" MaxWidth="600" Margin="0,0,0,6" BoxShadow="{StaticResource MovieSiftPanelShadow}">
         <DockPanel>
           <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,10">
             <TextBlock Text="{Binding Localization[WorkspaceSettings]}" Classes="heading" VerticalAlignment="Center" />
-            <Button Grid.Column="1" Content="{Binding Localization[WorkspaceClose]}" Command="{Binding ToggleAppearanceCommand}" />
+            <Button x:Name="CloseAppearanceButton" Grid.Column="1" Content="{Binding Localization[WorkspaceClose]}" Command="{Binding ToggleAppearanceCommand}" />
           </Grid>
           <Border DockPanel.Dock="Top" Classes="secondary" IsVisible="{Binding HasPendingMediaDecision}" Margin="0,0,0,10">
             <TextBlock Text="{Binding Localization[AppearancePendingDecision]}" Foreground="{DynamicResource MovieSiftWarningBrush}" TextWrapping="Wrap" />

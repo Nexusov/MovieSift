@@ -16,6 +16,7 @@ public sealed partial class BatchView : UserControl
 {
     private const double NarrowWorkspaceWidth = 850;
     private const double NarrowFileListHeight = 140;
+    private const double NarrowExpandedShelfFraction = 0.7;
     private const double FileSidebarWidth = 330;
     private BatchViewModel? observedWorkspace;
     private bool? narrowLayout;
@@ -25,6 +26,8 @@ public sealed partial class BatchView : UserControl
     {
         InitializeComponent();
         BatchFileList.AddHandler(KeyDownEvent, OnFileListKeyDown, RoutingStrategies.Tunnel);
+        FileSidebar.PropertyChanged += OnFileShelfChanged;
+        WorkspaceColumns.SizeChanged += OnWorkspaceAreaSizeChanged;
         DataContextChanged += OnDataContextChanged;
         SizeChanged += OnSizeChanged;
         AddHandler(DragDrop.DragOverEvent, OnDragOver);
@@ -88,11 +91,38 @@ public sealed partial class BatchView : UserControl
 
         narrowLayout = narrow;
         WorkspaceColumns.ColumnDefinitions = new(narrow ? "*" : $"{FileSidebarWidth},*");
-        WorkspaceColumns.RowDefinitions = new(narrow ? "Auto,*" : "*");
+        UpdateShelfRows();
         Grid.SetColumn(WorkspaceScrollViewer, narrow ? 0 : 1);
         Grid.SetRow(WorkspaceScrollViewer, narrow ? 1 : 0);
         BatchFileList.MaxHeight = narrow ? NarrowFileListHeight : double.PositiveInfinity;
         FileSidebar.IsExpanded = !narrow;
+    }
+
+    /// <summary>Shares the finite narrow layout height while keeping the same file collection and scroll position alive.</summary>
+    private void OnFileShelfChanged(object? sender, AvaloniaPropertyChangedEventArgs eventArguments)
+    {
+        if (eventArguments.Property == Expander.IsExpandedProperty)
+        {
+            UpdateShelfRows();
+        }
+    }
+
+    /// <summary>Rebounds file content when footer wrapping or window height changes the remaining preparation area.</summary>
+    private void OnWorkspaceAreaSizeChanged(object? sender, SizeChangedEventArgs eventArguments) => UpdateShelfRows();
+
+    /// <summary>Prevents an expanded Auto row from consuming the track viewport or overlapping the fixed footer.</summary>
+    private void UpdateShelfRows()
+    {
+        if (narrowLayout != true)
+        {
+            WorkspaceColumns.RowDefinitions = new("*");
+            FileSidebar.MaxHeight = double.PositiveInfinity;
+            return;
+        }
+
+        WorkspaceColumns.RowDefinitions = new("Auto,*");
+        FileSidebar.MaxHeight = FileSidebar.IsExpanded
+            ? WorkspaceColumns.Bounds.Height * NarrowExpandedShelfFraction : double.PositiveInfinity;
     }
 
     /// <summary>Opens deliberately activated row details while inclusion and filename controls retain their own actions.</summary>

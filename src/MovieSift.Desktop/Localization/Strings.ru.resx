@@ -384,4 +384,10 @@
   <data name="ReviewCheckAgain" xml:space="preserve"><value>Проверить заново</value></data>
   <data name="ReviewNoCopy" xml:space="preserve"><value>Изменений дорожек нет. Новый файл не будет создан.</value></data>
   <data name="ReviewSourceTracks" xml:space="preserve"><value>Дорожки исходного файла (инспекция)</value></data>
+  <data name="LanguagePreferenceFailure" xml:space="preserve"><value>Не удалось сохранить или восстановить язык. Текущий язык действует в этом сеансе; обработка доступна, если её хранилище исправно.</value></data>
+  <data name="IncludeFileAccessible" xml:space="preserve"><value>Включить файл в выбор: {0}</value></data>
+  <data name="AggregateSelectionHelp" xml:space="preserve"><value>Отмеченные дорожки сохраняются; неотмеченные не попадут в новую копию. Исходные файлы останутся без изменений.</value></data>
+  <data name="AggregateSectionSummary" xml:space="preserve"><value>{0} · Групп: {1} · Дорожек: {2}</value></data>
+  <data name="RemoveAllSubtitles" xml:space="preserve"><value>Удалить все субтитры из копий</value></data>
+  <data name="AggregateMemberKeep" xml:space="preserve"><value>Сохранить дорожку {0} с ID {1} в файле {2}: {3}</value></data>
 </root>

@@ -37,6 +37,7 @@ public sealed class BatchItemViewModel : ObservableObject
 
     public Guid Id => item.Id;
     public string SourcePath => item.SourcePath;
+    public string InclusionAccessibleName => Localization.Format(new("IncludeFileAccessible", [SourcePath]));
     public string FileName => Path.GetFileName(item.SourcePath);
     public string ContextPath => DescribeContextPath();
     public string RelativeSourcePath => item.FolderOrigin?.RelativePath ?? string.Empty;

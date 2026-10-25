@@ -384,4 +384,10 @@
   <data name="ReviewCheckAgain" xml:space="preserve"><value>Check again</value></data>
   <data name="ReviewNoCopy" xml:space="preserve"><value>No track changes. No new file will be created.</value></data>
   <data name="ReviewSourceTracks" xml:space="preserve"><value>Source tracks (inspection)</value></data>
+  <data name="LanguagePreferenceFailure" xml:space="preserve"><value>The language preference could not be saved or restored. Your current language works for this session; media processing is still available when its storage is healthy.</value></data>
+  <data name="IncludeFileAccessible" xml:space="preserve"><value>Include file in selection: {0}</value></data>
+  <data name="AggregateSelectionHelp" xml:space="preserve"><value>Checked tracks are retained; unchecked tracks are omitted from the new copy. Original files stay unchanged.</value></data>
+  <data name="AggregateSectionSummary" xml:space="preserve"><value>{0} · Groups: {1} · Tracks: {2}</value></data>
+  <data name="RemoveAllSubtitles" xml:space="preserve"><value>Remove all subtitles from copies</value></data>
+  <data name="AggregateMemberKeep" xml:space="preserve"><value>Keep {0} track {1} in {2}: {3}</value></data>
 </root>

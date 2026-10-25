@@ -63,8 +63,8 @@
       </WrapPanel>
       <Grid Grid.Row="1">
         <!-- One native collection remains alive when the responsive layout changes. -->
-        <Grid x:Name="WorkspaceColumns" ColumnDefinitions="330,*" ColumnSpacing="12" IsVisible="{Binding HasItems}">
-          <Expander x:Name="FileSidebar" IsExpanded="True" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid x:Name="WorkspaceColumns" ColumnDefinitions="330,*" ColumnSpacing="12" IsVisible="{Binding HasItems}" ClipToBounds="True">
+          <Expander x:Name="FileSidebar" IsExpanded="True" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True">
             <Expander.Header>
               <TextBlock x:Name="FileCountSummary" Text="{Binding SummaryText}" TextWrapping="Wrap" FontWeight="SemiBold" />
             </Expander.Header>
@@ -78,7 +78,7 @@
                   <ListBox.ItemTemplate>
                     <DataTemplate x:DataType="viewModels:BatchItemViewModel">
                       <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8" Margin="3,6" ToolTip.Tip="{Binding SourcePath}">
-                        <CheckBox x:Name="FileInclusionCheckBox" IsChecked="{Binding Included, Mode=TwoWay}" IsEnabled="{Binding CanChangeInclusion}" VerticalAlignment="Top" AutomationProperties.Name="{Binding SourcePath}" />
+                        <CheckBox x:Name="FileInclusionCheckBox" IsChecked="{Binding Included, Mode=TwoWay}" IsEnabled="{Binding CanChangeInclusion}" VerticalAlignment="Top" AutomationProperties.Name="{Binding InclusionAccessibleName}" />
                         <StackPanel Grid.Column="1" Spacing="4">
                           <Button x:Name="FileDetailsNameButton" Classes="fileName" Click="OnFileDetails" Padding="0" MinHeight="0"
                                   HorizontalContentAlignment="Left" HorizontalAlignment="Stretch"

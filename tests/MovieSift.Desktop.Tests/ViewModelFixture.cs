@@ -20,7 +20,7 @@ internal sealed class ViewModelFixture
     private static readonly string SourcePath = Path.Combine(Path.GetTempPath(), "MovieSift UI source.mkv");
     public static readonly string OutputPath = Path.Combine(Path.GetTempPath(), "MovieSift UI output.mkv");
 
-    public ViewModelFixture()
+    public ViewModelFixture(bool dataWritable = true)
     {
         var source = new SourceRevision(SourcePath, "fixture-identity", 1000, 1);
         var tracks = ImmutableArray.Create(
@@ -36,9 +36,9 @@ internal sealed class ViewModelFixture
         var coordinator = new BatchCoordinator(session, new InspectionService(Backend, sourceAccess),
             new JobCoordinator(Backend, sourceAccess, Outputs), sourceAccess);
         Workspace = new(new(session, coordinator, new BatchUiDiscovery([source]), new FakeDialogs(SourcePath),
-            localization, true, logger, new(new BatchUiPresetStore()), new BatchUiQueueListStore()));
+            localization, dataWritable, logger, new(new BatchUiPresetStore()), new BatchUiQueueListStore()));
         Appearance = new(new(new WorkspaceAppearanceStore(), localization, new AppearanceApplier(Avalonia.Application.Current)));
-        ViewModel = new(new(Settings, Outputs, localization, true, logger, Workspace, Appearance));
+        ViewModel = new(new(Settings, Outputs, localization, dataWritable, logger, Workspace, Appearance));
     }
 
     public MainViewModel ViewModel { get; }
@@ -73,6 +73,7 @@ internal sealed class FakeSettingsStore : ISettingsStore
 {
     public string Language { get; private set; } = "en";
     public Exception? LoadException { get; set; }
+    public Exception? SaveException { get; set; }
 
     /// <summary>Returns the explicit in-memory language preference.</summary>
     public Task<string> LoadLanguageAsync(CancellationToken cancellationToken = default)
@@ -88,6 +89,11 @@ internal sealed class FakeSettingsStore : ISettingsStore
     /// <summary>Records the code supplied by the real language command.</summary>
     public Task SaveLanguageAsync(SaveLanguageRequest request)
     {
+        if (SaveException is { } exception)
+        {
+            return Task.FromException(exception);
+        }
+
         Language = request.Language;
         return Task.CompletedTask;
     }
@@ -179,6 +185,7 @@ internal sealed class FakeOutputStore : IOutputStore
     public TaskCompletionSource? ContinueCleanup { get; set; }
     public int CleanupCount { get; private set; }
     public int DiscoveryCount { get; private set; }
+    public Exception? DiscoveryException { get; set; }
 
     /// <summary>Creates an in-memory ownership record for the synthetic candidate.</summary>
     public Task<OwnedOutput> ReserveAsync(ReserveOutputRequest request)
@@ -215,6 +222,12 @@ internal sealed class FakeOutputStore : IOutputStore
     public Task<ImmutableArray<InterruptedOutput>> FindInterruptedAsync(CancellationToken cancellationToken = default)
     {
         DiscoveryCount++;
+
+        if (DiscoveryException is { } exception)
+        {
+            return Task.FromException<ImmutableArray<InterruptedOutput>>(exception);
+        }
+
         return Task.FromResult(Interrupted);
     }
 }
