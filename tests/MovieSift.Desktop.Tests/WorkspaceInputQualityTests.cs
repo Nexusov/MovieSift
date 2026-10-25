@@ -22,6 +22,7 @@ public sealed class WorkspaceInputQualityTests
     private const double MinimumFileViewport = 32;
     private const double BoundsTolerance = 1;
     private const int MaximumFocusTraversalSteps = 100;
+    private const int PlatformFooterBudgetDifference = 4;
 
     /// <summary>Composes actual helper text against its displayed surface rather than trusting the source palette alone.</summary>
     [AvaloniaTheory]
@@ -91,15 +92,17 @@ public sealed class WorkspaceInputQualityTests
 
     /// <summary>Retains a usable clipped track viewport and reachable footer with either minimum-size shelf state.</summary>
     [AvaloniaTheory]
-    [InlineData("en", false, 1d)]
-    [InlineData("en", true, 1d)]
-    [InlineData("ru", false, 1d)]
-    [InlineData("ru", true, 1d)]
-    [InlineData("en", true, 1.5d)]
-    [InlineData("ru", true, 2d)]
-    [InlineData("en", false, 2d)]
-    [InlineData("ru", false, 1.5d)]
-    public async Task MinimumWindowKeepsExpandedFilesAndTracksWithinTheirOwnBounds(string language, bool expanded, double density)
+    [InlineData("en", false, 1d, 0)]
+    [InlineData("en", true, 1d, 0)]
+    [InlineData("ru", false, 1d, 0)]
+    [InlineData("ru", true, 1d, 0)]
+    [InlineData("en", true, 1.5d, 0)]
+    [InlineData("ru", true, 2d, 0)]
+    [InlineData("en", false, 2d, 0)]
+    [InlineData("ru", false, 1.5d, 0)]
+    [InlineData("ru", true, 1d, PlatformFooterBudgetDifference)]
+    [InlineData("ru", true, 2d, PlatformFooterBudgetDifference)]
+    public async Task MinimumWindowKeepsExpandedFilesAndTracksWithinTheirOwnBounds(string language, bool expanded, double density, int footerExtraSpace)
     {
         var fixture = SoftWorkspaceRenderTests.CreateLongNameFixture();
         await fixture.LoadAsync();
@@ -112,6 +115,10 @@ public sealed class WorkspaceInputQualityTests
             await fixture.Main.ChangeLanguageCommand.ExecuteAsync(language);
             Dispatcher.UIThread.RunJobs();
             var view = window.FindControl<BatchView>("Workspace")!;
+            var footer = view.FindControl<StackPanel>("BatchRunControls")!;
+            var footerMargin = footer.Margin;
+            // Model the observed platform metric difference without changing the declared window minimum or OS fonts.
+            footer.Margin = new(footerMargin.Left, footerMargin.Top + footerExtraSpace, footerMargin.Right, footerMargin.Bottom);
             var shelf = view.FindControl<Expander>("FileSidebar")!;
             shelf.IsExpanded = expanded;
             Dispatcher.UIThread.RunJobs();
@@ -155,7 +162,8 @@ public sealed class WorkspaceInputQualityTests
             using var renderedFrame = window.CaptureRenderedFrame();
             Assert.NotNull(renderedFrame);
             var editableHit = window.InputHitTest(editableBounds.Center);
-            SoftWorkspaceRenderTests.Save(window, $"quality-{language}-640x480-{density}-shelf-{expanded}", density);
+            var footerSuffix = footerExtraSpace == 0 ? string.Empty : $"-footer-{footerExtraSpace}";
+            SoftWorkspaceRenderTests.Save(window, $"quality-{language}-640x480-{density}-shelf-{expanded}{footerSuffix}", density);
             Assert.True(ReferenceEquals(editableHit, editableTrack) || editableHit is Visual editableVisual &&
                 editableVisual.GetVisualAncestors().Contains(editableTrack),
                 $"Track bounds={editableBounds}; hit={editableHit}; enabled={editableTrack.IsEffectivelyEnabled}.");

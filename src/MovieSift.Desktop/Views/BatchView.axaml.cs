@@ -16,7 +16,7 @@ public sealed partial class BatchView : UserControl
 {
     private const double NarrowWorkspaceWidth = 850;
     private const double NarrowFileListHeight = 140;
-    private const double NarrowExpandedShelfFraction = 0.7;
+    private const double NarrowExpandedShelfFraction = 0.75;
     private const double FileSidebarWidth = 330;
     private BatchViewModel? observedWorkspace;
     private bool? narrowLayout;
