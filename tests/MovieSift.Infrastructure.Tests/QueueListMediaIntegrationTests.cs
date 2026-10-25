@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text.Json;
@@ -99,7 +100,7 @@ public sealed class QueueListMediaIntegrationTests(ITestOutputHelper evidence)
         });
         Assert.Empty(Directory.EnumerateFileSystemEntries(outputRoot));
         Assert.Empty(workers.Identifiers);
-        Assert.Null((await coordinator.ReviewAsync(cancellationToken)).Review);
+        Assert.Null((await coordinator.ReviewSelectionsAsync(new(session.Snapshot.Revision, [], cancellationToken))).Review);
         Assert.Empty(workers.Identifiers);
         var inspected = await coordinator.InspectPendingAsync(cancellationToken);
         Assert.All(inspected.Items, item => Assert.Equal(BatchItemState.NeedsReview, item.State));
@@ -112,7 +113,6 @@ public sealed class QueueListMediaIntegrationTests(ITestOutputHelper evidence)
         var firstAudio = first.Inspection.Tracks.Where(track => track.Kind == TrackKind.Audio).ToArray();
         var chosenFirstAudio = firstAudio[1].Uid;
         var chosenSecondAudio = firstAudio[0].Uid;
-        var plans = new Dictionary<Guid, RemuxPlan>();
 
         foreach (var item in inspected.Items)
         {
@@ -121,19 +121,14 @@ public sealed class QueueListMediaIntegrationTests(ITestOutputHelper evidence)
             var retained = inspection.Tracks.Where(track => track.Kind == TrackKind.Video ||
                 track.Uid == chosenAudio || track.Kind == TrackKind.Subtitles && track.IsForced)
                 .Select(track => track.Id).ToArray();
-            var proposed = PlanBuilder.Build(new(inspection, retained, item.IntendedDestinationPath!, false,
-                item.IntendedOutputDirectoryRoot));
-            Assert.Null(proposed.Failure);
-            var plan = Assert.IsType<RemuxPlan>(proposed.Plan);
-            Assert.False(plan.IsNoChange);
-            Assert.True(session.ApprovePlan(new(item.Id, plan)).Applied);
-            plans.Add(item.Id, plan);
+            Assert.True(session.SetSelection(new(item.Id, retained.ToImmutableArray())).Applied);
         }
 
-        var review = await coordinator.ReviewAsync(cancellationToken);
+        var review = await coordinator.ReviewSelectionsAsync(new(session.Snapshot.Revision, [], cancellationToken));
         Assert.Null(review.Failure);
         Assert.Empty(review.ItemFailures);
         Assert.NotNull(review.Review);
+        var plans = review.Review.Items.ToDictionary(item => item.ItemId, item => item.Plan);
         Assert.Empty(Directory.EnumerateFileSystemEntries(outputRoot));
         var completed = await coordinator.RunAsync(new(review.Review.Id, CancellationToken: cancellationToken));
         Assert.True(completed.Phase == BatchPhase.Completed,

@@ -124,13 +124,13 @@ public sealed class BatchUnexpectedFailureTests
 
         foreach (var item in harness.Session.Snapshot.Items)
         {
-            harness.Approve(item);
+            await harness.SelectAndReviewAsync(item);
         }
 
         var sourceAccess = new ReviewFaultSourceAccess(harness) { ThrowOnRead = throwOnRead };
         var coordinator = new BatchCoordinator(harness.Session, new InspectionService(harness, harness),
             new JobCoordinator(harness, harness, harness), sourceAccess);
-        var rejected = await coordinator.ReviewAsync(TestContext.Current.CancellationToken);
+        var rejected = await coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken));
         var stopped = harness.Session.Snapshot;
 
         Assert.Null(rejected.Review);
@@ -147,7 +147,7 @@ public sealed class BatchUnexpectedFailureTests
         Assert.Equal(0, harness.CleanupCalls);
 
         sourceAccess.ShouldThrow = false;
-        var corrected = await coordinator.ReviewAsync(TestContext.Current.CancellationToken);
+        var corrected = await coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken));
         Assert.NotNull(corrected.Review);
         Assert.Null(corrected.Failure);
         Assert.Null(harness.Session.Snapshot.Failure);
@@ -218,7 +218,12 @@ public sealed class BatchUnexpectedFailureTests
             Assert.Equal(2, harness.Reservations.Count);
             Assert.Equal(2, harness.CleanupCalls);
 
-            Assert.Null((await harness.Coordinator.ReviewAsync(TestContext.Current.CancellationToken)).Review);
+            Assert.Null(stopped.Review);
+            Assert.Equal(ErrorCode.StalePlan, (await harness.Coordinator.RunAsync(new(review.Id))).Failure!.Code);
+            var freshReview = await harness.Coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken));
+            Assert.NotNull(freshReview.Review);
+            Assert.DoesNotContain(freshReview.Review.Items, item => item.ItemId == items[0].Id);
+            Assert.NotEqual(items[1].ApprovedPlan!.Id, freshReview.Review.Items[0].Plan.Id);
             Assert.Same(firstPublished, harness.Session.Snapshot.Items[0].Result);
             Assert.Equal(2, harness.CleanupCalls);
             Assert.DoesNotContain(items[2].SourcePath, harness.RemuxedPaths);
@@ -284,7 +289,7 @@ public sealed class BatchUnexpectedFailureTests
         Assert.False(harness.Session.Remove(first.Id).Applied);
         Assert.False(harness.Session.InvalidatePlan(first.Id).Applied);
         Assert.False(harness.Session.AddSources([first.DiscoveredSource!]).Applied);
-        Assert.Null((await harness.Coordinator.ReviewAsync(TestContext.Current.CancellationToken)).Review);
+        Assert.Null((await harness.Coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken))).Review);
         await harness.Coordinator.InspectPendingAsync(TestContext.Current.CancellationToken);
         await harness.Coordinator.InspectItemAsync(new(first.Id, TestContext.Current.CancellationToken));
         var rejectedRun = await harness.Coordinator.RunAsync(new(Guid.NewGuid(), CancellationToken: TestContext.Current.CancellationToken));

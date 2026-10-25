@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using MovieSift.Application;
 using MovieSift.Application.Batches;
 using MovieSift.Application.Inspection;
@@ -51,8 +52,8 @@ public sealed class BatchResetTests
         Assert.Null(newItem.ApprovedPlan);
         Assert.Null(newItem.Result);
         Assert.Equal(BatchItemState.PendingInspection, newItem.State);
-        Assert.False(harness.Session.ApprovePlan(new(newItem.Id, originalPlan)).Applied);
-        Assert.False(harness.Session.ApprovePlan(new(originalItem.Id, originalPlan)).Applied);
+        Assert.False(harness.Session.SetSelection(new(newItem.Id, originalPlan.RetainedTracks.Select(track => track.Id).ToImmutableArray())).Applied);
+        Assert.False(harness.Session.SetSelection(new(originalItem.Id, originalPlan.RetainedTracks.Select(track => track.Id).ToImmutableArray())).Applied);
         Assert.False(harness.Session.InvalidatePlan(originalItem.Id).Applied);
         Assert.False(harness.Session.SetIncluded(originalItem.Id, false).Applied);
         Assert.Same(pending, harness.Session.Snapshot);
@@ -71,9 +72,9 @@ public sealed class BatchResetTests
         Assert.Equal(BatchItemState.NeedsReview, inspected.State);
         Assert.Null(inspected.ApprovedPlan);
         var nextDestination = Path.Combine(Path.GetTempPath(), "MovieSift batch second result.mkv");
-        var nextPlan = harness.Approve(inspected, nextDestination);
+        var nextPlan = await harness.SelectAndReviewAsync(inspected, nextDestination);
         Assert.NotEqual(originalPlan.Id, nextPlan.Id);
-        var nextReview = (await harness.Coordinator.ReviewAsync(TestContext.Current.CancellationToken)).Review!;
+        var nextReview = (await harness.Coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken))).Review!;
         Assert.NotEqual(review.Id, nextReview.Id);
         Assert.Equal(newItem.Id, Assert.Single(nextReview.Items).ItemId);
         var repeated = await harness.Coordinator.RunAsync(new(nextReview.Id, progress, TestContext.Current.CancellationToken));
@@ -228,7 +229,7 @@ public sealed class BatchResetTests
             }
 
             operation = boundary == "review"
-                ? coordinator.ReviewAsync(TestContext.Current.CancellationToken)
+                ? coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken))
                 : coordinator.RunAsync(new(review.Id, CancellationToken: TestContext.Current.CancellationToken));
         }
 

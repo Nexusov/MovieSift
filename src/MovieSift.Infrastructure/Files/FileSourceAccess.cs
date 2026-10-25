@@ -108,6 +108,10 @@ public sealed class FileSourceAccess : ISourceAccess
         }
     }
 
+    /// <summary>Captures a regular file's identity directly from this operation's already opened handle.</summary>
+    internal static SourceRevision ReadRegularRevision(HandleRequest request) => OperatingSystem.IsWindows()
+        ? ReadWindowsRevision(request) : ReadLinuxRevision(request);
+
     /// <summary>Rechecks path safety and advisory capacity for only the additional allocation requested at this stage.</summary>
     public async Task ValidateDestinationAsync(ValidateDestinationRequest request)
     {

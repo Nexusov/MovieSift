@@ -1,7 +1,8 @@
 # MovieSift — Product and Engineering Brief
 
-Status: reviewed implementation baseline; no implementation or runtime acceptance is claimed.
-Reviewed: 2026-10-18.
+Status: historical product/engineering brief, originally reviewed 2026-10-18. Its Phase 0/1 staging instructions describe the original implementation task, not current feature limits or current acceptance results.
+
+Current normative behavior is defined by [README](README.md), [architecture](docs/ARCHITECTURE.md), [supported formats](docs/SUPPORTED_FORMATS.md) and [current plan](docs/PLAN.md). The safety and preservation requirements below still apply; implemented Phase 2/3 and the unified workspace supersede old tab/per-file-approval descriptions. Historical references are context, not permission for additional features or release publication.
 Project name: MovieSift. Use this name consistently for the repository, application, projects, packages and documentation.
 
 ## 1. Product and delivery scope
@@ -171,7 +172,7 @@ Reject URLs, playlists, non-regular inputs, and arbitrary tool arguments. Do not
 
 ## 8. UI and localization
 
-### Phase 1 screen
+### Historical Phase 1 screen
 
 Provide a real file picker, an inspector with actual tracks, Keep checkboxes, a readable output-plan review, output location selection, processing progress, cancellation, warning review, and a result with its output path. Use ordinary Avalonia controls and Fluent styling. Support keyboard navigation, clear focus, resizable layouts, long filenames, and readable errors. Do not build a custom design system or media player.
 
@@ -185,7 +186,7 @@ Provide a real file picker, an inspector with actual tracks, Keep checkboxes, a 
 - Keep JSON, CLI arguments, numeric protocol parsing, and persisted values culture-invariant. A language switch must not change the generated media plan or command.
 - Test English-first startup under a Russian culture, live switching with preserved selections/progress, persistence, fallback, resource-key/format-argument parity, and layouts in both languages. Avoid implementing a general translation framework.
 
-### Later batch UI
+### Historical batch UI goal
 
 Add a file list, per-file inspector, rule controls, per-file preview, output selector, and sequential queue. Use bounded concurrent probing and one remux worker by default. Extra remux concurrency needs measurements and an explicit setting.
 
@@ -270,7 +271,7 @@ Inspect Git state and repository instructions before changes. Preserve unrelated
 
 An implementation report is in Russian and separates behavior implemented, exact executed checks/results, known limitations, and the next bounded task. Code, documentation, and commit messages are in English. Do not claim architecture or production readiness merely because files were generated.
 
-## 13. Milestones and stopping point
+## 13. Historical implementation milestones and stopping points
 
 ### Phase 0 — Feasibility and foundation
 

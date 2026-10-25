@@ -32,6 +32,9 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private bool persistenceFailed;
 
+    [ObservableProperty]
+    private bool languagePreferenceFailed;
+
     /// <summary>Connects shell-only actions while the batch coordinator remains the sole media owner.</summary>
     public MainViewModel(MainViewModelServices services)
     {
@@ -85,19 +88,25 @@ public sealed partial class MainViewModel : ObservableObject
     /// <summary>Restores only preferences and recovery choices without inspecting or processing sources.</summary>
     public async Task InitializeAsync()
     {
+        var initialRevision = languageRevision;
+
         try
         {
-            var initialRevision = languageRevision;
             var language = await services.Settings.LoadLanguageAsync();
 
             if (initialRevision == languageRevision)
             {
                 Localization.SetLanguage(language);
+                LanguagePreferenceFailed = false;
             }
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or OperationFailureException)
         {
-            PersistenceFailed = true;
+            if (initialRevision == languageRevision)
+            {
+                LanguagePreferenceFailed = true;
+            }
+
             services.Log.Warning(exception, "Portable language settings could not be read");
         }
 
@@ -162,19 +171,31 @@ public sealed partial class MainViewModel : ObservableObject
     /// <summary>Propagates a storage failure to the unified workspace's write gate.</summary>
     partial void OnPersistenceFailedChanged(bool value) => NotifyPresentation();
 
+    /// <summary>Shows optional preference durability independently of the required media write gate.</summary>
+    partial void OnLanguagePreferenceFailedChanged(bool value) => NotifyPresentation();
+
     /// <summary>Updates translated presentation immediately and persists only the language code.</summary>
     private async Task ChangeLanguageAsync(string? language)
     {
-        languageRevision++;
+        var currentRevision = ++languageRevision;
         Localization.SetLanguage(language);
 
         try
         {
             await services.Settings.SaveLanguageAsync(new(Localization.Language));
+
+            if (currentRevision == languageRevision)
+            {
+                LanguagePreferenceFailed = false;
+            }
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or OperationFailureException)
         {
-            PersistenceFailed = true;
+            if (currentRevision == languageRevision)
+            {
+                LanguagePreferenceFailed = true;
+            }
+
             services.Log.Warning(exception, "The language preference could not be saved");
             NotifyPresentation();
         }

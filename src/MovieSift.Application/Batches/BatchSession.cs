@@ -2,7 +2,6 @@ using System.Collections.Immutable;
 using MovieSift.Application.QueueLists;
 using MovieSift.Core.Failures;
 using MovieSift.Core.Media;
-using MovieSift.Core.Planning;
 using MovieSift.Core.Rules;
 
 namespace MovieSift.Application.Batches;
@@ -93,51 +92,6 @@ public sealed partial class BatchSession
         Changed?.Invoke(updated);
         return new(true);
     }
-
-    /// <summary>Accepts a newly reviewed plan only for the matching immutable inspection.</summary>
-    public BatchEditResult ApprovePlan(BatchPlanApprovalRequest request) => EditItem(request.ItemId, item =>
-    {
-        var invalidPlan = item.Inspection is null || request.Plan.Inspection != item.Inspection ||
-            item.Result?.JobId == request.Plan.Id ||
-            request.Plan.OutputDirectoryRoot is not null && item.FolderOrigin is null;
-
-        if (invalidPlan)
-        {
-            return new(null, new(ErrorCode.StalePlan));
-        }
-
-        var duplicateIdentity = request.Plan.Id == Guid.Empty || snapshot.Items.Any(other =>
-            other.Id != item.Id && other.ApprovedPlan?.Id == request.Plan.Id);
-
-        if (duplicateIdentity)
-        {
-            return new(null, new(ErrorCode.InvalidSelection));
-        }
-
-        var rebuilt = PlanBuilder.Build(new(item.Inspection!, request.Plan.RetainedTracks.Select(track => track.Id).ToArray(),
-            request.Plan.DestinationPath, request.Plan.ZeroAudioConfirmed, request.Plan.OutputDirectoryRoot));
-
-        if (rebuilt.Plan is null)
-        {
-            return new(null, rebuilt.Failure);
-        }
-
-        if (!rebuilt.Plan.RetainedTracks.SequenceEqual(request.Plan.RetainedTracks))
-        {
-            return new(null, new(ErrorCode.InvalidSelection));
-        }
-
-        return new(item with
-        {
-            ApprovedPlan = request.Plan,
-            State = BatchItemState.Ready,
-            Result = null,
-            Failure = null,
-            RetainedTrackIds = request.Plan.RetainedTracks.Select(track => track.Id).ToImmutableArray(),
-            IntendedDestinationPath = request.Plan.DestinationPath,
-            IntendedOutputDirectoryRoot = request.Plan.OutputDirectoryRoot
-        }, null);
-    });
 
     /// <summary>Records destination intent without granting approval or changing an actual Keep selection.</summary>
     public BatchEditResult SetDestination(BatchDestinationRequest request) => EditItem(request.ItemId, item =>

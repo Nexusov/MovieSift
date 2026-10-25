@@ -59,31 +59,38 @@ internal sealed class BatchTestHarness : IMediaBackend, ISourceAccess, IOutputSt
         Coordinator = new(Session, new InspectionService(this, this), new JobCoordinator(this, this, this), this);
     }
 
-    /// <summary>Inspects and independently approves each default removal before aggregate review.</summary>
+    /// <summary>Inspects and records independent default removals before the production Review boundary.</summary>
     public async Task<BatchReview> PrepareAsync()
     {
         await Coordinator.InspectPendingAsync(TestContext.Current.CancellationToken);
 
         foreach (var item in Session.Snapshot.Items)
         {
-            Approve(item);
+            ConfigureSelection(item);
         }
 
-        var review = await Coordinator.ReviewAsync(TestContext.Current.CancellationToken);
+        var review = await Coordinator.ReviewSelectionsAsync(new(Session.Snapshot.Revision, [], TestContext.Current.CancellationToken));
         Assert.Null(review.Failure);
         Assert.Empty(review.ItemFailures);
         return Assert.IsType<BatchReview>(review.Review);
     }
 
     /// <summary>Builds selections from the item's own track identities instead of another episode's positions.</summary>
-    public RemuxPlan Approve(BatchItem item, string? destination = null, bool noChange = false)
+    public async Task<RemuxPlan> SelectAndReviewAsync(BatchItem item, string? destination = null, bool noChange = false)
+    {
+        ConfigureSelection(item, destination, noChange);
+        await Coordinator.ReviewSelectionsAsync(new(Session.Snapshot.Revision, [], TestContext.Current.CancellationToken));
+        return Assert.IsType<RemuxPlan>(Session.Snapshot.Items.Single(current => current.Id == item.Id).ApprovedPlan);
+    }
+
+    /// <summary>Edits only public selection and destination intent without injecting plan authority.</summary>
+    public void ConfigureSelection(BatchItem item, string? destination = null, bool noChange = false)
     {
         var inspection = Assert.IsType<MediaInspection>(item.Inspection);
-        var identifiers = inspection.Tracks.Where(track => noChange || track.Kind != TrackKind.Subtitles).Select(track => track.Id).ToArray();
-        var plan = PlanBuilder.Build(new(inspection, identifiers,
-            destination ?? Path.ChangeExtension(item.SourcePath, ".trimmed.mkv"), false)).Plan!;
-        Assert.True(Session.ApprovePlan(new(item.Id, plan)).Applied);
-        return plan;
+        var identifiers = inspection.Tracks.Where(track => noChange || track.Kind != TrackKind.Subtitles)
+            .Select(track => track.Id).ToImmutableArray();
+        Assert.True(Session.SetSelection(new(item.Id, identifiers)).Applied);
+        Assert.True(Session.SetDestination(new(item.Id, destination ?? Path.ChangeExtension(item.SourcePath, ".trimmed.mkv"))).Applied);
     }
 
     /// <summary>Creates an asynchronously continuable deterministic lifecycle gate.</summary>

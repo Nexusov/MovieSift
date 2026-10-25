@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Globalization;
 using System.Security.Cryptography;
@@ -75,7 +76,6 @@ public sealed class RecursiveBatchMediaIntegrationTests(ITestOutputHelper eviden
             secondInspection.Tracks.Select(track => track.Uid));
         Assert.NotEqual(originalVideo.Id, Assert.Single(secondInspection.Tracks.Where(track => track.Kind == TrackKind.Video)).Id);
         Assert.NotEqual(originalSubtitle.Id, Assert.Single(secondInspection.Tracks.Where(track => track.Kind == TrackKind.Subtitles)).Id);
-        var plans = new Dictionary<Guid, RemuxPlan>();
 
         foreach (var item in inspected.Items)
         {
@@ -93,19 +93,20 @@ public sealed class RecursiveBatchMediaIntegrationTests(ITestOutputHelper eviden
             var retainedIds = inspection.Tracks.Where(track => track.Kind == TrackKind.Video
                 || track.Uid == chosenAudioUid || isFirstSource && track.Kind == TrackKind.Subtitles)
                 .Select(track => track.Id).ToArray();
-            var planned = PlanBuilder.Build(new(inspection, retainedIds, destination, false, outputRoot));
-            Assert.Null(planned.Failure);
-            var plan = Assert.IsType<RemuxPlan>(planned.Plan);
-            Assert.False(plan.IsNoChange);
-            Assert.Equal(outputRoot, plan.OutputDirectoryRoot);
-            Assert.True(session.ApprovePlan(new(item.Id, plan)).Applied);
-            plans.Add(item.Id, plan);
+            Assert.True(session.SetSelection(new(item.Id, retainedIds.ToImmutableArray())).Applied);
+            Assert.True(session.SetDestination(new(item.Id, destination, outputRoot)).Applied);
         }
 
-        var reviewed = await coordinator.ReviewAsync(TestContext.Current.CancellationToken);
+        var reviewed = await coordinator.ReviewSelectionsAsync(new(session.Snapshot.Revision, [], TestContext.Current.CancellationToken));
         Assert.Null(reviewed.Failure);
         Assert.Empty(reviewed.ItemFailures);
         var review = Assert.IsType<BatchReview>(reviewed.Review);
+        var plans = review.Items.ToDictionary(item => item.ItemId, item => item.Plan);
+        Assert.All(review.Items, item =>
+        {
+            Assert.False(item.Plan.IsNoChange);
+            Assert.Equal(outputRoot, item.Plan.OutputDirectoryRoot);
+        });
         Assert.Equal(ExpectedFiles, review.Items.Length);
         Assert.Equal(ExpectedFiles, plans.Values.Select(plan => plan.DestinationPath).Distinct(StringComparer.Ordinal).Count());
         Assert.Empty(Directory.EnumerateFileSystemEntries(outputRoot));

@@ -2,7 +2,7 @@
 
 Use the stable SDK pinned by `global.json`, PowerShell 7, Python 3.9+ with standard-library `tarfile`/XZ support, Git, and an editor with C#/XAML support. Local verification used Python 3.13.0 and PowerShell 7.6.5. Python is required only for explicit source-notice extraction and fixture generation; no Python runtime is bundled or required by the application. Use the same central package versions as the application and restore committed lockfiles. Updating a dependency is a deliberate, independently reviewable change; regenerate the affected locks and rerun verification.
 
-## Local checks
+## Source-only checks
 
 ```powershell
 dotnet restore --locked-mode
@@ -15,17 +15,69 @@ If formatting is required, run `dotnet format --no-restore`, inspect the diff, a
 
 ## Explicit media tool acquisition
 
+Commands below run from the repository root in **PowerShell 7** unless marked Bash. Source-only restore/build/tests above do not provision media: optional local media cases report skips, not successful media coverage. Required CI sets `MOVIESIFT_REQUIRE_MEDIA_TOOLS=1` and fails on missing tools or fixtures. Do not use a separately installed FFmpeg or the old product's custom-version workers as a substitute.
+
+Acquisition is explicit and needs network access/disk space. `tools` must be absent or empty; existing tool payloads are never overwritten. MKV pins live in `build/tools.lock.json` / `build/mkv-source.lock.json`; FFmpeg/zlib source and recipe inputs live in `build/ffmpeg.lock.json`. Successful acquisition verifies source, worker and material evidence rather than trusting a directory name.
+
+### Windows media setup
+
+**1. Obtain the complete Windows MKV source-build artifact.** The existing [Windows MKV source-build candidate workflow](.github/workflows/windows-mkv-candidate.yml) produces `windows-mkv-source-candidate`, containing the two workers, DLL closure, `build-receipt.json`, sources, patches, original binary metadata, notices and build/compiler material. A portable app ZIP, test-evidence artifact or the official MKVToolNix ZIP is not this input. This guide does not dispatch a workflow automatically. If no successful unexpired matching artifact exists, request a separately authorized run of that workflow; it is not part of ordinary local setup or this quality pass.
+
+Install/authenticate GitHub CLI for repository-read access, then list the existing successful runs and select one explicitly:
+
 ```powershell
-pwsh ./build/acquire-tools.ps1 -RuntimeIdentifier win-x64 -Destination ./tools -WindowsMkvBuildDirectory /path/to/verified/windows-mkv-build
+gh run list --repo Nexusov/MovieSift --workflow windows-mkv-candidate.yml --status success --limit 10 --json databaseId,headSha,url
+$workerRunId = Read-Host 'Successful worker-build run ID with an unexpired artifact'
+gh api "repos/Nexusov/MovieSift/actions/runs/$workerRunId/artifacts" --jq '.artifacts[] | {id,name,expired,expires_at}'
+$mkvBuildDirectory = Join-Path (Get-Location) 'artifacts/windows-mkv-source-candidate'
+gh run download $workerRunId --repo Nexusov/MovieSift --name windows-mkv-source-candidate --dir $mkvBuildDirectory
+python ./build/distribution-inventory.py --validate-windows-mkv-build $mkvBuildDirectory
+$env:MOVIESIFT_WINDOWS_MKV_BUILD_DIRECTORY = $mkvBuildDirectory
 ```
 
-Use `linux-x64` on Linux. MKVToolNix artifacts and the FFmpeg/zlib source hashes are pinned in `build/tools.lock.json` and `build/ffmpeg.lock.json`; the tools are not checked into Git. Linux extraction occurs at build time and preserves the dependency tree, without requiring FUSE on users' systems. The build requires network access, adequate disk space, and Linux archive extraction tools; acquisition failures are real failures.
+Use a **fresh empty extraction directory**, and stop if download or validation fails. The two `.exe` files and receipt must be directly under `$mkvBuildDirectory`, not another nested artifact directory. Validation binds the current recipe/source locks, both actual PE workers and recursively imported DLLs to their complete hashed source/build materials. An expired/old artifact or changed recipe requires a current matching build; do not edit receipts or bypass the check. The workflow builds on its ephemeral Windows runner, never by installing the toolchain on the developer's host. Its reviewed artifacts expire after three days.
 
-The Windows MKV pair is built from the same 102.0 release source using `build/build-mkv-windows.sh` and the exact UCRT64 binary/source package pins in `build/mkv-source.lock.json`. `build/provision-windows-mkv.ps1` runs only on an ephemeral Windows GitHub Actions runner, never as a local prerequisite installer. It builds only `mkvmerge`/`mkvextract`, retains required QtCore and the actual recursively imported DLLs, and collects complete source packages, original patches/PKGBUILDs, binary metadata, notices and configuration/compiler evidence. Each binary's BUILDINFO recipe hash must match its collected source PKGBUILD. GMP, ICU and Vorbis notices come from exact pinned upstream source members where their binary packages omit notices. Host-only packages are recorded, not shipped.
+**2. Prepare FFmpeg's native prerequisites or reuse an exact build cache.** The worker artifact above supplies MKV only. FFmpeg/ffprobe are built from the pinned upstream source with explicit static zlib. A new Windows build needs:
 
-The required Windows job constructs or reuses only an exact-input verified build. Local acquisition/packaging can consume that complete worker/material directory through the parameter above or `MOVIESIFT_WINDOWS_MKV_BUILD_DIRECTORY`; no MSYS2 installation is then needed. `python build/distribution-inventory.py --validate-windows-mkv-build /path/to/build` independently checks the pair, all actual PE imports and complete material hashes. Review worker artifacts expire and do not substitute for delivering the covered source/materials with an eventual release. There is no automatic fallback to the historical official ZIP.
+- [MSYS2](https://www.msys2.org/) Bash at `C:/msys64/usr/bin/bash.exe`, plus GNU Make and tar/XZ utilities in that environment.
+- Native x64 MinGW-w64 GCC/binutils from a [MinGW-w64 distribution](https://www.mingw-w64.org/downloads/), on the process PATH, reporting `x86_64-w64-mingw32` from `gcc -dumpmachine`.
+- NASM on PATH. CI uses the hash-pinned NASM **3.01** and GNU Make **4.4.1** inputs documented in `build/provision-windows-ffmpeg.ps1`; GCC and MSYS2 Bash come from the Windows runner image. That script deliberately refuses local installation. Install/choose developer prerequisites explicitly; do not fake GitHub runner variables to run it locally.
 
-FFmpeg/ffprobe are built from the same pinned source with explicit static zlib, no autodetected optional codec libraries and no GPL/version3/nonfree configuration. Build-only prerequisites are GCC, binutils, GNU Make and NASM; native Windows builds also require MSYS2 Bash and MinGW-w64. CI uses `build/provision-windows-ffmpeg.ps1` only on its ephemeral Windows runner, with hash-pinned Make/NASM archives and no floating MSYS2 update. It refuses local-host installation. On Linux, install the documented compiler/make/NASM development prerequisites before acquisition. A verified existing source-build cache can be reused without a local compiler; source/RID/recipe and every worker/material hash must match. Actual compiler/configuration receipts accompany the package. Use a whitespace-free build-cache directory; packaged application, media and output paths still support spaces/Cyrillic. End users install neither compilers, .NET nor media tools.
+For an existing toolchain, set its actual directories (not example placeholder paths):
+
+```powershell
+$compilerDirectory = Read-Host 'Existing native x64 MinGW-w64 bin directory'
+$assemblerDirectory = Read-Host 'Existing NASM directory'
+$env:PATH = "$compilerDirectory;$assemblerDirectory;C:/msys64/usr/bin;$env:PATH"
+$env:MOVIESIFT_BUILD_MAKE = 'C:/msys64/usr/bin/make.exe'
+& 'C:/msys64/usr/bin/bash.exe' --version
+gcc -dumpmachine
+& $env:MOVIESIFT_BUILD_MAKE --version
+nasm -v
+```
+
+Alternatively, reuse an existing **complete** `ffmpeg-source-win-x64-<identity>` cache directory without a compiler. Keep its generated directory name, workers, `build-receipt.json` and all listed materials together under the chosen cache parent. Acquisition computes the identity from RID, source/zlib hashes and the current recipe, then `Read-VerifiedFfmpegBuild` in `build/ffmpeg-build-cache.ps1` verifies the receipt and every worker/material hash. Old-name/version or different-recipe caches do not qualify. Merely copying `ffmpeg.exe`/`ffprobe.exe` from a package is insufficient. Missing pinned source archives are downloaded and checked even when reusing a cache.
+
+**3. Acquire into an empty tools directory.** Choose a writable **whitespace-free** cache parent; FFmpeg's generated Makefiles do not support spaces in the build-cache path. This is a build-only limit, not a restriction on application/media/output paths.
+
+```powershell
+$toolCacheDirectory = Read-Host 'Writable whitespace-free FFmpeg cache parent (existing exact cache or new build)'
+pwsh ./build/acquire-tools.ps1 -RuntimeIdentifier win-x64 -Destination ./tools -CacheDirectory $toolCacheDirectory -WindowsMkvBuildDirectory $mkvBuildDirectory
+```
+
+Stop on any source, recipe, version, import or material failure. The complete source-built MKV input is mandatory; there is no official-binary fallback. Actual compiler/configuration receipts accompany both source-built backends; compiler/Make/NASM are build-only dependencies, not portable application requirements.
+
+### Linux media setup
+
+On Ubuntu 24.04 x64, install the pinned SDK and PowerShell 7 using their official [.NET](https://dotnet.microsoft.com/download/dotnet/10.0) / [PowerShell](https://learn.microsoft.com/powershell/scripting/install/install-ubuntu) instructions. The following are developer/CI native prerequisites, not an instruction for application end users:
+
+```bash
+sudo apt-get update
+sudo apt-get install --no-install-recommends -y build-essential nasm squashfs-tools file python3 python-is-python3 xz-utils libx11-6 libice6 libsm6 libfontconfig1 libicu74 libssl3t64 libgssapi-krb5-2 libbrotli1 libgmp10 libgl1 libegl1 libxrandr2 libxcursor1 libxi6 libxinerama1
+pwsh ./build/acquire-tools.ps1 -RuntimeIdentifier linux-x64 -Destination ./tools -CacheDirectory ./artifacts/downloads
+```
+
+The build-time pinned AppImage extraction preserves the approved MKV dependency tree and does not require FUSE. FFmpeg/ffprobe are built with the same pinned source/recipe and explicit static zlib, or verified from the exact `ffmpeg-source-linux-x64-<identity>` cache. Use a whitespace-free repository/cache path for this native build. The acquisition step records executable versions and runtime/material closure; success on a developer host does not establish Ubuntu Desktop acceptance.
 
 The production backend resolves `tools/mkvmerge.exe` and `tools/mkvextract.exe` on Windows, and the native executables under `tools/app-root/usr/bin` on Linux. Linux library paths are set on the worker's process environment; the application never invokes media through a shell. The `tools/mkvmerge`/`mkvextract` Linux wrappers are only build-time acquisition/fixture helpers. Tests accept an explicit tool directory; the live application always uses its app-local bundle. A test override does not establish portable-release acceptance. Both MKV executables must match MKVToolNix 102.0. The separate MP4 adapter uses the exact FFmpeg/ffprobe build in `build/ffmpeg.lock.json`, under `tools` on both targets. There is no backend fallback or container conversion.
 
@@ -35,12 +87,16 @@ Phase 2A tests are grouped under Application `Batches`, Infrastructure `BatchInp
 
 Phase 2B3 adds pure `ForcedSubtitleRuleTests`, Application/Desktop `BatchForcedSubtitleTests`, controlled `MkvForcedFlagParsingTests` and real `BatchForcedSubtitleIntegrationTests`. The real case uses `ForcedSubtitleFixture` to give otherwise matching subtitles different actual flags and payloads across reordered inputs. It must exercise production rule application, compare all retained track/attachment payloads and source hashes, and retain both owned remux handles through exit. Keep JSON parsing, controlled lifecycle, headless and native evidence distinct. Do not bypass conservative language validation using title/forced nonmatches.
 
-Generate both original fixture sets before running the mandatory media suite:
+## Mandatory fixtures and media tests
+
+After either OS setup, generate both original fixture sets in PowerShell 7:
 
 ```powershell
 python ./build/generate-fixtures.py --tool-directory ./tools --destination ./artifacts/fixtures
-python ./build/generate-mp4-fixtures.py --ffmpeg ./tools/ffmpeg.exe --destination ./artifacts/fixtures/mp4
+$ffmpegName = if ($IsWindows) { 'ffmpeg.exe' } else { 'ffmpeg' }
+python ./build/generate-mp4-fixtures.py --ffmpeg (Join-Path ./tools $ffmpegName) --destination ./artifacts/fixtures/mp4
 $env:MOVIESIFT_TOOL_DIRECTORY = (Resolve-Path ./tools).Path
+$env:MOVIESIFT_FIXTURE_DIRECTORY = (Resolve-Path ./artifacts/fixtures).Path
 $env:MOVIESIFT_REQUIRE_MEDIA_TOOLS = '1'
 dotnet test --configuration Release --no-build --no-restore --logger trx
 ```
@@ -61,7 +117,7 @@ CI uses the pinned bundled FFmpeg/ffprobe pair and checked-in original H.264/AAC
 ## Portable package checks
 
 ```powershell
-pwsh ./build/package.ps1 -RuntimeIdentifier win-x64 -FixturePath ./artifacts/fixtures/ordinary.mkv -Mp4FixturePath ./artifacts/fixtures/mp4/ordinary.mp4
+pwsh ./build/package.ps1 -RuntimeIdentifier win-x64 -WindowsMkvBuildDirectory $mkvBuildDirectory -ToolCacheDirectory $toolCacheDirectory -FixturePath ./artifacts/fixtures/ordinary.mkv -Mp4FixturePath ./artifacts/fixtures/mp4/ordinary.mp4
 pwsh ./build/verify-package.ps1 -ArchivePath ./artifacts/MovieSift-win-x64.zip -FixturePath ./artifacts/fixtures/ordinary.mkv -Mp4FixturePath ./artifacts/fixtures/mp4/ordinary.mp4
 ```
 
@@ -104,6 +160,6 @@ Original MovieSift code is licensed under [MIT](LICENSE), copyright (c) 2026 Nex
 
 Packaging generates `artifacts/distribution-reports/<RID>/distribution-<RID>.json` after comparing every staged/archived payload with `SHA256SUMS`, matching NuGet payload/notice bytes to original package members, and validating tool/source/material provenance. Reports include unknowns and `redistributionReady: false`; success is mechanical evidence, not legal approval. Run `python -m unittest discover -s build/tests -v` for the small archive/evidence regressions. Both existing required jobs run these checks and default to uploading only compact reports, manifests, inventories and test evidence. The separately authorized manual `retain_candidates: true` path described in the [release checklist](docs/release-checklist.md#optional-candidate-handoff) can retain each exact verified binary/material pair and its identities for seven days, after all platform gates succeed. These public-repository workflow artifacts are not private. Keep original NuGet caches, private-path restore graphs and unrelated work directories out of every upload. Consult the [current distribution requirements](docs/verification/release-distribution-closure.md) and [historical evidence index](docs/verification/README.md) for their distinct scopes.
 
-Unified workspace coverage uses Core `TrackGroupingPolicyTests`, Application `BatchAggregateTrackTests` / `BatchSelectionReviewTests`, Desktop `AggregateWorkspaceTests` and required `AggregateTrackMediaIntegrationTests`. The ordinary UI has one Review action; tests may use the lower-level per-file approval API to establish specific pre-existing authority. Preserve union scope, concrete member identities, changed-only invalidation, per-file zero-audio consent and NoChange. The real aggregate case removes only a second-file Spanish occurrence with a conflicting local ID, then independently compares retained payloads, supported metadata, sources and owned cleanup. Headless keyboard/control tests are not native desktop acceptance.
+Unified workspace coverage uses Core `TrackGroupingPolicyTests`, Application `BatchAggregateTrackTests` / `BatchSelectionReviewTests`, Desktop `AggregateWorkspaceTests` and required `AggregateTrackMediaIntegrationTests`. The UI and tests use the same `ReviewSelectionsAsync` boundary: edit selection/destination intent, then explicitly Review to create independent plans. There is no alternate per-file approval API. Preserve union scope, concrete member identities, changed-only invalidation, per-file zero-audio consent and NoChange. The real aggregate case removes only a second-file Spanish occurrence with a conflicting local ID, then independently compares retained payloads, supported metadata, sources and owned cleanup. Headless keyboard/control tests are not native desktop acceptance.
 
 Soft workspace coverage uses `WorkspacePresentationTests`, `AppearanceTests`, `SoftWorkspaceRenderTests` and the portable appearance-store/special-file tests. Set `MOVIESIFT_SOFT_RENDER_OUTPUT` to an owned development directory to export the actual Avalonia/Skia views; fixtures use controlled, nonprivate paths. The 1×/1.5×/2× offscreen densities do not change or verify desktop scaling. Preserve separate Review/Run, empty-batch preset access, active-job/theme isolation, malformed cosmetic records and warning/cleanup visibility. Filee-derived style patterns retain the shipped MIT notice under `docs/third-party`.

@@ -86,7 +86,7 @@ public sealed class MixedContainerIntegrationTests(ITestOutputHelper evidence)
             Assert.Equal(BatchItemState.PendingInspection, item.State);
             Assert.Empty(item.CurrentRetainedTrackIds);
         });
-        var premature = await coordinator.ReviewAsync(cancellationToken);
+        var premature = await coordinator.ReviewSelectionsAsync(new(session.Snapshot.Revision, [], cancellationToken));
         Assert.Null(premature.Review);
         Assert.NotEmpty(premature.ItemFailures);
         var inspected = await coordinator.InspectPendingAsync(cancellationToken);
@@ -116,21 +116,12 @@ public sealed class MixedContainerIntegrationTests(ITestOutputHelper evidence)
         var mkvIds = mkvRow.Inspection!.Tracks.Where(track => track.Kind == TrackKind.Video ||
             track.Kind == TrackKind.Audio && !track.IsDefault).Select(track => track.Id).ToImmutableArray();
         Assert.True(session.SetSelection(new(mkvRow.Id, mkvIds)).Applied);
-        var plans = new Dictionary<Guid, RemuxPlan>();
 
-        foreach (var item in session.Snapshot.Items)
-        {
-            var planResult = PlanBuilder.Build(new(item.Inspection!, item.CurrentRetainedTrackIds,
-                item.IntendedDestinationPath!, false, item.IntendedOutputDirectoryRoot));
-            Assert.Null(planResult.Failure);
-            var plan = Assert.IsType<RemuxPlan>(planResult.Plan);
-            Assert.True(session.ApprovePlan(new(item.Id, plan)).Applied);
-            plans[item.Id] = plan;
-        }
 
-        var review = await coordinator.ReviewAsync(cancellationToken);
+        var review = await coordinator.ReviewSelectionsAsync(new(session.Snapshot.Revision, [], cancellationToken));
         Assert.Empty(review.ItemFailures);
         var reviewed = Assert.IsType<BatchReview>(review.Review);
+        var plans = reviewed.Items.ToDictionary(item => item.ItemId, item => item.Plan);
         var completed = await coordinator.RunAsync(new(reviewed.Id, CancellationToken: cancellationToken));
         Assert.True(completed.Phase == BatchPhase.Completed, string.Join(Environment.NewLine,
             completed.Items.Select(item => $"{item.State}: {item.Failure}; {item.Result?.Tool}; {item.Result?.Verification}")));

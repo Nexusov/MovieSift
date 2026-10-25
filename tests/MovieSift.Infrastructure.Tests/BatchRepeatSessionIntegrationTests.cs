@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text.Json;
@@ -85,14 +86,13 @@ public sealed class BatchRepeatSessionIntegrationTests(ITestOutputHelper evidenc
                 return keepVideoOrApprovedAudio || keepSubtitles;
             }).Select(track => track.Id).ToArray();
             var destination = Path.Combine(outputDirectory, FormattableString.Invariant($"session-{sessionNumber}.trimmed.mkv"));
-            var planResult = PlanBuilder.Build(new(inspection, retainedIds, destination, false));
-            Assert.Null(planResult.Failure);
-            var plan = Assert.IsType<RemuxPlan>(planResult.Plan);
-            Assert.True(session.ApprovePlan(new(item.Id, plan)).Applied);
-            var reviewed = await coordinator.ReviewAsync(TestContext.Current.CancellationToken);
+            Assert.True(session.SetSelection(new(item.Id, retainedIds.ToImmutableArray())).Applied);
+            Assert.True(session.SetDestination(new(item.Id, destination)).Applied);
+            var reviewed = await coordinator.ReviewSelectionsAsync(new(session.Snapshot.Revision, [], TestContext.Current.CancellationToken));
             Assert.Null(reviewed.Failure);
             Assert.Empty(reviewed.ItemFailures);
             var review = Assert.IsType<BatchReview>(reviewed.Review);
+            var plan = Assert.Single(review.Items).Plan;
 
             if (previous is not null)
             {

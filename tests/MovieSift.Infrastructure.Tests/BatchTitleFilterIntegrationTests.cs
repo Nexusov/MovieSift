@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text.Json;
@@ -69,7 +70,6 @@ public sealed class BatchTitleFilterIntegrationTests(ITestOutputHelper evidence)
         var applied = coordinator.ApplyLanguageRules(preview);
         Assert.True(applied.Applied, applied.Failure?.ToString());
         Assert.Equal(2, applied.ChangedItemIds.Length);
-        var plans = new Dictionary<Guid, RemuxPlan>();
 
         foreach (var item in session.Snapshot.Items)
         {
@@ -78,18 +78,15 @@ public sealed class BatchTitleFilterIntegrationTests(ITestOutputHelper evidence)
             var expected = inspection.Tracks.Where(track => track.Kind == TrackKind.Video || track.Uid == intendedAudioUid);
             Assert.Equal(expected.Select(track => track.Id), item.CurrentRetainedTrackIds);
             Assert.Equal(Assert.Single(preview.Items, proposal => proposal.ItemId == item.Id).ProposedRetainedTrackIds, item.CurrentRetainedTrackIds);
-            var planned = PlanBuilder.Build(new(inspection, item.CurrentRetainedTrackIds,
-                Path.Combine(outputs, Path.GetFileNameWithoutExtension(item.SourcePath) + ".trimmed.mkv"), false));
-            var plan = Assert.IsType<RemuxPlan>(planned.Plan);
-            Assert.False(plan.IsNoChange);
-            Assert.True(session.ApprovePlan(new(item.Id, plan)).Applied);
-            plans.Add(item.Id, plan);
+            Assert.True(session.SetDestination(new(item.Id,
+                Path.Combine(outputs, Path.GetFileNameWithoutExtension(item.SourcePath) + ".trimmed.mkv"))).Applied);
         }
 
-        var reviewed = await coordinator.ReviewAsync(TestContext.Current.CancellationToken);
+        var reviewed = await coordinator.ReviewSelectionsAsync(new(session.Snapshot.Revision, [], TestContext.Current.CancellationToken));
         Assert.Null(reviewed.Failure);
         Assert.Empty(reviewed.ItemFailures);
         var review = Assert.IsType<BatchReview>(reviewed.Review);
+        var plans = review.Items.ToDictionary(item => item.ItemId, item => item.Plan);
         var completed = await coordinator.RunAsync(new(review.Id, CancellationToken: TestContext.Current.CancellationToken));
         Assert.True(completed.Phase == BatchPhase.Completed,
             string.Join(Environment.NewLine, completed.Items.Select(item => $"{item.State}: {item.Failure}; {item.Result?.Verification}")));

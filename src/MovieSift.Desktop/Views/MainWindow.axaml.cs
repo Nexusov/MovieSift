@@ -1,23 +1,83 @@
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 using MovieSift.Desktop.Appearance;
 using MovieSift.Desktop.ViewModels;
 
 namespace MovieSift.Desktop.Views;
 
-/// <summary>Owns only window initialization and safe asynchronous close behavior.</summary>
+/// <summary>Owns window-level focus, initialization and safe asynchronous close behavior.</summary>
 public sealed partial class MainWindow : Window
 {
     private bool shutdownCompleted;
     private bool shutdownInProgress;
 
-    /// <summary>Loads the compiled view and connects lifetime-only events.</summary>
+    /// <summary>Loads compiled controls and connects view-only input and lifetime events.</summary>
     public MainWindow()
     {
         InitializeComponent();
         AppearanceMotionPolicy.Track(this);
+        AppearancePanel.PropertyChanged += OnAppearancePanelChanged;
+        AddHandler(KeyDownEvent, OnAppearanceKeyDown, RoutingStrategies.Tunnel);
         Opened += OnOpened;
         Closing += OnClosing;
+    }
+
+    /// <summary>Moves focus only on an actual open/close transition, preserving ordinary editor navigation.</summary>
+    private void OnAppearancePanelChanged(object? sender, AvaloniaPropertyChangedEventArgs eventArguments)
+    {
+        if (eventArguments.Property != IsVisibleProperty)
+        {
+            return;
+        }
+
+        var appearanceIsOpen = AppearancePanel.IsVisible;
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (!IsVisible || AppearancePanel.IsVisible != appearanceIsOpen)
+            {
+                return;
+            }
+
+            AppearanceFocusTarget(appearanceIsOpen).Focus();
+        });
+    }
+
+    /// <summary>Prefers an already pending mandatory close decision over the ordinary cosmetic invoking control.</summary>
+    private Button AppearanceFocusTarget(bool appearanceIsOpen)
+    {
+        if (appearanceIsOpen)
+        {
+            return CloseAppearanceButton;
+        }
+
+        if (DataContext is MainViewModel { HasWarningCloseDecision: true })
+        {
+            return RemainInWarningReviewButton;
+        }
+
+        if (DataContext is MainViewModel { RequiresCloseDecision: true })
+        {
+            return CloseDespiteUncertaintyButton;
+        }
+
+        return AppearanceButton;
+    }
+
+    /// <summary>Escape closes only cosmetic UI; media cancellation and warning decisions remain explicit actions.</summary>
+    private void OnAppearanceKeyDown(object? sender, KeyEventArgs eventArguments)
+    {
+        var closesAppearance = eventArguments.Key == Key.Escape && DataContext is MainViewModel { IsAppearanceOpen: true };
+
+        if (!closesAppearance)
+        {
+            return;
+        }
+
+        ((MainViewModel)DataContext!).IsAppearanceOpen = false;
+        eventArguments.Handled = true;
     }
 
     /// <summary>Restores portable state after the ViewModel has been composed.</summary>
@@ -50,6 +110,7 @@ public sealed partial class MainWindow : Window
             eventArguments.Cancel = true;
             var warningReviewViewModel = (MainViewModel)DataContext!;
             warningReviewViewModel.RequestWarningCloseReview();
+            warningReviewViewModel.IsAppearanceOpen = false;
             this.FindControl<Button>("RemainInWarningReviewButton")?.Focus();
             return;
         }
@@ -59,6 +120,7 @@ public sealed partial class MainWindow : Window
         if (needsExplicitDecision)
         {
             eventArguments.Cancel = true;
+            ((MainViewModel)DataContext!).IsAppearanceOpen = false;
             return;
         }
 

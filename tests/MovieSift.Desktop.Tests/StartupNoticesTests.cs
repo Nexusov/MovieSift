@@ -38,7 +38,8 @@ public sealed class StartupNoticesTests
         fixture.Settings.LoadException = new IOException("Synthetic settings read failure.");
         fixture.Outputs.Interrupted = [new(null, "InvalidRecord", false, "untrusted-record.json")];
         await fixture.ViewModel.InitializeAsync();
-        Assert.True(fixture.ViewModel.PersistenceFailed);
+        Assert.True(fixture.ViewModel.LanguagePreferenceFailed);
+        Assert.False(fixture.ViewModel.PersistenceFailed);
         Assert.True(fixture.ViewModel.HasInterrupted);
         Assert.Contains("needs manual review", fixture.ViewModel.InterruptedDetails);
         Assert.Equal(1, fixture.Outputs.DiscoveryCount);

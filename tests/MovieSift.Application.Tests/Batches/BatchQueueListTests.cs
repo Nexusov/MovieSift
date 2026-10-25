@@ -4,7 +4,6 @@ using MovieSift.Application.Inspection;
 using MovieSift.Application.Jobs;
 using MovieSift.Application.QueueLists;
 using MovieSift.Core.Failures;
-using MovieSift.Core.Planning;
 using Xunit;
 
 namespace MovieSift.Application.Tests.Batches;
@@ -69,8 +68,8 @@ public sealed class BatchQueueListTests
         Assert.Empty(reader.DestinationValidations);
         Assert.Empty(reader.Reservations);
         Assert.Equal(0, reader.CleanupCalls);
-        Assert.False(reader.Session.ApprovePlan(new(pending.Items[0].Id, oldFirst.ApprovedPlan!)).Applied);
-        Assert.Null((await reader.Coordinator.ReviewAsync(TestContext.Current.CancellationToken)).Review);
+        Assert.False(reader.Session.SetSelection(new(pending.Items[0].Id, oldFirst.CurrentRetainedTrackIds)).Applied);
+        Assert.Null((await reader.Coordinator.ReviewSelectionsAsync(new(reader.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken))).Review);
         Assert.Equal(ErrorCode.StalePlan,
             (await reader.Coordinator.RunAsync(new(before.Review!.Id))).Failure!.Code);
         Assert.Empty(reader.RemuxedPaths);
@@ -81,11 +80,10 @@ public sealed class BatchQueueListTests
         Assert.Equal(inspected.Inspection!.Tracks.Select(track => track.Id), inspected.CurrentRetainedTrackIds);
         Assert.Null(inspected.ApprovedPlan);
         Assert.Equal(nestedDestination, inspected.IntendedDestinationPath);
-        Assert.Null((await reader.Coordinator.ReviewAsync(TestContext.Current.CancellationToken)).Review);
-        var plan = PlanBuilder.Build(new(inspected.Inspection, inspected.CurrentRetainedTrackIds,
-            inspected.IntendedDestinationPath!, false, inspected.IntendedOutputDirectoryRoot)).Plan!;
-        Assert.True(reader.Session.ApprovePlan(new(inspected.Id, plan)).Applied);
-        Assert.NotNull((await reader.Coordinator.ReviewAsync(TestContext.Current.CancellationToken)).Review);
+        Assert.Null(reader.Session.Snapshot.Review);
+        Assert.True(reader.Session.SetSelection(new(inspected.Id, inspected.Inspection.Tracks
+            .Where(track => track.Kind != MovieSift.Core.Media.TrackKind.Subtitles).Select(track => track.Id).ToImmutableArray())).Applied);
+        Assert.NotNull((await reader.Coordinator.ReviewSelectionsAsync(new(reader.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken))).Review);
         Assert.Empty(reader.RemuxedPaths);
     }
 
@@ -126,10 +124,10 @@ public sealed class BatchQueueListTests
         Assert.True(harness.Session.AddDiscoveryResult(new([], [new(sourcePath, discoveryFailure)])).Applied);
         await harness.Coordinator.InspectPendingAsync(TestContext.Current.CancellationToken);
         var valid = harness.Session.Snapshot.Items[0];
-        harness.Approve(valid);
+        await harness.SelectAndReviewAsync(valid);
         var failed = Assert.Single(harness.Session.Snapshot.Items, item => item.SourcePath == sourcePath);
         Assert.True(harness.Session.SetIncluded(failed.Id, false).Applied);
-        Assert.NotNull((await harness.Coordinator.ReviewAsync(TestContext.Current.CancellationToken)).Review);
+        Assert.NotNull((await harness.Coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken))).Review);
         var reviewed = harness.Session.Snapshot;
         var destination = Path.Combine(Path.GetTempPath(), "missing source intended output.mkv");
 
@@ -194,8 +192,8 @@ public sealed class BatchQueueListTests
     {
         var harness = new BatchTestHarness(1);
         await harness.Coordinator.InspectPendingAsync(TestContext.Current.CancellationToken);
-        harness.Approve(harness.Session.Snapshot.Items[0], noChange: true);
-        var review = (await harness.Coordinator.ReviewAsync(TestContext.Current.CancellationToken)).Review!;
+        await harness.SelectAndReviewAsync(harness.Session.Snapshot.Items[0], noChange: true);
+        var review = (await harness.Coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken))).Review!;
         await harness.Coordinator.RunAsync(new(review.Id));
         Assert.Empty(harness.Session.CaptureQueueList().Entries);
         Assert.Empty(harness.RemuxedPaths);
@@ -319,11 +317,11 @@ public sealed class BatchQueueListTests
         Assert.Equal(changed, items[0].Inspection!.Source);
         Assert.NotEqual(old.Items[0].Inspection!.Source, items[0].Inspection!.Source);
         Assert.Null(items[0].ApprovedPlan);
-        harness.Approve(items[0]);
-        var secondPlan = harness.Approve(items[1]);
+        await harness.SelectAndReviewAsync(items[0]);
+        var secondPlan = await harness.SelectAndReviewAsync(items[1]);
         harness.Revisions[changedPath] = changed with { Length = changed.Length + 1 };
         harness.DestinationFailures[secondPlan.DestinationPath] = new(ErrorCode.DestinationExists);
-        var reviewed = await harness.Coordinator.ReviewAsync(TestContext.Current.CancellationToken);
+        var reviewed = await harness.Coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken));
         Assert.Null(reviewed.Review);
         Assert.Equal([ErrorCode.SourceChanged, ErrorCode.DestinationExists], reviewed.ItemFailures.Select(item => item.Failure.Code));
         Assert.Empty(harness.RemuxedPaths);
@@ -346,7 +344,7 @@ public sealed class BatchQueueListTests
         Assert.Null(item.Inspection);
         Assert.Null(item.ApprovedPlan);
         Assert.Empty(item.CurrentRetainedTrackIds);
-        Assert.Null((await harness.Coordinator.ReviewAsync(TestContext.Current.CancellationToken)).Review);
+        Assert.Null((await harness.Coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken))).Review);
         Assert.Empty(harness.RemuxedPaths);
         Assert.Equal(0, harness.CleanupCalls);
     }
@@ -364,7 +362,7 @@ public sealed class BatchQueueListTests
         Assert.True(harness.Coordinator.RestoreQueueList(listing).Applied);
         var restored = harness.Session.Snapshot;
         Assert.False(harness.Coordinator.ApplyLanguageRules(preview).Applied);
-        Assert.False(harness.Session.ApprovePlan(new(old.Items[0].Id, old.Items[0].ApprovedPlan!)).Applied);
+        Assert.False(harness.Session.SetSelection(new(old.Items[0].Id, old.Items[0].CurrentRetainedTrackIds)).Applied);
         Assert.False(harness.Session.SetDestination(new(old.Items[0].Id, old.Items[0].IntendedDestinationPath!)).Applied);
         Assert.Same(restored, harness.Session.Snapshot);
         Assert.Empty(harness.RemuxedPaths);

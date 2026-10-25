@@ -74,6 +74,7 @@ public sealed class SoftWorkspaceRenderTests
             fileSidebar.IsExpanded = true;
             Dispatcher.UIThread.RunJobs();
             window.UpdateLayout();
+            Assert.True(scroll.Viewport.Height > 0, "Expanding the file shelf must preserve a usable track viewport.");
             Save(window, $"{theme}-{language}-{width}x{height}-{density}-files-selection", density);
             fileSidebar.IsExpanded = expandedBeforeCapture;
             var editableGroup = workspace.GetVisualDescendants().OfType<CheckBox>().First(control =>
@@ -188,7 +189,7 @@ public sealed class SoftWorkspaceRenderTests
     }
 
     /// <summary>Uses similarly prefixed episode filenames so renders expose meaningful filename truncation.</summary>
-    private static BatchViewModelFixture CreateLongNameFixture()
+    internal static BatchViewModelFixture CreateLongNameFixture()
     {
         var fixture = new BatchViewModelFixture();
         var sources = fixture.Backend.Inspections.Values.ToArray();
@@ -220,7 +221,7 @@ public sealed class SoftWorkspaceRenderTests
     }
 
     /// <summary>Exports logical-size/density snapshots only when explicitly requested by the development environment.</summary>
-    private static void Save(Window window, string name, double density)
+    internal static void Save(Window window, string name, double density)
     {
         var directory = Environment.GetEnvironmentVariable("MOVIESIFT_SOFT_RENDER_OUTPUT");
 
@@ -238,12 +239,17 @@ public sealed class SoftWorkspaceRenderTests
         }
         bitmap.Save(Path.Combine(directory, name + ".png"), PngBitmapEncoderOptions.Default);
         var main = window.DataContext as MainViewModel;
+        var workspace = window.FindControl<BatchView>("Workspace");
+        var fileShelf = workspace?.FindControl<Expander>("FileSidebar");
+        var fileList = workspace?.FindControl<ListBox>("BatchFileList");
+        var trackScroll = workspace?.FindControl<ScrollViewer>("WorkspaceScrollViewer");
         File.WriteAllText(Path.Combine(directory, name + ".json"), JsonSerializer.Serialize(new
         {
             method = "Avalonia.Headless + Skia RenderTargetBitmap; controlled UI metadata; not native desktop acceptance",
             logicalWidth = window.ClientSize.Width,
             logicalHeight = window.ClientSize.Height,
             renderDensity = density,
+            headlessRenderScaling = window.RenderScaling,
             language = main?.Localization.Language,
             appearanceTheme = main?.Appearance?.Current.Theme.ToString(),
             lightSecondaryTextOverride = main?.Appearance?.Current.LightOverrides?.SecondaryText,
@@ -254,6 +260,10 @@ public sealed class SoftWorkspaceRenderTests
             currentReview = main?.Batch.HasCurrentReview,
             reviewedCopyCount = main?.Batch.ReviewedCopyCount,
             reviewedNoChangeCount = main?.Batch.ReviewedNoChangeCount,
+            fileShelfExpanded = fileShelf?.IsExpanded,
+            fileShelfHeight = fileShelf?.Bounds.Height,
+            fileViewportHeight = fileList?.GetVisualDescendants().OfType<ScrollViewer>().SingleOrDefault()?.Viewport.Height,
+            trackViewportHeight = trackScroll?.Viewport.Height,
             osDisplayScalingChanged = false
         }, new JsonSerializerOptions { WriteIndented = true }));
     }

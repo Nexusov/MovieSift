@@ -94,7 +94,14 @@ public sealed class JobCoordinator(IMediaBackend backend, ISourceAccess sourceAc
         }
         catch (OperationFailureException exception)
         {
-            result = result with { Phase = JobPhase.Failed, Failure = exception.Failure };
+            var cancelled = exception.Failure.Code == ErrorCode.Cancelled;
+            result = result with
+            {
+                Phase = cancelled ? JobPhase.Cancelled : JobPhase.Failed,
+                Failure = exception.Failure,
+                CancellationRequested = cancelled,
+                CleanupIssues = result.CleanupIssues.AddRange(exception.CleanupIssues)
+            };
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {
@@ -107,7 +114,7 @@ public sealed class JobCoordinator(IMediaBackend backend, ISourceAccess sourceAc
 
             if (shouldCleanup)
             {
-                result = result with { CleanupIssues = await CleanupSafelyAsync(output!) };
+                result = result with { CleanupIssues = result.CleanupIssues.AddRange(await CleanupSafelyAsync(output!)) };
             }
 
             gate.Release();
@@ -153,7 +160,14 @@ public sealed class JobCoordinator(IMediaBackend backend, ISourceAccess sourceAc
         }
         catch (OperationFailureException exception)
         {
-            result = result with { Phase = JobPhase.Failed, Failure = exception.Failure };
+            var cancelled = exception.Failure.Code == ErrorCode.Cancelled;
+            result = result with
+            {
+                Phase = cancelled ? JobPhase.Cancelled : JobPhase.Failed,
+                Failure = exception.Failure,
+                CancellationRequested = cancelled,
+                CleanupIssues = result.CleanupIssues.AddRange(exception.CleanupIssues)
+            };
             pendingWarning = null;
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
@@ -165,7 +179,7 @@ public sealed class JobCoordinator(IMediaBackend backend, ISourceAccess sourceAc
         {
             if (pendingWarning is null && result.Failure?.Code != ErrorCode.ProcessTerminationFailed)
             {
-                result = result with { CleanupIssues = await CleanupSafelyAsync(pending.Output) };
+                result = result with { CleanupIssues = result.CleanupIssues.AddRange(await CleanupSafelyAsync(pending.Output)) };
             }
 
             gate.Release();

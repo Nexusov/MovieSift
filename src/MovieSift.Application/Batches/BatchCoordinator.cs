@@ -194,64 +194,6 @@ public sealed partial class BatchCoordinator(
         }
     }
 
-    /// <summary>Validates all included remaining approvals and freezes the next explicit run.</summary>
-    public async Task<BatchReviewResult> ReviewAsync(CancellationToken cancellationToken = default)
-    {
-        if (!await gate.WaitAsync(0))
-        {
-            return new(null, [], new(ErrorCode.Busy));
-        }
-
-        try
-        {
-            if (!session.TryBegin(BatchPhase.Reviewing, out var failure))
-            {
-                return new(null, [], failure);
-            }
-
-            var current = session.Snapshot;
-            var validation = await BatchReviewValidator.ValidateAsync(new(current, sourceAccess, cancellationToken));
-
-            if (validation.Failure is not null || !validation.ItemFailures.IsEmpty)
-            {
-                session.Update(snapshot => snapshot with { Phase = BatchPhase.Preparing, Failure = validation.Failure });
-                return validation;
-            }
-
-            session.Update(snapshot => snapshot with
-            {
-                Phase = BatchPhase.Ready,
-                Review = validation.Review,
-                Failure = null,
-                PauseReason = BatchPauseReason.None,
-                PauseRequested = false
-            });
-            return validation;
-        }
-        catch (OperationCanceledException)
-        {
-            FinishPreparation(true);
-            return new(null, [], new(ErrorCode.Cancelled));
-        }
-        catch (Exception exception)
-        {
-            var failure = new Failure(ErrorCode.IoFailure, exception.ToString());
-            session.Update(snapshot => snapshot with
-            {
-                Phase = BatchPhase.Preparing,
-                Review = null,
-                Failure = failure,
-                PauseReason = BatchPauseReason.None,
-                PauseRequested = false
-            });
-            return new(null, [], failure);
-        }
-        finally
-        {
-            gate.Release();
-        }
-    }
-
     /// <summary>Runs the latest immutable batch review until completion or the first pause boundary.</summary>
     public async Task<BatchSnapshot> RunAsync(BatchRunRequest request)
     {

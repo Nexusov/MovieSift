@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Security.Cryptography;
 using System.Text.Json;
 using MovieSift.Application.Batches;
@@ -59,7 +60,6 @@ public sealed class BatchMediaIntegrationTests(ITestOutputHelper evidence)
         Assert.Equal(expectedReorderedUids, secondInspection.Tracks.Select(track => track.Uid));
         Assert.NotEqual(originalVideo.Id, Assert.Single(secondInspection.Tracks.Where(track => track.Kind == TrackKind.Video)).Id);
         Assert.NotEqual(originalSubtitles.Id, Assert.Single(secondInspection.Tracks.Where(track => track.Kind == TrackKind.Subtitles)).Id);
-        var plans = new Dictionary<Guid, RemuxPlan>();
 
         foreach (var item in inspected.Items)
         {
@@ -70,17 +70,15 @@ public sealed class BatchMediaIntegrationTests(ITestOutputHelper evidence)
                 || track.Uid == approvedAudioUid || isFirstSource && track.Kind == TrackKind.Subtitles)
                 .Select(track => track.Id).ToArray();
             var destination = Path.Combine(outputDirectory, Path.GetFileNameWithoutExtension(item.SourcePath) + ".trimmed.mkv");
-            var planResult = PlanBuilder.Build(new(inspection, retainedIds, destination, false));
-            Assert.Null(planResult.Failure);
-            var plan = Assert.IsType<RemuxPlan>(planResult.Plan);
-            Assert.True(session.ApprovePlan(new(item.Id, plan)).Applied);
-            plans.Add(item.Id, plan);
+            Assert.True(session.SetSelection(new(item.Id, retainedIds.ToImmutableArray())).Applied);
+            Assert.True(session.SetDestination(new(item.Id, destination)).Applied);
         }
 
-        var reviewed = await coordinator.ReviewAsync(TestContext.Current.CancellationToken);
+        var reviewed = await coordinator.ReviewSelectionsAsync(new(session.Snapshot.Revision, [], TestContext.Current.CancellationToken));
         Assert.Null(reviewed.Failure);
         Assert.Empty(reviewed.ItemFailures);
         var review = Assert.IsType<BatchReview>(reviewed.Review);
+        var plans = review.Items.ToDictionary(item => item.ItemId, item => item.Plan);
         var completed = await coordinator.RunAsync(new(review.Id, CancellationToken: TestContext.Current.CancellationToken));
         var completionEvidence = string.Join(Environment.NewLine, completed.Items.Select(item =>
             $"{item.SourcePath}: {item.State}; failure={item.Failure}; tool={item.Result?.Tool}; verification={item.Result?.Verification}"));

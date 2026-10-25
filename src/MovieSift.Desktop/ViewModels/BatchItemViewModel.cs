@@ -37,6 +37,7 @@ public sealed class BatchItemViewModel : ObservableObject
 
     public Guid Id => item.Id;
     public string SourcePath => item.SourcePath;
+    public string InclusionAccessibleName => Localization.Format(new("IncludeFileAccessible", [SourcePath]));
     public string FileName => Path.GetFileName(item.SourcePath);
     public string ContextPath => DescribeContextPath();
     public string RelativeSourcePath => item.FolderOrigin?.RelativePath ?? string.Empty;
@@ -237,27 +238,6 @@ public sealed class BatchItemViewModel : ObservableObject
         }
 
         Refresh();
-    }
-
-    /// <summary>Snapshots only the current file's IDs and explicit zero-audio consent.</summary>
-    public void Approve()
-    {
-        if (!CanEditPlan || item.Inspection is null)
-        {
-            return;
-        }
-
-        var identifiers = Tracks.Where(track => track.Keep).Select(track => track.Track.Id).ToArray();
-        var result = PlanBuilder.Build(new(item.Inspection, identifiers, OutputPath, ZeroAudioConfirmed, outputDirectoryRoot));
-        planningFailure = result.Failure;
-
-        if (result.Plan is { } plan)
-        {
-            planningFailure = options.Session.ApprovePlan(new(Id, plan)).Failure;
-        }
-
-        Refresh();
-        options.Changed();
     }
 
     /// <summary>Applies an explicit shared-folder change only to items that can still be planned.</summary>

@@ -8,6 +8,132 @@ namespace MovieSift.Application.Tests.Batches;
 /// <summary>Checks that one explicit Review issues separate current plans while retaining established validation.</summary>
 public sealed class BatchSelectionReviewTests
 {
+    /// <summary>NoChange validates its source but never consults an unused output destination.</summary>
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task NoChangeIgnoresMissingOrExistingDestination(bool existingDestination)
+    {
+        var harness = new BatchTestHarness(1);
+        await harness.Coordinator.InspectPendingAsync(TestContext.Current.CancellationToken);
+        var item = Assert.Single(harness.Session.Snapshot.Items);
+
+        if (existingDestination)
+        {
+            var destination = Path.ChangeExtension(item.SourcePath, ".trimmed.mkv");
+            Assert.True(harness.Session.SetDestination(new(item.Id, destination)).Applied);
+            harness.DestinationFailures[destination] = new(ErrorCode.DestinationExists);
+        }
+
+        var result = await Review(harness);
+
+        Assert.NotNull(result.Review);
+        Assert.True(Assert.Single(result.Review.Items).Plan.IsNoChange);
+        Assert.Empty(harness.DestinationValidations);
+        await harness.Coordinator.RunAsync(new(result.Review.Id));
+        Assert.Empty(harness.RemuxedPaths);
+        Assert.Empty(harness.Reservations);
+    }
+
+    /// <summary>Only a real copy occupies its destination; unchanged siblings never reserve or remux.</summary>
+    [Fact]
+    public async Task ChangedAndNoChangeItemsMayShareUnusedDestinationIntent()
+    {
+        var harness = new BatchTestHarness(3);
+        await harness.Coordinator.InspectPendingAsync(TestContext.Current.CancellationToken);
+        var items = harness.Session.Snapshot.Items;
+        var destination = Path.Combine(Path.GetTempPath(), "MovieSift shared changed output.mkv");
+
+        foreach (var item in items)
+        {
+            Assert.True(harness.Session.SetDestination(new(item.Id, destination)).Applied);
+        }
+
+        Assert.True(harness.Session.SetSelection(new(items[0].Id, [0, 1])).Applied);
+        var reviewed = await Review(harness);
+        Assert.NotNull(reviewed.Review);
+        Assert.Single(harness.DestinationValidations);
+        Assert.False(reviewed.Review.Items[0].Plan.IsNoChange);
+        Assert.All(reviewed.Review.Items.Skip(1), item => Assert.True(item.Plan.IsNoChange));
+
+        var completed = await harness.Coordinator.RunAsync(new(reviewed.Review.Id));
+
+        Assert.Equal(BatchPhase.Completed, completed.Phase);
+        Assert.Equal([items[0].SourcePath], harness.RemuxedPaths);
+        Assert.Single(harness.Reservations);
+        Assert.Equal([destination], harness.PublishedPaths);
+        Assert.All(completed.Items.Skip(1), item =>
+        {
+            Assert.Equal(BatchItemState.NoChange, item.State);
+            Assert.Null(item.Result!.PublishedPath);
+        });
+    }
+
+    /// <summary>All inputs remain protected sources even when their own unused output or inclusion is irrelevant.</summary>
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task ChangedOutputCannotAliasUnchangedOrExcludedSource(bool includeUnchanged)
+    {
+        var harness = new BatchTestHarness();
+        await harness.Coordinator.InspectPendingAsync(TestContext.Current.CancellationToken);
+        var items = harness.Session.Snapshot.Items;
+        Assert.True(harness.Session.SetSelection(new(items[0].Id, [0, 1])).Applied);
+        Assert.True(harness.Session.SetDestination(new(items[0].Id, items[1].SourcePath)).Applied);
+        Assert.True(harness.Session.SetIncluded(items[1].Id, includeUnchanged).Applied);
+
+        var rejected = await Review(harness);
+
+        Assert.Null(rejected.Review);
+        var failure = Assert.Single(rejected.ItemFailures);
+        Assert.Equal(items[0].Id, failure.ItemId);
+        Assert.Equal(ErrorCode.InvalidDestination, failure.Failure.Code);
+        Assert.Empty(harness.RemuxedPaths);
+        Assert.Empty(harness.Reservations);
+        Assert.Empty(harness.PublishedPaths);
+    }
+
+    /// <summary>Changing a previously unchanged selection restores all copy-destination requirements.</summary>
+    [Fact]
+    public async Task LaterRemovalRequiresDestinationAndFreshReview()
+    {
+        var harness = new BatchTestHarness(1);
+        await harness.Coordinator.InspectPendingAsync(TestContext.Current.CancellationToken);
+        var reviewed = await Review(harness);
+        Assert.NotNull(reviewed.Review);
+        var item = Assert.Single(harness.Session.Snapshot.Items);
+        Assert.True(harness.Session.SetSelection(new(item.Id, [0, 1])).Applied);
+        Assert.Null(harness.Session.Snapshot.Review);
+        Assert.Equal(ErrorCode.StalePlan, (await harness.Coordinator.RunAsync(new(reviewed.Review.Id))).Failure!.Code);
+
+        var rejected = await Review(harness);
+
+        Assert.Null(rejected.Review);
+        Assert.Equal(ErrorCode.InvalidDestination, Assert.Single(rejected.ItemFailures).Failure.Code);
+        Assert.Empty(harness.RemuxedPaths);
+    }
+
+    /// <summary>NoChange rechecks its approved source immediately before completing without a copy.</summary>
+    [Fact]
+    public async Task NoChangeRejectsSourceChangedAfterReview()
+    {
+        var harness = new BatchTestHarness(1);
+        await harness.Coordinator.InspectPendingAsync(TestContext.Current.CancellationToken);
+        var reviewed = await Review(harness);
+        Assert.NotNull(reviewed.Review);
+        var item = Assert.Single(harness.Session.Snapshot.Items);
+        harness.Revisions[item.SourcePath] = item.Inspection!.Source with { LastWriteUtcTicks = 999 };
+
+        var stopped = await harness.Coordinator.RunAsync(new(reviewed.Review.Id));
+
+        Assert.Equal(BatchItemState.Failed, Assert.Single(stopped.Items).State);
+        Assert.Equal(ErrorCode.SourceChanged, stopped.Items[0].Result!.Failure!.Code);
+        Assert.Empty(harness.DestinationValidations);
+        Assert.Empty(harness.RemuxedPaths);
+        Assert.Empty(harness.Reservations);
+        Assert.Empty(harness.PublishedPaths);
+    }
+
     /// <summary>One-item use needs no separate lifecycle and a no-op edit preserves the exact approval/review.</summary>
     [Fact]
     public async Task OneReviewApprovesEachPlanAndNoOpRetainsAuthority()
@@ -80,6 +206,11 @@ public sealed class BatchSelectionReviewTests
         await harness.Coordinator.InspectPendingAsync(TestContext.Current.CancellationToken);
         SetDestinations(harness);
         var item = harness.Session.Snapshot.Items[0];
+
+        if (!changedSource)
+        {
+            Assert.True(harness.Session.SetSelection(new(item.Id, [0, 1])).Applied);
+        }
 
         if (changedSource)
         {

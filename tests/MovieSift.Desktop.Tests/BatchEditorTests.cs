@@ -36,10 +36,10 @@ public sealed class BatchEditorTests
             Assert.All(first.Tracks.Concat(second.Tracks), track => Assert.True(track.Keep));
             fixture.Batch.SelectedItem = first;
             first.Tracks.Single(track => track.Track.Id == 1).Keep = false;
-            fixture.Batch.ApproveSelectedCommand.Execute(null);
+            await fixture.Batch.ReviewCommand.ExecuteAsync(null);
             fixture.Batch.SelectedItem = second;
             second.Tracks.Single(track => track.Track.Id == 25).Keep = false;
-            fixture.Batch.ApproveSelectedCommand.Execute(null);
+            await fixture.Batch.ReviewCommand.ExecuteAsync(null);
             var firstPlan = first.ApprovedPlan;
             var secondPlan = second.ApprovedPlan;
             var firstRows = first.Tracks.ToArray();
@@ -94,7 +94,7 @@ public sealed class BatchEditorTests
         Assert.Same(secondPlan, second.ApprovedPlan);
         Assert.False(fixture.Batch.HasReview);
         fixture.Batch.SelectedItem = first;
-        fixture.Batch.ApproveSelectedCommand.Execute(null);
+        await fixture.Batch.ReviewCommand.ExecuteAsync(null);
         await fixture.Batch.ReviewCommand.ExecuteAsync(null);
         Assert.True(fixture.Batch.HasReview);
 
@@ -337,21 +337,22 @@ public sealed class BatchEditorTests
 
         fixture.Batch.SelectedItem = first;
         first.ZeroAudioConfirmed = true;
-        fixture.Batch.ApproveSelectedCommand.Execute(null);
+        await fixture.Batch.ReviewCommand.ExecuteAsync(null);
         Assert.NotNull(first.ApprovedPlan);
         fixture.Batch.SelectedItem = second;
-        fixture.Batch.ApproveSelectedCommand.Execute(null);
+        await fixture.Batch.ReviewCommand.ExecuteAsync(null);
         Assert.Null(second.ApprovedPlan);
         Assert.False(second.ZeroAudioConfirmed);
         Assert.True(second.NeedsZeroAudioConfirmation);
-        Assert.Equal(fixture.Localization["ErrorZeroAudioConfirmationRequired"], second.ErrorText);
+        Assert.Equal(fixture.Localization["ErrorZeroAudioConfirmationRequired"],
+            Assert.Single(fixture.Batch.ReviewRows, row => row.Item.Id == second.Id).FailureText);
         Assert.True(first.ZeroAudioConfirmed);
         await fixture.Main.ChangeLanguageCommand.ExecuteAsync("ru");
         Assert.NotNull(first.ApprovedPlan);
         Assert.Null(second.ApprovedPlan);
         Assert.False(second.ZeroAudioConfirmed);
         second.ZeroAudioConfirmed = true;
-        fixture.Batch.ApproveSelectedCommand.Execute(null);
+        await fixture.Batch.ReviewCommand.ExecuteAsync(null);
         await fixture.Batch.ReviewCommand.ExecuteAsync(null);
         Assert.True(fixture.Batch.HasReview);
         Assert.All(fixture.Batch.Snapshot.Review!.Items, reviewed =>
@@ -514,13 +515,16 @@ public sealed class BatchEditorTests
             track.Keep = false;
         }
 
-        fixture.Batch.ApproveSelectedCommand.Execute(null);
-        Assert.True(first.HasError);
-        Assert.Equal(fixture.Localization["ErrorZeroAudioConfirmationRequired"], first.ErrorText);
+        await fixture.Batch.ReviewCommand.ExecuteAsync(null);
+        Assert.True(fixture.Batch.HasError);
+        Assert.Equal(fixture.Localization["ErrorZeroAudioConfirmationRequired"],
+            Assert.Single(fixture.Batch.ReviewRows, row => row.Item.Id == first.Id).FailureText);
         await fixture.Batch.InspectSelectedCommand.ExecuteAsync(null);
         Assert.Equal(BatchItemState.NeedsReview, first.Snapshot.State);
         Assert.False(first.HasError);
         Assert.Empty(first.ErrorText);
+        Assert.False(fixture.Batch.HasError);
+        Assert.False(Assert.Single(fixture.Batch.ReviewRows, row => row.Item.Id == first.Id).HasFailure);
         Assert.False(first.ZeroAudioConfirmed);
         Assert.All(first.Tracks, track => Assert.True(track.Keep));
         Assert.Null(first.ApprovedPlan);

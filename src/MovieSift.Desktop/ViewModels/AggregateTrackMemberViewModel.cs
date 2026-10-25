@@ -27,6 +27,10 @@ public sealed class AggregateTrackMemberViewModel : ObservableObject
     public string TitleText => string.IsNullOrWhiteSpace(member.Track.Title) ? Localization["Untitled"] : member.Track.Title;
     public string LanguageText => string.Join(" / ", new[] { member.Track.Language, member.Track.LanguageIetf }.Where(value => !string.IsNullOrWhiteSpace(value)).Distinct(StringComparer.Ordinal));
     public string FlagsText => TrackPresentation.DescribeFlags(member.Track, Localization);
+    public bool IsRequired => member.Track.Kind == TrackKind.Video;
+    public string KeepAccessibleName => Localization.Format(new("AggregateMemberKeep",
+        [Localization[member.Track.Kind.ToString()], IdentifierText, SourcePath,
+            string.Join(", ", new[] { LanguageText, TitleText, FlagsText }.Where(value => !string.IsNullOrWhiteSpace(value)))]));
     public bool CanEdit => options.CanEdit() && member.IsEditable;
     public string StateText => Localization[member.State is BatchItemState.Completed or BatchItemState.NoChange ? "AggregateHistorical" : member.Track.Kind == TrackKind.Video ? "AlwaysKept" : "AggregateEditable"];
 

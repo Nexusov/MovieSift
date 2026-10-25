@@ -1,6 +1,9 @@
+using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using MovieSift.Application.Batches;
+using MovieSift.Core.Media;
 
 namespace MovieSift.Desktop.ViewModels;
 
@@ -15,10 +18,19 @@ public sealed class AggregateTracksViewModel : ObservableObject
     {
         this.options = options;
         projection = options.Session.CreateTrackProjection();
+        RemoveAllSubtitlesCommand = new RelayCommand(RemoveAllSubtitles, () => CanRemoveSubtitles);
         Refresh();
     }
 
     public ObservableCollection<AggregateTrackGroupViewModel> Groups { get; } = [];
+    public ObservableCollection<AggregateTrackGroupViewModel> VideoGroups { get; } = [];
+    public ObservableCollection<AggregateTrackGroupViewModel> AudioGroups { get; } = [];
+    public ObservableCollection<AggregateTrackGroupViewModel> SubtitleGroups { get; } = [];
+    public string VideoSummaryText => DescribeSection(TrackKind.Video);
+    public string AudioSummaryText => DescribeSection(TrackKind.Audio);
+    public string SubtitleSummaryText => DescribeSection(TrackKind.Subtitles);
+    public bool CanRemoveSubtitles => options.CanEdit() && EditableKeptSubtitles().Any();
+    public IRelayCommand RemoveAllSubtitlesCommand { get; }
     public Localization.LocalizationService Localization => options.Localization;
     public bool HasGroups => Groups.Count != 0;
     public bool HasUnresolved => projection.UnresolvedFileCount != 0;
@@ -60,6 +72,63 @@ public sealed class AggregateTracksViewModel : ObservableObject
             Groups.Remove(removed);
         }
 
+        RefreshSection(VideoGroups, TrackKind.Video);
+        RefreshSection(AudioGroups, TrackKind.Audio);
+        RefreshSection(SubtitleGroups, TrackKind.Subtitles);
         OnPropertyChanged(string.Empty);
+        RemoveAllSubtitlesCommand.NotifyCanExecuteChanged();
+    }
+
+    /// <summary>Keeps section collections stable so selection edits do not replace controls or lose keyboard focus.</summary>
+    private void RefreshSection(ObservableCollection<AggregateTrackGroupViewModel> section, TrackKind kind)
+    {
+        var expected = Groups.Where(group => group.Snapshot.Key.Kind == kind).ToArray();
+        for (var index = 0; index < expected.Length; index++)
+        {
+            var row = expected[index];
+            var previousIndex = section.IndexOf(row);
+
+            if (previousIndex < 0)
+            {
+                section.Insert(index, row);
+                continue;
+            }
+
+            if (previousIndex != index)
+            {
+                section.Move(previousIndex, index);
+            }
+        }
+
+        foreach (var removed in section.Where(row => !expected.Contains(row)).ToArray())
+        {
+            section.Remove(removed);
+        }
+    }
+
+    /// <summary>Describes actual category groups and occurrences, including duplicates and uncertain metadata.</summary>
+    private string DescribeSection(TrackKind kind)
+    {
+        var groups = projection.Groups.Where(group => group.Key.Kind == kind).ToArray();
+        return Localization.Format(new("AggregateSectionSummary",
+            [Localization[kind.ToString()], groups.Length, groups.Sum(group => group.OccurrenceCount)]));
+    }
+
+    /// <summary>Targets only included editable subtitle occurrences whose Keep value would actually change.</summary>
+    private IEnumerable<BatchTrackMember> EditableKeptSubtitles() => projection.Groups
+        .Where(group => group.Key.Kind == TrackKind.Subtitles)
+        .SelectMany(group => group.Members).Where(member => member.IsEditable && member.Keep);
+
+    /// <summary>Applies one atomic, revision-bound selection edit without interpreting language or approving plans.</summary>
+    private void RemoveAllSubtitles()
+    {
+        if (!CanRemoveSubtitles)
+        {
+            return;
+        }
+
+        var members = EditableKeptSubtitles().ToImmutableArray();
+        var result = options.Session.SetTrackSelection(new(projection, members, false));
+        options.SelectionEdited(result.Failure);
     }
 }

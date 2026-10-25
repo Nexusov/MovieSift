@@ -72,18 +72,18 @@ public sealed class BatchSessionTests
         var harness = new BatchTestHarness(1);
         harness.Session.AddDiscoveryResult(new([], [new("missing", new(ErrorCode.InvalidSource))]));
         await harness.Coordinator.InspectPendingAsync(TestContext.Current.CancellationToken);
-        harness.Approve(harness.Session.Snapshot.Items[0]);
+        await harness.SelectAndReviewAsync(harness.Session.Snapshot.Items[0]);
 
-        var rejected = await harness.Coordinator.ReviewAsync(TestContext.Current.CancellationToken);
+        var rejected = await harness.Coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken));
         var failed = Assert.Single(rejected.ItemFailures);
         Assert.Equal(ErrorCode.InvalidSource, failed.Failure.Code);
         Assert.True(harness.Session.SetIncluded(failed.ItemId, false).Applied);
-        var approved = await harness.Coordinator.ReviewAsync(TestContext.Current.CancellationToken);
+        var approved = await harness.Coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken));
         Assert.NotNull(approved.Review);
         Assert.Single(approved.Review.Items);
     }
 
-    /// <summary>Rejects a plan from another file despite otherwise valid numeric selections.</summary>
+    /// <summary>Rejects another file's local IDs and builds distinct immutable plans only through current Review.</summary>
     [Fact]
     public async Task PlanCannotBeReusedForAnotherEpisode()
     {
@@ -91,13 +91,19 @@ public sealed class BatchSessionTests
         await harness.Coordinator.InspectPendingAsync(TestContext.Current.CancellationToken);
         var first = harness.Session.Snapshot.Items[0];
         var second = harness.Session.Snapshot.Items[1];
-        var plan = harness.Approve(first);
+        harness.ConfigureSelection(first);
 
-        var result = harness.Session.ApprovePlan(new(second.Id, plan));
+        var before = harness.Session.Snapshot;
+        var result = harness.Session.SetSelection(new(second.Id, before.Items[0].CurrentRetainedTrackIds));
         Assert.False(result.Applied);
-        Assert.Equal(ErrorCode.StalePlan, result.Failure!.Code);
+        Assert.Equal(ErrorCode.InvalidSelection, result.Failure!.Code);
+        Assert.Same(before, harness.Session.Snapshot);
         Assert.Null(harness.Session.Snapshot.Items[1].ApprovedPlan);
         Assert.NotEqual(first.Inspection!.Tracks[0].Id, second.Inspection!.Tracks[0].Id);
+        harness.ConfigureSelection(second);
+        var review = await harness.Coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, []));
+        Assert.NotNull(review.Review);
+        Assert.NotEqual(review.Review.Items[0].Plan.Id, review.Review.Items[1].Plan.Id);
     }
 
     /// <summary>Rejects every duplicate destination and a destination aliasing even an excluded source.</summary>
@@ -108,18 +114,18 @@ public sealed class BatchSessionTests
         await harness.Coordinator.InspectPendingAsync(TestContext.Current.CancellationToken);
         var items = harness.Session.Snapshot.Items;
         var destination = Path.Combine(Path.GetTempPath(), "duplicate output.mkv");
-        harness.Approve(items[0], destination);
-        harness.Approve(items[1], Path.Combine(Path.GetDirectoryName(destination)!, ".", Path.GetFileName(destination)));
+        await harness.SelectAndReviewAsync(items[0], destination);
+        await harness.SelectAndReviewAsync(items[1], Path.Combine(Path.GetDirectoryName(destination)!, ".", Path.GetFileName(destination)));
         Assert.True(harness.Session.SetIncluded(items[2].Id, false).Applied);
 
-        var duplicate = await harness.Coordinator.ReviewAsync(TestContext.Current.CancellationToken);
+        var duplicate = await harness.Coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken));
         Assert.Equal(2, duplicate.ItemFailures.Length);
         Assert.All(duplicate.ItemFailures, failure => Assert.Equal(ErrorCode.InvalidDestination, failure.Failure.Code));
         Assert.Empty(harness.RemuxedPaths);
 
-        harness.Approve(harness.Session.Snapshot.Items[0], items[2].SourcePath);
-        harness.Approve(harness.Session.Snapshot.Items[1]);
-        var alias = await harness.Coordinator.ReviewAsync(TestContext.Current.CancellationToken);
+        await harness.SelectAndReviewAsync(harness.Session.Snapshot.Items[0], items[2].SourcePath);
+        await harness.SelectAndReviewAsync(harness.Session.Snapshot.Items[1]);
+        var alias = await harness.Coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken));
         var failure = Assert.Single(alias.ItemFailures);
         Assert.Equal(items[0].Id, failure.ItemId);
         Assert.Equal(ErrorCode.InvalidDestination, failure.Failure.Code);
@@ -132,12 +138,13 @@ public sealed class BatchSessionTests
         var harness = new BatchTestHarness();
         await harness.Coordinator.InspectPendingAsync(TestContext.Current.CancellationToken);
         var items = harness.Session.Snapshot.Items;
-        harness.Approve(items[0]);
-        var secondPlan = harness.Approve(items[1]);
+        await harness.SelectAndReviewAsync(items[0]);
+        var secondPlan = await harness.SelectAndReviewAsync(items[1]);
+        harness.DestinationValidations.Clear();
         harness.Revisions[items[0].SourcePath] = items[0].Inspection!.Source with { Length = 101 };
         harness.DestinationFailures[secondPlan.DestinationPath] = new(ErrorCode.DestinationExists);
 
-        var review = await harness.Coordinator.ReviewAsync(TestContext.Current.CancellationToken);
+        var review = await harness.Coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken));
         Assert.Null(review.Review);
         Assert.Equal([ErrorCode.SourceChanged, ErrorCode.DestinationExists], review.ItemFailures.Select(failure => failure.Failure.Code));
         Assert.Single(harness.DestinationValidations);

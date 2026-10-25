@@ -22,6 +22,7 @@ public sealed class ReviewPresentationRegressionTests
     {
         var fixture = new BatchViewModelFixture();
         await fixture.LoadAsync();
+        fixture.Batch.Items[0].Tracks.First(track => track.Track.Kind == TrackKind.Subtitles).Keep = false;
 
         if (repeat)
         {

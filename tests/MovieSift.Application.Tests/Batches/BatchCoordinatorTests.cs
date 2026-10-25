@@ -97,7 +97,7 @@ public sealed class BatchCoordinatorTests
         Assert.Equal(BatchItemState.Completed, paused.Items[0].State);
         Assert.Equal(BatchItemState.Ready, paused.Items[1].State);
         Assert.Single(harness.RemuxedPaths);
-        var resume = await harness.Coordinator.ReviewAsync(TestContext.Current.CancellationToken);
+        var resume = await harness.Coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken));
         Assert.Single(resume.Review!.Items);
         Assert.Equal(BatchPauseReason.None, harness.Session.Snapshot.PauseReason);
         var completed = await harness.Coordinator.RunAsync(new(resume.Review.Id));
@@ -140,10 +140,13 @@ public sealed class BatchCoordinatorTests
         var paused = await run;
         Assert.Equal(BatchItemState.Cancelled, paused.Items[0].State);
         Assert.Empty(harness.PublishedPaths);
-        Assert.Null((await harness.Coordinator.ReviewAsync(TestContext.Current.CancellationToken)).Review);
+        Assert.Null(paused.Review);
+        var obsolete = await harness.Coordinator.RunAsync(new(review.Id));
+        Assert.Equal(ErrorCode.StalePlan, obsolete.Failure!.Code);
+        Assert.Single(harness.RemuxedPaths);
         Assert.True(harness.Session.SetIncluded(paused.Items[0].Id, false).Applied);
         harness.OnRemux = null;
-        var resume = await harness.Coordinator.ReviewAsync(TestContext.Current.CancellationToken);
+        var resume = await harness.Coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken));
         var completed = await harness.Coordinator.RunAsync(new(resume.Review!.Id));
         Assert.Equal(BatchPhase.Completed, completed.Phase);
         Assert.Equal(BatchItemState.Cancelled, completed.Items[0].State);
@@ -188,7 +191,7 @@ public sealed class BatchCoordinatorTests
         Assert.Single(harness.RemuxedPaths);
         Assert.Equal(2, harness.VerifyCalls);
 
-        var resume = await harness.Coordinator.ReviewAsync(TestContext.Current.CancellationToken);
+        var resume = await harness.Coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken));
         var completed = await harness.Coordinator.RunAsync(new(resume.Review!.Id));
         Assert.Equal(BatchPhase.Completed, completed.Phase);
         Assert.Equal(2, harness.RemuxedPaths.Count);
@@ -215,7 +218,12 @@ public sealed class BatchCoordinatorTests
         Assert.Equal(1, harness.CleanupCalls);
         Assert.Single(harness.RemuxedPaths);
         Assert.Empty(harness.PublishedPaths);
-        Assert.Null((await harness.Coordinator.ReviewAsync(TestContext.Current.CancellationToken)).Review);
+        Assert.Null(discarded.Review);
+        Assert.Equal(ErrorCode.StalePlan, (await harness.Coordinator.RunAsync(new(review.Id))).Failure!.Code);
+        var freshReview = await harness.Coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken));
+        Assert.NotNull(freshReview.Review);
+        Assert.NotEqual(first.ApprovedPlan!.Id, freshReview.Review.Items[0].Plan.Id);
+        Assert.Single(harness.RemuxedPaths);
     }
 
     /// <summary>Stops on an item failure and requires explicit correction with a newly approved plan.</summary>
@@ -231,11 +239,12 @@ public sealed class BatchCoordinatorTests
         Assert.Equal(BatchPauseReason.ItemFailed, failed.PauseReason);
         Assert.Equal(BatchItemState.Failed, failed.Items[0].State);
         Assert.Single(harness.RemuxedPaths);
-        Assert.Null((await harness.Coordinator.ReviewAsync(TestContext.Current.CancellationToken)).Review);
-        Assert.False(harness.Session.ApprovePlan(new(first.Id, first.ApprovedPlan!)).Applied);
+        var staleRun = await harness.Coordinator.RunAsync(new(review.Id));
+        Assert.Equal(ErrorCode.StalePlan, staleRun.Failure!.Code);
+        Assert.Single(harness.RemuxedPaths);
         harness.ExitCodes[first.SourcePath] = 0;
-        harness.Approve(failed.Items[0]);
-        var corrected = await harness.Coordinator.ReviewAsync(TestContext.Current.CancellationToken);
+        await harness.SelectAndReviewAsync(failed.Items[0]);
+        var corrected = await harness.Coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken));
         var completed = await harness.Coordinator.RunAsync(new(corrected.Review!.Id));
         Assert.Equal(BatchPhase.Completed, completed.Phase);
         Assert.Equal(3, harness.RemuxedPaths.Count);
@@ -258,7 +267,7 @@ public sealed class BatchCoordinatorTests
         Assert.False(harness.Session.Remove(first.Id).Applied);
         Assert.False(harness.Session.SetIncluded(first.Id, false).Applied);
         Assert.False(harness.Session.InvalidatePlan(first.Id).Applied);
-        Assert.Null((await harness.Coordinator.ReviewAsync(TestContext.Current.CancellationToken)).Review);
+        Assert.Null((await harness.Coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken))).Review);
         Assert.Single(harness.RemuxedPaths);
     }
 
@@ -285,7 +294,7 @@ public sealed class BatchCoordinatorTests
         Assert.Equal(BatchPauseReason.UnsafeOwnership, stopped.PauseReason);
         Assert.True(stopped.HasSafetyBlock);
         Assert.False(harness.Session.SetIncluded(stopped.Items[0].Id, false).Applied);
-        Assert.Null((await harness.Coordinator.ReviewAsync(TestContext.Current.CancellationToken)).Review);
+        Assert.Null((await harness.Coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken))).Review);
         Assert.Single(harness.RemuxedPaths);
     }
 
@@ -313,9 +322,9 @@ public sealed class BatchCoordinatorTests
     {
         var harness = new BatchTestHarness();
         await harness.Coordinator.InspectPendingAsync(TestContext.Current.CancellationToken);
-        harness.Approve(harness.Session.Snapshot.Items[0], noChange: true);
-        harness.Approve(harness.Session.Snapshot.Items[1]);
-        var review = await harness.Coordinator.ReviewAsync(TestContext.Current.CancellationToken);
+        await harness.SelectAndReviewAsync(harness.Session.Snapshot.Items[0], noChange: true);
+        await harness.SelectAndReviewAsync(harness.Session.Snapshot.Items[1]);
+        var review = await harness.Coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken));
         var completed = await harness.Coordinator.RunAsync(new(review.Review!.Id));
 
         Assert.Equal(BatchItemState.NoChange, completed.Items[0].State);
@@ -391,7 +400,7 @@ public sealed class BatchCoordinatorTests
         Assert.Single(harness.InspectedPaths);
         Assert.False(harness.Session.SetIncluded(first.Id, false).Applied);
         Assert.False(harness.Session.Remove(first.Id).Applied);
-        Assert.Null((await harness.Coordinator.ReviewAsync(TestContext.Current.CancellationToken)).Review);
+        Assert.Null((await harness.Coordinator.ReviewSelectionsAsync(new(harness.Session.Snapshot.Revision, [], TestContext.Current.CancellationToken))).Review);
         Assert.Empty(harness.RemuxedPaths);
     }
 }

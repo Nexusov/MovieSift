@@ -3,6 +3,59 @@
              xmlns:viewModels="using:MovieSift.Desktop.ViewModels"
              x:Class="MovieSift.Desktop.Views.AggregateTracksView"
              x:DataType="viewModels:AggregateTracksViewModel">
+  <UserControl.Resources>
+    <DataTemplate x:Key="AggregateGroupTemplate" x:DataType="viewModels:AggregateTrackGroupViewModel">
+      <Border Classes="card" Padding="10" Margin="0,3">
+        <StackPanel Spacing="6">
+          <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+            <CheckBox IsChecked="{Binding Keep, Mode=OneWay}" IsThreeState="True" Command="{Binding ToggleKeepCommand}"
+                      IsEnabled="{Binding CanEdit}" IsVisible="{Binding !IsRequired}" Content="{Binding Localization[Keep]}" VerticalAlignment="Top"
+                      AutomationProperties.Name="{Binding KeepAccessibleName}" />
+            <StackPanel Grid.Column="1" Spacing="3">
+              <WrapPanel>
+                <TextBlock Text="{Binding KindText}" FontWeight="SemiBold" Margin="0,0,8,0" />
+                <TextBlock Text="{Binding LanguageText}" FontWeight="SemiBold" Margin="0,0,8,0" />
+                <TextBlock Text="{Binding TitleText}" TextWrapping="Wrap" />
+                <TextBlock Text="{Binding Localization[AlwaysKept]}" Classes="muted" IsVisible="{Binding IsRequired}" Margin="8,0,0,0" />
+              </WrapPanel>
+              <WrapPanel>
+                <TextBlock Text="{Binding CodecText}" Classes="muted" Margin="0,0,8,0" />
+                <TextBlock Text="{Binding ChannelsText}" Classes="muted" Margin="0,0,8,0" />
+                <TextBlock Text="{Binding CoverageText}" Classes="muted" />
+              </WrapPanel>
+              <TextBlock x:Name="AggregateGroupFlagsText" Text="{Binding FlagsText}" Classes="muted" TextWrapping="Wrap" />
+              <TextBlock Text="{Binding ChoiceText}" IsVisible="{Binding HasChoiceNotice}" Foreground="{DynamicResource MovieSiftWarningBrush}" TextWrapping="Wrap" />
+              <TextBlock Text="{Binding LanguageIssueText}" IsVisible="{Binding HasLanguageIssue}" TextWrapping="Wrap" />
+            </StackPanel>
+            <ToggleButton Grid.Column="2" Content="⌄" IsChecked="{Binding IsExpanded, Mode=TwoWay}" VerticalAlignment="Top"
+                          ToolTip.Tip="{Binding Localization[AggregateMembers]}" AutomationProperties.Name="{Binding MembersAccessibleName}" />
+          </Grid>
+          <ItemsControl ItemsSource="{Binding Members}" IsVisible="{Binding IsExpanded}" HorizontalAlignment="Stretch">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="viewModels:AggregateTrackMemberViewModel">
+                <Border Background="{DynamicResource MovieSiftSecondaryBrush}" CornerRadius="9" Padding="8" Margin="0,3">
+                  <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                    <CheckBox AutomationProperties.Name="{Binding KeepAccessibleName}" IsChecked="{Binding Keep, Mode=TwoWay}" IsEnabled="{Binding CanEdit}" IsVisible="{Binding !IsRequired}" Content="{Binding Localization[Keep]}" VerticalAlignment="Top" />
+                    <StackPanel Grid.Column="1" Spacing="3">
+                      <TextBlock Text="{Binding SourcePath}" TextWrapping="Wrap" />
+                      <WrapPanel>
+                        <TextBlock Text="{Binding Localization[TrackId]}" Margin="0,0,4,0" />
+                        <TextBlock Text="{Binding IdentifierText}" Margin="0,0,8,0" />
+                        <TextBlock Text="{Binding LanguageText}" />
+                      </WrapPanel>
+                      <TextBlock Text="{Binding TitleText}" TextWrapping="Wrap" />
+                      <TextBlock Text="{Binding FlagsText}" TextWrapping="Wrap" />
+                      <TextBlock Text="{Binding StateText}" TextWrapping="Wrap" />
+                    </StackPanel>
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+    </DataTemplate>
+  </UserControl.Resources>
   <StackPanel Spacing="8">
     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
       <TextBlock Text="{Binding Localization[AggregateHeading]}" FontSize="17" FontWeight="SemiBold" VerticalAlignment="Center" />
@@ -16,64 +69,18 @@
       </Button>
     </Grid>
     <TextBlock x:Name="AggregateScopeText" Text="{Binding ScopeText}" Classes="muted" TextWrapping="Wrap" />
+    <TextBlock Text="{Binding Localization[AggregateSelectionHelp]}" Classes="muted" TextWrapping="Wrap" />
     <StackPanel IsVisible="{Binding HasUnresolved}" Spacing="4">
       <TextBlock Text="{Binding Localization[AggregateUnresolved]}" TextWrapping="Wrap" Foreground="{DynamicResource MovieSiftErrorBrush}" />
       <TextBlock Text="{Binding UnresolvedText}" TextWrapping="Wrap" />
     </StackPanel>
-    <ItemsControl x:Name="AggregateTrackList" ItemsSource="{Binding Groups}">
-      <ItemsControl.ItemTemplate>
-        <DataTemplate x:DataType="viewModels:AggregateTrackGroupViewModel">
-          <Border Classes="card" Padding="10" Margin="0,3">
-            <StackPanel Spacing="6">
-              <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
-                <CheckBox IsChecked="{Binding Keep, Mode=OneWay}" IsThreeState="True" Command="{Binding ToggleKeepCommand}"
-                          IsEnabled="{Binding CanEdit}" Content="{Binding Localization[Keep]}" VerticalAlignment="Top"
-                          AutomationProperties.Name="{Binding KeepAccessibleName}" />
-                <StackPanel Grid.Column="1" Spacing="3">
-                  <WrapPanel>
-                    <TextBlock Text="{Binding KindText}" FontWeight="SemiBold" Margin="0,0,8,0" />
-                    <TextBlock Text="{Binding LanguageText}" FontWeight="SemiBold" Margin="0,0,8,0" />
-                    <TextBlock Text="{Binding TitleText}" TextWrapping="Wrap" />
-                    <TextBlock Text="{Binding Localization[AlwaysKept]}" Classes="muted" IsVisible="{Binding IsRequired}" Margin="8,0,0,0" />
-                  </WrapPanel>
-                  <WrapPanel>
-                    <TextBlock Text="{Binding CodecText}" Classes="muted" Margin="0,0,8,0" />
-                    <TextBlock Text="{Binding ChannelsText}" Classes="muted" Margin="0,0,8,0" />
-                    <TextBlock Text="{Binding CoverageText}" Classes="muted" />
-                  </WrapPanel>
-                  <TextBlock x:Name="AggregateGroupFlagsText" Text="{Binding FlagsText}" Classes="muted" TextWrapping="Wrap" />
-                  <TextBlock Text="{Binding ChoiceText}" IsVisible="{Binding HasChoiceNotice}" Foreground="{DynamicResource MovieSiftWarningBrush}" TextWrapping="Wrap" />
-                  <TextBlock Text="{Binding LanguageIssueText}" IsVisible="{Binding HasLanguageIssue}" TextWrapping="Wrap" />
-                </StackPanel>
-                <ToggleButton Grid.Column="2" Content="⌄" IsChecked="{Binding IsExpanded, Mode=TwoWay}" VerticalAlignment="Top"
-                              ToolTip.Tip="{Binding Localization[AggregateMembers]}" AutomationProperties.Name="{Binding Localization[AggregateMembers]}" />
-              </Grid>
-              <ItemsControl ItemsSource="{Binding Members}" IsVisible="{Binding IsExpanded}" HorizontalAlignment="Stretch">
-                <ItemsControl.ItemTemplate>
-                  <DataTemplate x:DataType="viewModels:AggregateTrackMemberViewModel">
-                    <Border Background="{DynamicResource MovieSiftSecondaryBrush}" CornerRadius="9" Padding="8" Margin="0,3">
-                      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
-                        <CheckBox IsChecked="{Binding Keep, Mode=TwoWay}" IsEnabled="{Binding CanEdit}" Content="{Binding Localization[Keep]}" VerticalAlignment="Top" />
-                        <StackPanel Grid.Column="1" Spacing="3">
-                          <TextBlock Text="{Binding SourcePath}" TextWrapping="Wrap" />
-                          <WrapPanel>
-                            <TextBlock Text="{Binding Localization[TrackId]}" Margin="0,0,4,0" />
-                            <TextBlock Text="{Binding IdentifierText}" Margin="0,0,8,0" />
-                            <TextBlock Text="{Binding LanguageText}" />
-                          </WrapPanel>
-                          <TextBlock Text="{Binding TitleText}" TextWrapping="Wrap" />
-                          <TextBlock Text="{Binding FlagsText}" TextWrapping="Wrap" />
-                          <TextBlock Text="{Binding StateText}" TextWrapping="Wrap" />
-                        </StackPanel>
-                      </Grid>
-                    </Border>
-                  </DataTemplate>
-                </ItemsControl.ItemTemplate>
-              </ItemsControl>
-            </StackPanel>
-          </Border>
-        </DataTemplate>
-      </ItemsControl.ItemTemplate>
-    </ItemsControl>
+    <TextBlock x:Name="VideoSectionHeading" Text="{Binding VideoSummaryText}" FontWeight="SemiBold" TextWrapping="Wrap" />
+    <ItemsControl ItemsSource="{Binding VideoGroups}" ItemTemplate="{StaticResource AggregateGroupTemplate}" />
+    <TextBlock x:Name="AudioSectionHeading" Text="{Binding AudioSummaryText}" FontWeight="SemiBold" TextWrapping="Wrap" />
+    <ItemsControl ItemsSource="{Binding AudioGroups}" ItemTemplate="{StaticResource AggregateGroupTemplate}" />
+    <TextBlock x:Name="SubtitleSectionHeading" Text="{Binding SubtitleSummaryText}" FontWeight="SemiBold" TextWrapping="Wrap" />
+    <Button x:Name="RemoveAllSubtitlesButton" Content="{Binding Localization[RemoveAllSubtitles]}"
+            Command="{Binding RemoveAllSubtitlesCommand}" HorizontalAlignment="Left" />
+    <ItemsControl ItemsSource="{Binding SubtitleGroups}" ItemTemplate="{StaticResource AggregateGroupTemplate}" />
   </StackPanel>
 </UserControl>

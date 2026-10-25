@@ -44,8 +44,10 @@ public sealed class AggregateTrackGroupViewModel : ObservableObject
     public string LanguageIssueText => group.LanguageIssue is { } issue ? Localization[$"RuleIssue{issue}"] : string.Empty;
     public string KeepAccessibleName => string.Join(", ", new[]
     {
-        $"{Localization["Keep"]}: {KindText}", LanguageText, TitleText, CodecText, ChannelsText, FlagsText, CoverageText
+        $"{Localization["Keep"]}: {KindText}", LanguageText, TitleText, CodecText, ChannelsText, FlagsText, CoverageText,
+        group.LanguageIssue is not null ? $"{group.Members[0].Inspection.Source.FullPath} / {group.Members[0].Track.Id}" : string.Empty
     }.Where(value => !string.IsNullOrWhiteSpace(value)));
+    public string MembersAccessibleName => $"{Localization["AggregateMembers"]}: {KeepAccessibleName}";
     public bool HasChoiceNotice => Keep != true;
     public string ChoiceText => Localization[Keep is true ? "AggregateAllKept" : Keep is false ? "AggregateAllRemoved" : "AggregateMixed"];
     public IRelayCommand ToggleKeepCommand { get; }
