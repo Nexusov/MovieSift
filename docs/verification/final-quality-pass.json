@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "scope": "MovieSift bounded final quality pass F1–F9",
   "comparisonBase": "3ee89d45f1be64e80db92c5bdfb24b2aa31a1016",
-  "codeRevision": "244ba4a45b68bf24b5cf56a6dac246b7d383a711",
-  "runtimeSourceTree": "cb73a83eda47479c9a8b92b8d4d3bd26797e0969",
-  "executionSource": "Committed runtime/test code; only documentation/images pending in the worktree during local validation. No portable or native binary was exercised.",
+  "codeRevision": "9760d39bb3e6cba8107a46d151f3dd974edc225a",
+  "runtimeSourceTree": "7652ed861fdbfc657d4075dd0f2299b17467c651",
+  "executionSource": "Clean committed source checkout during corrected local build/tests/renders; ignored outputs only. Current documentation/image update follows validation. No portable or native binary was exercised.",
   "platform": {
     "os": "Windows 10 Home Single Language 22H2 x64",
     "build": "19045.6456",
@@ -37,7 +37,40 @@
     },
     "F5": {
       "before": "Expanded minimum EN/RU shelf left a 0px track viewport.",
-      "after": "Bounded scrolling/clipping leaves reachable file/track/footer controls; actual headless geometry and hit targets checked."
+      "after": "Bounded scrolling/clipping leaves reachable file/track/footer controls; actual headless geometry and hit targets checked.",
+      "platformCorrection": {
+        "initialCiRun": 40190955132,
+        "initialHead": "8027f72c3ce44b733807ced399df1531bba2227d",
+        "initialCheckout": "5b51d08f85205bea56a6a048d43e78b1c66b929c",
+        "linuxFailure": "Two RU expanded-shelf cases yielded file viewports 30/31px below the unchanged 32px requirement. Core183/Application306/Infrastructure471 passed; Windows full job passed.",
+        "controlledReproduction": {
+          "window": [
+            640,
+            480
+          ],
+          "extraFooterPixels": 4,
+          "beforeFileViewports": [
+            31,
+            30.5
+          ]
+        },
+        "correction": "Expanded shelf receives three quarters of remaining area; tracks retain a quarter. Existing 32px file/40px track thresholds, geometry and hit tests stay intact.",
+        "afterControlled": {
+          "scale1": {
+            "file": 40,
+            "tracks": 44
+          },
+          "scale2": {
+            "file": 39.5,
+            "tracks": 44.5
+          }
+        },
+        "focusedAfter": {
+          "passed": 34,
+          "skipped": 0
+        },
+        "nativeOrOsFontsChanged": false
+      }
     },
     "F6": {
       "before": "Opening Appearance left focus outside its covered cosmetic scope.",
@@ -70,7 +103,7 @@
       "errors": 0
     },
     "ordinaryCSharp": {
-      "passed": 1123,
+      "passed": 1125,
       "skipped": 61,
       "failed": 0,
       "groups": [
@@ -90,10 +123,10 @@
         },
         {
           "assembly": "MovieSift.Desktop.Tests.dll",
-          "passed": 229,
+          "passed": 231,
           "failed": 0,
           "skipped": 0,
-          "total": 229
+          "total": 231
         },
         {
           "assembly": "MovieSift.Infrastructure.Tests.dll",
@@ -152,19 +185,20 @@
       "limit": "Current MovieSift FFmpeg/compiler absent locally; full MP4/mixed and target package workflows are mandatory CI scope."
     },
     "headless": {
-      "desktopPassed": 229,
-      "newInputCasesPassed": 19,
+      "desktopPassed": 231,
+      "newInputCasesPassed": 21,
       "existingRenderCasesPassed": 13,
-      "generatedFrames": 35,
+      "generatedFrames": 37,
       "method": "Actual Avalonia.Headless input/layout controls and Skia offscreen raster; controlled nonprivate metadata.",
       "minimumCases": [
         {
           "language": "en",
           "headlessRenderScaling": 1.5,
           "fileShelfExpanded": true,
-          "fileShelfHeight": 128.66666666666666,
-          "fileViewportHeight": 32.666666666666664,
-          "trackViewportHeight": 54.666666666666664
+          "fileShelfHeight": 138,
+          "fileViewportHeight": 42,
+          "trackViewportHeight": 45.333333333333336,
+          "controlledFooterExtraPixels": 0
         },
         {
           "language": "en",
@@ -172,15 +206,17 @@
           "fileShelfExpanded": false,
           "fileShelfHeight": 48,
           "fileViewportHeight": 88,
-          "trackViewportHeight": 135
+          "trackViewportHeight": 135,
+          "controlledFooterExtraPixels": 0
         },
         {
           "language": "en",
           "headlessRenderScaling": 1,
           "fileShelfExpanded": true,
-          "fileShelfHeight": 129,
-          "fileViewportHeight": 34,
-          "trackViewportHeight": 54
+          "fileShelfHeight": 138,
+          "fileViewportHeight": 43,
+          "trackViewportHeight": 45,
+          "controlledFooterExtraPixels": 0
         },
         {
           "language": "en",
@@ -188,7 +224,8 @@
           "fileShelfExpanded": false,
           "fileShelfHeight": 48,
           "fileViewportHeight": 88,
-          "trackViewportHeight": 135
+          "trackViewportHeight": 135,
+          "controlledFooterExtraPixels": 0
         },
         {
           "language": "ru",
@@ -196,7 +233,8 @@
           "fileShelfExpanded": false,
           "fileShelfHeight": 48,
           "fileViewportHeight": 88,
-          "trackViewportHeight": 135.33333333333334
+          "trackViewportHeight": 135.33333333333334,
+          "controlledFooterExtraPixels": 0
         },
         {
           "language": "ru",
@@ -204,23 +242,44 @@
           "fileShelfExpanded": false,
           "fileShelfHeight": 48,
           "fileViewportHeight": 88,
-          "trackViewportHeight": 135
+          "trackViewportHeight": 135,
+          "controlledFooterExtraPixels": 0
         },
         {
           "language": "ru",
           "headlessRenderScaling": 1,
           "fileShelfExpanded": true,
-          "fileShelfHeight": 129,
-          "fileViewportHeight": 34,
-          "trackViewportHeight": 54
+          "fileShelfHeight": 135,
+          "fileViewportHeight": 40,
+          "trackViewportHeight": 44,
+          "controlledFooterExtraPixels": 4
+        },
+        {
+          "language": "ru",
+          "headlessRenderScaling": 1,
+          "fileShelfExpanded": true,
+          "fileShelfHeight": 138,
+          "fileViewportHeight": 43,
+          "trackViewportHeight": 45,
+          "controlledFooterExtraPixels": 0
         },
         {
           "language": "ru",
           "headlessRenderScaling": 2,
           "fileShelfExpanded": true,
-          "fileShelfHeight": 128.5,
-          "fileViewportHeight": 33.5,
-          "trackViewportHeight": 54.5
+          "fileShelfHeight": 134.5,
+          "fileViewportHeight": 39.5,
+          "trackViewportHeight": 44.5,
+          "controlledFooterExtraPixels": 4
+        },
+        {
+          "language": "ru",
+          "headlessRenderScaling": 2,
+          "fileShelfExpanded": true,
+          "fileShelfHeight": 137.5,
+          "fileViewportHeight": 42.5,
+          "trackViewportHeight": 45.5,
+          "controlledFooterExtraPixels": 0
         }
       ],
       "geometry": "Scroll viewports, complete editable-checkbox bounds/hit target and unobscured footer checked while shelf remains expanded after deterministic headless frame flush.",
@@ -228,7 +287,7 @@
     }
   },
   "independentReview": {
-    "method": "Cross-review by separate implementers covering F1–F9 plus root final diff review; evidence-backed findings resolved within this delivery.",
+    "method": "Independent final read-only diff review covered F1–F9; the two-file CI geometry correction was separately reviewed without threshold/gate weakening. Cross-review and root review also completed; no unresolved required findings.",
     "unresolvedRequiredFindings": []
   },
   "images": [
@@ -294,8 +353,8 @@
     },
     {
       "path": "docs/verification/screenshots/final-quality/en-minimum-expanded.png",
-      "size": 35245,
-      "sha256": "f197ccfc03db6170d64542f0604c79394ef4f04e35f6049db767d5cc50b64eee",
+      "size": 35338,
+      "sha256": "36008bac0f5a83cf917c20c0bd2fe53d17f3ca079d82991eacd86fb46972427f",
       "observation": {
         "method": "Avalonia.Headless + Skia RenderTargetBitmap; controlled UI metadata; not native desktop acceptance",
         "logicalWidth": 640,
@@ -316,16 +375,16 @@
         "reviewedCopyCount": 0,
         "reviewedNoChangeCount": 0,
         "fileShelfExpanded": true,
-        "fileShelfHeight": 129,
-        "fileViewportHeight": 34,
-        "trackViewportHeight": 54,
+        "fileShelfHeight": 138,
+        "fileViewportHeight": 43,
+        "trackViewportHeight": 45,
         "osDisplayScalingChanged": false
       }
     },
     {
       "path": "docs/verification/screenshots/final-quality/ru-minimum-expanded-2x.png",
-      "size": 92085,
-      "sha256": "c15254c3654738d46062891037a650287045cfc73da44ce2aa61827b381e1881",
+      "size": 92285,
+      "sha256": "ecd9a0de0728984bed1885d886ba107c8f79695adec737f05d6a25c24e57cb37",
       "observation": {
         "method": "Avalonia.Headless + Skia RenderTargetBitmap; controlled UI metadata; not native desktop acceptance",
         "logicalWidth": 640,
@@ -346,9 +405,9 @@
         "reviewedCopyCount": 0,
         "reviewedNoChangeCount": 0,
         "fileShelfExpanded": true,
-        "fileShelfHeight": 128.5,
-        "fileViewportHeight": 33.5,
-        "trackViewportHeight": 54.5,
+        "fileShelfHeight": 137.5,
+        "fileViewportHeight": 42.5,
+        "trackViewportHeight": 45.5,
         "osDisplayScalingChanged": false
       }
     }
