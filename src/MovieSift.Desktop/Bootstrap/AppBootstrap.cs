@@ -1,15 +1,20 @@
+using System.Runtime.InteropServices;
+using Avalonia.Controls;
 using MovieSift.Application.Batches;
 using MovieSift.Application.Inspection;
 using MovieSift.Application.Jobs;
 using MovieSift.Application.Presets;
+using MovieSift.Application.Updates;
 using MovieSift.Desktop.Appearance;
 using MovieSift.Desktop.Interaction;
 using MovieSift.Desktop.Localization;
+using MovieSift.Desktop.Updates;
 using MovieSift.Desktop.ViewModels;
 using MovieSift.Desktop.Views;
 using MovieSift.Infrastructure.Files;
 using MovieSift.Infrastructure.MediaTools;
 using MovieSift.Infrastructure.Persistence;
+using MovieSift.Infrastructure.Updates;
 using Serilog;
 
 namespace MovieSift.Desktop.Bootstrap;
@@ -21,8 +26,9 @@ internal static class AppBootstrap
     private const int RetainedLogFiles = 7;
 
     /// <summary>Creates the live application with app-local tools and portable data.</summary>
-    public static MainWindow CreateMainWindow()
+    public static Window CreateMainWindow(bool canInstallUpdates)
     {
+        var localization = new LocalizationService();
         var dataDirectory = Path.Combine(AppContext.BaseDirectory, "data");
         var dataWritable = CanWriteData(dataDirectory);
         var loggerConfiguration = new LoggerConfiguration().MinimumLevel.Information();
@@ -42,7 +48,6 @@ internal static class AppBootstrap
             new FfmpegBackend(new(sourceAccess, FfmpegToolPaths.FromApplicationDirectory())));
         var outputs = new OwnedOutputStore(dataDirectory);
         var settings = new PortableSettingsStore(dataDirectory);
-        var localization = new LocalizationService();
         var window = new MainWindow();
         var dialogs = new WindowFileDialogs(new(window, localization));
         var jobs = new JobCoordinator(backend, sourceAccess, outputs);
@@ -53,8 +58,23 @@ internal static class AppBootstrap
             new RulePresetService(new PortableRulePresetStore(dataDirectory)), new PortableQueueListStore(dataDirectory)));
         var appearance = new AppearanceViewModel(new(new PortableAppearanceStore(dataDirectory), localization,
             new AppearanceApplier(Avalonia.Application.Current!)));
-        window.DataContext = new MainViewModel(new(settings, outputs, localization, dataWritable, logger, batchViewModel, appearance));
-        window.Closed += (_, _) => logger.Dispose();
+        var version = typeof(App).Assembly.GetName().Version!;
+        var currentVersion = new AppVersion(version.Major, version.Minor, version.Build);
+        var runtime = RuntimeInformation.ProcessArchitecture == Architecture.X64
+            ? OperatingSystem.IsWindows() ? "win-x64" : OperatingSystem.IsLinux() ? "linux-x64" : "unsupported"
+            : "unsupported";
+        var http = new HttpClient(new HttpClientHandler { AllowAutoRedirect = false }) { Timeout = Timeout.InfiniteTimeSpan };
+        var previousInstallFailed = Environment.GetEnvironmentVariable("MOVIESIFT_UPDATE_FAILED") == "1";
+        Environment.SetEnvironmentVariable("MOVIESIFT_UPDATE_FAILED", null);
+        var updates = new UpdatesViewModel(new GitHubUpdateService(http, AppContext.BaseDirectory, currentVersion,
+            runtime, canInstallUpdates), new PortableUpdatePreferencesStore(dataDirectory), localization, currentVersion, logger, previousInstallFailed);
+        window.DataContext = new MainViewModel(new(settings, outputs, localization, dataWritable, logger, batchViewModel, appearance, updates));
+        window.StartupCompleted += PortableUpdateInstaller.AcknowledgeStartup;
+        window.Closed += (_, _) =>
+        {
+            http.Dispose();
+            logger.Dispose();
+        };
         return window;
     }
 

@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
+using MovieSift.Application.Updates;
 using MovieSift.Desktop.Appearance;
 using MovieSift.Desktop.ViewModels;
 
@@ -13,6 +14,9 @@ public sealed partial class MainWindow : Window
 {
     private bool shutdownCompleted;
     private bool shutdownInProgress;
+    private UpdateWindow? updateWindow;
+
+    public event Action? StartupCompleted;
 
     /// <summary>Loads compiled controls and connects view-only input and lifetime events.</summary>
     public MainWindow()
@@ -23,6 +27,7 @@ public sealed partial class MainWindow : Window
         AddHandler(KeyDownEvent, OnAppearanceKeyDown, RoutingStrategies.Tunnel);
         Opened += OnOpened;
         Closing += OnClosing;
+        Closed += OnClosed;
     }
 
     /// <summary>Moves focus only on an actual open/close transition, preserving ordinary editor navigation.</summary>
@@ -85,7 +90,83 @@ public sealed partial class MainWindow : Window
     {
         if (DataContext is MainViewModel viewModel)
         {
+            if (viewModel.Updates is { } updates)
+            {
+                updates.ShowRequested += OnShowUpdate;
+                updates.InstallPrepared += OnInstallPreparedAsync;
+            }
+
             await viewModel.InitializeAsync();
+
+            if (IsVisible)
+            {
+                StartupCompleted?.Invoke();
+            }
+        }
+    }
+
+    /// <summary>Shows at most one notification and keeps available updates accessible after dismissal.</summary>
+    private async void OnShowUpdate()
+    {
+        if (!IsVisible || shutdownInProgress || updateWindow is not null || DataContext is not MainViewModel { Updates: { HasUpdate: true } updates })
+        {
+            return;
+        }
+
+        updateWindow = new UpdateWindow { DataContext = updates };
+
+        try
+        {
+            await updateWindow.ShowDialog(this);
+        }
+        finally
+        {
+            updateWindow = null;
+            AvailableUpdateButton.Focus();
+        }
+    }
+
+    /// <summary>Hands off installation only after the shell is idle and its portable preference writes finish.</summary>
+    private async Task OnInstallPreparedAsync(PreparedUpdate prepared)
+    {
+        if (shutdownInProgress || DataContext is not MainViewModel { Updates: { } updates } viewModel || !viewModel.CanInstallUpdate)
+        {
+            throw new UpdateException(UpdateErrorCode.Busy, "Finish media and recovery decisions before installing an update.");
+        }
+
+        shutdownInProgress = true;
+
+        try
+        {
+            if (viewModel.Appearance is { } appearance)
+            {
+                await appearance.WhenIdleAsync();
+            }
+
+            await updates.WhenPreferencesSavedAsync();
+
+            if (!viewModel.CanInstallUpdate)
+            {
+                throw new UpdateException(UpdateErrorCode.Busy, "Media state changed before installation could begin.");
+            }
+
+            await updates.LaunchInstallerAsync(prepared);
+            shutdownCompleted = true;
+            Close();
+        }
+        finally
+        {
+            shutdownInProgress = false;
+        }
+    }
+
+    /// <summary>Detaches view callbacks when the window lifetime ends.</summary>
+    private void OnClosed(object? sender, EventArgs eventArguments)
+    {
+        if (DataContext is MainViewModel { Updates: { } updates })
+        {
+            updates.ShowRequested -= OnShowUpdate;
+            updates.InstallPrepared -= OnInstallPreparedAsync;
         }
     }
 

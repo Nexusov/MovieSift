@@ -3,6 +3,7 @@
 Status: historical product/engineering brief, originally reviewed 2026-10-18. Its Phase 0/1 staging instructions describe the original implementation task, not current feature limits or current acceptance results.
 
 Current normative behavior is defined by [README](README.md), [architecture](docs/ARCHITECTURE.md), [supported formats](docs/SUPPORTED_FORMATS.md) and [current plan](docs/PLAN.md). The safety and preservation requirements below still apply; implemented Phase 2/3 and the unified workspace supersede old tab/per-file-approval descriptions. Historical references are context, not permission for additional features or release publication.
+The post-1.0 development extension adds recoverable source replacement and explicitly installed portable updates. The older out-of-scope lists below remain historical; current behavior and invariants are described in `docs/ARCHITECTURE.md` and `AGENTS.md`.
 Project name: MovieSift. Use this name consistently for the repository, application, projects, packages and documentation.
 
 ## 1. Product and delivery scope

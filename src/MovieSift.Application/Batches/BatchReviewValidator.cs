@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using MovieSift.Application.Ports;
 using MovieSift.Core.Failures;
+using MovieSift.Core.Planning;
 
 namespace MovieSift.Application.Batches;
 
@@ -37,7 +38,7 @@ internal static class BatchReviewValidator
                 continue;
             }
 
-            if (!plan!.IsNoChange && HasOutputConflict(plan.DestinationPath, sources, destinations))
+            if (!plan!.IsNoChange && HasOutputConflict(plan, sources, destinations))
             {
                 failures.Add(new(item.Id, new(ErrorCode.InvalidDestination)));
                 continue;
@@ -59,7 +60,7 @@ internal static class BatchReviewValidator
                 }
 
                 await request.SourceAccess.ValidateDestinationAsync(new(revision, plan.DestinationPath, revision.Length,
-                    request.CancellationToken, plan.OutputDirectoryRoot, plan.Inspection.Container));
+                    request.CancellationToken, plan.OutputDirectoryRoot, plan.Inspection.Container, plan.OutputMode));
             }
             catch (OperationFailureException exception)
             {
@@ -81,10 +82,12 @@ internal static class BatchReviewValidator
     }
 
     /// <summary>Compares only destinations that will actually create an output against every source and output.</summary>
-    private static bool HasOutputConflict(string destination, HashSet<string> sources, HashSet<string> duplicates)
+    private static bool HasOutputConflict(RemuxPlan plan, HashSet<string> sources, HashSet<string> duplicates)
     {
-        var canonical = BatchSession.CanonicalPath(destination);
-        return sources.Contains(canonical) || duplicates.Contains(canonical);
+        var canonical = BatchSession.CanonicalPath(plan.DestinationPath);
+        var replacesOwnSource = plan.OutputMode == OutputMode.ReplaceSource &&
+            plan.DestinationPath == plan.Inspection.Source.FullPath;
+        return sources.Contains(canonical) && !replacesOwnSource || duplicates.Contains(canonical);
     }
 }
 

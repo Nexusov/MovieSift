@@ -7,6 +7,7 @@ using MovieSift.Application;
 using MovieSift.Application.Batches;
 using MovieSift.Application.Jobs;
 using MovieSift.Core.Failures;
+using MovieSift.Core.Planning;
 
 namespace MovieSift.Desktop.ViewModels;
 
@@ -21,6 +22,7 @@ public sealed partial class BatchViewModel : ObservableObject
     private Failure? failure;
     private long operationRevision;
     private string outputFolder = string.Empty;
+    private OutputMode outputMode;
     private bool includeSubfolders;
     private bool externalOperationActive;
     private bool writesBlocked;
@@ -56,13 +58,14 @@ public sealed partial class BatchViewModel : ObservableObject
         AggregateTracks = new(new(services.Session, Localization, () => CanEdit, OnAggregateSelectionEdited));
         AddFilesCommand = new AsyncRelayCommand(AddFilesAsync, () => CanEdit);
         AddFolderCommand = new AsyncRelayCommand(AddFolderAsync, () => CanEdit);
-        ChooseOutputCommand = new AsyncRelayCommand(ChooseOutputAsync, () => CanEdit);
+        ChooseOutputCommand = new AsyncRelayCommand(ChooseOutputAsync, () => CanEdit && IsCopyMode);
+        UseSourceFoldersCommand = new RelayCommand(() => ApplyOutputFolder(string.Empty), () => CanEdit && IsCopyMode && HasCustomOutputFolder);
         InspectPendingCommand = new AsyncRelayCommand(InspectPendingAsync, () => CanEdit && Items.Any(item => item.Snapshot.State == BatchItemState.PendingInspection));
         InspectSelectedCommand = new AsyncRelayCommand(InspectSelectedAsync, () => CanInspectSelected);
         RemoveSelectedCommand = new RelayCommand(RemoveSelected, () => CanRemoveSelected);
         CloseReviewCommand = new RelayCommand(CloseReview);
         OpenSelectedDetailsCommand = new RelayCommand(() => IsDetailsOpen = true, () => SelectedItem is not null);
-        ReviewCommand = new AsyncRelayCommand(ReviewAsync, () => CanEdit && Items.Count != 0);
+        ReviewCommand = new AsyncRelayCommand(ReviewAsync, () => CanEdit && Items.Count != 0 && !HasMixedOutputModes);
         RunCommand = new AsyncRelayCommand(RunAsync, () => CanRun);
         CancelCommand = new RelayCommand(Cancel, () => IsBusy);
         PauseCommand = new RelayCommand(services.Coordinator.Pause, () => Snapshot.Phase == BatchPhase.Running && !Snapshot.PauseRequested);
@@ -85,6 +88,44 @@ public sealed partial class BatchViewModel : ObservableObject
     public AggregateTracksViewModel AggregateTracks { get; }
     public BatchSnapshot Snapshot { get; private set; }
     public string OutputFolder => outputFolder;
+    private IEnumerable<BatchItemViewModel> PendingOutputItems => Items.Where(item =>
+        item.Snapshot.State is not (BatchItemState.Completed or BatchItemState.NoChange));
+    private OutputMode EffectiveOutputMode => PendingOutputItems.FirstOrDefault()?.Snapshot.OutputMode ?? outputMode;
+    public bool HasMixedOutputModes => PendingOutputItems.Select(item => item.Snapshot.OutputMode).Distinct().Skip(1).Any();
+    public bool IsCopyMode => !HasMixedOutputModes && EffectiveOutputMode == OutputMode.Copy;
+    public bool HasCustomOutputFolder => IsCopyMode && !string.IsNullOrEmpty(outputFolder);
+    private bool UsesAdjacentCopies => !HasCustomOutputFolder && PendingOutputItems.All(item =>
+        MovieSift.Core.Media.MediaContainerPolicy.FromExtension(item.SourcePath) is not null &&
+        item.Snapshot.IntendedDestinationPath == Path.Combine(Path.GetDirectoryName(item.SourcePath)!,
+            MovieSift.Core.Media.MediaContainerPolicy.TrimmedFileName(item.SourcePath)));
+    public string OutputSafetyText => Localization[HasMixedOutputModes ? "OutputMixedHelp" :
+        IsCopyMode ? UsesAdjacentCopies ? "OutputCopyBesideHelp" : "WorkspaceOriginalShort" : "OutputReplaceHelp"];
+    public int SelectedOutputModeIndex
+    {
+        get => HasMixedOutputModes ? -1 : (int)EffectiveOutputMode;
+        set
+        {
+            if (!CanEdit || !Enum.IsDefined((OutputMode)value))
+            {
+                OnPropertyChanged();
+                return;
+            }
+
+            if (outputMode == (OutputMode)value && Items.All(item => item.Snapshot.OutputMode == outputMode))
+            {
+                return;
+            }
+
+            outputMode = (OutputMode)value;
+
+            foreach (var editor in Items.ToArray())
+            {
+                editor.ApplyOutputMode(outputMode, outputFolder);
+            }
+
+            OnEditorChanged();
+        }
+    }
     public bool IncludeSubfolders
     {
         get => includeSubfolders;
@@ -100,7 +141,7 @@ public sealed partial class BatchViewModel : ObservableObject
         }
     }
     public bool CanEdit => IsWorkspaceAvailable && !HasNewBatchConfirmation && !Presets.IsBusy && Recovery.CanEditBatch;
-    public bool CanRun => CanEdit && !writesBlocked && HasCurrentReview;
+    public bool CanRun => CanEdit && !writesBlocked && !HasMixedOutputModes && HasCurrentReview;
     public bool CanRemoveSelected => CanEdit && SelectedItem is { Snapshot.Result: null };
     public bool CanInspectSelected => CanEdit && SelectedItem is { } selected && selected.Snapshot.State is not (BatchItemState.Completed or BatchItemState.NoChange);
     public bool HasSafetyBlock => Snapshot.HasSafetyBlock;
@@ -120,6 +161,7 @@ public sealed partial class BatchViewModel : ObservableObject
     public string StatusText => EffectiveFailure?.Code == ErrorCode.Cancelled ? Localization["Cancelled"] : Localization[$"Batch{Snapshot.Phase}"];
     public string PauseText => Snapshot.Phase == BatchPhase.Running && Snapshot.PauseRequested ? Localization["BatchPauseRequestedPending"] :
         Snapshot.PauseReason == BatchPauseReason.None ? string.Empty : Localization[$"BatchPause{Snapshot.PauseReason}"];
+    public bool HasPauseNotice => PauseText.Length != 0;
     public string CurrentItemText => Snapshot.Items.FirstOrDefault(item => item.State is BatchItemState.Running or BatchItemState.Inspecting or BatchItemState.AwaitingWarningReview)?.SourcePath ?? string.Empty;
     public string StageText => activeProgress is { } progress ? Localization[PhaseKey(progress.Phase)] : string.Empty;
     public string SummaryText => Localization.Format(new("BatchSummary", [Items.Count, Items.Count(item => item.Included), Items.Count(item => item.Snapshot.State is BatchItemState.Completed or BatchItemState.NoChange)]));
@@ -141,6 +183,7 @@ public sealed partial class BatchViewModel : ObservableObject
     public IAsyncRelayCommand AddFilesCommand { get; }
     public IAsyncRelayCommand AddFolderCommand { get; }
     public IAsyncRelayCommand ChooseOutputCommand { get; }
+    public IRelayCommand UseSourceFoldersCommand { get; }
     public IAsyncRelayCommand InspectPendingCommand { get; }
     public IAsyncRelayCommand InspectSelectedCommand { get; }
     public IRelayCommand RemoveSelectedCommand { get; }
@@ -208,6 +251,7 @@ public sealed partial class BatchViewModel : ObservableObject
         }
 
         operationRevision++;
+        outputMode = OutputMode.Copy;
         IsReviewOpen = false;
         IsDetailsOpen = false;
         IsRulesOpen = false;
@@ -293,23 +337,9 @@ public sealed partial class BatchViewModel : ObservableObject
     /// <summary>Captures the folder mode for this addition without reinterpreting previously accepted rows.</summary>
     private Task AddFolderAsync() => ExecuteOwnedAsync(async cancellationToken =>
     {
-        if (IncludeSubfolders && string.IsNullOrWhiteSpace(outputFolder))
-        {
-            preparationNoticeKey = "RecursiveOutputGuide";
-            Refresh();
-            var selectedOutput = await services.Dialogs.SelectOutputFolderAsync();
-            cancellationToken.ThrowIfCancellationRequested();
-
-            if (selectedOutput is null)
-            {
-                return;
-            }
-
-            ApplyOutputFolder(selectedOutput);
-        }
-
         var kind = IncludeSubfolders ? BatchInputKind.RecursiveFolder : BatchInputKind.TopLevelFolder;
-        var outputRoot = IncludeSubfolders ? outputFolder : null;
+        var useSourceDirectories = !IsCopyMode || string.IsNullOrEmpty(outputFolder);
+        var outputRoot = IncludeSubfolders && !useSourceDirectories ? outputFolder : null;
         var folder = await services.Dialogs.SelectInputFolderAsync();
 
         if (folder is null)
@@ -317,12 +347,13 @@ public sealed partial class BatchViewModel : ObservableObject
             return;
         }
 
-        await DiscoverAsync(new(kind, [folder], cancellationToken, outputRoot));
+        await DiscoverAsync(new(kind, [folder], cancellationToken, outputRoot, useSourceDirectories));
     });
 
     /// <summary>Accepts a bounded addition, then probes its real files serially by stable item ID.</summary>
     private async Task DiscoverAsync(BatchInputDiscoveryRequest request)
     {
+        var selectedMode = EffectiveOutputMode;
         var discovered = await services.Discovery.DiscoverAsync(request);
         request.CancellationToken.ThrowIfCancellationRequested();
         var edit = services.Session.AddDiscoveryResult(discovered);
@@ -333,12 +364,9 @@ public sealed partial class BatchViewModel : ObservableObject
             return;
         }
 
-        if (!string.IsNullOrEmpty(outputFolder))
+        foreach (var editor in Items.Where(editor => editor.Snapshot.IntendedDestinationPath is null).ToArray())
         {
-            foreach (var editor in Items.Where(editor => editor.Snapshot.IntendedDestinationPath is null))
-            {
-                editor.ApplyOutputFolder(outputFolder);
-            }
+            editor.ApplyOutputMode(selectedMode, outputFolder);
         }
 
         if (services.Session.Snapshot.Items.Any(item => item.State == BatchItemState.PendingInspection && item.Included))
@@ -405,6 +433,14 @@ public sealed partial class BatchViewModel : ObservableObject
         if (!CanEdit)
         {
             return;
+        }
+
+        var selectedMode = EffectiveOutputMode;
+
+        // Legacy saved lists can omit destination intent; commit the displayed default before capturing Review's revision.
+        foreach (var editor in Items.Where(item => item.Snapshot.IntendedDestinationPath is null).ToArray())
+        {
+            editor.ApplyOutputMode(selectedMode, outputFolder);
         }
 
         IsRulesOpen = false;
@@ -653,6 +689,7 @@ public sealed partial class BatchViewModel : ObservableObject
         AddFilesCommand?.NotifyCanExecuteChanged();
         AddFolderCommand?.NotifyCanExecuteChanged();
         ChooseOutputCommand?.NotifyCanExecuteChanged();
+        UseSourceFoldersCommand?.NotifyCanExecuteChanged();
         InspectPendingCommand?.NotifyCanExecuteChanged();
         InspectSelectedCommand?.NotifyCanExecuteChanged();
         RemoveSelectedCommand?.NotifyCanExecuteChanged();

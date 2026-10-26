@@ -1,4 +1,5 @@
 using MovieSift.Application.Batches;
+using MovieSift.Core.Planning;
 
 namespace MovieSift.Desktop.ViewModels;
 
@@ -39,7 +40,8 @@ public sealed partial class BatchViewModel
         Localization[HasError ? "ReviewNeedsAttention" : "ReviewRequired"];
     public string RunActionText => ReviewedCopyCount == 0 ? Localization["RunNoChanges"] :
         Snapshot.Items.Any(item => item.Result?.PublishedPath is not null) ? Localization["RunContinue"] :
-        FormatCount("RunCopies", ReviewedCopyCount);
+        Snapshot.Review!.Items.Any(item => !item.Plan.IsNoChange && item.Plan.OutputMode == OutputMode.ReplaceSource)
+            ? FormatCount("RunReplacements", ReviewedCopyCount) : FormatCount("RunCopies", ReviewedCopyCount);
 
     public bool IsReviewOpen
     {
@@ -93,6 +95,8 @@ public sealed partial class BatchViewModel
         {
             editor.ApplyOutputFolder(folder);
         }
+
+        Refresh();
     }
 
     /// <summary>Reconciles per-file review rows without replacing stable editors or manufacturing plan authority.</summary>

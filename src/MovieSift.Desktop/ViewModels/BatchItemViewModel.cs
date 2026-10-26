@@ -31,7 +31,7 @@ public sealed class BatchItemViewModel : ObservableObject
         outputFolder = item.IntendedOutputDirectoryRoot ?? options.OutputFolder;
         outputDirectoryRoot = item.IntendedOutputDirectoryRoot ??
             (item.FolderOrigin is not null && !string.IsNullOrEmpty(outputFolder) ? outputFolder : null);
-        outputPath = item.IntendedDestinationPath ?? (string.IsNullOrEmpty(options.OutputFolder) ? string.Empty : DeriveDestination(options.OutputFolder));
+        outputPath = item.IntendedDestinationPath ?? DeriveDestination(options.OutputFolder);
         ApplySnapshot(item);
     }
 
@@ -49,6 +49,7 @@ public sealed class BatchItemViewModel : ObservableObject
     public bool HasTracks => displayedInspection is not null;
     public bool CanChangeInclusion => options.CanEdit() && item.State is not (BatchItemState.Completed or BatchItemState.NoChange);
     public bool CanEditPlan => options.CanEdit() && item.Inspection is not null && item.State is BatchItemState.NeedsReview or BatchItemState.Ready;
+    public bool CanEditDestination => CanEditPlan && item.OutputMode == OutputMode.Copy;
     public bool HasPlan => item.ApprovedPlan is not null;
     public bool HasError => EffectiveFailure is { Code: not ErrorCode.Cancelled };
     public string ErrorText => EffectiveFailure is { } failure ? Localization[$"Error{failure.Code}"] : string.Empty;
@@ -152,7 +153,7 @@ public sealed class BatchItemViewModel : ObservableObject
         get => outputPath;
         set
         {
-            if (!CanEditPlan || !SetProperty(ref outputPath, value))
+            if (!CanEditDestination || !SetProperty(ref outputPath, value))
             {
                 return;
             }
@@ -242,6 +243,10 @@ public sealed class BatchItemViewModel : ObservableObject
 
     /// <summary>Applies an explicit shared-folder change only to items that can still be planned.</summary>
     public void ApplyOutputFolder(string folder)
+        => ApplyOutputMode(item.OutputMode, folder);
+
+    /// <summary>Changes only output intent; replacement is bound to this file's own source and still requires Review.</summary>
+    public void ApplyOutputMode(OutputMode mode, string folder)
     {
         var editableState = item.State is BatchItemState.PendingInspection or BatchItemState.NeedsReview or
             BatchItemState.Ready or BatchItemState.Failed or BatchItemState.Cancelled;
@@ -251,10 +256,10 @@ public sealed class BatchItemViewModel : ObservableObject
             return;
         }
 
-        var destination = DeriveDestination(folder);
-        var directoryRoot = item.FolderOrigin is not null ? folder : null;
+        var destination = mode == OutputMode.ReplaceSource ? SourcePath : DeriveDestination(folder);
+        var directoryRoot = mode == OutputMode.Copy && item.FolderOrigin is not null && !string.IsNullOrEmpty(folder) ? folder : null;
         var unchanged = outputPath == destination && outputDirectoryRoot == directoryRoot &&
-            item.IntendedDestinationPath == destination && item.IntendedOutputDirectoryRoot == directoryRoot;
+            item.IntendedDestinationPath == destination && item.IntendedOutputDirectoryRoot == directoryRoot && item.OutputMode == mode;
         outputFolder = folder;
 
         if (unchanged)
@@ -265,11 +270,11 @@ public sealed class BatchItemViewModel : ObservableObject
         outputPath = destination;
         outputDirectoryRoot = directoryRoot;
 
-        StoreDestination();
+        StoreDestination(mode);
     }
 
     /// <summary>Retains destination intent below presentation without creating approval authority.</summary>
-    private void StoreDestination()
+    private void StoreDestination(OutputMode? mode = null)
     {
         // An uninspected failure may have no supported filename convention, so it has no derived destination intent.
         if (item.Inspection is null && string.IsNullOrEmpty(outputPath))
@@ -278,7 +283,7 @@ public sealed class BatchItemViewModel : ObservableObject
             return;
         }
 
-        var changed = options.Session.SetDestination(new(Id, outputPath, outputDirectoryRoot));
+        var changed = options.Session.SetDestination(new(Id, outputPath, outputDirectoryRoot, mode ?? item.OutputMode));
         planningFailure = changed.Failure;
         Refresh();
         options.Changed();
@@ -335,6 +340,12 @@ public sealed class BatchItemViewModel : ObservableObject
     /// <summary>Uses the established naming convention without silently resolving collisions.</summary>
     private string DeriveDestination(string folder)
     {
+        if (string.IsNullOrEmpty(folder))
+        {
+            return MediaContainerPolicy.FromExtension(SourcePath) is null ? string.Empty :
+                Path.Combine(Path.GetDirectoryName(SourcePath)!, MediaContainerPolicy.TrimmedFileName(SourcePath));
+        }
+
         if (item.FolderOrigin is { } origin)
         {
             var result = OutputPathPolicy.DeriveFolderDestination(new(folder, origin.RelativePath));

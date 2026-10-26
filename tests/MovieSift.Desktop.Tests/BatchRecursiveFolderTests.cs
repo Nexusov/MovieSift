@@ -12,9 +12,9 @@ namespace MovieSift.Desktop.Tests;
 /// <summary>Checks recursive input presentation and immutable approvals without claiming native dialog execution.</summary>
 public sealed class BatchRecursiveFolderTests
 {
-    /// <summary>Defaults to direct entries, requires an explicit root, and captures the mode only for a later addition.</summary>
+    /// <summary>Defaults to direct entries and allows recursive copies beside sources without a destination picker.</summary>
     [AvaloniaFact]
-    public async Task FolderModeRequiresOutputAndDoesNotReinterpretAcceptedRows()
+    public async Task FolderModeSupportsAdjacentCopiesAndDoesNotReinterpretAcceptedRows()
     {
         var fixture = new BatchViewModelFixture();
         var view = new BatchView { DataContext = fixture.Batch };
@@ -33,15 +33,17 @@ public sealed class BatchRecursiveFolderTests
             fixture.Batch.IncludeSubfolders = true;
             var outputFolder = fixture.Dialogs.OutputFolder;
             fixture.Dialogs.OutputFolder = null;
-            await fixture.Batch.AddFolderCommand.ExecuteAsync(null);
-            Assert.Null(fixture.Discovery.LastRequest);
-            Assert.Equal(0, fixture.Dialogs.InputFolderRequests);
-            Assert.False(fixture.Batch.HasError);
-            Assert.True(fixture.Batch.HasPreparationNotice);
-            Assert.Equal(fixture.Localization["RecursiveOutputGuide"], fixture.Batch.PreparationNoticeText);
-
             SetFolderInputs(fixture);
+            await fixture.Batch.AddFolderCommand.ExecuteAsync(null);
+            Assert.True(fixture.Discovery.LastRequest!.UseSourceDirectories);
+            Assert.Null(fixture.Discovery.LastRequest.OutputRoot);
+            Assert.Equal(1, fixture.Dialogs.InputFolderRequests);
+            Assert.False(fixture.Batch.HasError);
+            Assert.False(fixture.Batch.HasPreparationNotice);
+            Assert.All(fixture.Batch.Items, item => Assert.Equal(Path.GetDirectoryName(item.SourcePath), Path.GetDirectoryName(item.OutputPath)));
+
             fixture.Dialogs.OutputFolder = outputFolder;
+            await fixture.Batch.ChooseOutputCommand.ExecuteAsync(null);
             await fixture.Batch.AddFolderCommand.ExecuteAsync(null);
             Assert.Equal(BatchInputKind.RecursiveFolder, fixture.Discovery.LastRequest!.Kind);
             Assert.Equal(fixture.Batch.OutputFolder, fixture.Discovery.LastRequest.OutputRoot);

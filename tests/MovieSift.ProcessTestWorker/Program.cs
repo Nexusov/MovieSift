@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using MovieSift.Infrastructure.Persistence;
+using MovieSift.Infrastructure.Updates;
 
 namespace MovieSift.ProcessTestWorker;
 
@@ -19,11 +20,33 @@ internal static class Program
 
         if (arguments.Length == 0)
         {
+            if (Environment.GetEnvironmentVariable("MOVIESIFT_TEST_UPDATE_RESTART") is { } restart)
+            {
+                if (restart == "acknowledge")
+                {
+                    PortableUpdateInstaller.AcknowledgeStartup();
+                    return 0;
+                }
+                return 73;
+            }
             return 2;
         }
 
         switch (arguments[0])
         {
+            case "update-installer":
+                return arguments.Length == 3 ? await PortableUpdateInstaller.RunAsync(arguments[1], arguments[2]) : 2;
+            case "update-parent":
+                if (arguments.Length != 2)
+                {
+                    return 2;
+                }
+                using (UpdateApplicationLease.Acquire(arguments[1]))
+                {
+                    Console.WriteLine("UPDATE_PARENT_READY");
+                    await Console.In.ReadLineAsync().WaitAsync(TimeSpan.FromSeconds(60));
+                }
+                return 0;
             case "echo":
                 Console.WriteLine(JsonSerializer.Serialize(arguments.Skip(1).ToArray()));
                 return 0;

@@ -4,6 +4,7 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using MovieSift.Application.Batches;
 using MovieSift.Application.Jobs;
+using MovieSift.Core.Planning;
 using MovieSift.Desktop.Views;
 using Xunit;
 
@@ -17,27 +18,36 @@ public sealed class BatchSizeResultTests
     private const long LargerOutputLength = 1300;
     private const long SizeDelta = 300;
 
-    /// <summary>Reports measured reduction, growth and equality in either language without changing file authority.</summary>
+    /// <summary>Reports measured sizes in either output mode without promising that the original remains on disk.</summary>
     [AvaloniaTheory]
-    [InlineData("en", SmallerOutputLength, "SizeDifference")]
-    [InlineData("ru", SmallerOutputLength, "SizeDifference")]
-    [InlineData("en", LargerOutputLength, "SizeIncrease")]
-    [InlineData("ru", LargerOutputLength, "SizeIncrease")]
-    [InlineData("en", SourceLength, "SizeEqual")]
-    [InlineData("ru", SourceLength, "SizeEqual")]
-    public async Task PublishedSizesUseRecordedEvidenceWithoutChangingSelectionOrReview(string language, long outputLength, string resourceKey)
+    [InlineData("en", SmallerOutputLength, "SizeDifference", OutputMode.Copy)]
+    [InlineData("ru", SmallerOutputLength, "SizeDifference", OutputMode.Copy)]
+    [InlineData("en", LargerOutputLength, "SizeIncrease", OutputMode.Copy)]
+    [InlineData("ru", LargerOutputLength, "SizeIncrease", OutputMode.Copy)]
+    [InlineData("en", SourceLength, "SizeEqual", OutputMode.Copy)]
+    [InlineData("ru", SourceLength, "SizeEqual", OutputMode.Copy)]
+    [InlineData("en", SmallerOutputLength, "SizeDifference", OutputMode.ReplaceSource)]
+    [InlineData("ru", SmallerOutputLength, "SizeDifference", OutputMode.ReplaceSource)]
+    [InlineData("en", LargerOutputLength, "SizeIncrease", OutputMode.ReplaceSource)]
+    [InlineData("ru", LargerOutputLength, "SizeIncrease", OutputMode.ReplaceSource)]
+    [InlineData("en", SourceLength, "SizeEqual", OutputMode.ReplaceSource)]
+    [InlineData("ru", SourceLength, "SizeEqual", OutputMode.ReplaceSource)]
+    public async Task PublishedSizesUseRecordedEvidenceWithoutChangingSelectionOrReview(
+        string language, long outputLength, string resourceKey, OutputMode mode)
     {
         var fixture = new ViewModelFixture();
         await fixture.LoadAsync();
+        fixture.Workspace.SelectedOutputModeIndex = (int)mode;
         fixture.Item.Tracks[1].Keep = false;
         await fixture.Workspace.ReviewCommand.ExecuteAsync(null);
         var review = fixture.Workspace.Snapshot.Review;
         var approval = fixture.Item.ApprovedPlan;
+        Assert.Equal(mode, approval!.OutputMode);
         var kept = fixture.Item.Tracks.Select(track => track.Keep).ToArray();
         var completed = fixture.Item.Snapshot with
         {
             State = BatchItemState.Completed,
-            Result = new(approval!.Id, JobPhase.Completed, PublishedPath: ViewModelFixture.OutputPath, OutputLength: outputLength)
+            Result = new(approval.Id, JobPhase.Completed, PublishedPath: approval.DestinationPath, OutputLength: outputLength)
         };
         fixture.Item.ApplySnapshot(completed);
         await fixture.ViewModel.ChangeLanguageCommand.ExecuteAsync(language);
@@ -46,7 +56,7 @@ public sealed class BatchSizeResultTests
             : fixture.Item.Localization.Format(new(resourceKey, [SizeDelta]));
         Assert.True(fixture.Item.HasSizeDifference);
         Assert.Equal(expected, fixture.Item.SizeDifferenceText);
-        Assert.Contains(language == "ru" ? "Оригинал остаётся на диске" : "The original remains on disk", fixture.Item.SizeDifferenceText);
+        Assert.DoesNotContain(language == "ru" ? "Оригинал остаётся на диске" : "The original remains on disk", fixture.Item.SizeDifferenceText);
         Assert.Same(completed, fixture.Item.Snapshot);
         Assert.Same(approval, fixture.Item.ApprovedPlan);
         Assert.Same(review, fixture.Workspace.Snapshot.Review);

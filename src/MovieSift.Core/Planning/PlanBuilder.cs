@@ -38,12 +38,20 @@ public static class PlanBuilder
             return new(null, new(ErrorCode.ZeroAudioConfirmationRequired));
         }
 
-        if (!Enum.IsDefined(inspection.Container))
+        if (!Enum.IsDefined(inspection.Container) || !Enum.IsDefined(request.OutputMode))
         {
             return new(null, new(ErrorCode.InvalidDestination));
         }
 
         var noChange = retainedTracks.Length == inspection.Tracks.Length;
+        var invalidReplacement = request.OutputMode == OutputMode.ReplaceSource &&
+            (request.DestinationPath != inspection.Source.FullPath || request.OutputDirectoryRoot is not null);
+
+        if (invalidReplacement)
+        {
+            return new(null, new(ErrorCode.InvalidDestination));
+        }
+
         var invalidContainerDestination = !noChange && (string.IsNullOrWhiteSpace(request.DestinationPath) ||
             MediaContainerPolicy.FromExtension(request.DestinationPath) != inspection.Container);
 
@@ -62,7 +70,7 @@ public static class PlanBuilder
         }
 
         var plan = new RemuxPlan(Guid.NewGuid(), inspection, retainedTracks, request.DestinationPath,
-            request.ZeroAudioConfirmed, request.OutputDirectoryRoot);
+            request.ZeroAudioConfirmed, request.OutputDirectoryRoot, request.OutputMode);
         return new(plan, null);
     }
 }

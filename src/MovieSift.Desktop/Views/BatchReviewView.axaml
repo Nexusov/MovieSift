@@ -13,7 +13,7 @@
           </StackPanel>
           <Button Grid.Column="1" Content="{Binding Localization[WorkspaceBack]}" Command="{Binding CloseReviewCommand}" VerticalAlignment="Top" />
         </Grid>
-        <TextBlock Classes="muted" Text="{Binding Localization[WorkspaceOriginalShort]}" TextWrapping="Wrap" />
+        <TextBlock Classes="muted" Text="{Binding OutputSafetyText}" TextWrapping="Wrap" />
         <ProgressBar IsVisible="{Binding IsReviewPending}" IsIndeterminate="True" />
         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
           <Button x:Name="StartBatchButton" Classes="primary" Content="{Binding RunActionText}" Command="{Binding RunCommand}" IsVisible="{Binding HasCurrentReview}" HorizontalAlignment="Left" />
@@ -31,6 +31,7 @@
                   <TextBlock FontWeight="SemiBold" Text="{Binding SourceName}" ToolTip.Tip="{Binding SourcePath}" TextWrapping="Wrap" />
                   <TextBlock Classes="muted" Text="{Binding SourceContext}" TextWrapping="Wrap" />
                   <TextBlock x:Name="ReviewDestination" Text="{Binding DestinationPath}" IsVisible="{Binding !NoChange}" TextWrapping="Wrap" />
+                  <TextBlock Text="{Binding DestinationActionText}" IsVisible="{Binding HasCopyPlan}" FontWeight="SemiBold" TextWrapping="Wrap" />
                   <TextBlock Text="{Binding Item.Localization[ReviewNoCopy]}" IsVisible="{Binding NoChange}" FontWeight="SemiBold" TextWrapping="Wrap" />
                   <Expander Header="{Binding Item.Localization[ReviewSourceTracks]}" IsVisible="{Binding NoChange}">
                     <TextBlock Text="{Binding RetainedTracksText}" TextWrapping="Wrap" />

@@ -3,13 +3,14 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using MovieSift.Application.QueueLists;
+using MovieSift.Core.Planning;
 
 namespace MovieSift.Infrastructure.Persistence;
 
 /// <summary>Encodes a bounded listing schema that cannot contain trusted inspections, selections or jobs.</summary>
 internal static class QueueListJson
 {
-    internal const int CurrentVersion = 1;
+    internal const int CurrentVersion = 2;
     internal const int MaximumBytes = 65_536;
     internal const int MaximumDepth = 16;
     private static readonly UTF8Encoding StrictUtf8 = new(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true);
@@ -48,7 +49,7 @@ internal static class QueueListJson
             throw new JsonException("The queue list must contain an integer version.");
         }
 
-        if (root.GetProperty("version").GetInt32() != CurrentVersion)
+        if (root.GetProperty("version").GetInt32() is not (1 or CurrentVersion))
         {
             return new(null, null, new(QueueListErrorCode.UnsupportedVersion, "The queue-list version is not supported."));
         }
@@ -61,7 +62,12 @@ internal static class QueueListJson
             throw new JsonException("The queue list requires a nonempty revision and entries array.");
         }
 
-        var list = new QueueList(stored.Entries.Select(ReadEntry).ToImmutableArray());
+        if (stored.Entries.Length > QueueListPolicy.MaximumEntries)
+        {
+            return new(null, null, new(QueueListErrorCode.LimitExceeded, "The queue list exceeds its entry limit."));
+        }
+
+        var list = new QueueList(stored.Entries.Select(entry => ReadEntry(entry, stored.Version)).ToImmutableArray());
         var failure = QueueListPolicy.Validate(list);
         return failure is null ? new(list, stored.Revision) : new(null, null, failure);
     }
@@ -82,7 +88,8 @@ internal static class QueueListJson
         }
 
         var document = new QueueListDocument(CurrentVersion, revision, list.Entries.Select(entry => new QueueListRecord(
-            entry.SourcePath, entry.DestinationPath, entry.Included, entry.FolderOrigin, entry.OutputDirectoryRoot)).ToImmutableArray());
+            entry.SourcePath, entry.DestinationPath, entry.Included, entry.FolderOrigin, entry.OutputDirectoryRoot,
+            entry.OutputMode)).ToImmutableArray());
         var bytes = JsonSerializer.SerializeToUtf8Bytes(document, Options);
 
         if (bytes.Length > MaximumBytes)
@@ -95,14 +102,23 @@ internal static class QueueListJson
     }
 
     /// <summary>Rejects an explicit null array member instead of loading a partial listing.</summary>
-    private static QueueListEntry ReadEntry(QueueListRecord stored)
+    private static QueueListEntry ReadEntry(QueueListRecord stored, int version)
     {
         if (stored is null)
         {
             throw new JsonException("A queue entry cannot be null.");
         }
 
-        return new(stored.SourcePath, stored.DestinationPath, stored.Included, stored.FolderOrigin, stored.OutputDirectoryRoot);
+        var invalidMode = version == CurrentVersion && stored.OutputMode is null ||
+            version == 1 && stored.OutputMode is not (null or OutputMode.Copy);
+
+        if (invalidMode)
+        {
+            throw new JsonException("The queue output mode does not match its schema version.");
+        }
+
+        return new(stored.SourcePath, stored.DestinationPath, stored.Included, stored.FolderOrigin, stored.OutputDirectoryRoot,
+            stored.OutputMode ?? OutputMode.Copy);
     }
 
     /// <summary>Rejects duplicate object properties at every level and malformed escaped Unicode names.</summary>

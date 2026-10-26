@@ -28,6 +28,8 @@ public sealed class BatchReviewRowViewModel : ObservableObject
     public bool HasPlan => Plan is not null;
     public bool NoChange => Plan?.IsNoChange == true;
     public bool HasCopyPlan => Plan is { IsNoChange: false };
+    public bool ReplacesOriginal => Plan is { IsNoChange: false, OutputMode: OutputMode.ReplaceSource };
+    public string DestinationActionText => Localization[ReplacesOriginal ? "OutputWillReplace" : "OutputWillCopy"];
     public bool HasFailure => Failure is { Code: not ErrorCode.Cancelled };
     public string FailureText => Failure is { } failure ? Localization[$"Error{failure.Code}"] : string.Empty;
     public string FailureReasonText => Failure is { Reason: not ErrorReason.None } failure

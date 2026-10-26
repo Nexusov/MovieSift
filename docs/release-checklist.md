@@ -1,6 +1,6 @@
 # MovieSift release checklist
 
-[MovieSift 1.0.0](https://github.com/Nexusov/MovieSift/releases/tag/v1.0.0) is published as an ordinary Release and Latest. Tag `v1.0.0` remains on `6fb2a2711745880d1bb39f1177fadbd6a64827f3`, tree `82d40f3f3b121f828a41713240651d1e22b665dc`; later documentation commits are not the source of the frozen release archives. The earlier [0.1.0-rc.1 Pre-release](https://github.com/Nexusov/MovieSift/releases/tag/v0.1.0-rc.1), its tag and assets remain unchanged.
+[MovieSift 1.0.0](https://github.com/Nexusov/MovieSift/releases/tag/v1.0.0) is published as an ordinary Release and Latest. Tag `v1.0.0` remains on `6fb2a2711745880d1bb39f1177fadbd6a64827f3`, tree `82d40f3f3b121f828a41713240651d1e22b665dc`; later documentation commits are not the source of the frozen release archives. The earlier 0.1.0-rc.1 release page and its assets were removed on 2026-10-26; its Git tag was also removed; historical source and verification records remain.
 
 ## Current candidate verification
 
@@ -35,6 +35,6 @@ Staging verifies the clean checked-out revision/tree, runtime, binary/material a
 
 Artifacts are named `candidate-<runtime>-<full-checked-source-SHA>-run-<run-id>-attempt-<attempt>` and expire after **seven days**. MovieSift is public: users with repository read access who are signed in can [download them](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/download-workflow-artifacts). Candidate retention is not a GitHub Release, permanent source hosting or redistribution assurance. The preparation summary's `publicDeliveryPerformed: false` describes preparation before any optional upload.
 
-The completed [pre-rename handoff](https://github.com/Nexusov/MovieSift/actions/runs/40150657001) belongs to `2ba8ba1d4a4507ff678ff0f31045c81e497451d0`, attempt 1. It remains historical and does not supply renamed application archives. The later [MovieSift handoff](https://github.com/Nexusov/MovieSift/actions/runs/40239884148), attempt 1, produced the unchanged `a0ea505a6275f3b89e7b08ac4e6a7ae058c6ca5a` candidates published in the [historical RC](https://github.com/Nexusov/MovieSift/releases/tag/v0.1.0-rc.1); its original assets remain unchanged.
+The completed [pre-rename handoff](https://github.com/Nexusov/MovieSift/actions/runs/40150657001) belongs to `2ba8ba1d4a4507ff678ff0f31045c81e497451d0`, attempt 1. It remains historical and does not supply renamed application archives. The later [MovieSift handoff](https://github.com/Nexusov/MovieSift/actions/runs/40239884148), attempt 1, produced the unchanged `a0ea505a6275f3b89e7b08ac4e6a7ae058c6ca5a` candidates published in the former 0.1.0-rc.1 release. That release page and its downloads have since been removed; these records describe the original distribution.
 
 The [1.0.0 handoff](https://github.com/Nexusov/MovieSift/actions/runs/40254293203), attempt 1, produced the new `6fb2a2711745880d1bb39f1177fadbd6a64827f3` binary/material pairs published in 1.0.0. Seven-day retention is not their public-release hosting arrangement; the public release links above identify the delivered set.

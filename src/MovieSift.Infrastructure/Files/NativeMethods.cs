@@ -48,7 +48,7 @@ internal struct LinuxFileInformation
     public long Reserved3;
 }
 
-/// <summary>Exposes the two target platforms' read-only file identity APIs.</summary>
+/// <summary>Exposes file identity APIs and narrowly scoped Linux permission operations on an owned candidate.</summary>
 internal static class NativeMethods
 {
     [DllImport("kernel32.dll", SetLastError = true)]
@@ -66,4 +66,10 @@ internal static class NativeMethods
 
     [DllImport("libc", EntryPoint = "open", SetLastError = true)]
     internal static extern int Open([MarshalAs(UnmanagedType.LPUTF8Str)] string path, int flags);
+
+    [DllImport("libc", EntryPoint = "fchmod", SetLastError = true)]
+    internal static extern int FChmod(int file, uint mode);
+
+    [DllImport("libc", EntryPoint = "fgetxattr", SetLastError = true)]
+    internal static extern nint FGetXAttr(int file, [MarshalAs(UnmanagedType.LPUTF8Str)] string name, IntPtr value, nuint size);
 }

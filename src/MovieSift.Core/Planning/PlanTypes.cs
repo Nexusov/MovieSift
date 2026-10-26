@@ -9,7 +9,8 @@ public sealed record PlanRequest(
     IReadOnlyCollection<int> RetainedTrackIds,
     string DestinationPath,
     bool ZeroAudioConfirmed,
-    string? OutputDirectoryRoot = null);
+    string? OutputDirectoryRoot = null,
+    OutputMode OutputMode = OutputMode.Copy);
 
 public sealed record RemuxPlan(
     Guid Id,
@@ -17,7 +18,8 @@ public sealed record RemuxPlan(
     ImmutableArray<MediaTrack> RetainedTracks,
     string DestinationPath,
     bool ZeroAudioConfirmed,
-    string? OutputDirectoryRoot = null)
+    string? OutputDirectoryRoot = null,
+    OutputMode OutputMode = OutputMode.Copy)
 {
     public bool IsNoChange => RetainedTracks.Length == Inspection.Tracks.Length;
     public bool RemovesDefaultAudio => Inspection.Tracks.Any(track =>

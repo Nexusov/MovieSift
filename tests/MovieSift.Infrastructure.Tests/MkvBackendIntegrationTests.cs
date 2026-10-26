@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Globalization;
 using System.Security.Cryptography;
+using MovieSift.Application.Jobs;
 using MovieSift.Application.Ports;
 using MovieSift.Core.Media;
 using MovieSift.Core.Planning;
@@ -15,6 +16,78 @@ namespace MovieSift.Infrastructure.Tests;
 /// <summary>Exercises real MKVToolNix identification, remux, verification, and retained encoded payloads.</summary>
 public sealed class MkvBackendIntegrationTests
 {
+    /// <summary>Replaces one original through the real job owner and verifies published media against the untouched fixture.</summary>
+    [MediaFact]
+    public async Task ReplaceSourcePreservesRetainedMediaAndCleansOwnedBackupAndJournal()
+    {
+        using var workspace = new TestWorkspace();
+        var fixturePath = Path.Combine(MediaTestEnvironment.FixtureDirectory, "ordinary.mkv");
+        var sourceDirectory = Path.Combine(workspace.Path, "source files");
+        Directory.CreateDirectory(sourceDirectory);
+        var sourcePath = Path.Combine(sourceDirectory, "-исходник ; & replace.mkv");
+        File.Copy(fixturePath, sourcePath);
+        var originalHash = await HashAsync(sourcePath);
+        Assert.Equal(originalHash, await HashAsync(fixturePath));
+        var scratch = Path.Combine(workspace.Path, "scratch");
+        var backend = MediaTestEnvironment.CreateBackend(scratch);
+        var inspection = await backend.InspectAsync(new(sourcePath, TestContext.Current.CancellationToken));
+        Assert.True(inspection.HasChapters);
+        Assert.True(inspection.HasTags);
+        var audioTracks = inspection.Tracks.Where(track => track.Kind == TrackKind.Audio).ToArray();
+        Assert.Equal(2, audioTracks.Length);
+        Assert.Contains(inspection.Tracks, track => track.Kind == TrackKind.Subtitles);
+        var retained = inspection.Tracks.Where(track => track.Kind == TrackKind.Video || track.Id == audioTracks[1].Id).ToArray();
+        var retainedIds = retained.Select(track => track.Id).ToArray();
+        var plan = Assert.IsType<RemuxPlan>(PlanBuilder.Build(new(inspection, retainedIds, sourcePath, false,
+            OutputMode: OutputMode.ReplaceSource)).Plan);
+        var data = Path.Combine(workspace.Path, "data");
+        var coordinator = new JobCoordinator(backend, new FileSourceAccess(), new OwnedOutputStore(data));
+
+        var result = await coordinator.RunAsync(new(plan, CancellationToken: TestContext.Current.CancellationToken));
+
+        Assert.True(result.Phase == JobPhase.Completed, $"{result.Phase}: {result.Failure}; {result.Tool}; {result.Verification}");
+        Assert.Null(result.Failure);
+        Assert.Empty(result.CleanupIssues);
+        Assert.Equal(0, result.Tool?.ExitCode);
+        var verification = Assert.IsType<VerificationOutcome>(result.Verification);
+        Assert.True(verification.Passed, verification.Details);
+        Assert.Equal(sourcePath, result.PublishedPath);
+        Assert.Equal(new FileInfo(sourcePath).Length, result.OutputLength);
+        Assert.NotEqual(originalHash, await HashAsync(sourcePath));
+        var output = await backend.InspectAsync(new(sourcePath, TestContext.Current.CancellationToken));
+        Assert.Equal(retained.Select(track => track.Uid), output.Tracks.Select(track => track.Uid));
+        Assert.DoesNotContain(output.Tracks, track => track.Kind == TrackKind.Subtitles);
+        Assert.False(Assert.Single(output.Tracks.Where(track => track.Kind == TrackKind.Audio)).IsDefault);
+        Assert.Equal(inspection.Title, output.Title);
+        Assert.True(output.HasChapters);
+        Assert.True(output.HasTags);
+        Assert.Equal(inspection.Attachments.ToArray(), output.Attachments.ToArray());
+
+        // The original path now contains the result; use the unchanged fixture as the independent verification source.
+        var reference = await backend.InspectAsync(new(fixturePath, TestContext.Current.CancellationToken));
+        var referencePlan = Assert.IsType<RemuxPlan>(PlanBuilder.Build(new(reference, retainedIds, sourcePath, false)).Plan);
+        var publishedVerification = await backend.VerifyAsync(new(referencePlan, sourcePath, TestContext.Current.CancellationToken));
+        Assert.True(publishedVerification.Passed, publishedVerification.Details);
+
+        foreach (var track in retained)
+        {
+            var outputTrack = Assert.Single(output.Tracks, candidate => candidate.Uid == track.Uid);
+            await MediaPayloadEvidence.AssertIdenticalAsync(new(fixturePath, track.Id, sourcePath, outputTrack.Id,
+                workspace.Path, FormattableString.Invariant($"replacement-track-{track.Id}")));
+        }
+
+        var attachment = Assert.Single(inspection.Attachments);
+        var outputAttachment = Assert.Single(output.Attachments);
+        await MediaPayloadEvidence.AssertIdenticalAsync(new(fixturePath, attachment.Id, sourcePath, outputAttachment.Id,
+            workspace.Path, "replacement-attachment", "attachments"));
+        Assert.Equal(originalHash, await HashAsync(fixturePath));
+        Assert.Equal([sourcePath], Directory.GetFiles(sourceDirectory));
+        Assert.Empty(Directory.GetDirectories(sourceDirectory));
+        Assert.False(File.Exists(Path.Combine(sourceDirectory, MediaContainerPolicy.TrimmedFileName(sourcePath))));
+        Assert.Empty(Directory.EnumerateFileSystemEntries(Path.Combine(data, "ownership")));
+        Assert.Empty(Directory.EnumerateFileSystemEntries(scratch));
+    }
+
     /// <summary>Proves exact retained bytes and metadata on single- and multiple-video fixtures.</summary>
     [MediaTheory]
     [InlineData("ordinary.mkv")]

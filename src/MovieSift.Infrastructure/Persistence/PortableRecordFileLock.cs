@@ -27,18 +27,18 @@ internal sealed class PortableRecordFileLock(SafeFileHandle handle) : IDisposabl
     private int disposed;
 
     /// <summary>Rejects redirected paths and unsafe handles before acquiring a fail-fast OS lock.</summary>
-    internal static PortableRecordFileLock Acquire(string path)
+    internal static PortableRecordFileLock Acquire(string path, bool shared = false)
     {
         PathSafety.RejectReparsePoints(Path.GetDirectoryName(path)!);
 
         if (OperatingSystem.IsWindows())
         {
-            return AcquireWindows(path);
+            return AcquireWindows(path, shared);
         }
 
         if (OperatingSystem.IsLinux() && RuntimeInformation.ProcessArchitecture == Architecture.X64)
         {
-            return AcquireLinux(path);
+            return AcquireLinux(path, shared);
         }
 
         throw Unavailable("Portable record locking supports only Windows x64 and Linux x64.");
@@ -66,9 +66,9 @@ internal sealed class PortableRecordFileLock(SafeFileHandle handle) : IDisposabl
     }
 
     /// <summary>Uses an exclusive Windows handle while opening the link itself for safe type validation.</summary>
-    private static PortableRecordFileLock AcquireWindows(string path)
+    private static PortableRecordFileLock AcquireWindows(string path, bool shared)
     {
-        var opened = CreateFile(path, WindowsReadWrite, 0, IntPtr.Zero, WindowsOpenAlways,
+        var opened = CreateFile(path, WindowsReadWrite, shared ? 3u : 0u, IntPtr.Zero, WindowsOpenAlways,
             WindowsOpenReparsePoint, IntPtr.Zero);
 
         if (opened.IsInvalid)
@@ -100,7 +100,7 @@ internal sealed class PortableRecordFileLock(SafeFileHandle handle) : IDisposabl
     }
 
     /// <summary>Opens without FIFO blocking or final-link traversal and locks the verified regular inode.</summary>
-    private static PortableRecordFileLock AcquireLinux(string path)
+    private static PortableRecordFileLock AcquireLinux(string path, bool shared)
     {
         var descriptor = Open(path, LinuxReadWrite | LinuxCreate | LinuxNonBlocking | LinuxNoFollow | LinuxCloseOnExec,
             LinuxOwnerReadWrite);
@@ -122,7 +122,7 @@ internal sealed class PortableRecordFileLock(SafeFileHandle handle) : IDisposabl
                 throw Unavailable("The portable record lock must be a regular file without redirection.");
             }
 
-            if (Flock(opened, LinuxExclusiveNonBlockingLock) != 0)
+            if (Flock(opened, shared ? 1 | 4 : LinuxExclusiveNonBlockingLock) != 0)
             {
                 var error = Marshal.GetLastPInvokeError();
                 throw error == LinuxWouldBlock ? Busy() : Unavailable($"Could not acquire the portable record lock (OS error {error}).");

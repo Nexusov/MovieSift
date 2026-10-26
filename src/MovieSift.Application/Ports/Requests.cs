@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using MovieSift.Core.Media;
 using MovieSift.Core.Planning;
 
@@ -9,9 +10,10 @@ public sealed record RemuxRequest(RemuxPlan Plan, string CandidatePath, IProgres
 public sealed record VerifyRequest(RemuxPlan Plan, string CandidatePath, CancellationToken CancellationToken = default);
 public sealed record ValidateDestinationRequest(SourceRevision Source, string DestinationPath, long AdditionalAllocationBytes,
     CancellationToken CancellationToken = default, string? OutputDirectoryRoot = null,
-    MediaContainer Container = MediaContainer.Matroska);
+    MediaContainer Container = MediaContainer.Matroska, OutputMode OutputMode = OutputMode.Copy);
 public sealed record ReserveOutputRequest(RemuxPlan Plan, CancellationToken CancellationToken = default);
-public sealed record OutputRequest(OwnedOutput Output, CancellationToken CancellationToken = default);
+public sealed record OutputRequest(OwnedOutput Output, CancellationToken CancellationToken = default,
+    SourceRevision? VerifiedCandidate = null);
 public sealed record SaveLanguageRequest(string Language, CancellationToken CancellationToken = default);
 
 public enum ToolDisposition { Success, WarningReview, Failure }
@@ -28,7 +30,8 @@ public sealed record ToolOutcome(int ExitCode, string Diagnostics, ToolDispositi
 }
 public sealed record VerificationOutcome(bool Passed, string Details);
 public sealed record OwnedOutput(Guid JobId, string DirectoryPath, string CandidatePath, string DestinationPath, string OwnershipToken,
-    MediaContainer Container = MediaContainer.Matroska);
+    MediaContainer Container = MediaContainer.Matroska, OutputMode OutputMode = OutputMode.Copy,
+    SourceRevision? ExpectedSource = null);
 public sealed record InterruptedOutput(OwnedOutput? Output, string Stage, bool CanClean, string? Issue = null);
 public sealed record CleanupIssue(string Path, string Detail);
-public sealed record PublishedOutput(string Path, long Length);
+public sealed record PublishedOutput(string Path, long Length, ImmutableArray<CleanupIssue> CleanupIssues = default);

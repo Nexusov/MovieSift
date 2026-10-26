@@ -99,7 +99,8 @@ public sealed partial class BatchSession
         var equivalent = item.State == BatchItemState.Ready && item.Result is null &&
             existing is not null && ReferenceEquals(existing.Inspection, item.Inspection) &&
             existing.RetainedTracks.Select(track => track.Id).SequenceEqual(item.CurrentRetainedTrackIds) &&
-            existing.DestinationPath == destination && existing.OutputDirectoryRoot == item.IntendedOutputDirectoryRoot;
+            existing.DestinationPath == destination && existing.OutputDirectoryRoot == item.IntendedOutputDirectoryRoot &&
+            existing.OutputMode == item.OutputMode;
 
         if (equivalent)
         {
@@ -107,7 +108,7 @@ public sealed partial class BatchSession
         }
 
         var built = PlanBuilder.Build(new(item.Inspection, item.CurrentRetainedTrackIds,
-            destination ?? string.Empty, confirmations.Contains(item.Id), item.IntendedOutputDirectoryRoot));
+            destination ?? string.Empty, confirmations.Contains(item.Id), item.IntendedOutputDirectoryRoot, item.OutputMode));
 
         if (built.Plan is null)
         {

@@ -4,6 +4,7 @@
     <Project Path="src/MovieSift.Core/MovieSift.Core.csproj" />
     <Project Path="src/MovieSift.Desktop/MovieSift.Desktop.csproj" />
     <Project Path="src/MovieSift.Infrastructure/MovieSift.Infrastructure.csproj" />
+    <Project Path="src/MovieSift.Updater/MovieSift.Updater.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/MovieSift.Application.Tests/MovieSift.Application.Tests.csproj" />

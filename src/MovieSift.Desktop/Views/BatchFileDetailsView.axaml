@@ -11,7 +11,7 @@
       <TextBlock Text="{Binding BackendDescription}" TextWrapping="Wrap" />
       <TextBlock Text="{Binding MediaFeaturesText}" TextWrapping="Wrap" />
       <TextBlock Text="{Binding Localization[Output]}" />
-      <TextBox Text="{Binding OutputPath, Mode=TwoWay}" IsEnabled="{Binding CanEditPlan}" TextWrapping="Wrap"
+      <TextBox Text="{Binding OutputPath, Mode=TwoWay}" IsEnabled="{Binding CanEditDestination}" TextWrapping="Wrap"
                AutomationProperties.Name="{Binding Localization[Output]}" />
       <ItemsControl ItemsSource="{Binding Tracks}" IsEnabled="{Binding CanEditPlan}">
         <ItemsControl.ItemTemplate>

@@ -29,7 +29,10 @@ public static class QueueListPolicy
         foreach (var entry in list.Entries)
         {
             var invalidEntry = entry is null || !IsCanonicalAbsolutePath(entry.SourcePath) ||
-                (entry.DestinationPath is not null && !IsCanonicalAbsolutePath(entry.DestinationPath));
+                (entry.DestinationPath is not null && !IsCanonicalAbsolutePath(entry.DestinationPath)) ||
+                entry is not null && (!Enum.IsDefined(entry.OutputMode) ||
+                    entry.OutputMode == OutputMode.ReplaceSource &&
+                    (entry.DestinationPath != entry.SourcePath || entry.OutputDirectoryRoot is not null));
 
             if (invalidEntry)
             {

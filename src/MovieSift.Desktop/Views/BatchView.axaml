@@ -11,14 +11,22 @@
     <StackPanel x:Name="BatchRunControls" DockPanel.Dock="Bottom" Spacing="6" Margin="0,10,0,0">
       <Border Classes="panel" Padding="12">
         <StackPanel Spacing="8">
-          <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
-            <Button x:Name="BatchOutputFolderButton" Content="{Binding Localization[ChooseOutput]}" Command="{Binding ChooseOutputCommand}" />
-            <TextBlock Grid.Column="1" Text="{Binding OutputFolder}" Classes="muted" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" ToolTip.Tip="{Binding OutputFolder}" />
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+            <ComboBox x:Name="OutputModeSelector" SelectedIndex="{Binding SelectedOutputModeIndex, Mode=TwoWay}" IsEnabled="{Binding CanEdit}" HorizontalAlignment="Stretch" AutomationProperties.Name="{Binding Localization[OutputModeLabel]}" AutomationProperties.HelpText="{Binding OutputSafetyText}" ToolTip.Tip="{Binding OutputSafetyText}">
+              <ComboBoxItem><TextBlock Text="{Binding Localization[OutputCopyMode]}" /></ComboBoxItem>
+              <ComboBoxItem><TextBlock Text="{Binding Localization[OutputReplaceMode]}" /></ComboBoxItem>
+            </ComboBox>
+            <Button Grid.Column="1" x:Name="BatchOutputFolderButton" Command="{Binding ChooseOutputCommand}" IsVisible="{Binding IsCopyMode}" ToolTip.Tip="{Binding OutputFolder}" AutomationProperties.Name="{Binding Localization[ChooseOutput]}">
+              <StackPanel MaxWidth="220" Spacing="2">
+                <TextBlock Text="{Binding Localization[ChooseOutput]}" />
+                <TextBlock Text="{Binding OutputFolder}" Classes="muted" TextTrimming="CharacterEllipsis" IsVisible="{Binding HasCustomOutputFolder}" />
+              </StackPanel>
+            </Button>
           </Grid>
           <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
             <StackPanel Spacing="3" VerticalAlignment="Center">
               <TextBlock x:Name="BatchStatusText" Text="{Binding StatusText}" TextWrapping="Wrap" FontWeight="SemiBold" />
-              <TextBlock Classes="muted" Text="{Binding Localization[WorkspaceOriginalShort]}" TextWrapping="Wrap" />
+              <TextBlock Classes="muted" Text="{Binding OutputSafetyText}" TextWrapping="Wrap" />
             </StackPanel>
             <Button Grid.Column="1" x:Name="ReviewBatchButton" Classes="primary" Content="{Binding Localization[BatchReviewRemaining]}" Command="{Binding ReviewCommand}" IsVisible="{Binding !IsReviewOpen}" />
           </Grid>
@@ -27,8 +35,8 @@
             <TextBlock Text="{Binding StageText}" />
             <ProgressBar Minimum="0" Maximum="100" Value="{Binding ProgressValue}" IsIndeterminate="{Binding IsProgressIndeterminate}" />
           </StackPanel>
-          <TextBlock Text="{Binding PauseText}" IsVisible="{Binding HasItems}" TextWrapping="Wrap" />
-          <WrapPanel>
+          <TextBlock Text="{Binding PauseText}" IsVisible="{Binding HasPauseNotice}" TextWrapping="Wrap" />
+          <WrapPanel IsVisible="{Binding IsBusy}">
             <Button Content="{Binding Localization[BatchPauseAfterCurrent]}" Command="{Binding PauseCommand}" IsVisible="{Binding CanPause}" Margin="0,0,8,0" />
             <Button x:Name="CancelBatchButton" Classes="danger" Content="{Binding Localization[BatchCancel]}" Command="{Binding CancelCommand}" IsVisible="{Binding CanCancel}" />
           </WrapPanel>
@@ -55,6 +63,7 @@
               <StackPanel Spacing="10" MaxWidth="300">
                 <CheckBox x:Name="IncludeSubfoldersCheckBox" IsChecked="{Binding IncludeSubfolders, Mode=TwoWay}" IsEnabled="{Binding CanEdit}" Content="{Binding Localization[BatchIncludeSubfolders]}" />
                 <TextBlock Text="{Binding Localization[BatchFolderScopeHelp]}" Classes="muted" TextWrapping="Wrap" />
+                <Button Content="{Binding Localization[OutputUseSourceFolders]}" Command="{Binding UseSourceFoldersCommand}" IsVisible="{Binding HasCustomOutputFolder}" />
                 <Button x:Name="NewBatchButton" Click="OnNewQueue" Content="{Binding Localization[BatchNew]}" Command="{Binding NewBatchCommand}" IsVisible="{Binding ShowNewQueue}" />
               </StackPanel>
             </Flyout>
