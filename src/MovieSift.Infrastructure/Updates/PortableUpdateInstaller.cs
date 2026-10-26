@@ -211,6 +211,9 @@ public static class PortableUpdateInstaller
     {
         var managed = await UpdatePackage.ReadManifestAsync(source, cancellationToken);
         managed.TryAdd("SHA256SUMS", string.Empty);
+        var rootPermissions = UpdateFilePermissions.Capture(source, directory: true);
+        rootPermissions.PrepareDirectory(destination);
+        var directories = new List<(UpdateFilePermissions Permissions, string Destination)> { (rootPermissions, destination) };
         var pending = new Stack<string>();
         pending.Push(source);
         var count = 0;
@@ -234,7 +237,9 @@ public static class PortableUpdateInstaller
                 var output = UpdatePackage.SafeRelativePath(destination, relative);
                 if (Directory.Exists(entry))
                 {
-                    Directory.CreateDirectory(output);
+                    var permissions = UpdateFilePermissions.Capture(entry, directory: true);
+                    permissions.PrepareDirectory(output);
+                    directories.Add((permissions, output));
                     pending.Push(entry);
                     continue;
                 }
@@ -244,16 +249,22 @@ public static class PortableUpdateInstaller
                         $"A user file conflicts with the new package: {relative}. The existing installation was preserved.");
                 }
                 Directory.CreateDirectory(Path.GetDirectoryName(output)!);
+                var filePermissions = UpdateFilePermissions.Capture(entry, directory: false);
                 await using var input = FileSourceAccess.OpenRegularReadStream(entry);
-                await using var copied = new FileStream(output, FileMode.CreateNew, FileAccess.Write, FileShare.None);
-                await input.CopyToAsync(copied, cancellationToken);
-                await copied.FlushAsync(cancellationToken);
-                copied.Flush(flushToDisk: true);
-                if (!OperatingSystem.IsWindows())
+                await using (var copied = filePermissions.CreateFile(output))
                 {
-                    File.SetUnixFileMode(output, File.GetUnixFileMode(entry) & (UnixFileMode)0x1FF);
+                    await input.CopyToAsync(copied, cancellationToken);
+                    await copied.FlushAsync(cancellationToken);
+                    copied.Flush(flushToDisk: true);
                 }
+                filePermissions.VerifyFile(output);
             }
+        }
+        // Children are complete before restrictive Unix parent modes are restored.
+        foreach (var directory in Enumerable.Reverse(directories))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            directory.Permissions.CompleteDirectory(directory.Destination);
         }
     }
 

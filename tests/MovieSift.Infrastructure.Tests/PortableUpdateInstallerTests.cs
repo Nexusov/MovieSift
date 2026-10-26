@@ -244,7 +244,7 @@ public sealed class PortableUpdateInstallerTests
     private static string WorkerDirectory() => Path.Combine(MediaTestEnvironment.RepositoryDirectory, "tests", "MovieSift.ProcessTestWorker",
         "bin", new DirectoryInfo(AppContext.BaseDirectory).Parent!.Name, "net10.0");
 
-    private sealed class InstallationFixture : IDisposable
+    internal sealed class InstallationFixture : IDisposable
     {
         private readonly TestWorkspace workspace = new();
         internal string App => Path.Combine(workspace.Path, "app Кириллица");

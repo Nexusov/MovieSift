@@ -77,4 +77,6 @@ Installation waits until processing, recovery decisions and settings saves are f
 
 Automatic installation requires a local writable portable application folder and its bundled helper. A source/debug build or a read-only location may require manual downloading. The updater keeps the old application in its adjacent `.moviesift-update-…/previous` folder; remove that backup after verifying the new version. If an interrupted directory switch requires manual recovery, consult `UPDATE-RESULT.txt` in that same folder. Do not replace files beneath a still-running application.
 
+If the updater cannot preserve your folder or file permissions, extract the new version into a separate folder and migrate your data manually, checking access permissions before use. Windows updates preserve current access rules as a fixed snapshot; later permission changes to the parent folder do not propagate automatically.
+
 Version 1.0.0 has no updater. The first version with this feature must be downloaded and extracted manually; later compatible releases can be installed from the application.
