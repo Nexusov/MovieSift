@@ -1,3 +1,34 @@
+# MovieSift 1.0.0
+
+[MovieSift 1.0.0](https://github.com/Nexusov/MovieSift/releases/tag/v1.0.0) is published as an ordinary GitHub Release and Latest. This version removes the prerelease suffix and preserves the existing MKV/MP4 workflow; no new media feature, codec or matching mode is introduced.
+
+## Downloads and portable startup
+
+- [Windows x64 ZIP](https://github.com/Nexusov/MovieSift/releases/download/v1.0.0/MovieSift-win-x64.zip)
+- [Linux x64 tar.gz](https://github.com/Nexusov/MovieSift/releases/download/v1.0.0/MovieSift-linux-x64.tar.gz)
+- [Windows matching source/build materials](https://github.com/Nexusov/MovieSift/releases/download/v1.0.0/MovieSift-win-x64-materials-6fb2a2711745.tar.gz) and [Linux matching source/build materials](https://github.com/Nexusov/MovieSift/releases/download/v1.0.0/MovieSift-linux-x64-materials-6fb2a2711745.tar.gz)
+- [SHA256SUMS](https://github.com/Nexusov/MovieSift/releases/download/v1.0.0/SHA256SUMS), with separate platform inventories and material summaries on the release page.
+
+Extract the complete archive into a new writable folder. Launch `MovieSift.exe` on Windows or `./MovieSift` from `MovieSift-linux-x64` on Linux. No separately installed .NET or media tools are required; Linux still needs the documented [OS native libraries](SUPPORTED_FORMATS.md#platform-and-native-requirements). Keep the complete extracted directory together and follow the [upgrade guidance](../README.md#upgrading-an-earlier-portable-candidate).
+
+## Included behavior and supported scope
+
+Remove unwanted embedded audio/subtitle tracks without re-encoding, using a common track list with per-file exceptions, explicit Review and sequential verified copies. All admitted video remains retained and sources remain unchanged. The reversible **Remove all subtitles from copies** action, optional language/title/forced rules, explicitly loaded presets, recursive relative output directories and explicit unfinished-list Restore remain available. English/Russian and portable appearance preferences are unchanged.
+
+MKV admits the documented ordinary self-contained Matroska subset with supported chapters, tags and attachments. MP4 is limited to ordinary self-contained, unencrypted, nonfragmented H.264/AVC, AAC and mov_text, supported ordinary chapters and JPEG/PNG artwork; at most one distinct referenced QuickTime chapter track is admitted. Unsupported detected structures are rejected. The [exact preservation contract](SUPPORTED_FORMATS.md) remains authoritative. There is no conversion, transcoding, playback, source replacement or parallel remuxing.
+
+## Source and verification
+
+Tag `v1.0.0` identifies `6fb2a2711745880d1bb39f1177fadbd6a64827f3`, tree `82d40f3f3b121f828a41713240651d1e22b665dc`. [Integrated-main CI](https://github.com/Nexusov/MovieSift/actions/runs/40253431802) and the single [retained candidate run](https://github.com/Nexusov/MovieSift/actions/runs/40254293203), attempt 1, passed the required Windows/Linux checks, including mandatory real media, packaging/inventory/materials, relocation and the Linux clean container. Both newly built packages have 1.0.0 application metadata without a prerelease suffix. They are not renamed RC archives; later documentation commits do not change their source or bytes.
+
+All nine release assets were verified against their actual sizes and SHA256 values. Matching material bundles bind covered-source/build material, notices and the exact application source to each binary. GitHub's automatic source downloads do not replace them. Original code remains [MIT](../LICENSE), copyright (c) 2026 Nexusov; bundled components retain their independent terms.
+
+## Known limitations
+
+The ordinary Release/Latest designation does not establish unperformed native visual/focus/scrolling, 100%/150%/200% OS-scaling, clean Windows 11 x64 25H2 or Ubuntu 24.04 Desktop/X11-XWayland acceptance. Recorded strict active-cancellation, repeated/verification-close and real-warning native gaps remain unverified rather than claimed passes or established defects. Historical evidence retains its original binary/platform scope. No new native acceptance campaign accompanied this release.
+
+---
+
 # MovieSift 0.1.0-rc.1 — Pre-release
 
 [MovieSift 0.1.0-rc.1](https://github.com/Nexusov/MovieSift/releases/tag/v0.1.0-rc.1) is the first public release candidate, published for evaluation rather than as a fully accepted stable release. It includes the integrated unified workspace, appearance redesign and reviewed F1–F9 corrections. Original MovieSift code uses [MIT](../LICENSE), copyright (c) 2026 Nexusov. Bundled components retain their own terms.
