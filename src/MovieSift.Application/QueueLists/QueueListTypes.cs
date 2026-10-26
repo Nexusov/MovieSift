@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using MovieSift.Application.Batches;
+using MovieSift.Core.Planning;
 
 namespace MovieSift.Application.QueueLists;
 
@@ -13,7 +14,8 @@ public sealed record QueueListEntry(
     string? DestinationPath,
     bool Included = true,
     FolderSourceOrigin? FolderOrigin = null,
-    string? OutputDirectoryRoot = null);
+    string? OutputDirectoryRoot = null,
+    OutputMode OutputMode = OutputMode.Copy);
 
 public sealed record QueueList(ImmutableArray<QueueListEntry> Entries);
 public sealed record QueueListFailure(QueueListErrorCode Code, string Detail = "");

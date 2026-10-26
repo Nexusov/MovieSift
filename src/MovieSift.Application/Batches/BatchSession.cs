@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using MovieSift.Application.QueueLists;
 using MovieSift.Core.Failures;
 using MovieSift.Core.Media;
+using MovieSift.Core.Planning;
 using MovieSift.Core.Rules;
 
 namespace MovieSift.Application.Batches;
@@ -96,13 +97,17 @@ public sealed partial class BatchSession
     /// <summary>Records destination intent without granting approval or changing an actual Keep selection.</summary>
     public BatchEditResult SetDestination(BatchDestinationRequest request) => EditItem(request.ItemId, item =>
     {
-        if (request.OutputDirectoryRoot is not null && item.FolderOrigin is null)
+        var invalidMode = !Enum.IsDefined(request.OutputMode) ||
+            request.OutputMode == OutputMode.ReplaceSource &&
+            (request.DestinationPath != item.SourcePath || request.OutputDirectoryRoot is not null);
+
+        if (invalidMode || request.OutputDirectoryRoot is not null && item.FolderOrigin is null)
         {
             return new(null, new(ErrorCode.InvalidDestination));
         }
 
         var unchanged = item.IntendedDestinationPath == request.DestinationPath &&
-            item.IntendedOutputDirectoryRoot == request.OutputDirectoryRoot;
+            item.IntendedOutputDirectoryRoot == request.OutputDirectoryRoot && item.OutputMode == request.OutputMode;
 
         if (unchanged)
         {
@@ -113,6 +118,7 @@ public sealed partial class BatchSession
         {
             IntendedDestinationPath = request.DestinationPath,
             IntendedOutputDirectoryRoot = request.OutputDirectoryRoot,
+            OutputMode = request.OutputMode,
             ApprovedPlan = null,
             State = item.Inspection is null ? item.State : BatchItemState.NeedsReview,
             Failure = item.Inspection is null ? item.Failure : null
@@ -164,7 +170,7 @@ public sealed partial class BatchSession
             var entries = snapshot.Items.Where(item =>
                 item.State is not (BatchItemState.Completed or BatchItemState.NoChange) && item.Result?.PublishedPath is null)
                 .Select(item => new QueueListEntry(item.SourcePath, item.IntendedDestinationPath, item.Included,
-                    item.FolderOrigin, item.IntendedOutputDirectoryRoot)).ToImmutableArray();
+                    item.FolderOrigin, item.IntendedOutputDirectoryRoot, item.OutputMode)).ToImmutableArray();
             return new(entries);
         }
     }
@@ -201,7 +207,7 @@ public sealed partial class BatchSession
             var items = list.Entries.Select(entry => new BatchItem(Guid.NewGuid(), entry.SourcePath, null,
                 Included: entry.Included, FolderOrigin: entry.FolderOrigin,
                 IntendedDestinationPath: entry.DestinationPath,
-                IntendedOutputDirectoryRoot: entry.OutputDirectoryRoot)).ToImmutableArray();
+                IntendedOutputDirectoryRoot: entry.OutputDirectoryRoot, OutputMode: entry.OutputMode)).ToImmutableArray();
             updated = snapshot = new(snapshot.Revision + 1, BatchPhase.Preparing, items);
         }
 

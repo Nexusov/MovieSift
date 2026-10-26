@@ -120,6 +120,7 @@ public sealed class FileSourceAccess : ISourceAccess
         var parent = Path.GetDirectoryName(path);
         var invalidDestination = request.AdditionalAllocationBytes < 0 || !Path.IsPathFullyQualified(request.DestinationPath) ||
             MediaContainerPolicy.FromExtension(path) != request.Container || !Enum.IsDefined(request.Container) ||
+            !Enum.IsDefined(request.OutputMode) ||
             path.StartsWith(@"\\", StringComparison.Ordinal) || parent is null;
 
         if (invalidDestination)
@@ -129,7 +130,16 @@ public sealed class FileSourceAccess : ISourceAccess
 
         var existingParent = ValidateOutputParent(new(request, parent!));
 
-        if (File.Exists(path))
+        if (request.OutputMode == OutputMode.ReplaceSource)
+        {
+            if (path != request.Source.FullPath || request.OutputDirectoryRoot is not null)
+            {
+                throw new OperationFailureException(new(ErrorCode.InvalidDestination, "Replacement must target its own inspected source."));
+            }
+
+            ValidateReplaceableSource(request.Source);
+        }
+        else if (File.Exists(path))
         {
             var destinationRevision = await ReadRevisionAsync(new(path, request.CancellationToken));
             var code = destinationRevision.FileIdentity == request.Source.FileIdentity
@@ -152,6 +162,29 @@ public sealed class FileSourceAccess : ISourceAccess
         if (drive.AvailableFreeSpace < request.AdditionalAllocationBytes)
         {
             throw new OperationFailureException(new(ErrorCode.InsufficientSpace, "The additional output allocation exceeds the currently available space."));
+        }
+    }
+
+    /// <summary>Requires the same writable single-link regular source before an explicitly approved replacement.</summary>
+    internal static void ValidateReplaceableSource(SourceRevision expected)
+    {
+        PathSafety.RejectReparsePoints(expected.FullPath);
+        using var stream = OpenRegularReadStream(expected.FullPath);
+        var current = ReadRegularRevision(new(expected.FullPath, stream.SafeFileHandle));
+
+        if (current != expected)
+        {
+            throw new OperationFailureException(new(ErrorCode.SourceChanged));
+        }
+
+        var singleLink = OperatingSystem.IsWindows()
+            ? NativeMethods.GetFileInformationByHandle(stream.SafeFileHandle, out var windows) && windows.NumberOfLinks == 1
+            : NativeMethods.FStat(stream.SafeFileHandle.DangerousGetHandle().ToInt32(), out var linux) == 0 && linux.NumberOfLinks == 1;
+
+        if (!singleLink || File.GetAttributes(expected.FullPath).HasFlag(FileAttributes.ReadOnly))
+        {
+            throw new OperationFailureException(new(ErrorCode.InvalidDestination,
+                "Replacing originals requires a writable regular file with exactly one link. Create a copy instead."));
         }
     }
 

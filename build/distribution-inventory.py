@@ -555,7 +555,7 @@ def classify(records, origins, components, tool_lock, profile):
         if original:
             record.update(category="original-or-generated-project-output", origin="Recorded build revision and packaging scripts")
 
-            if name in ("MovieSift", "MovieSift.exe"):
+            if name in ("MovieSift", "MovieSift.exe", "MovieSift.Updater", "MovieSift.Updater.exe"):
                 record.update(origin="SDK-generated .NET apphost; SDK version in build-provenance.json", sourceCompleteness="Exact apphost template/source relationship requires review")
             continue
 

@@ -1,0 +1,25 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:updates="using:MovieSift.Desktop.Updates"
+             x:Class="MovieSift.Desktop.Views.UpdatesView"
+             x:DataType="updates:UpdatesViewModel">
+  <StackPanel Spacing="10">
+    <TextBlock Text="{Binding Localization[UpdatesHeading]}" Classes="heading" />
+    <TextBlock Text="{Binding CurrentVersionText}" Classes="muted" TextWrapping="Wrap" />
+    <TextBlock Text="{Binding Localization[UpdatesPreviousFailure]}" IsVisible="{Binding PreviousInstallFailed}" TextWrapping="Wrap" />
+    <CheckBox Content="{Binding Localization[UpdatesCheckOnStartup]}" IsChecked="{Binding CheckOnStartup}" IsEnabled="{Binding !IsInstalling}" />
+    <TextBlock Text="{Binding Localization[UpdatesPreferenceFailed]}" IsVisible="{Binding PreferenceFailed}"
+               Foreground="{DynamicResource MovieSiftWarningBrush}" TextWrapping="Wrap" />
+    <TextBlock Text="{Binding AvailableVersionText}" IsVisible="{Binding HasUpdate}" FontWeight="SemiBold" TextWrapping="Wrap" />
+    <TextBlock Text="{Binding Localization[UpdatesInstallNotice]}" IsVisible="{Binding HasUpdate}" TextWrapping="Wrap" />
+    <TextBlock Text="{Binding StatusText}" TextWrapping="Wrap" />
+    <TextBlock Text="{Binding CleanupNotice}" IsVisible="{Binding HasCleanupNotice}" TextWrapping="Wrap" />
+    <TextBlock Text="{Binding Localization[UpdatesFinishWork]}" IsVisible="{Binding InstallationBlocked}" TextWrapping="Wrap" />
+    <ProgressBar Minimum="0" Maximum="100" Value="{Binding Progress}" IsVisible="{Binding IsInstalling}" />
+    <WrapPanel>
+      <Button Content="{Binding Localization[UpdatesCheckNow]}" Command="{Binding CheckCommand}" Margin="0,0,8,8" />
+      <Button Content="{Binding Localization[UpdatesInstall]}" Command="{Binding InstallCommand}" IsVisible="{Binding HasUpdate}" Margin="0,0,8,8" />
+      <Button Content="{Binding Localization[Cancel]}" Command="{Binding CancelCommand}" IsVisible="{Binding CanCancel}" Margin="0,0,8,8" />
+    </WrapPanel>
+  </StackPanel>
+</UserControl>

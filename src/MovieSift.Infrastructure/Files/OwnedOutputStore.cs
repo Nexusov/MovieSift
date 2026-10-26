@@ -6,23 +6,27 @@ using MovieSift.Application;
 using MovieSift.Application.Ports;
 using MovieSift.Core.Failures;
 using MovieSift.Core.Media;
+using MovieSift.Core.Planning;
 using MovieSift.Infrastructure.Persistence;
 
 namespace MovieSift.Infrastructure.Files;
 
-/// <summary>Publishes only uniquely owned candidates and never overwrites a destination.</summary>
-public sealed class OwnedOutputStore : IOutputStore
+/// <summary>Publishes owned candidates as new copies or explicitly approved replacements of their inspected source.</summary>
+public sealed partial class OwnedOutputStore : IOutputStore
 {
     private const int LegacyMatroskaRecordVersion = 1;
-    private const int RecordVersion = 2;
+    private const int LegacyContainerRecordVersion = 2;
+    private const int RecordVersion = 3;
     private const int OwnershipTokenBytes = 32;
     private const int OwnershipTokenCharacters = OwnershipTokenBytes * 2;
     private const string CandidateStem = "candidate";
     private const string MarkerName = "owner.json";
     private const string ReservedStage = "Reserved";
     private const string PublishingStage = "Publishing";
+    private const string PublishedStage = "Published";
     private readonly string recordDirectory;
     private readonly Action<ReservationBoundary, OwnedOutput>? reservationBoundary;
+    private readonly Action<ReplacementBoundary, OwnedOutput>? replacementBoundary;
 
     /// <summary>Uses the ordinary reservation lifecycle without development-only scheduling behavior.</summary>
     public OwnedOutputStore(string dataDirectory) : this(dataDirectory, null)
@@ -30,10 +34,12 @@ public sealed class OwnedOutputStore : IOutputStore
     }
 
     /// <summary>Exposes exact storage boundaries to deterministic fault tests without changing the public media port.</summary>
-    internal OwnedOutputStore(string dataDirectory, Action<ReservationBoundary, OwnedOutput>? reservationBoundary)
+    internal OwnedOutputStore(string dataDirectory, Action<ReservationBoundary, OwnedOutput>? reservationBoundary,
+        Action<ReplacementBoundary, OwnedOutput>? replacementBoundary = null)
     {
         recordDirectory = Path.Combine(Path.GetFullPath(dataDirectory), "ownership");
         this.reservationBoundary = reservationBoundary;
+        this.replacementBoundary = replacementBoundary;
     }
 
     /// <summary>Records ownership before any media tool can write the candidate.</summary>
@@ -52,7 +58,8 @@ public sealed class OwnedOutputStore : IOutputStore
         }
 
         var candidateName = CandidateStem + MediaContainerPolicy.Extension(container);
-        var output = ValidateOutput(new(request.Plan.Id, directory, Path.Combine(directory, candidateName), destination, token, container));
+        var output = ValidateOutput(new(request.Plan.Id, directory, Path.Combine(directory, candidateName), destination, token, container,
+            request.Plan.OutputMode, request.Plan.OutputMode == OutputMode.ReplaceSource ? request.Plan.Inspection.Source : null));
         using var partial = new PartialReservation();
 
         try
@@ -207,12 +214,24 @@ public sealed class OwnedOutputStore : IOutputStore
     public async Task MarkPublishingAsync(OutputRequest request)
     {
         await ValidateOwnershipAsync(request);
-        await WriteRecordAsync(new(request.Output, PublishingStage));
+
+        if (request.Output.OutputMode == OutputMode.ReplaceSource)
+        {
+            FileSourceAccess.ValidateReplaceableSource(request.Output.ExpectedSource!);
+            await ValidateReplacementCandidateAsync(request.Output, request.VerifiedCandidate);
+        }
+
+        await WriteRecordAsync(new(request.Output, PublishingStage, request.VerifiedCandidate));
     }
 
     /// <summary>Uses the platform move's no-overwrite operation on the destination filesystem.</summary>
     public async Task<PublishedOutput> PublishAsync(OutputRequest request)
     {
+        if (request.Output.OutputMode == OutputMode.ReplaceSource)
+        {
+            return await ReplaceSourceAsync(request);
+        }
+
         await ValidateOwnershipAsync(request);
         var length = new FileInfo(request.Output.CandidatePath).Length;
 
@@ -248,6 +267,11 @@ public sealed class OwnedOutputStore : IOutputStore
             if (unsafeInterruptedCleanup)
             {
                 return [new(request.Output.DirectoryPath, "A previous worker may still own this candidate. Start a fresh operation; no media was deleted.")];
+            }
+
+            if (request.Output.OutputMode == OutputMode.ReplaceSource)
+            {
+                await PrepareReplacementCleanupAsync(record);
             }
 
             var permittedPaths = new HashSet<string>(StringComparer.Ordinal)
@@ -298,7 +322,8 @@ public sealed class OwnedOutputStore : IOutputStore
             {
                 var record = await ReadRecordAsync(path);
                 await ValidateEvidenceAsync(record);
-                var canClean = !IsOriginalProcessAlive(record) && !File.Exists(record.Output.CandidatePath);
+                var canClean = !IsOriginalProcessAlive(record) && !File.Exists(record.Output.CandidatePath) &&
+                    (record.Output.OutputMode == OutputMode.Copy || record.Stage == PublishedStage);
                 results.Add(new(record.Output, record.Stage, canClean));
             }
             catch (Exception exception) when (exception is JsonException or IOException or UnauthorizedAccessException or OperationFailureException)
@@ -357,7 +382,7 @@ public sealed class OwnedOutputStore : IOutputStore
 
         var validOwnerIdentity = record.OwnerProcessId > 0 && record.OwnerStartedUtcTicks > 0 &&
             record.OwnerStartedUtcTicks <= DateTime.MaxValue.Ticks;
-        var validVersion = record.Version is LegacyMatroskaRecordVersion or RecordVersion;
+        var validVersion = record.Version is LegacyMatroskaRecordVersion or LegacyContainerRecordVersion or RecordVersion;
         var validHeader = validVersion && validOwnerIdentity;
 
         if (!validHeader)
@@ -369,9 +394,20 @@ public sealed class OwnedOutputStore : IOutputStore
         {
             ReservedStage => ReservedStage,
             PublishingStage => PublishingStage,
+            PublishedStage when record.Version == RecordVersion => PublishedStage,
             _ => throw InvalidOwnership("The ownership record has an invalid stage.")
         };
         var output = ValidateOutput(record.Output);
+        var invalidLegacyMode = record.Version != RecordVersion &&
+            (output.OutputMode != OutputMode.Copy || output.ExpectedSource is not null || record.VerifiedCandidate is not null);
+        var invalidPublication = stage == PublishedStage && output.OutputMode != OutputMode.ReplaceSource ||
+            output.OutputMode == OutputMode.ReplaceSource && stage != ReservedStage &&
+            !IsValidCandidateRevision(output, record.VerifiedCandidate);
+
+        if (invalidLegacyMode || invalidPublication)
+        {
+            throw InvalidOwnership("The publication evidence does not match the ownership record version or mode.");
+        }
         var validContainerHeader = record.Version == LegacyMatroskaRecordVersion
             ? record.Container is null && output.Container == MediaContainer.Matroska
             : record.Container is not null && Enum.IsDefined(record.Container.Value) && record.Container == output.Container;
@@ -386,7 +422,7 @@ public sealed class OwnedOutputStore : IOutputStore
             throw InvalidOwnership("The ownership record filename does not match its operation identifier.");
         }
 
-        return new(output, stage, record.OwnerProcessId, record.OwnerStartedUtcTicks);
+        return new(output, stage, record.OwnerProcessId, record.OwnerStartedUtcTicks, record.VerifiedCandidate);
     }
 
     /// <summary>Requires a complete operation identity and an exact canonical adjacent candidate layout.</summary>
@@ -404,6 +440,19 @@ public sealed class OwnedOutputStore : IOutputStore
         if (!validIdentity || !validPaths)
         {
             throw InvalidOwnership("The ownership record has an invalid operation identifier, token or path.");
+        }
+
+        var validMode = output.OutputMode switch
+        {
+            OutputMode.Copy => output.ExpectedSource is null,
+            OutputMode.ReplaceSource => output.ExpectedSource is { } source &&
+                source.FullPath == output.DestinationPath && IsValidRevision(source),
+            _ => false
+        };
+
+        if (!validMode)
+        {
+            throw InvalidOwnership("Replacement requires the exact inspected source revision; copy records cannot replace a source.");
         }
 
         var parent = Path.GetDirectoryName(output.DestinationPath);
@@ -498,7 +547,7 @@ public sealed class OwnedOutputStore : IOutputStore
     {
         using var process = Process.GetCurrentProcess();
         var record = new OwnershipRecord(RecordVersion, request.Output, request.Stage, process.Id, process.StartTime.ToUniversalTime().Ticks,
-            request.Output.Container);
+            request.Output.Container, request.VerifiedCandidate);
         return BoundedJson.WriteAsync(new JsonWriteRequest<OwnershipRecord>(RecordPath(request.Output.JobId), record, cancellationToken, overwrite));
     }
 

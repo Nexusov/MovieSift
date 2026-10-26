@@ -31,6 +31,7 @@ public sealed class FileBatchInputDiscovery(ISourceAccess sourceAccess, IOutputS
         request.CancellationToken.ThrowIfCancellationRequested();
         var validShape = request.Paths is not null && request.Paths.Count != 0
             && Enum.IsDefined(request.Kind)
+            && !(request.UseSourceDirectories && request.OutputRoot is not null)
             && (request.Kind == BatchInputKind.ExplicitFiles || request.Paths.Count == 1);
 
         if (!validShape)
@@ -227,21 +228,26 @@ public sealed class FileBatchInputDiscovery(ISourceAccess sourceAccess, IOutputS
     /// <summary>Combines the chosen output subtree with actual validated ownership and application working locations.</summary>
     private async Task<IReadOnlyList<string>> GetExcludedDirectoriesAsync(BatchInputDiscoveryRequest request, string folder)
     {
-        if (string.IsNullOrWhiteSpace(request.OutputRoot))
+        if (!request.UseSourceDirectories && string.IsNullOrWhiteSpace(request.OutputRoot))
         {
             throw new OperationFailureException(new(ErrorCode.InvalidSource,
                 "Choose an existing output folder before including subfolders.", ErrorReason.RecursiveOutputRequired));
         }
 
-        var outputRoot = ValidateFolder(request.OutputRoot);
+        var outputRoot = request.UseSourceDirectories ? null : ValidateFolder(request.OutputRoot!);
 
-        if (OutputPathPolicy.IsWithinDirectory(outputRoot, folder))
+        if (outputRoot is not null && OutputPathPolicy.IsWithinDirectory(outputRoot, folder))
         {
             throw new OperationFailureException(new(ErrorCode.InvalidSource,
                 "The recursive output root cannot equal or contain the selected source root.", ErrorReason.RecursiveRootConflict));
         }
 
-        var exclusions = new HashSet<string>(workingDirectorySnapshot.Select(Path.GetFullPath), PathComparer) { outputRoot };
+        var exclusions = new HashSet<string>(workingDirectorySnapshot.Select(Path.GetFullPath), PathComparer);
+
+        if (outputRoot is not null)
+        {
+            exclusions.Add(outputRoot);
+        }
 
         if (ownedOutputs is not null)
         {

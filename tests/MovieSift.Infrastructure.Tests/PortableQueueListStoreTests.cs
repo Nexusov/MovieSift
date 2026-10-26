@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Text;
 using System.Text.Json.Nodes;
 using MovieSift.Application.QueueLists;
+using MovieSift.Core.Planning;
 using MovieSift.Infrastructure.Persistence;
 using Xunit;
 
@@ -12,6 +13,27 @@ namespace MovieSift.Infrastructure.Tests;
 public sealed class PortableQueueListStoreTests
 {
     private static readonly TimeSpan ProcessTimeout = TimeSpan.FromSeconds(20);
+
+    /// <summary>New records preserve output intent and old listings restore only the historical no-overwrite copy mode.</summary>
+    [Fact]
+    public async Task OutputModeRoundTripsAndVersionOneDefaultsToCopy()
+    {
+        using var workspace = new TestWorkspace();
+        var source = Path.Combine(workspace.Path, "source.mkv");
+        var listing = new QueueList([new(source, source, OutputMode: OutputMode.ReplaceSource)]);
+        var saved = await Store(workspace).WriteAsync(new(listing, null, TestContext.Current.CancellationToken));
+        Assert.True(saved.Committed);
+        var loaded = await Store(workspace).ReadAsync(TestContext.Current.CancellationToken);
+        Assert.Equal(OutputMode.ReplaceSource, Assert.Single(loaded.List!.Entries).OutputMode);
+        var legacy = JsonNode.Parse(await ReadBytesAsync(workspace))!.AsObject();
+        legacy["version"] = 1;
+        legacy["entries"]![0]!.AsObject().Remove("outputMode");
+        await File.WriteAllTextAsync(RecordPath(workspace), legacy.ToJsonString(), TestContext.Current.CancellationToken);
+        var migrated = await Store(workspace).ReadAsync(TestContext.Current.CancellationToken);
+        Assert.Null(migrated.Failure);
+        Assert.Equal(OutputMode.Copy, Assert.Single(migrated.List!.Entries).OutputMode);
+        Assert.False(File.Exists(source));
+    }
 
     /// <summary>Reading missing state neither creates data nor invents a persisted revision.</summary>
     [Fact]
@@ -44,7 +66,7 @@ public sealed class PortableQueueListStoreTests
         Assert.False(Directory.Exists(list.Entries[0].OutputDirectoryRoot));
         var json = JsonNode.Parse(await ReadBytesAsync(workspace))!.AsObject();
         Assert.Equal(new[] { "entries", "revision", "version" }, json.Select(property => property.Key).Order(StringComparer.Ordinal));
-        Assert.Equal(new[] { "destinationPath", "folderOrigin", "included", "outputDirectoryRoot", "sourcePath" },
+        Assert.Equal(new[] { "destinationPath", "folderOrigin", "included", "outputDirectoryRoot", "outputMode", "sourcePath" },
             json["entries"]![0]!.AsObject().Select(property => property.Key).Order(StringComparer.Ordinal));
         AssertNoTemporaryFiles(workspace.Path);
     }
@@ -110,6 +132,8 @@ public sealed class PortableQueueListStoreTests
     [InlineData("mismatched-origin")]
     [InlineData("escaped-output")]
     [InlineData("missing-output-root")]
+    [InlineData("missing-output-mode")]
+    [InlineData("invalid-output-mode")]
     [InlineData("unknown-job")]
     [InlineData("duplicate-source")]
     [InlineData("duplicate-property")]
@@ -388,9 +412,14 @@ public sealed class PortableQueueListStoreTests
             case "mismatched-origin": entry["folderOrigin"]!["relativePath"] = "other.mkv"; break;
             case "escaped-output": entry["destinationPath"] = Path.Combine(rootPath, "escape.mkv"); break;
             case "missing-output-root": entry.Remove("outputDirectoryRoot"); break;
+            case "missing-output-mode": entry.Remove("outputMode"); break;
+            case "invalid-output-mode": entry["outputMode"] = 99; break;
             case "unknown-job": entry["approvedPlan"] = new JsonObject(); break;
             case "duplicate-source": entries.Add(entry.DeepClone()); break;
-            case "duplicate-property": return Encoding.UTF8.GetBytes(root.ToJsonString().Replace("\"version\":1", "\"version\":1,\"version\":1", StringComparison.Ordinal));
+            case "duplicate-property":
+                return Encoding.UTF8.GetBytes(root.ToJsonString().Replace(
+                $"\"version\":{QueueListJson.CurrentVersion}",
+                $"\"version\":{QueueListJson.CurrentVersion},\"version\":{QueueListJson.CurrentVersion}", StringComparison.Ordinal));
             case "invalid-property-unicode": return Encoding.UTF8.GetBytes(root.ToJsonString().Replace("\"included\":true", "\"included\":true,\"\\uD800\":0", StringComparison.Ordinal));
             case "invalid-path-unicode": return Encoding.UTF8.GetBytes(root.ToJsonString().Replace("missing file.mkv", "missing\\uD800.mkv", StringComparison.Ordinal));
             case "invalid-utf8": return [0x7B, 0xFF, 0x7D];

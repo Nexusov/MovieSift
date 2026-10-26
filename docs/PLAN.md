@@ -6,11 +6,23 @@
 
 [Integrated-main CI](https://github.com/Nexusov/MovieSift/actions/runs/40253431802) and the single [retained candidate run](https://github.com/Nexusov/MovieSift/actions/runs/40254293203), attempt 1, passed both required platform jobs on that direct commit. Mandatory media, packaging/inventory, matching materials, relocation and the Linux clean container gates remained intact. The public release contains nine verified assets: two binary archives, their matching material archives, two inventories, two material summaries and a common `SHA256SUMS`. Later documentation-only commits do not change their source or bytes. Version numbering does not establish the deferred native/scaling or recorded cancellation/close/warning acceptance.
 
+## Unreleased development changes
+
+The development branch adds an explicit choice between an adjacent `.trimmed` copy and replacement of the inspected original after verification. Copy remains the default, a separate output folder is still available, and changing the mode requires a new Review. Source replacement retains backup and recovery information when publication is uncertain.
+
+The new updater checks for newer stable GitHub releases after startup, keeps a dismissible notification and requires an explicit Install action. A separate helper verifies and switches the portable application while preserving settings and unfinished-list intent. These functions are not included in the published 1.0.0 archives; the first updater-enabled release must be installed manually. The [user guide](USAGE.md#changes-in-the-development-build) and [architecture](ARCHITECTURE.md) describe the development behavior.
+
+The README and release description have been shortened, and the README uses a dark render of the unchanged 1.0.0 interface. Verification of the new source replacement, updater and UI changes is separate from the historical CI results below. No replacement release archives have been published, and existing native/scaling acceptance limits remain unchanged.
+
+Local Linux validation used .NET SDK 10.0.402 and PowerShell 7.6.5: locked restore, `dotnet format --no-restore --verify-no-changes`, `dotnet build --configuration Release --no-restore -m:1 -nodeReuse:false -p:UseSharedCompilation=false`, and `dotnet test --configuration Release --no-build --no-restore -m:1`. The Release build had no warnings or errors. C# results were **1,261 passed and 33 explicit optional-media skips**. Controlled filesystem/process tests cover replacement failure boundaries, Linux permissions, installer handoff, rollback and startup acknowledgement; headless tests cover update consent, busy/close behavior and minimum-size EN/RU layout. They do not establish native desktop acceptance.
+
+`python -m unittest discover -s build/tests -q` passed all **101** build-script tests with PowerShell and the hash-verified FFmpeg/zlib source prerequisites available. Required CI must provision the actual media workers, execute the new real MKV source-replacement case and all existing media tests, and verify each produced archive through `MovieSift.Updater --verify-update-archive` before accepting the package. No required test or platform check was weakened.
+
 ## Historical release candidate
 
-[MovieSift 0.1.0-rc.1](https://github.com/Nexusov/MovieSift/releases/tag/v0.1.0-rc.1) is the first public Pre-release, not Latest. Its tag identifies `a0ea505a6275f3b89e7b08ac4e6a7ae058c6ca5a`, tree `6024784b24242e776a9478b0218be49c239ac93c`, identical to the reviewed F1–F9 implementation tree. [PR #13](https://github.com/Nexusov/MovieSift/pull/13) integrated those corrections through an ordinary protected merge.
+MovieSift 0.1.0-rc.1 was the first public prerelease. Its release page and assets were removed on 2026-10-26; its Git tag was also removed; historical source and verification records remain. The former tag pointed to `a0ea505a6275f3b89e7b08ac4e6a7ae058c6ca5a`, tree `6024784b24242e776a9478b0218be49c239ac93c`, identical to the reviewed F1–F9 implementation tree. [PR #13](https://github.com/Nexusov/MovieSift/pull/13) integrated those corrections through an ordinary protected merge.
 
-[Main CI](https://github.com/Nexusov/MovieSift/actions/runs/40239000664) and the single [retained candidate run](https://github.com/Nexusov/MovieSift/actions/runs/40239884148), attempt 1, passed both required platform jobs on that direct commit. The public release preserves the exact verified Windows/Linux binary archives and matching material archives, with separate inventories/summaries and a common `SHA256SUMS`: nine uploaded assets. Later documentation-only commits do not change the release source or replace these bytes. Native/target-desktop/scaling and recorded warning/cancellation/close limits remain below.
+[Main CI](https://github.com/Nexusov/MovieSift/actions/runs/40239000664) and the single [retained candidate run](https://github.com/Nexusov/MovieSift/actions/runs/40239884148), attempt 1, passed both required platform jobs on that direct commit. That release originally distributed the exact verified Windows/Linux binary archives and matching material archives, with separate inventories/summaries and a common `SHA256SUMS`: nine uploaded assets. Later documentation-only commits do not change the release source or replace these bytes. Native/target-desktop/scaling and recorded warning/cancellation/close limits remain below.
 
 ## Earlier integrated baseline
 
@@ -28,14 +40,14 @@ Before-fix controlled/headless regressions reproduced the unreported private-dir
 
 The [quality-pass CI](https://github.com/Nexusov/MovieSift/actions/runs/40192089745) passed a synthetic merge whose tree equals the reviewed HEAD tree. The integrated-main and retained-run checks linked above then passed directly at `a0ea505a6275f3b89e7b08ac4e6a7ae058c6ca5a`. Windows ran 1,162 C# tests with 29 documented platform skips; Linux ran 1,191 without skips; both passed 101 Python checks. Mandatory media, packaging/inventory, matching materials, relocation and the applicable clean Linux container gates remained intact. Local optional-media tests and historical builds do not substitute for those results. No new native campaign accompanied publication.
 
-## Delivered behavior
+## Published 1.0.0 behavior
 
 - One workspace accepts one file, several files or bounded local folder discovery. Aggregate tracks show the union of included inspections, preserving duplicate occurrences and exact per-file identities; individual exceptions remain available.
 - One explicit Review validates separate immutable per-file plans. Run is a separate action. Zero-audio consent is file-specific, NoChange creates no output, and sequential jobs preserve the existing warning/cancellation/cleanup and no-overwrite contracts.
 - MKV and the documented MP4 subset retain their input container and encoded media. Rules, named portable presets, recursive relative outputs and explicit unfinished-list Restore/Discard remain available.
 - English/Russian, light/dark/system appearance, custom colors with contrast validation and reduced motion use independent portable preferences. Cosmetic edits preserve selections and job authority.
 
-The [README](../README.md), [architecture](ARCHITECTURE.md) and [supported formats](SUPPORTED_FORMATS.md) define the precise behavior and limits. No additional product phase or optional polish is a prerequisite for this bounded correction delivery.
+The [README](../README.md), [1.0.0 architecture](https://github.com/Nexusov/MovieSift/blob/v1.0.0/docs/ARCHITECTURE.md) and [1.0.0 supported formats](https://github.com/Nexusov/MovieSift/blob/v1.0.0/docs/SUPPORTED_FORMATS.md) define that release's behavior and limits. Development changes above do not alter its published binaries.
 
 ## Remaining desktop acceptance and release limits
 

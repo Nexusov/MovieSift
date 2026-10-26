@@ -185,7 +185,7 @@ public sealed class PortableFileTests : IDisposable
 
         Assert.Equal(MediaContainer.Mp4, request.Output.Container);
         Assert.Equal("candidate.mp4", Path.GetFileName(request.Output.CandidatePath));
-        Assert.Equal(2, record["Version"]!.GetValue<int>());
+        Assert.Equal(3, record["Version"]!.GetValue<int>());
         Assert.Equal((int)MediaContainer.Mp4, record["Container"]!.GetValue<int>());
         await File.WriteAllTextAsync(request.Output.CandidatePath, "retained mp4", TestContext.Current.CancellationToken);
         await request.Store.MarkPublishingAsync(new(request.Output));
@@ -267,7 +267,9 @@ public sealed class PortableFileTests : IDisposable
     [InlineData("$", "{bad json")]
     [InlineData("$", "null")]
     [InlineData("Version", null)]
-    [InlineData("Version", "3")]
+    [InlineData("Version", "99")]
+    [InlineData("Output.OutputMode", "99")]
+    [InlineData("Output.OutputMode", "1")]
     [InlineData("Container", null)]
     [InlineData("Container", "null")]
     [InlineData("Container", "99")]

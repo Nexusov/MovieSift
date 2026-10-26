@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using System.Text.Json.Serialization;
 using MovieSift.Application.Batches;
 using MovieSift.Application.QueueLists;
+using MovieSift.Core.Planning;
 
 namespace MovieSift.Infrastructure.Persistence;
 
@@ -15,7 +16,8 @@ internal sealed record QueueListRecord(
     [property: JsonRequired] string? DestinationPath,
     [property: JsonRequired] bool Included,
     [property: JsonRequired] FolderSourceOrigin? FolderOrigin,
-    [property: JsonRequired] string? OutputDirectoryRoot);
+    [property: JsonRequired] string? OutputDirectoryRoot,
+    OutputMode? OutputMode = null);
 
 internal sealed record QueueListFileActions(Action<string, string> Publish, Action<string> DeleteTemporary);
 

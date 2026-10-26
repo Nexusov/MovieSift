@@ -14,7 +14,7 @@ public static class BatchDiscoveryLimits
 }
 
 public sealed record BatchInputDiscoveryRequest(BatchInputKind Kind, IReadOnlyList<string> Paths,
-    CancellationToken CancellationToken = default, string? OutputRoot = null);
+    CancellationToken CancellationToken = default, string? OutputRoot = null, bool UseSourceDirectories = false);
 
 public sealed record FolderSourceOrigin(string RootPath, string RelativePath);
 

@@ -41,7 +41,7 @@ public sealed class JobCoordinator(IMediaBackend backend, ISourceAccess sourceAc
 
             var destinationRequest = new ValidateDestinationRequest(request.Plan.Inspection.Source, request.Plan.DestinationPath,
                 request.Plan.Inspection.Source.Length, request.CancellationToken, request.Plan.OutputDirectoryRoot,
-                request.Plan.Inspection.Container);
+                request.Plan.Inspection.Container, request.Plan.OutputMode);
             await sourceAccess.ValidateDestinationAsync(destinationRequest);
 
             if (request.Plan.OutputDirectoryRoot is not null)
@@ -110,7 +110,7 @@ public sealed class JobCoordinator(IMediaBackend backend, ISourceAccess sourceAc
         finally
         {
             var shouldCleanup = output is not null && pendingWarning?.Output != output &&
-                result.Failure?.Code != ErrorCode.ProcessTerminationFailed;
+                CanCleanupAfterFailure(request.Plan.OutputMode, result.Failure);
 
             if (shouldCleanup)
             {
@@ -177,7 +177,7 @@ public sealed class JobCoordinator(IMediaBackend backend, ISourceAccess sourceAc
         }
         finally
         {
-            if (pendingWarning is null && result.Failure?.Code != ErrorCode.ProcessTerminationFailed)
+            if (pendingWarning is null && CanCleanupAfterFailure(pending.Plan.OutputMode, result.Failure))
             {
                 result = result with { CleanupIssues = result.CleanupIssues.AddRange(await CleanupSafelyAsync(pending.Output)) };
             }
@@ -229,17 +229,20 @@ public sealed class JobCoordinator(IMediaBackend backend, ISourceAccess sourceAc
         await ValidatePlanAsync(new(request.Plan, request.CancellationToken));
         // The adjacent candidate is already allocated; renaming it does not allocate a second media payload.
         await sourceAccess.ValidateDestinationAsync(new(request.Plan.Inspection.Source, request.Plan.DestinationPath,
-            AdditionalAllocationBytes: 0, request.CancellationToken, request.Plan.OutputDirectoryRoot, request.Plan.Inspection.Container));
+            AdditionalAllocationBytes: 0, request.CancellationToken, request.Plan.OutputDirectoryRoot, request.Plan.Inspection.Container,
+            request.Plan.OutputMode));
         await outputStore.ValidateOwnershipAsync(new(request.Output, request.CancellationToken));
         await ValidateCandidateAsync(new(request.Output.CandidatePath, request.CandidateRevision, request.CancellationToken));
         request.CancellationToken.ThrowIfCancellationRequested();
-        await outputStore.MarkPublishingAsync(new(request.Output));
-        var publication = await outputStore.PublishAsync(new(request.Output));
+        var publicationRequest = new OutputRequest(request.Output, VerifiedCandidate: request.CandidateRevision);
+        await outputStore.MarkPublishingAsync(publicationRequest);
+        var publication = await outputStore.PublishAsync(publicationRequest);
         return request.Result with
         {
             Phase = JobPhase.Completed,
             PublishedPath = publication.Path,
             OutputLength = publication.Length,
+            CleanupIssues = request.Result.CleanupIssues.AddRange(publication.CleanupIssues.IsDefault ? [] : publication.CleanupIssues),
             CancellationRequested = request.CancellationToken.IsCancellationRequested,
             Failure = null
         };
@@ -268,6 +271,11 @@ public sealed class JobCoordinator(IMediaBackend backend, ISourceAccess sourceAc
             return [new(output.DirectoryPath, exception.Message)];
         }
     }
+
+    /// <summary>Retains uncertain replacement backups while preserving the existing no-overwrite copy cleanup policy.</summary>
+    private static bool CanCleanupAfterFailure(OutputMode mode, Failure? failure) =>
+        failure?.Code != ErrorCode.ProcessTerminationFailed &&
+        !(mode == OutputMode.ReplaceSource && failure?.Code == ErrorCode.PublicationUncertain);
 
     /// <summary>Reports backend progress without capturing an accidental synchronization context.</summary>
     private sealed class InlineProgress(IProgress<JobProgress>? progress) : IProgress<double>

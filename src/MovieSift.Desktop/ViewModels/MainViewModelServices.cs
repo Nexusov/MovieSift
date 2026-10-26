@@ -1,6 +1,7 @@
 using MovieSift.Application.Ports;
 using MovieSift.Desktop.Appearance;
 using MovieSift.Desktop.Localization;
+using MovieSift.Desktop.Updates;
 using Serilog;
 
 namespace MovieSift.Desktop.ViewModels;
@@ -13,4 +14,5 @@ public sealed record MainViewModelServices(
     bool DataWritable,
     ILogger Log,
     BatchViewModel Batch,
-    AppearanceViewModel? Appearance = null);
+    AppearanceViewModel? Appearance = null,
+    UpdatesViewModel? Updates = null);

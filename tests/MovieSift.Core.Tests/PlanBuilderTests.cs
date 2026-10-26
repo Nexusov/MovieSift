@@ -14,6 +14,26 @@ public sealed class PlanBuilderTests
         [Track(new(0, TrackKind.Video)), Track(new(1, TrackKind.Audio, true)),
             Track(new(2, TrackKind.Audio)), Track(new(3, TrackKind.Subtitles))], [], "Title", false, false);
 
+    /// <summary>Freezes replacement intent only for the exact inspected source, without granting a general overwrite flag.</summary>
+    [Theory]
+    [InlineData("source.mkv", null, true)]
+    [InlineData("other.mkv", null, false)]
+    [InlineData("source.mkv", "output-root", false)]
+    public void ReplacementRequiresItsOwnSource(string destination, string? outputRoot, bool accepted)
+    {
+        var result = PlanBuilder.Build(new(Inspection, [0, 1], destination, false, outputRoot, OutputMode.ReplaceSource));
+        Assert.Equal(accepted, result.IsSuccess);
+
+        if (accepted)
+        {
+            Assert.Equal(OutputMode.ReplaceSource, result.Plan!.OutputMode);
+        }
+        else
+        {
+            Assert.Equal(ErrorCode.InvalidDestination, result.Failure?.Code);
+        }
+    }
+
     /// <summary>Snapshots mutable selections and retains the inspected order.</summary>
     [Fact]
     public void SelectionIsSnapshottedInSourceOrder()

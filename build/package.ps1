@@ -16,6 +16,7 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 $repositoryRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $desktopProject = Join-Path $repositoryRoot 'src/MovieSift.Desktop/MovieSift.Desktop.csproj'
+$updaterProject = Join-Path $repositoryRoot 'src/MovieSift.Updater/MovieSift.Updater.csproj'
 $runtimeVersion = '10.0.13'
 
 if (-not $OutputDirectory) {
@@ -62,6 +63,34 @@ try {
     if ($LASTEXITCODE -ne 0) {
         throw 'Self-contained publish failed.'
     }
+
+    # Both apphosts share the same pinned runtime in the archive. At update time the
+    # helper/runtime is copied to private sibling storage before either tree moves.
+    & $Dotnet restore $updaterProject --locked-mode
+
+    if ($LASTEXITCODE -ne 0) {
+        throw 'Locked updater restore failed.'
+    }
+
+    $updaterPublish = Join-Path $OutputDirectory ('updater-' + [Guid]::NewGuid().ToString('N'))
+    & $Dotnet publish $updaterProject --configuration Release --runtime $RuntimeIdentifier --self-contained true --no-restore --output $updaterPublish "-p:RuntimeFrameworkVersion=$runtimeVersion" -p:PublishTrimmed=false -p:PublishSingleFile=false -p:PublishAot=false
+
+    if ($LASTEXITCODE -ne 0) {
+        throw 'Self-contained updater publish failed.'
+    }
+
+    foreach ($file in Get-ChildItem -LiteralPath $updaterPublish -File) {
+        $target = Join-Path $packageRoot $file.Name
+        if (Test-Path -LiteralPath $target) {
+            if ((Get-FileHash -LiteralPath $target -Algorithm SHA256).Hash -ne (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash) {
+                throw "Desktop/updater shared payload mismatch: $($file.Name)"
+            }
+        }
+        else {
+            Copy-Item -LiteralPath $file.FullName -Destination $target
+        }
+    }
+    Remove-Item -LiteralPath $updaterPublish -Recurse
 
     & (Join-Path $PSScriptRoot 'acquire-tools.ps1') -RuntimeIdentifier $RuntimeIdentifier -Destination (Join-Path $packageRoot 'tools') -CacheDirectory $ToolCacheDirectory -WindowsMkvBuildDirectory $WindowsMkvBuildDirectory
     New-Item -ItemType Directory -Path (Join-Path $packageRoot 'data') -Force | Out-Null
@@ -168,7 +197,7 @@ try {
     }
 
     if ($RuntimeIdentifier -eq 'win-x64') {
-        [IO.Compression.ZipFile]::CreateFromDirectory($stagingRoot, $archivePath, [IO.Compression.CompressionLevel]::Optimal, $false)
+        [IO.Compression.ZipFile]::CreateFromDirectory($packageRoot, $archivePath, [IO.Compression.CompressionLevel]::Optimal, $true)
     }
 
     if ($RuntimeIdentifier -eq 'linux-x64') {

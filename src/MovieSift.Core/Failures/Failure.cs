@@ -46,7 +46,8 @@ public enum ErrorReason
     InvalidBatchInput,
     RecursiveOutputRequired,
     RecursiveRootConflict,
-    BatchDepthLimit
+    BatchDepthLimit,
+    ReplacementPermissions
 }
 
 public sealed record Failure(ErrorCode Code, string Detail = "", ErrorReason Reason = ErrorReason.None);

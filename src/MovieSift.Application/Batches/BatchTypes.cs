@@ -23,7 +23,8 @@ public sealed record BatchItem(
     ImmutableArray<int> RetainedTrackIds = default,
     FolderSourceOrigin? FolderOrigin = null,
     string? IntendedDestinationPath = null,
-    string? IntendedOutputDirectoryRoot = null)
+    string? IntendedOutputDirectoryRoot = null,
+    OutputMode OutputMode = OutputMode.Copy)
 {
     public ImmutableArray<int> CurrentRetainedTrackIds => !RetainedTrackIds.IsDefault
         ? RetainedTrackIds
@@ -37,7 +38,8 @@ public sealed record BatchItemFailure(Guid ItemId, Failure Failure);
 public sealed record BatchReviewResult(BatchReview? Review, ImmutableArray<BatchItemFailure> ItemFailures, Failure? Failure = null);
 public sealed record BatchEditResult(bool Applied, Failure? Failure = null);
 public sealed record BatchSelectionRequest(Guid ItemId, ImmutableArray<int> RetainedTrackIds);
-public sealed record BatchDestinationRequest(Guid ItemId, string DestinationPath, string? OutputDirectoryRoot = null);
+public sealed record BatchDestinationRequest(Guid ItemId, string DestinationPath, string? OutputDirectoryRoot = null,
+    OutputMode OutputMode = OutputMode.Copy);
 public sealed record BatchItemRequest(Guid ItemId, CancellationToken CancellationToken = default);
 public sealed record BatchRunRequest(Guid ReviewId, IProgress<BatchProgress>? Progress = null, CancellationToken CancellationToken = default);
 public sealed record BatchWarningRequest(Guid ItemId, CancellationToken CancellationToken = default);

@@ -1,0 +1,21 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:updates="using:MovieSift.Desktop.Updates"
+        x:Class="MovieSift.Desktop.Views.UpdateWindow"
+        x:DataType="updates:UpdatesViewModel"
+        Title="MovieSift" Width="460" SizeToContent="Height" CanResize="False"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False">
+  <StackPanel Margin="24" Spacing="14">
+    <TextBlock Text="{Binding AvailableVersionText}" Classes="heading" TextWrapping="Wrap" />
+    <TextBlock Text="{Binding Localization[UpdatesInstallNotice]}" TextWrapping="Wrap" />
+    <TextBlock Text="{Binding StatusText}" TextWrapping="Wrap" />
+    <TextBlock Text="{Binding CleanupNotice}" IsVisible="{Binding HasCleanupNotice}" TextWrapping="Wrap" />
+    <TextBlock Text="{Binding Localization[UpdatesFinishWork]}" IsVisible="{Binding InstallationBlocked}" TextWrapping="Wrap" />
+    <ProgressBar Minimum="0" Maximum="100" Value="{Binding Progress}" IsVisible="{Binding IsInstalling}" />
+    <WrapPanel HorizontalAlignment="Right">
+      <Button x:Name="InstallButton" Content="{Binding Localization[UpdatesInstall]}" Command="{Binding InstallCommand}" Margin="0,0,8,8" />
+      <Button Content="{Binding Localization[Cancel]}" Command="{Binding CancelCommand}" IsVisible="{Binding CanCancel}" Margin="0,0,8,8" />
+      <Button Content="{Binding Localization[WorkspaceClose]}" Click="OnCloseClick" Margin="0,0,0,8" />
+    </WrapPanel>
+  </StackPanel>
+</Window>

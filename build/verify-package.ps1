@@ -119,6 +119,8 @@ if ($IsWindows) {
 }
 
 $executablePath = Join-Path $PackageDirectory $executableName
+$updaterName = if ($IsWindows) { 'MovieSift.Updater.exe' } else { 'MovieSift.Updater' }
+$updaterPath = Join-Path $PackageDirectory $updaterName
 $runtimeFiles = @('System.Private.CoreLib.dll', 'hostfxr.dll', 'coreclr.dll')
 
 if ($IsLinux) {
@@ -131,6 +133,13 @@ foreach ($requiredPath in @($executablePath, (Join-Path $PackageDirectory 'porta
         throw "Required packaged file is missing: $requiredPath"
     }
 }
+
+foreach ($name in @($updaterName, 'MovieSift.Updater.dll', 'MovieSift.Updater.deps.json', 'MovieSift.Updater.runtimeconfig.json')) {
+    if (-not (Test-Path -LiteralPath (Join-Path $PackageDirectory $name) -PathType Leaf)) {
+        throw "Required update helper file is missing: $name"
+    }
+}
+Invoke-PackagedApplication @{ Executable = $updaterPath; Arguments = @('--verify-runtime') }
 
 if ($PSCmdlet.ParameterSetName -eq 'Archive') {
     $manifestPath = Join-Path $PackageDirectory 'SHA256SUMS'
@@ -170,6 +179,8 @@ if ($PSCmdlet.ParameterSetName -eq 'Archive') {
     }
 
     Write-Output "Relocated package integrity passed: $($manifestPaths.Count) files."
+    $runtimeIdentifier = if ($IsWindows) { 'win-x64' } else { 'linux-x64' }
+    Invoke-PackagedApplication -Options @{ Executable = $updaterPath; Arguments = @('--verify-update-archive', $ArchivePath, $runtimeIdentifier) }
 }
 
 Invoke-PackagedApplication -Options @{ Executable = $executablePath; Arguments = @('--verify-tools') }
