@@ -2,6 +2,8 @@
 
 MovieSift removes unwanted embedded audio and subtitle tracks from local **MKV and supported MP4** files without re-encoding. It creates a separate `.trimmed.mkv` or `.trimmed.mp4` copy and leaves the original untouched. Keeping both files does not free the original's disk space.
 
+This source prepares **MovieSift 1.0.0**, without a prerelease suffix. Its new binary/material archives are not yet published; the working downloads below continue to identify the previously published RC. The version change does not establish the deferred desktop/scaling or recorded cancellation/close/warning acceptance.
+
 [**MovieSift 0.1.0-rc.1**](https://github.com/Nexusov/MovieSift/releases/tag/v0.1.0-rc.1) is the first public **Pre-release**, for evaluation rather than a fully accepted stable release. Its frozen binary source is `a0ea505a6275f3b89e7b08ac4e6a7ae058c6ca5a`.
 
 **Portable downloads:** [Windows x64 ZIP](https://github.com/Nexusov/MovieSift/releases/download/v0.1.0-rc.1/MovieSift-win-x64.zip) · [Linux x64 tar.gz](https://github.com/Nexusov/MovieSift/releases/download/v0.1.0-rc.1/MovieSift-linux-x64.tar.gz). Extract the complete archive into a new writable folder, then launch `MovieSift.exe` on Windows or `./MovieSift` on Linux. No separately installed .NET or media tools are required; Linux still needs the documented [OS native libraries](docs/SUPPORTED_FORMATS.md#platform-and-native-requirements).
