@@ -1,40 +1,44 @@
-# MovieSift release checklist
+# Release checklist
 
-[MovieSift 1.0.0](https://github.com/Nexusov/MovieSift/releases/tag/v1.0.0) is published as an ordinary Release and Latest. Tag `v1.0.0` remains on `6fb2a2711745880d1bb39f1177fadbd6a64827f3`, tree `82d40f3f3b121f828a41713240651d1e22b665dc`; later documentation commits are not the source of the frozen release archives. The earlier 0.1.0-rc.1 release page and its assets were removed on 2026-10-26; its Git tag was also removed; historical source and verification records remain.
+Use this checklist for a new MovieSift release. Published downloads and version-specific notes belong on [GitHub Releases](https://github.com/Nexusov/MovieSift/releases).
 
-## Current candidate verification
+## Build and verify
 
-Current locked restore, formatting, Release build, focused/control/headless/media and Python verification are distinguished in [PLAN](PLAN.md) and its linked evidence. Current paths, UI/resource names, commands, links and package definitions consistently use MovieSift. Historical originals remain accessible through the [immutable evidence index](verification/README.md).
+- [ ] Set the application version and choose the exact source commit for the release tag. Confirm the version in both packaged applications; a stable release must have no prerelease suffix.
+- [ ] Pass both required jobs in [Verify and package](../.github/workflows/verify.yml) for that source: Windows and Linux builds, tests, real MKV/MP4 workflows, package inventory, updater archive validation, relocation and the clean Linux container check.
+- [ ] Review the outstanding desktop checks below. Report their actual status in the release notes.
+- [ ] Prepare a matching binary/material pair for each runtime using the [distribution requirements](DISTRIBUTION.md). Check the source revision, archive sizes, hashes, inventory and material summary against the actual files to be published.
+- [ ] Review bundled runtime and tool updates, notices and source materials. Changed dependencies require a new build and matching materials.
 
-[Version 1.0.0 main CI](https://github.com/Nexusov/MovieSift/actions/runs/40253431802) and the single [retained-run attempt 1](https://github.com/Nexusov/MovieSift/actions/runs/40254293203) passed both required platform jobs on `6fb2a2711745880d1bb39f1177fadbd6a64827f3`. Mandatory real-media, inventory, matching-material, relocation and Linux container checks passed. The downloaded archives, packaged 1.0.0 application metadata and all nine published asset identities were verified. Subsequent corrections require their own applicable checks.
+Build and local verification commands are in [CONTRIBUTING](../CONTRIBUTING.md). Keep the [main protection rules](../.github/rulesets/protect-main.json) and required platform checks enabled.
 
-Historical RC verification: [PR #13](https://github.com/Nexusov/MovieSift/pull/13) integrated the quality corrections at `a0ea505a6275f3b89e7b08ac4e6a7ae058c6ca5a`, tree `6024784b24242e776a9478b0218be49c239ac93c`. [Main CI](https://github.com/Nexusov/MovieSift/actions/runs/40239000664) and the single [retained-run attempt 1](https://github.com/Nexusov/MovieSift/actions/runs/40239884148) passed both required platform jobs on that exact direct commit. Mandatory real-media, inventory, matching-material, relocation and Linux container checks passed. Downloaded candidate sets and all published asset identities were checked; subsequent corrections still require their own applicable checks.
+## Publish
 
-Every newly prepared binary/material pair must identify its actual source commit, tree, archive bytes and tool receipts. Rebuild workers carrying the custom FFmpeg version label; never reuse or relabel pre-rename hashes as MovieSift evidence. Candidate handoff and public release remain separate from this verification.
+- [ ] Create a version tag on the verified source commit and describe user-visible changes, compatibility limits and upgrade instructions.
+- [ ] Publish the binary archives, matching material archives, platform inventories and material summaries, plus a common `SHA256SUMS`, together on the release page.
+- [ ] Verify the uploaded assets and public download links against the prepared set. Retain the matching source materials with the binaries; expiring CI artifacts are insufficient.
+- [ ] Use the intended stable/prerelease and Latest settings. Publish changed binaries under a new version rather than replacing an existing release's files.
 
-## Public release decisions
-
-1. **Original-code license — complete.** [MIT](../LICENSE), `Copyright (c) 2026 Nexusov`, applies to original MovieSift code. Preserve this exact grant and independent third-party terms in binary and source/material packages.
-2. **Matching covered-source delivery - published for 1.0.0.** The release hosts the [Windows matching materials](https://github.com/Nexusov/MovieSift/releases/download/v1.0.0/MovieSift-win-x64-materials-6fb2a2711745.tar.gz) and [Linux matching materials](https://github.com/Nexusov/MovieSift/releases/download/v1.0.0/MovieSift-linux-x64-materials-6fb2a2711745.tar.gz) beside its new binaries, together with inventories, summaries and [SHA256SUMS](https://github.com/Nexusov/MovieSift/releases/download/v1.0.0/SHA256SUMS). They contain the collected corresponding source, patches, compilation/install scripts and notices identified by the [distribution requirements](verification/release-distribution-closure.md). Preserve this matching arrangement for future distributions; an expiring Actions artifact alone is insufficient. Mechanical validation is not a blanket legal certification.
-3. **Desktop acceptance — deferred.** Native visual/focus/scrolling, OS scaling at the supported 100%/150%/200% combinations, Windows 11 x64 25H2 and Ubuntu 24.04 x64 Desktop/X11-XWayland are not established by the historical Windows 10 functional or Linux container results. Preserve the strict W13 correlation, active/repeated/verification-close and real-warning limitations. Do not relabel them as passes or application defects. Publication did not resume these campaigns.
-4. **Version 1.0.0 publication - complete.** The owner-authorized [Release](https://github.com/Nexusov/MovieSift/releases/tag/v1.0.0) is public, not draft or prerelease, and designated Latest. It publishes the new frozen binaries and matching materials with documented acceptance limits. These flags do not prove previously unperformed native/scaling checks. A future changed binary distribution requires its own review and authorization.
-
-Bit-for-bit reproduction, complete historical compiler reconstruction and source archives for every permissively licensed component are not universal release conditions. Apply the notice, corresponding-source and relinking requirements to the actual shipped components and selected license alternatives.
+Version 1.0.0 has no built-in updater. The first updater-enabled version requires a manual installation, as described in the [user guide](USAGE.md).
 
 ## Optional candidate handoff
 
-The **Verify and package** workflow defaults `workflow_dispatch.inputs.retain_candidates` to boolean `false`. Pull requests, pushes and default manual runs upload compact evidence. Explicit `retain_candidates=true` retains one separate binary/material set per runtime only after that platform passes all mandatory checks, including Linux's container check.
-
-For an authorized handoff from a reviewed branch, use its exact ref; for example:
+To retain packages from a verified workflow run, start **Verify and package** manually with `retain_candidates=true` on the intended ref:
 
 ```sh
 gh workflow run verify.yml --repo Nexusov/MovieSift --ref main -f retain_candidates=true
 ```
 
-Staging verifies the clean checked-out revision/tree, runtime, binary/material archive sizes and SHA256 values, and inventory/summary agreement. Exactly five files are retained: the binary archive, matching source/material archive, distribution inventory, material summary and `SHA256SUMS`. Original archive bytes remain unchanged inside the Actions transport ZIP. A synthetic merge, when checked out, is recorded as that actual source identity.
+The default is `false`. Each successful platform retains five files: its binary archive, matching material archive, distribution inventory, material summary and `SHA256SUMS`. Linux retention also requires the container check. Artifact names include the runtime, actual checked-out commit, run and attempt.
 
-Artifacts are named `candidate-<runtime>-<full-checked-source-SHA>-run-<run-id>-attempt-<attempt>` and expire after **seven days**. MovieSift is public: users with repository read access who are signed in can [download them](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/download-workflow-artifacts). Candidate retention is not a GitHub Release, permanent source hosting or redistribution assurance. The preparation summary's `publicDeliveryPerformed: false` describes preparation before any optional upload.
+Artifacts expire after **seven days**. They are downloadable by signed-in users with repository read access. Download and verify the complete set before expiry; use a GitHub Release for lasting distribution.
 
-The completed [pre-rename handoff](https://github.com/Nexusov/MovieSift/actions/runs/40150657001) belongs to `2ba8ba1d4a4507ff678ff0f31045c81e497451d0`, attempt 1. It remains historical and does not supply renamed application archives. The later [MovieSift handoff](https://github.com/Nexusov/MovieSift/actions/runs/40239884148), attempt 1, produced the unchanged `a0ea505a6275f3b89e7b08ac4e6a7ae058c6ca5a` candidates published in the former 0.1.0-rc.1 release. That release page and its downloads have since been removed; these records describe the original distribution.
+## Outstanding desktop checks
 
-The [1.0.0 handoff](https://github.com/Nexusov/MovieSift/actions/runs/40254293203), attempt 1, produced the new `6fb2a2711745880d1bb39f1177fadbd6a64827f3` binary/material pairs published in 1.0.0. Seven-day retention is not their public-release hosting arrangement; the public release links above identify the delivered set.
+Native acceptance remains incomplete on **Windows 11 25H2 x64** and **Ubuntu 24.04 x64 Desktop with X11/XWayland**. The remaining checks are:
+
+- Visual layout, keyboard focus, scrolling and dialogs in English/Russian at 100%, 150% and 200% OS scaling.
+- Cancel during a live remux worker; single/repeated close during processing; close during verification. Confirm input timing against the worker lifetime and inspect cleanup and published results.
+- Real warning scenarios, including publish, discard and close.
+
+Automated tests and offscreen renders do not establish these native results. Earlier Windows 10 functional checks and Linux CLI/container checks do not cover the declared desktop targets. These unverified cases are not confirmed application defects.

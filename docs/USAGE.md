@@ -1,82 +1,85 @@
 # MovieSift user guide
 
-This guide describes the published [MovieSift 1.0.0](https://github.com/Nexusov/MovieSift/releases/tag/v1.0.0). See the [README](../README.md#get-started) for download and startup instructions.
+See the [README](../README.md) for downloads and startup.
+
+**Version note:** this guide describes the current source. Published **1.0.0** creates copies in a selected output folder; it has neither source replacement nor an updater. Download and extract the first release containing those features manually.
 
 ## Choose what to keep
 
-Add local files or a folder. The **Audio** and **Subtitles** sections show tracks across every included file, including tracks found in only one episode. A checked track is kept; an unchecked track is omitted from the copy. Expand a group to make per-file choices. Video tracks are always kept.
+Add local files or a folder. **Audio** and **Subtitles** show tracks from every included file, including tracks found in only one episode. Checked tracks are kept; unchecked tracks are removed from the result. All tracks start selected, and video is always kept.
 
-**Remove all subtitles from copies** clears subtitle selections for included, editable files. You can select them again before Review. This action does not change audio, attachments, excluded files or completed results.
+Use a group checkbox to change its tracks together, or expand it for per-file exceptions. Grouping uses metadata, not spoken content. Excluding a file removes it from these actions without deleting it.
 
-Choose an output folder, select **Review changes**, and check each file's plan. Removing every audio track requires separate confirmation for that file. Files marked **NoChange** need no output folder and create no copy. Review does not start processing: use the separate **Create copies** action when ready.
+**Remove all subtitles** clears subtitle selections for included, editable files. You can select them again before Review. Audio, video, attachments and completed results are unaffected.
 
-Original files remain unchanged in 1.0.0. Keeping the original and the smaller copy uses space for both files. Existing outputs are not replaced or automatically renamed; choose a different destination if a name is already taken.
+## Choose the result
+
+| Output mode | Result |
+| --- | --- |
+| **Create trimmed copies** (default) | Creates `name.trimmed.mkv` or `name.trimmed.mp4` beside each original. Choose an output folder to save elsewhere. Originals remain unchanged. |
+| **Replace original files** | Creates and verifies a temporary result, then replaces the file at its original path. Review identifies every replacement. |
+
+Existing copy destinations are never overwritten or automatically renamed. An **Unchanged** file creates no output and is never replaced.
+
+Replacement still needs space for a complete temporary result. Read-only files, files with multiple hard links and unsupported Linux permissions require copy mode. If replacement is interrupted or uncertain, keep the reported backup and recovery files until the outcome is resolved. See [replacement details](ARCHITECTURE.md#output-choice-and-source-replacement).
+
+## Review and run
+
+Select **Review changes** and check each file's tracks and destination. Removing the last audio track requires separate confirmation for that file. Unresolved inspection errors in included files prevent Review.
+
+Review does not process files. Use the separate action to create copies or replace the stated number of originals. Selection, destination or output-mode changes require another Review; language and theme changes do not.
 
 ## Folders and rules
 
-**Include subfolders** keeps relative subdirectories under the output folder you choose. A queue can contain up to 100 entries; a folder scan examines at most 10,000 filesystem entries and 32 directory levels. Network locations and redirected directories, including symlinks and junctions, are not followed. An incomplete folder scan does not silently add a partial selection.
+**Include subfolders** searches below the chosen folder. A separate output folder preserves relative directories: `Series/Season 2/episode.mkv` becomes `Output/Season 2/episode.trimmed.mkv`. Saving beside originals uses their existing directories.
 
-Language rules are optional. Use **Preview** to inspect their proposed changes, then **Apply** to change the current selections. Title filters match literal text; forced-subtitle filters use the track's actual forced flag. A preset stores rule settings and is applied only after you explicitly **Load** it. Rules and presets never start processing. See [rule details](SUPPORTED_FORMATS.md#language-selection-rules).
+The queue holds at most 100 entries. Scans have [additional limits](SUPPORTED_FORMATS.md#input-discovery-scope), reject inaccessible or redirected directories, and never silently accept an incomplete selection. Existing `.trimmed` files are ordinary inputs, not automatically excluded by name.
+
+Language rules are optional: **Preview** the proposed choices, then **Apply**. Ambiguous language metadata can leave a file unchanged for manual selection. Title filters match literal text; forced-subtitle filters select whole tracks marked as forced. See [matching rules](SUPPORTED_FORMATS.md#language-selection-rules).
+
+Presets store rule settings. Select a preset, explicitly **Load** it, then Preview and Apply. Neither rules nor presets start processing.
 
 ## Pause, cancel and warnings
 
-Files are processed one at a time. **Pause after current file** lets the current file finish. **Cancel batch** requests cancellation of the active job and prevents the next file from starting. Previously completed outputs stay intact.
+Files run one at a time. **Pause after current file** lets the active file finish. **Cancel batch** requests cancellation and prevents the next file from starting; completed results remain intact. Cancellation before the final replacement step preserves the original; a replacement already in progress may complete.
 
-A warning or failure pauses the queue. If an MKV result needs warning review, read the message and choose whether to publish or discard that result. A failed verification cannot be overridden. When closing during work, let MovieSift finish stopping its worker and report the result before moving files or deleting temporary directories.
+A warning or failure pauses the queue. For an MKV warning, inspect the message and choose whether to publish or discard the verified result. Failed verification cannot be overridden. When closing during work, wait for MovieSift to stop its worker and report the outcome before moving or deleting working files.
 
-**New queue** clears the current list after confirmation. It does not delete media, completed outputs, preferences or presets.
+**New queue** clears the list after confirmation without deleting media, completed outputs, settings or presets.
 
 ## Saved lists and interrupted work
 
-After a restart, choose **Restore saved list** to load unfinished paths and destinations, or **Discard saved list** to clear the saved listing. Neither action processes media or deletes original files.
+After restarting, **Restore saved list** recovers unfinished paths and destinations; **Discard saved list** clears the listing. Neither processes or deletes media. Restored files need fresh inspection, selections and Review.
 
-Restored files need fresh inspection, track selection and Review. Old track selections and approvals are not reused. If a saved list is unreadable, MovieSift leaves it untouched and reports the problem. Keep a backup before correcting it externally, then use **Reload saved list** with an empty queue.
+An unreadable list is left untouched. Back it up before correcting it externally, then use **Reload saved list** with an empty queue.
 
-Records of interrupted media operations are separate from the saved list. Do not rename private working directories or edit their recorded paths. Keep the application directory available while any interrupted operation remains unresolved. The [recovery design](ARCHITECTURE.md#unfinished-queue-list-recovery) explains the distinction.
+Interrupted-operation records are separate. Keep the old application directory and reported working files until recovery is resolved. Do not rename working directories or edit journal paths. See [recovery details](ARCHITECTURE.md#unfinished-queue-list-recovery).
 
 ## Appearance and language
 
-Open **Appearance & language** to switch between English and Russian, choose a theme, customize colors or reduce motion. Changes preserve your track choices and reviewed plans. Escape closes the panel and returns keyboard focus.
-
-If a preference cannot be saved, it may still apply for the current session. MovieSift reports the problem without treating a cosmetic save failure as a media-processing failure.
+Open **Appearance & language** for English/Russian, themes, custom colors and reduced motion. Escape closes the panel. A preference that cannot be saved may still apply for the current session; MovieSift reports the problem without interrupting media work.
 
 ## Upgrading a portable copy
 
-MovieSift 1.0.0 does not check for or install updates. Download a newer release from [GitHub Releases](https://github.com/Nexusov/MovieSift/releases).
+### Install updates
 
-1. Finish or explicitly discard pending work in the old copy and close it.
-2. Extract the new archive into a new writable directory. Keep its complete contents together.
-3. If needed, copy `data/settings.json`, `data/appearance.json` and `data/rule-presets.json` from the old directory.
-4. A copied `data/queue-list.json` still requires explicit Restore, fresh inspection and Review.
+MovieSift checks GitHub for newer stable releases after startup. **Close** dismisses the notification; **Update available** remains in the header and **Appearance & language → Updates**. That panel also offers manual checks and an option to disable startup checks. Network errors do not block media use.
 
-Keep the old application directory for any unresolved work. Do not copy unresolved `data/ownership` records, rename private job directories or edit journal paths. Keep each release's bundled tools with that release; mixing application and worker versions can prevent processing.
+Only **Install and restart** downloads and installs. Finish processing, resolve recovery notices and allow settings saves to complete first. Settings and the unfinished list are retained; track choices and Review must be recreated after restart.
+
+Installation requires a local writable portable folder and its bundled updater. Unsupported locations or permissions require manual migration. Windows updates preserve current access rules as a fixed snapshot; later parent-folder permission changes do not propagate automatically.
+
+The old application remains in the adjacent `.moviesift-update-…/previous` folder. Remove it after checking the new version. If a switch is interrupted, consult `UPDATE-RESULT.txt` in the same update folder. Never replace files beneath a running application.
+
+### Upgrade manually
+
+1. Finish or explicitly discard pending work, then close the old copy.
+2. Extract the new release into a separate writable directory. Keep all bundled files together.
+3. To retain preferences, copy `data/settings.json`, `data/appearance.json`, `data/updates.json` and `data/rule-presets.json` if present. Check access permissions when migrating data.
+4. Optionally copy `data/queue-list.json`; Restore still requires fresh inspection and Review.
+
+Keep the old directory for unresolved work. Do not transfer unresolved `data/ownership` records or mix media tools from different releases.
 
 ## Compatibility and help
 
-See [supported formats](SUPPORTED_FORMATS.md) for codec, metadata and platform requirements. The [release checklist](release-checklist.md) records remaining desktop, scaling and cancellation/close checks.
-
-When reporting a problem, include the MovieSift version, operating system, the action you took and the displayed error. Remove personal filenames and paths from any logs you share.
-
-## Changes in the development build
-
-These features are being prepared after 1.0.0 and are not included in the download links above.
-
-### Choose the result
-
-**Create a copy** is the default. With no output folder selected, each file produces a `.trimmed` copy beside its original. You can still select a separate output folder.
-
-**Replace originals** creates and verifies temporary results before replacing the selected files at their original paths. Review shows exactly which files will be replaced; changing the mode requires another Review. NoChange files remain untouched. Cancel or a verification error before replacement leaves the original in place.
-
-If a replacement outcome is uncertain, MovieSift keeps its backup and recovery information and pauses the queue. Follow the displayed paths; do not delete those files until the result is understood. Read-only or multiply linked files are not replaceable. Linux files with unsupported permission/ownership or extended ACL requirements require copy mode.
-
-### Install updates
-
-After opening, MovieSift can check GitHub for a newer stable version. **Install and restart** downloads and checks the package, closes the application safely and starts the new version. **Close** dismisses the notification; the available update remains in the header and in **Appearance & language → Updates**. You can also check manually or disable startup checks there.
-
-Installation waits until processing, recovery decisions and settings saves are finished. Your portable settings and unfinished file list are retained. Track choices and Review are recreated after restart, just as when restoring a saved list. Network errors do not block media use.
-
-Automatic installation requires a local writable portable application folder and its bundled helper. A source/debug build or a read-only location may require manual downloading. The updater keeps the old application in its adjacent `.moviesift-update-…/previous` folder; remove that backup after verifying the new version. If an interrupted directory switch requires manual recovery, consult `UPDATE-RESULT.txt` in that same folder. Do not replace files beneath a still-running application.
-
-If the updater cannot preserve your folder or file permissions, extract the new version into a separate folder and migrate your data manually, checking access permissions before use. Windows updates preserve current access rules as a fixed snapshot; later permission changes to the parent folder do not propagate automatically.
-
-Version 1.0.0 has no updater. The first version with this feature must be downloaded and extracted manually; later compatible releases can be installed from the application.
+See [supported formats](SUPPORTED_FORMATS.md) for media and system requirements. Problem reports should include the version, operating system, steps and displayed error. Remove personal filenames and paths from shared logs.

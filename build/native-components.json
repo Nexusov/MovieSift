@@ -416,7 +416,7 @@
         "httpStatus": 200,
         "result": "retrieved; not proof of exact binary source"
       },
-      "versionStatus": "Exact official SDK binary match; complete QtBase source and SDK configuration collected. Selected GPL2 alternative and public material-delivery requirement recorded in release-distribution-closure.md.",
+      "versionStatus": "Exact official SDK binary match; complete QtBase source and SDK configuration collected. Selected GPL2 alternative and public material-delivery requirement recorded in docs/DISTRIBUTION.md.",
       "sourcePackageEvidence": {
         "component": "Qt Core",
         "version": "6.6.1",
@@ -2183,7 +2183,7 @@
       "evidence": "Exact payload policy retains22 libraries and omits83 unused libraries/static archives.15 retained libraries match13 complete primary source RPMs; QtCore and all3 ICU libraries match official Qt SDK bytes. Applicable collected notices are included.",
       "missing": "Actually deliver the collected covered source/build material and notices with the eventual public release. Core's GPL2 alternative is selected and complete QtBase/SDK configuration material is collected; no additional Core source/patch/relink-object gap was identified. Custom Boost/cmark build details remain provenance unknowns, not automatic permissive-source blockers.",
       "primaryLocationChecked": "Hash-bound build/tool-payload.lock.json, build/tool-materials.lock.json and official AlmaLinux/Qt archive members.",
-      "nextAction": "Retain Core's selected GPL2 alternative and provide the collected source/build/notices alongside the eventual release; do not demand source for omitted GUI payloads. See docs/verification/release-distribution-closure.md."
+      "nextAction": "Retain Core's selected GPL2 alternative and provide the collected source/build/notices alongside the eventual release; do not demand source for omitted GUI payloads. See docs/DISTRIBUTION.md."
     },
     {
       "component": "NuGet native static subcomponents and generated apphost",
