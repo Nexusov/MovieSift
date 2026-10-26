@@ -1,5 +1,9 @@
 # MovieSift — current delivery status
 
+## Version 1.0.0 preparation
+
+The application source version is **1.0.0**, without a prerelease suffix. Publication requires fresh Windows/Linux archives and matching materials from the integrated version commit, successful required CI and verification of the actual packaged application metadata. Version numbering does not establish the deferred native/scaling or recorded cancellation/close/warning acceptance. The published RC downloads below remain current until 1.0.0 is actually available; its tag, assets and historical evidence remain unchanged.
+
 ## Published release candidate
 
 [MovieSift 0.1.0-rc.1](https://github.com/Nexusov/MovieSift/releases/tag/v0.1.0-rc.1) is the first public Pre-release, not Latest. Its tag identifies `a0ea505a6275f3b89e7b08ac4e6a7ae058c6ca5a`, tree `6024784b24242e776a9478b0218be49c239ac93c`, identical to the reviewed F1–F9 implementation tree. [PR #13](https://github.com/Nexusov/MovieSift/pull/13) integrated those corrections through an ordinary protected merge.
