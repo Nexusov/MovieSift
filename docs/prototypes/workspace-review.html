@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="ru">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MovieSift — выбор дорожек и проверка</title><style>:root{color-scheme:dark;--page:#13151a;--surface:#191b20;--panel:#24272e;--hover:#30343e;--text:#f5f2ea;--muted:#b9b4aa;--line:#454a57;--accent:#7376e5;--on-accent:#fff;--warning:#e5bc78;--danger:#f3a0ad;--gap:16px;--space:24px;--radius:12px;--tooltip-layer:20;font:14px/1.5 'Segoe UI',Arial,sans-serif;background-color:var(--page);color:var(--text)}*{box-sizing:border-box}body{margin:0}main{width:min(1160px,100%);margin:auto;padding:36px 28px}h1,h2,h3,p{margin:0}h1{font-size:27px;letter-spacing:-.6px;font-weight:600}h2{font-size:20px;font-weight:650;letter-spacing:-.3px}h3{font-size:14px;font-weight:600}.eyebrow{font-size:10px;letter-spacing:1.8px;color:var(--muted);margin-bottom:6px}.muted,small{color:var(--muted);font-size:12px}small{display:block}button,input{font:inherit}button{display:inline-flex;align-items:center;justify-content:center;gap:8px;color:var(--text);background-color:transparent;border:1px solid var(--line);border-radius:8px;padding:8px 12px;cursor:pointer;min-height:36px}button:hover{background-color:var(--hover)}button:disabled{opacity:.45;cursor:default}button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px}button.primary{background-color:var(--accent);border-color:transparent;color:var(--on-accent);font-weight:600}button.primary:hover{filter:brightness(1.1)}[hidden]{display:none!important}.study{display:flex;justify-content:space-between;align-items:end;gap:var(--gap);margin-bottom:24px}.study>span{font-size:11px;color:var(--muted)}.demo-controls{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:18px}.demo-controls>span{font-size:11px;color:var(--muted);margin-right:10px}.demo-controls button{font-size:12px;min-height:30px;padding:4px 12px}.demo-controls button[aria-pressed=true]{border-color:var(--accent);background-color:color-mix(in srgb,var(--accent) 13%,var(--surface))}.app{background-color:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:0 20px 60px #0003;overflow:hidden}.app-header{display:flex;align-items:center;justify-content:space-between;gap:var(--gap);padding:20px 24px;border-bottom:1px solid var(--line)}.brand{display:flex;align-items:center;gap:12px}.brand img{width:40px;height:40px}.brand strong{font-size:22px;letter-spacing:-.5px}.window-actions{display:flex;align-items:center;gap:8px}.window-actions .icon{font-size:16px;width:40px;padding:6px}.caption{color:var(--muted);font-size:15px;margin-left:12px;white-space:nowrap}.scene{padding:24px}.workspace-toolbar{display:flex;align-items:center;justify-content:space-between;gap:var(--gap);margin-bottom:24px}.workspace-toolbar>div{display:flex;gap:8px;flex-wrap:wrap}.source-line{display:flex;align-items:center;justify-content:space-between;gap:var(--gap);margin-bottom:20px}.source-line>div{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.source-line strong{font-size:16px}.file-badge{display:inline-flex;align-items:center;border:1px solid var(--line);color:var(--muted);font-size:10px;letter-spacing:.5px;padding:4px 7px;border-radius:5px}.source-line details{position:relative;font-size:12px;color:var(--muted)}summary{cursor:pointer;list-style:none}summary::-webkit-details-marker{display:none}.file-info{position:absolute;right:0;top:30px;z-index:3;width:280px;padding:16px;border:1px solid var(--line);border-radius:9px;background-color:var(--panel);box-shadow:0 12px 30px #0005}.chevron{display:inline-block;width:8px;height:8px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:translateY(-2px) rotate(45deg);margin-left:8px}details[open]>summary .chevron{transform:translateY(2px) rotate(225deg)}.destination{border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:24px;background-color:var(--panel)}.section-label{font-size:12px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:7px}.mode-options{display:grid;grid-template-columns:1fr 1fr;gap:10px}.mode-options label{display:flex;gap:10px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:9px;cursor:pointer}.mode-options label:has(input:checked){border-color:var(--accent);background-color:color-mix(in srgb,var(--accent) 10%,var(--panel))}input{accent-color:var(--accent)}input[type=radio],input[type=checkbox]{width:16px;height:16px;flex-shrink:0}.mode-options strong{font-size:13px}.mode-options small{font-size:11px;margin-top:3px}.destination-path{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:12px;color:var(--muted);font-size:12px}.destination-path button{font-size:12px;min-height:30px;padding:4px 10px}.destination-path strong{color:var(--text);font-weight:500}.notice{font-size:12px;color:var(--warning);margin-top:12px;padding:10px 12px;border-radius:8px;background-color:color-mix(in srgb,var(--warning) 7%,var(--panel));border-left:2px solid var(--warning)}.section-heading{display:flex;justify-content:space-between;align-items:center;gap:var(--gap);margin-bottom:16px}.section-heading .muted{margin-top:5px}.count{font-size:11px;color:var(--muted);white-space:nowrap}.video-summary{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 14px;border:1px solid var(--line);border-radius:9px;font-size:12px}.video-summary .muted{margin-left:auto}.lock{color:var(--muted);font-size:14px}.category-heading{display:flex;justify-content:space-between;align-items:center;margin:20px 0 9px}.category-heading h3 span{margin-left:8px;font-weight:400}.text-button{font-size:12px;padding:2px 4px;min-height:25px;border:0;color:var(--muted)}.track-list{display:flex;flex-direction:column;gap:7px}.track-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;padding:11px 13px;background-color:var(--panel);border:1px solid var(--line);border-radius:9px}.track-primary{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0}.track-primary strong{font-size:13px;font-weight:600}.language-tag{font-size:10px;border:1px solid var(--line);border-radius:4px;padding:1px 5px;color:var(--muted)}.track-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:3px;font-size:11px;color:var(--muted)}.track-actions{display:flex;align-items:center;gap:6px}.remove-track{width:32px;height:32px;min-height:32px;padding:0;border-color:transparent;font-size:21px;color:var(--muted)}.remove-track:hover{color:var(--danger);border-color:color-mix(in srgb,var(--danger) 35%,transparent);background-color:color-mix(in srgb,var(--danger) 8%,var(--panel))}.undo-track{font-size:11px;min-height:29px;padding:3px 9px}.track-row.excluded{background-color:transparent;border-style:dashed}.track-row.excluded .track-primary{opacity:.65}.excluded-section{margin-top:18px}.excluded-section>summary{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted);padding:10px 0}.excluded-section[open]>.track-list{margin-top:8px}.actions{display:flex;align-items:center;justify-content:space-between;gap:var(--gap);margin-top:24px;padding-top:18px;border-top:1px solid var(--line)}.actions strong{font-size:13px}.actions small{font-size:11px;margin-top:4px}.help{display:inline-flex;position:relative;vertical-align:middle;margin-left:3px}.help>button{border-radius:50%;border:1px solid var(--line);width:17px;height:17px;min-height:17px;font-size:10px;padding:0;color:var(--muted)}[role=tooltip]{position:fixed;z-index:var(--tooltip-layer);display:block;width:min(310px,calc(100vw - 24px));padding:12px 14px;border:1px solid var(--line);border-radius:9px;background-color:var(--panel);color:var(--text);box-shadow:0 10px 30px #0006;font-size:12px;line-height:1.5;pointer-events:none;font-weight:400}.review-file{border:1px solid var(--line);border-radius:var(--radius);background-color:var(--panel);overflow:hidden}.review-file-heading{display:flex;align-items:center;gap:12px;padding:18px;border-bottom:1px solid var(--line)}.review-file-heading>div{flex:1;min-width:0}.review-file-heading strong{font-size:15px}.review-file-heading small{font-size:11px;overflow-wrap:anywhere;margin-top:4px}.review-section{padding:18px}.review-section h3{margin-bottom:12px}.review-track-list{display:grid;gap:0}.review-track{display:grid;grid-template-columns:54px minmax(0,1fr) auto;gap:12px;padding:9px 0;align-items:center;border-bottom:1px solid color-mix(in srgb,var(--line) 55%,transparent);font-size:12px}.review-track:last-child{border-bottom:0}.review-track>span:first-child,.review-track small{font-size:11px;color:var(--muted)}.review-track strong{font-weight:500}.review-track .codec{font-size:11px;color:var(--muted)}.retained-details{margin:0 18px 18px;padding:14px 0 0;border-top:1px solid var(--line)}.retained-details>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px}.retained-details small{font-size:11px;margin-top:4px}.summary-action{font-size:11px;color:var(--muted);white-space:nowrap}.retained-details[open]>.review-track-list{margin-top:12px}.default-note{padding:12px 18px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}.default-note strong{color:var(--warning);font-weight:500}.consent{display:flex;align-items:start;gap:10px;margin-top:16px;padding:14px;border:1px solid var(--line);border-radius:9px;font-size:12px}.demo-message{font-size:12px;color:var(--muted);margin-top:14px}.inspection{padding:32px;min-height:400px}.inspection-header{display:flex;align-items:center;gap:14px}.inspection-header .muted{margin-top:4px}.inspection-steps{display:flex;gap:24px;flex-wrap:wrap;list-style:none;padding:20px 0;margin:24px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);color:var(--muted);font-size:12px}.inspection-steps li:before{content:'○';margin-right:8px}.inspection-steps .done:before{content:'✓';color:var(--text)}.inspection-steps .active{color:var(--text)}.inspection-steps .active:before{content:'◉';color:var(--accent)}.inspection-status{font-size:14px;font-weight:600}.indeterminate{height:5px;border-radius:5px;background-color:var(--panel);overflow:hidden;margin:18px 0}.indeterminate:before{content:'';display:block;background-color:var(--accent);height:100%;width:30%;animation:busy 2s ease-in-out infinite}.time-values{display:flex;gap:24px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-bottom:14px}.time-values strong{color:var(--text);font-weight:500;margin-left:6px;font-variant-numeric:tabular-nums}#cancel-inspection,#retry-inspection{margin-top:20px}.study-foot{font-size:11px;color:var(--muted);margin-top:18px}@keyframes busy{0%{transform:translateX(-100%)}100%{transform:translateX(440%)}}@media(prefers-reduced-motion:reduce){.indeterminate:before{animation:none;transform:translateX(100%)}}@media(max-width:760px){main{padding:24px 16px}.study{align-items:start;flex-direction:column}.scene{padding:18px}.app-header{padding:16px}.caption{display:none}.source-line{align-items:start;flex-direction:column}.source-line>div small{width:100%}.section-heading{align-items:start;flex-direction:column}.workspace-toolbar{align-items:start;flex-direction:column}.actions{align-items:stretch;flex-direction:column}.actions button{align-self:flex-start}.retained-details>summary{align-items:start;flex-direction:column}}@media(max-width:480px){main{padding:18px 10px}h1{font-size:23px}.brand small{display:none}.brand strong{font-size:18px}.brand img{width:32px;height:32px}.window-actions button{padding:7px}.window-actions button span{display:none}.scene{padding:14px}.mode-options{grid-template-columns:1fr}.destination-path{align-items:start;flex-direction:column}.video-summary .muted{margin-left:0}.review-track{grid-template-columns:35px minmax(0,1fr)}.review-track .codec{grid-column:2}.review-file-heading .count{display:none}.inspection{padding:20px}.inspection-steps{gap:12px;flex-direction:column}.time-values{gap:12px}.workspace-toolbar button{font-size:12px;padding:7px 9px}.review-section{padding:14px}.default-note{padding:12px 14px}.retained-details{margin:0 14px 14px}}
+
+/* Keep Review/Run reachable and reserve a real gutter beside all scrolling content. */
+.app{display:flex;flex-direction:column;height:900px}.app-header{flex-shrink:0}.scene{display:flex;flex-direction:column;min-height:0;flex:1}.scene-scroll{overflow-y:auto;scrollbar-gutter:stable;min-height:0;flex:1;padding-right:14px}.actions{flex-shrink:0;margin-top:16px}.scene.inspection{overflow-y:auto}.window-actions .icon{white-space:nowrap;flex-shrink:0}.study-foot{max-width:980px}@media(max-width:480px){.app{height:960px}.scene-scroll{padding-right:8px}}
+</style></head>
+<body>
+<main>
+  <header class="study"><div><p class="eyebrow">MOVIESIFT / WORKSPACE PROPOSAL</p><h1>Убрать лишнее. Проверить результат.</h1></div><span>Прототип перед реализацией пунктов 4, 5, 7 и 8</span></header>
+  <div class="demo-controls"><span>Демонстрация экранов</span><button data-scene="tracks" aria-pressed="true">Дорожки</button><button data-scene="review" aria-pressed="false">Проверка</button><button data-scene="inspection" aria-pressed="false">Ожидание</button></div>
+  <section class="app" aria-label="Прототип MovieSift">
+    <header class="app-header"><div class="brand"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsbGVkYnk9InRpdGxlIj48dGl0bGUgaWQ9InRpdGxlIj5Nb3ZpZVNpZnQg4oCUIGZpbG0gYW5kIHNjaXNzb3JzPC90aXRsZT48cmVjdCB4PSIyIiB5PSIyIiB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHJ4PSIxNyIgZmlsbD0iIzY1NjlkYyIvPjxnIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIyLjgiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHJlY3QgeD0iMTMiIHk9IjE1IiB3aWR0aD0iMzQiIGhlaWdodD0iMzAiIHJ4PSI0Ii8+PHBhdGggZD0iTTIwIDE2djI4TTE0IDIzaDZtLTYgMTNoNk00MCAxNnYyOG0wLTIxaDZtLTYgMTNoNiIvPjwvZz48cGF0aCBkPSJtMzUgNDMgMTYtMTlNNDYgNDIgMzEgMjQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzY1NjlkYyIgc3Ryb2tlLXdpZHRoPSI4IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48ZyBmaWxsPSIjNjU2OWRjIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48Y2lyY2xlIGN4PSIzMiIgY3k9IjQ3IiByPSI1Ii8+PGNpcmNsZSBjeD0iNDgiIGN5PSI0NyIgcj0iNSIvPjxwYXRoIGQ9Im0zNSA0MyAxNi0xOW0tNiAxOUwzMSAyNCIgZmlsbD0ibm9uZSIvPjwvZz48L3N2Zz4K" alt="Значок MovieSift: плёнка и ножницы"><div><strong>MovieSift</strong><small>Оставьте нужные дорожки.</small></div></div><div class="window-actions"><button class="icon" aria-label="Язык интерфейса"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h12M9 2v3M12 5c-1 6-4 9-9 12M5 9c1 3 3 5 6 7M13 21l4.5-11L22 21M14.5 17h6"/></svg></button><button>◉ <span>Оформление</span></button><span class="caption" aria-hidden="true">−　□　×</span></div></header>
+    <section id="tracks-scene" class="scene"><div class="scene-scroll">
+      <div class="workspace-toolbar"><div><button>＋ Добавить файлы</button><button>Добавить папку</button><button>Правила и пресеты</button></div><span class="muted">1 файл</span></div>
+      <div class="source-line"><div><span class="file-badge">MKV</span><strong>Фильм.mkv</strong><small>D:\Movies · дорожки прочитаны</small></div><details><summary>Подробности <span class="chevron"></span></summary><div class="file-info">Matroska · H.264 · 1920 × 1080<br>6 аудиодорожек · 5 дорожек субтитров<br>Индивидуальные дорожки этого файла показаны ниже.</div></details></div>
+      <section class="destination"><div class="section-label">Как сохранить результат <span class="help"><button aria-label="О способах сохранения" aria-describedby="output-tip">?</button><span id="output-tip" role="tooltip" hidden>Новая копия сохраняет оригинал. При замене сначала создаётся и проверяется временный результат, затем заменяется исходный файл.</span></span></div><div class="mode-options"><label><input type="radio" name="output-mode" value="copy" checked><span><strong>Новая копия</strong><small>Оригинал останется на месте</small></span></label><label><input type="radio" name="output-mode" value="replace"><span><strong>Заменить исходный файл</strong><small>Без отдельного итогового файла</small></span></label></div><div id="destination-path" class="destination-path"><span>Куда: <strong>рядом с исходным</strong> · Фильм.trimmed.mkv</span><button>Изменить папку…</button></div><p id="replace-notice" class="notice" hidden>Для замены потребуется место для временного файла. Исходник заменяется только после проверки; согласие запрашивается перед запуском.</p></section>
+      <div class="section-heading"><div><h2>Какие дорожки оставить <span class="help"><button aria-label="Как исключать дорожки" aria-describedby="selection-tip">?</button><span id="selection-tip" role="tooltip" hidden>Изначально сохраняются все дорожки. Нажмите ×, чтобы исключить ненужную из результата. Исключённую дорожку можно вернуть. Исходный файл на этом экране не изменяется.</span></span></h2><p class="muted">Нажмите × у ненужной дорожки. Ошиблись — верните её.</p></div><span id="choice-count" class="count"></span></div>
+      <div class="video-summary"><span class="lock" aria-hidden="true">▣</span><strong>Видео</strong><span>H.264 · 1080p</span><span class="muted">Всегда сохраняется</span></div>
+      <div class="category-heading"><h3>Аудио <span id="audio-count" class="muted"></span></h3></div><div id="audio-tracks" class="track-list"></div>
+      <div class="category-heading"><h3>Субтитры <span id="subtitle-count" class="muted"></span></h3><button id="remove-subtitles" class="text-button">Исключить все</button></div><div id="subtitle-tracks" class="track-list"></div>
+      <details class="excluded-section" id="excluded-section"><summary><span id="excluded-heading"></span><span class="chevron"></span></summary><div id="excluded-tracks" class="track-list"></div></details>
+      </div><footer class="actions"><div><strong id="footer-summary"></strong><small id="footer-safety"></small></div><button id="open-review" class="primary">Проверить изменения →</button></footer>
+    </section>
+    <section id="review-scene" class="scene" hidden><div class="scene-scroll">
+      <div class="section-heading"><div><p class="eyebrow">ПЕРЕД ЗАПУСКОМ</p><h2>Проверка изменений</h2><p class="muted">Сначала проверьте план. Обработка ещё не запущена.</p></div><button id="back-to-tracks">← Изменить дорожки</button></div>
+      <div class="review-file"><div class="review-file-heading"><span class="file-badge">MKV</span><div><strong>Фильм.mkv</strong><small id="review-destination"></small></div><span id="review-mode" class="count"></span></div>
+        <div class="review-section"><h3 id="review-remove-heading"></h3><div id="review-removed" class="review-track-list"></div></div>
+        <details id="retained-details" class="retained-details"><summary><div><strong id="retained-heading"></strong><small id="retained-summary"></small></div><span class="summary-action">Показать дорожки <span class="chevron"></span></span></summary><div id="review-retained" class="review-track-list"></div></details>
+        <div id="default-warning" class="default-note"><span>Стандартное аудио: <strong>не назначено</strong> <span class="help"><button aria-label="О стандартном аудио" aria-describedby="default-tip">?</button><span id="default-tip" role="tooltip" hidden>Вы исключили дорожку с исходным флагом default. MovieSift не назначает этот флаг другой дорожке. Выбор звуковой дорожки проигрывателем может отличаться.</span></span></span></div>
+      </div>
+      <label id="replace-consent" class="consent" hidden><input id="replace-confirmed" type="checkbox"><span>Подтверждаю замену исходного файла после успешной проверки результата.</span></label>
+      <label id="silent-consent" class="consent" hidden><input id="silent-confirmed" type="checkbox"><span>Подтверждаю создание видео без аудиодорожек.</span></label>
+      <div id="no-change" class="notice" hidden>Дорожки не изменены. Файл не будет обрабатываться, новый файл не появится.</div>
+      </div><footer class="actions"><div><strong id="review-safety"></strong><small>План не меняет кодеки, порядок и метаданные сохранённых дорожек.</small></div><button id="run-demo" class="primary"></button></footer>
+      <p id="run-message" class="demo-message" role="status" hidden>Это прототип: обработка не запускалась, файлы не изменялись.</p>
+    </section>
+    <section id="inspection-scene" class="scene inspection" hidden>
+      <div class="inspection-header"><span class="file-badge">MKV</span><div><h2>Читаем дорожки</h2><p class="muted">Фильм.mkv · исходный файл не изменяется</p></div></div>
+      <ol class="inspection-steps"><li class="done">Файл доступен</li><li class="active">Дорожки и метаданные</li><li>Повторная проверка источника</li></ol>
+      <div id="inspection-active"><p class="inspection-status">Ожидаем ответ MKVToolNix</p><div class="indeterminate" role="progressbar" aria-label="Инспекция выполняется"></div><div class="time-values"><span>Прошло <strong id="elapsed">02:08</strong></span><span>Осталось <strong>оценка пока недоступна</strong> <span class="help"><button aria-label="Почему нет оценки времени" aria-describedby="eta-tip">?</button><span id="eta-tip" role="tooltip" hidden>Медиатулза не сообщает долю выполненного чтения. Обратный отсчёт был бы недостоверным. Прошедшее время и текущий этап показываются отдельно.</span></span></span></div><p class="muted">Для большого файла или медленного диска проверка может занять больше времени. Можно отменить и повторить позже.</p><button id="cancel-inspection">Отменить проверку</button></div>
+      <div id="inspection-cancelled" hidden><h3>Проверка отменена</h3><p class="muted">Дорожки не подтверждены. Обработка не запускалась.</p><button id="retry-inspection">Повторить проверку</button></div>
+    </section>
+  </section>
+  <p class="study-foot">Прототип, не приложение. Медиафайлы не читаются и не изменяются. Таймер демонстрационный. Наведите курсор на ? или перейдите к нему клавишей Tab.</p>
+</main>
+<script>/* Demonstrates output intent only. No filesystem, media process or network API is used. */
+(() => {
+  const TIMER_TICK_MS = 1000;
+  const SECONDS_PER_MINUTE = 60;
+  const SAMPLE_ELAPSED_SECONDS = 128;
+  const TOOLTIP_GUTTER = 12;
+  const tracks = [
+    { id: 0, kind: 'video', language: 'EN', title: 'Основное видео', codec: 'H.264 · 1080p' },
+    { id: 1, kind: 'audio', language: 'RU', title: 'Русская озвучка A', codec: 'AC-3 · 6 каналов', default: true },
+    { id: 2, kind: 'audio', language: 'RU', title: 'Русская озвучка B', codec: 'AC-3 · 6 каналов' },
+    { id: 3, kind: 'audio', language: 'RU', title: 'Русская озвучка C', codec: 'DTS · 6 каналов' },
+    { id: 4, kind: 'audio', language: 'RU', title: 'Русская озвучка D', codec: 'DTS · 6 каналов' },
+    { id: 5, kind: 'audio', language: 'RU', title: 'Дубляж', codec: 'AC-3 · 6 каналов' },
+    { id: 6, kind: 'audio', language: 'EN', title: 'Original soundtrack', codec: 'DTS · 6 каналов' },
+    { id: 7, kind: 'subtitle', language: 'RU', title: 'Русские субтитры', codec: 'SRT · дорожка 7' },
+    { id: 8, kind: 'subtitle', language: 'RU', title: 'Русские субтитры', codec: 'SRT · дорожка 8' },
+    { id: 9, kind: 'subtitle', language: 'RU', title: 'Русские субтитры', codec: 'SRT · дорожка 9' },
+    { id: 10, kind: 'subtitle', language: 'RU', title: 'Русские субтитры', codec: 'SRT · дорожка 10' },
+    { id: 11, kind: 'subtitle', language: 'EN', title: 'English captions', codec: 'SRT · дорожка 11' }
+  ];
+  const removed = new Set([1, 2, 3, 4]);
+  let mode = 'copy';
+  let scene = 'tracks';
+  let elapsed = SAMPLE_ELAPSED_SECONDS;
+  let inspectionCancelled = false;
+  let activeTip = null;
+
+  /** Derive visible choices from one source-local selection rather than independent review state. */
+  const selected = () => tracks.filter(({ id }) => !removed.has(id));
+
+  /** Create one reversible track choice with a clearly scoped output-removal action. */
+  const trackRow = ({ track, excluded }) => {
+    const row = document.createElement('div');
+    row.className = `track-row${excluded ? ' excluded' : ''}`;
+    const content = document.createElement('div');
+    const primary = document.createElement('div');
+    primary.className = 'track-primary';
+    const title = document.createElement('strong');
+    title.textContent = track.title;
+    const language = document.createElement('span');
+    language.className = 'language-tag';
+    language.textContent = track.language;
+    primary.append(title, language);
+    const metadata = document.createElement('div');
+    metadata.className = 'track-meta';
+    metadata.textContent = `${track.codec} · ID ${track.id}${track.default ? ' · по умолчанию' : ''}`;
+    content.append(primary, metadata);
+    const action = document.createElement('button');
+    action.type = 'button';
+    action.className = excluded ? 'undo-track' : 'remove-track';
+    action.textContent = excluded ? '↶ Вернуть' : '×';
+    action.dataset.trackId = String(track.id);
+    action.setAttribute('aria-label', `${excluded ? 'Вернуть в результат' : 'Исключить из результата'}: ${track.title}, ${track.language}, ID ${track.id}`);
+    action.addEventListener('click', () => {
+
+      if (excluded) {
+        removed.delete(track.id);
+      } else {
+        removed.add(track.id);
+      }
+
+      invalidateReview();
+      renderChoices();
+    });
+    row.append(content, action);
+    return row;
+  };
+
+  /** Require fresh explicit review/consent after output intent or choices change. */
+  const invalidateReview = () => {
+    document.getElementById('replace-confirmed').checked = false;
+    document.getElementById('silent-confirmed').checked = false;
+    document.getElementById('run-message').hidden = true;
+  };
+
+  /** Update the primary editor without removing access to excluded tracks. */
+  const renderChoices = () => {
+    const retained = selected();
+    const audio = retained.filter(({ kind }) => kind === 'audio');
+    const subtitles = retained.filter(({ kind }) => kind === 'subtitle');
+    document.getElementById('audio-tracks').replaceChildren(...audio.map((track) => trackRow({ track, excluded: false })));
+    document.getElementById('subtitle-tracks').replaceChildren(...subtitles.map((track) => trackRow({ track, excluded: false })));
+    document.getElementById('excluded-tracks').replaceChildren(...tracks.filter(({ id }) => removed.has(id)).map((track) => trackRow({ track, excluded: true })));
+    document.getElementById('audio-count').textContent = `${audio.length} из 6`;
+    document.getElementById('subtitle-count').textContent = `${subtitles.length} из 5`;
+    document.getElementById('choice-count').textContent = `В результате: ${retained.length} из 12`;
+    document.getElementById('excluded-heading').textContent = `Исключены из результата: ${removed.size}`;
+    document.getElementById('excluded-section').hidden = !removed.size;
+    document.getElementById('footer-summary').textContent = `Исключить: ${removed.size} · Оставить: ${retained.length}`;
+    document.getElementById('footer-safety').textContent = mode === 'copy' ? 'Исходный файл останется без изменений.' : 'Замена потребует отдельного подтверждения перед запуском.';
+    document.getElementById('destination-path').hidden = mode !== 'copy';
+    document.getElementById('replace-notice').hidden = mode !== 'replace';
+    document.getElementById('remove-subtitles').disabled = !subtitles.length;
+  };
+
+  /** Present a compact result list; identifiers remain available without repeating the full source filename. */
+  const reviewTrack = ({ track }) => {
+    const row = document.createElement('div');
+    row.className = 'review-track';
+    const language = document.createElement('span');
+    language.textContent = track.language;
+    const title = document.createElement('strong');
+    title.textContent = track.title;
+    const metadata = document.createElement('span');
+    metadata.className = 'codec';
+    metadata.textContent = `${track.codec} · ID ${track.id}`;
+    row.append(language, title, metadata);
+    return row;
+  };
+
+  /** Derive a separate visible review and explicit destructive/silent consent from current choices. */
+  const renderReview = () => {
+    const retained = selected();
+    const audioCount = retained.filter(({ kind }) => kind === 'audio').length;
+    const subtitleCount = retained.filter(({ kind }) => kind === 'subtitle').length;
+    document.getElementById('review-destination').textContent = mode === 'copy' ? 'Новый файл → D:\\Movies\\Фильм.trimmed.mkv' : 'Заменить → D:\\Movies\\Фильм.mkv';
+    document.getElementById('review-mode').textContent = mode === 'copy' ? 'Новая копия' : 'Замена исходника';
+    document.getElementById('review-remove-heading').textContent = `Будут исключены: ${removed.size}`;
+    document.getElementById('review-removed').replaceChildren(...tracks.filter(({ id }) => removed.has(id)).map((track) => reviewTrack({ track })));
+    document.getElementById('review-retained').replaceChildren(...retained.map((track) => reviewTrack({ track })));
+    document.getElementById('retained-heading').textContent = `Останется в результате: ${retained.length}`;
+    document.getElementById('retained-summary').textContent = `Видео: 1 · Аудио: ${audioCount} · Субтитры: ${subtitleCount}`;
+    document.querySelector('#default-warning strong').textContent = removed.has(1) ? 'не назначено' : 'Русская озвучка A';
+    document.getElementById('default-tip').textContent = removed.has(1)
+      ? 'Исключена дорожка с исходным флагом default. MovieSift не назначает этот флаг другой дорожке. Выбор проигрывателя может отличаться.'
+      : 'Исходный флаг default сохранён у этой дорожки. MovieSift не назначает новые флаги автоматически.';
+    document.getElementById('replace-consent').hidden = mode !== 'replace' || !removed.size;
+    document.getElementById('silent-consent').hidden = audioCount > 0;
+    document.getElementById('no-change').hidden = removed.size > 0;
+    document.getElementById('review-safety').textContent = mode === 'copy' ? 'Оригинал останется на месте.' : 'Замена выполняется только после проверки результата.';
+    const run = document.getElementById('run-demo');
+    run.textContent = mode === 'copy' ? 'Создать копию' : 'Заменить исходный файл';
+    const replacementAllowed = mode !== 'replace' || document.getElementById('replace-confirmed').checked;
+    const audioAllowed = audioCount > 0 || document.getElementById('silent-confirmed').checked;
+    run.disabled = !removed.size || !replacementAllowed || !audioAllowed;
+  };
+
+  /** Change only the demonstrator screen; this never reads media or executes an approved job. */
+  const showScene = ({ target }) => {
+    scene = target;
+    ['tracks', 'review', 'inspection'].forEach((name) => {
+      document.getElementById(`${name}-scene`).hidden = name !== target;
+      document.querySelector(`[data-scene="${name}"]`).setAttribute('aria-pressed', String(name === target));
+    });
+    hideTip();
+
+    if (target === 'review') {
+      renderReview();
+    }
+  };
+
+  /** Position explanatory text near its trigger while preventing viewport-edge clipping. */
+  const showTip = ({ button }) => {
+    hideTip();
+    const tip = document.getElementById(button.getAttribute('aria-describedby'));
+    tip.hidden = false;
+    const trigger = button.getBoundingClientRect();
+    const bounds = tip.getBoundingClientRect();
+    const left = Math.min(Math.max(TOOLTIP_GUTTER, trigger.left), innerWidth - bounds.width - TOOLTIP_GUTTER);
+    const below = trigger.bottom + TOOLTIP_GUTTER;
+    const top = below + bounds.height <= innerHeight - TOOLTIP_GUTTER ? below : Math.max(TOOLTIP_GUTTER, trigger.top - bounds.height - TOOLTIP_GUTTER);
+    tip.style.left = `${left}px`;
+    tip.style.top = `${top}px`;
+    activeTip = tip;
+  };
+
+  /** Dismiss only cosmetic explanatory text, preserving keyboard focus and choices. */
+  const hideTip = () => {
+
+    if (activeTip) {
+      activeTip.hidden = true;
+      activeTip = null;
+    }
+  };
+
+  document.querySelectorAll('[data-scene]').forEach((button) => button.addEventListener('click', () => showScene({ target: button.dataset.scene })));
+  document.querySelectorAll('[name="output-mode"]').forEach((input) => input.addEventListener('change', () => {
+    mode = input.value;
+    invalidateReview();
+    renderChoices();
+  }));
+  document.getElementById('open-review').addEventListener('click', () => showScene({ target: 'review' }));
+  document.getElementById('back-to-tracks').addEventListener('click', () => showScene({ target: 'tracks' }));
+  document.getElementById('remove-subtitles').addEventListener('click', () => {
+    tracks.filter(({ kind }) => kind === 'subtitle').forEach(({ id }) => removed.add(id));
+    invalidateReview();
+    renderChoices();
+  });
+  ['replace-confirmed', 'silent-confirmed'].forEach((name) => document.getElementById(name).addEventListener('change', renderReview));
+  document.getElementById('run-demo').addEventListener('click', () => { document.getElementById('run-message').hidden = false; });
+  document.querySelectorAll('.help>button').forEach((button) => {
+    button.addEventListener('pointerenter', () => showTip({ button }));
+    button.addEventListener('focus', () => showTip({ button }));
+    button.addEventListener('pointerleave', () => {
+
+      if (document.activeElement !== button) {
+        hideTip();
+      }
+    });
+    button.addEventListener('blur', hideTip);
+  });
+  document.addEventListener('keydown', (event) => {
+
+    if (event.key === 'Escape') {
+      hideTip();
+    }
+  });
+  window.addEventListener('scroll', hideTip, { passive: true });
+  window.addEventListener('resize', hideTip);
+  document.getElementById('cancel-inspection').addEventListener('click', () => {
+    inspectionCancelled = true;
+    document.getElementById('inspection-active').hidden = true;
+    document.getElementById('inspection-cancelled').hidden = false;
+  });
+  document.getElementById('retry-inspection').addEventListener('click', () => {
+    inspectionCancelled = false;
+    elapsed = 0;
+    document.getElementById('inspection-active').hidden = false;
+    document.getElementById('inspection-cancelled').hidden = true;
+    document.getElementById('elapsed').textContent = '00:00';
+  });
+  setInterval(() => {
+
+    if (scene !== 'inspection' || inspectionCancelled) {
+      return;
+    }
+
+    elapsed++;
+    const minutes = String(Math.floor(elapsed / SECONDS_PER_MINUTE)).padStart(2, '0');
+    const seconds = String(elapsed % SECONDS_PER_MINUTE).padStart(2, '0');
+    document.getElementById('elapsed').textContent = `${minutes}:${seconds}`;
+  }, TIMER_TICK_MS);
+  renderChoices();
+})();
+</script></body></html>
