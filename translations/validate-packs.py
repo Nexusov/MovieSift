@@ -39,6 +39,8 @@ def validate_pack(request):
     """Check one complete pack against its filename, schema, bounds and resource contract."""
     path, locale, contract = request
     payload = path.read_bytes()
+    if b"\r" in payload:
+        raise ValueError(f"{locale}: translation sources must use LF line endings before catalog hashing")
     if not payload or len(payload) > MAX_PACK_BYTES:
         raise ValueError(f"{locale}: pack byte bound exceeded")
     data = json.loads(payload.decode("utf-8"), object_pairs_hook=reject_duplicates)
@@ -78,7 +80,7 @@ def main():
     expected = {"version": PACK_VERSION, "packs": records}
     catalog = directory / "catalog.json"
     if options.write_catalog:
-        catalog.write_text(json.dumps(expected, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        catalog.write_bytes((json.dumps(expected, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
     if not options.allow_incomplete:
         actual = json.loads(catalog.read_text(encoding="utf-8"), object_pairs_hook=reject_duplicates)
         if actual != expected:

@@ -40,6 +40,15 @@ class TranslationValidationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "resource mismatch"):
             self.validate()
 
+    def test_crlf_source_cannot_produce_a_different_git_catalog(self):
+        """Refuse bytes that Git's required LF checkout would change after hashing."""
+        content = json.dumps(self.pack, ensure_ascii=False, indent=2).encode("utf-8")
+        self.path.write_bytes(content.replace(b"\n", b"\r\n"))
+        with self.assertRaisesRegex(ValueError, "LF"):
+            VALIDATOR.validate_pack((self.path, "es", self.contract))
+        self.path.write_bytes(content)
+        self.assertEqual(VALIDATOR.validate_pack((self.path, "es", self.contract))["bytes"], len(content))
+
     def test_placeholder_format_or_multiplicity_change_is_rejected(self):
         """Protect both .NET format specifiers and repeated argument occurrences."""
         for changed in ("{0} pistas; {0}", "{0:N0} pistas", "{1:N0} pistas; {1:N0}"):

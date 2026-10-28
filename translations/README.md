@@ -14,4 +14,6 @@ python -m unittest discover -s translations -p "test_*.py"
 
 Generation fails if any supported locale is missing or invalid. Validation requires exact key coverage, nonblank bounded values and identical .NET format placeholders, including formatting and repeated occurrences. English technical names and media-format identifiers may intentionally remain original. Complete mechanical coverage does not replace native-speaker translation review.
 
+Pack source files must use UTF-8 with LF line endings, matching the repository's Git attributes. The validator rejects CRLF before hashing, and catalog generation writes LF independently of the host OS. This keeps published GitHub bytes and Windows/Linux checkout hashes identical.
+
 During development, `--allow-incomplete` checks existing packs without producing a releasable catalog. Do not use that option as a release gate. Packs and catalogs must never contain media paths, executable code, markup or workflow authority.
