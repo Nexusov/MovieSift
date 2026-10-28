@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Xml.Linq;
 using MovieSift.Application;
+using MovieSift.Application.Inspection;
 using MovieSift.Application.Ports;
 using MovieSift.Core.Failures;
 using MovieSift.Core.Media;
@@ -29,15 +30,18 @@ public sealed class MkvBackend(MkvBackendOptions options) : IMediaBackend
     /// <summary>Inspects the detected container, required properties, and supported chapter/tag structures.</summary>
     public async Task<MediaInspection> InspectAsync(InspectRequest request)
     {
+        request.Progress?.Report(InspectionStage.CheckingTools);
         await ValidateToolsAsync(request.CancellationToken).ConfigureAwait(false);
         var revision = await options.SourceAccess.ReadRevisionAsync(new SourceRequest(
             request.SourcePath, request.CancellationToken)).ConfigureAwait(false);
+        request.Progress?.Report(InspectionStage.ReadingContainer);
         var inspection = await IdentifyAsync(new IdentifyRequest(revision, request.CancellationToken)).ConfigureAwait(false);
         var scratch = CreateScratchDirectory();
         var terminationConfirmed = true;
 
         try
         {
+            request.Progress?.Report(InspectionStage.ReadingMetadata);
             await ExtractMetadataAsync(new MetadataExtraction(inspection, scratch, request.CancellationToken)).ConfigureAwait(false);
             return inspection;
         }

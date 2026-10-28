@@ -453,6 +453,14 @@
     "WindowMinimize": "최소화",
     "WindowMaximize": "최대화",
     "WindowRestore": "창 복원",
-    "WindowClose": "MovieSift 닫기"
+    "WindowClose": "MovieSift 닫기",
+    "InspectionStageCheckingSource": "원본 파일 확인 중…",
+    "InspectionStageCheckingTools": "포함된 미디어 도구 확인 중…",
+    "InspectionStageReadingContainer": "컨테이너 및 트랙 정보 읽는 중…",
+    "InspectionStageReadingMetadata": "챕터 및 태그 읽는 중…",
+    "InspectionStageRecheckingSource": "원본이 변경되지 않았는지 다시 확인 중…",
+    "InspectionElapsed": "경과 시간: {0}",
+    "InspectionRemainingUnknown": "이 검사의 남은 시간은 예상할 수 없습니다.",
+    "InspectionSlowNotice": "검사가 진행 중입니다. 일부 검사는 파일을 스캔할 수 있습니다. 취소해도 원본은 변경되지 않습니다."
   }
 }

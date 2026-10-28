@@ -20,6 +20,8 @@ public sealed partial class BatchCoordinator(
     private CancellationTokenSource? activeCancellation;
     private BatchLanguagePreview? issuedLanguagePreview;
 
+    public event Action<BatchInspectionProgress>? InspectionProgressChanged;
+
     /// <summary>Starts an empty in-memory batch only when no operation or unresolved ownership is present.</summary>
     public BatchEditResult StartNewBatch(long? expectedRevision = null)
     {
@@ -302,7 +304,8 @@ public sealed partial class BatchCoordinator(
             Failure = null,
             RetainedTrackIds = default
         });
-        var result = await inspectionService.InspectAsync(new(item.SourcePath, request.CancellationToken));
+        var progress = new InspectionObserver(session, item.Id, update => InspectionProgressChanged?.Invoke(update));
+        var result = await inspectionService.InspectAsync(new(item.SourcePath, request.CancellationToken, progress));
         var failure = result.IsStale ? new Failure(ErrorCode.StalePlan) : result.Failure;
         var state = result.Inspection is not null ? BatchItemState.NeedsReview :
             failure?.Code == ErrorCode.Cancelled ? BatchItemState.Cancelled : BatchItemState.Failed;
@@ -314,6 +317,19 @@ public sealed partial class BatchCoordinator(
             Failure = failure,
             RetainedTrackIds = result.Inspection?.Tracks.Select(track => track.Id).ToImmutableArray() ?? []
         });
+    }
+
+    /// <summary>Forwards an actual backend stage with its file identity, without queued synchronization callbacks.</summary>
+    private sealed class InspectionObserver(BatchSession session, Guid itemId, Action<BatchInspectionProgress> report) : IProgress<InspectionStage>
+    {
+        /// <summary>Notifies presentation only while this exact queue entry is being inspected.</summary>
+        public void Report(InspectionStage value)
+        {
+            if (session.Snapshot.Items.Any(item => item.Id == itemId && item.State == BatchItemState.Inspecting))
+            {
+                report(new(itemId, value));
+            }
+        }
     }
 
     /// <summary>Routes review actions by frozen item and job identity rather than the current editor.</summary>

@@ -12,11 +12,14 @@ public sealed class InspectionService(IMediaBackend backend, ISourceAccess sourc
     public async Task<InspectionResult> InspectAsync(InspectRequest request)
     {
         var currentRevision = Interlocked.Increment(ref revision);
+        using var progress = new RevisionProgress(this, currentRevision, request);
 
         try
         {
+            progress.Report(InspectionStage.CheckingSource);
             var before = await sourceAccess.ReadRevisionAsync(new(request.SourcePath, request.CancellationToken));
-            var inspection = await backend.InspectAsync(request);
+            var inspection = await backend.InspectAsync(request with { Progress = progress });
+            progress.Report(InspectionStage.RecheckingSource);
             var after = await sourceAccess.ReadRevisionAsync(new(request.SourcePath, request.CancellationToken));
 
             if (currentRevision != Volatile.Read(ref revision))
@@ -43,5 +46,26 @@ public sealed class InspectionService(IMediaBackend backend, ISourceAccess sourc
         {
             return new(null, new(ErrorCode.IoFailure, exception.Message), currentRevision != Volatile.Read(ref revision));
         }
+    }
+
+    /// <summary>Stops superseded or cancelled backend notifications before they reach presentation.</summary>
+    private sealed class RevisionProgress(InspectionService owner, long expectedRevision, InspectRequest request) : IProgress<InspectionStage>, IDisposable
+    {
+        private int completed;
+
+        /// <summary>Forwards only observations from the currently owned inspection.</summary>
+        public void Report(InspectionStage value)
+        {
+            var isCurrent = Volatile.Read(ref completed) == 0 && expectedRevision == Volatile.Read(ref owner.revision)
+                && !request.CancellationToken.IsCancellationRequested;
+
+            if (isCurrent)
+            {
+                request.Progress?.Report(value);
+            }
+        }
+
+        /// <summary>Closes the observation lifetime on success or failure without changing request cancellation.</summary>
+        public void Dispose() => Volatile.Write(ref completed, 1);
     }
 }

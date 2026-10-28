@@ -453,6 +453,14 @@
     "WindowMinimize": "最小化",
     "WindowMaximize": "最大化",
     "WindowRestore": "ウィンドウを元のサイズに戻す",
-    "WindowClose": "MovieSift を閉じる"
+    "WindowClose": "MovieSift を閉じる",
+    "InspectionStageCheckingSource": "入力ファイルを確認中…",
+    "InspectionStageCheckingTools": "同梱のメディアツールを確認中…",
+    "InspectionStageReadingContainer": "コンテナーとトラック情報を読み取り中…",
+    "InspectionStageReadingMetadata": "チャプターとタグを読み取り中…",
+    "InspectionStageRecheckingSource": "入力が変更されていないことを再確認中…",
+    "InspectionElapsed": "経過時間: {0}",
+    "InspectionRemainingUnknown": "この調査の残り時間は推定できません。",
+    "InspectionSlowNotice": "調査を続けています。一部の確認ではファイルを走査します。キャンセルしても入力は変更しません。"
   }
 }

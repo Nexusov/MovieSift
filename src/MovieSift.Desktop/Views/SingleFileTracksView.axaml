@@ -1,0 +1,19 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:viewModels="using:MovieSift.Desktop.ViewModels"
+             xmlns:views="using:MovieSift.Desktop.Views"
+             x:Class="MovieSift.Desktop.Views.SingleFileTracksView"
+             x:DataType="viewModels:BatchItemViewModel">
+  <StackPanel Spacing="8">
+    <TextBlock Classes="heading" Text="{Binding Localization[AggregateHeading]}" />
+    <TextBlock Text="{Binding FileName}" FontWeight="SemiBold" TextWrapping="Wrap" ToolTip.Tip="{Binding SourcePath}" />
+    <TextBlock Text="{Binding StateText}" Classes="muted" TextWrapping="Wrap" />
+    <TextBlock Text="{Binding Localization[BatchExcluded]}" IsVisible="{Binding !Included}" TextWrapping="Wrap" />
+    <Button x:Name="SingleFileRemoveAllSubtitlesButton" Content="{Binding Localization[RemoveAllSubtitles]}"
+            Command="{Binding $parent[views:BatchView].((viewModels:BatchViewModel)DataContext).AggregateTracks.RemoveAllSubtitlesCommand}"
+            HorizontalAlignment="Left" />
+    <views:FileTracksView />
+    <TextBlock Text="{Binding ErrorText}" Foreground="{DynamicResource MovieSiftErrorBrush}" TextWrapping="Wrap" IsVisible="{Binding HasError}" />
+    <TextBlock Text="{Binding ErrorReasonText}" TextWrapping="Wrap" IsVisible="{Binding HasError}" />
+  </StackPanel>
+</UserControl>

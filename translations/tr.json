@@ -453,6 +453,14 @@
     "WindowMinimize": "Simge durumuna küçült",
     "WindowMaximize": "Ekranı kapla",
     "WindowRestore": "Pencereyi geri yükle",
-    "WindowClose": "MovieSift uygulamasını kapat"
+    "WindowClose": "MovieSift uygulamasını kapat",
+    "InspectionStageCheckingSource": "Kaynak dosya denetleniyor…",
+    "InspectionStageCheckingTools": "Birlikte gelen medya araçları denetleniyor…",
+    "InspectionStageReadingContainer": "Kapsayıcı ve iz bilgileri okunuyor…",
+    "InspectionStageReadingMetadata": "Bölümler ve etiketler okunuyor…",
+    "InspectionStageRecheckingSource": "Kaynağın değişmediği yeniden denetleniyor…",
+    "InspectionElapsed": "Geçen süre: {0}",
+    "InspectionRemainingUnknown": "Bu incelemenin kalan süresi tahmin edilemiyor.",
+    "InspectionSlowNotice": "İnceleme sürüyor. Bazı denetimler dosyayı tarayabilir; iptal etmek kaynağı değiştirmez."
   }
 }

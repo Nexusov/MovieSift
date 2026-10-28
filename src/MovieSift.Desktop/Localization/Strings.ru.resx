@@ -454,4 +454,12 @@
   <data name="WindowMaximize" xml:space="preserve"><value>Развернуть</value></data>
   <data name="WindowRestore" xml:space="preserve"><value>Восстановить окно</value></data>
   <data name="WindowClose" xml:space="preserve"><value>Закрыть MovieSift</value></data>
+  <data name="InspectionStageCheckingSource" xml:space="preserve"><value>Проверка исходного файла…</value></data>
+  <data name="InspectionStageCheckingTools" xml:space="preserve"><value>Проверка встроенных медиатулзов…</value></data>
+  <data name="InspectionStageReadingContainer" xml:space="preserve"><value>Чтение контейнера и дорожек…</value></data>
+  <data name="InspectionStageReadingMetadata" xml:space="preserve"><value>Чтение глав и тегов…</value></data>
+  <data name="InspectionStageRecheckingSource" xml:space="preserve"><value>Повторная проверка неизменности исходника…</value></data>
+  <data name="InspectionElapsed" xml:space="preserve"><value>Прошло: {0}</value></data>
+  <data name="InspectionRemainingUnknown" xml:space="preserve"><value>Для этой инспекции оставшееся время пока неизвестно.</value></data>
+  <data name="InspectionSlowNotice" xml:space="preserve"><value>Инспекция ещё выполняется. Некоторые проверки могут сканировать файл; отмена не изменит исходник.</value></data>
 </root>

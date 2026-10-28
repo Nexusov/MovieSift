@@ -15,6 +15,9 @@ public sealed partial class BatchViewModel
     private string preparationNoticeKey = string.Empty;
 
     public bool HasItems => Items.Count != 0;
+    public bool IsSingleFile => Items.Count == 1;
+    public BatchItemViewModel? SingleFileItem => IsSingleFile ? Items[0] : null;
+    public string SelectedDetailsHeading => Localization[IsSingleFile ? "WorkspaceDetails" : "BatchSelectedFile"];
     public bool IsEmpty => !HasItems;
     public bool HasPendingInspections => Items.Any(item => item.Included && item.Snapshot.State == BatchItemState.PendingInspection);
     public bool CanPause => Snapshot.Phase == BatchPhase.Running && !Snapshot.PauseRequested;

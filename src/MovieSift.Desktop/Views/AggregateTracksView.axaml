@@ -3,6 +3,14 @@
              xmlns:viewModels="using:MovieSift.Desktop.ViewModels"
              x:Class="MovieSift.Desktop.Views.AggregateTracksView"
              x:DataType="viewModels:AggregateTracksViewModel">
+  <UserControl.Styles>
+    <Style Selector="ToggleButton.memberExpand PathIcon">
+      <Setter Property="RenderTransform" Value="rotate(0deg)" />
+    </Style>
+    <Style Selector="ToggleButton.memberExpand:checked PathIcon">
+      <Setter Property="RenderTransform" Value="rotate(180deg)" />
+    </Style>
+  </UserControl.Styles>
   <UserControl.Resources>
     <DataTemplate x:Key="AggregateGroupTemplate" x:DataType="viewModels:AggregateTrackGroupViewModel">
       <Border Classes="card" Padding="10" Margin="0,3">
@@ -27,8 +35,12 @@
               <TextBlock Text="{Binding ChoiceText}" IsVisible="{Binding HasChoiceNotice}" Foreground="{DynamicResource MovieSiftWarningBrush}" TextWrapping="Wrap" />
               <TextBlock Text="{Binding LanguageIssueText}" IsVisible="{Binding HasLanguageIssue}" TextWrapping="Wrap" />
             </StackPanel>
-            <ToggleButton Grid.Column="2" Content="⌄" IsChecked="{Binding IsExpanded, Mode=TwoWay}" VerticalAlignment="Top"
-                          ToolTip.Tip="{Binding Localization[AggregateMembers]}" AutomationProperties.Name="{Binding MembersAccessibleName}" />
+            <ToggleButton Grid.Column="2" Classes="memberExpand" Width="32" Height="32" MinWidth="32" MinHeight="32" Padding="8"
+                          IsChecked="{Binding IsExpanded, Mode=TwoWay}" VerticalAlignment="Top"
+                          ToolTip.Tip="{Binding Localization[AggregateMembers]}" AutomationProperties.Name="{Binding MembersAccessibleName}">
+              <PathIcon Width="12" Height="8" RenderTransformOrigin="50%,50%"
+                        Data="M0,1.5 L1.5,0 L6,4.5 L10.5,0 L12,1.5 L6,7.5 Z" />
+            </ToggleButton>
           </Grid>
           <ItemsControl ItemsSource="{Binding Members}" IsVisible="{Binding IsExpanded}" HorizontalAlignment="Stretch">
             <ItemsControl.ItemTemplate>

@@ -454,4 +454,12 @@
   <data name="WindowMaximize" xml:space="preserve"><value>Maximize</value></data>
   <data name="WindowRestore" xml:space="preserve"><value>Restore window</value></data>
   <data name="WindowClose" xml:space="preserve"><value>Close MovieSift</value></data>
+  <data name="InspectionStageCheckingSource" xml:space="preserve"><value>Checking the source file…</value></data>
+  <data name="InspectionStageCheckingTools" xml:space="preserve"><value>Checking bundled media tools…</value></data>
+  <data name="InspectionStageReadingContainer" xml:space="preserve"><value>Reading container and track information…</value></data>
+  <data name="InspectionStageReadingMetadata" xml:space="preserve"><value>Reading chapters and tags…</value></data>
+  <data name="InspectionStageRecheckingSource" xml:space="preserve"><value>Rechecking that the source is unchanged…</value></data>
+  <data name="InspectionElapsed" xml:space="preserve"><value>Elapsed: {0}</value></data>
+  <data name="InspectionRemainingUnknown" xml:space="preserve"><value>Remaining time cannot be estimated for this inspection.</value></data>
+  <data name="InspectionSlowNotice" xml:space="preserve"><value>Inspection is still in progress. Some checks may scan the file; you can cancel without changing the source.</value></data>
 </root>

@@ -8,9 +8,11 @@ See the [README](../README.md) for downloads and startup.
 
 Add local files or a folder. **Audio** and **Subtitles** show tracks from every included file, including tracks found in only one episode. Checked tracks are kept; unchecked tracks are removed from the result. All tracks start selected, and video is always kept.
 
-Use a group checkbox to change its tracks together, or expand it for per-file exceptions. Grouping uses metadata, not spoken content. Excluding a file removes it from these actions without deleting it.
+With one file, its actual tracks are shown directly; **Details** contains file information and destination editing without a second track list. With multiple files, use a group checkbox to change its tracks together, or expand it for per-file exceptions. Grouping uses metadata, not spoken content. Excluding a file removes it from these actions without deleting it.
 
 **Remove all subtitles** clears subtitle selections for included, editable files. You can select them again before Review. Audio, video, attachments and completed results are unaffected.
+
+During inspection, the workspace shows the current backend stage and elapsed time for the active file. Remaining time is explicitly unavailable because the tools do not report a reliable fraction of inspection completed. A slow-check notice appears after 30 seconds; it is not a timeout prediction. Cancel remains available.
 
 ## Choose the result
 

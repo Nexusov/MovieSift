@@ -20,6 +20,8 @@ One `BatchSession` serves one file or many. Its immutable snapshots hold each it
 
 Track IDs belong to a particular file and backend. They are distinct from Matroska UIDs, output indexes and UI rows. Audio and subtitle tracks initially have Keep selected; every video track is retained. Removing all subtitles is valid. Removing the last existing audio track requires consent for that file and selection revision.
 
+A sole queue entry uses the shared file-local track editor directly. Multiple entries use the aggregate editor, even when only one is included; both presentations retain the same item editors and session authority.
+
 The common list is the **union** of included inspections. `TrackGroupingPolicy` groups exact canonical language, title, codec/channels, forced status and semantic roles; unknown/conflicting metadata stays separate. Duplicates and per-file exceptions remain visible. Default/enabled flags are displayed separately.
 
 The projection references authoritative session choices. Group, member and remove-all-subtitles edits validate the whole request before applying it atomically. Actual edits invalidate affected plans and Review; no-op edits preserve them. Completed results stay locked.
@@ -29,6 +31,8 @@ The projection references authoritative session choices. Group, member and remov
 NoChange still validates the source and selection, but skips remuxing and destination-only checks. It neither creates a copy nor replaces the original. Other jobs must still avoid its source path, just as they must avoid excluded sources.
 
 Warnings, errors, cancellation or unresolved cleanup pause sequential dispatch. Warning decisions stay attached to the actual item/job even if another row is selected. Continuing requires explicit review/start. A new queue cannot discard unresolved ownership; a nonempty reset requires confirmation and creates a fresh session revision.
+
+Inspection publishes typed backend-stage observations through `InspectionService` and `BatchCoordinator`. Revision, cancellation and item checks reject stale observations. A Desktop-only monotonic timer displays elapsed time; it does not infer progress or remaining time from worker timeouts and does not change process ownership.
 
 ## Discovery and destinations
 

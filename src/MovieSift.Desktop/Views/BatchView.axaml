@@ -33,6 +33,13 @@
           <StackPanel IsVisible="{Binding IsBusy}" Spacing="5">
             <TextBlock Text="{Binding CurrentItemText}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding CurrentItemText}" />
             <TextBlock Text="{Binding StageText}" />
+            <StackPanel x:Name="InspectionActivityNotice" IsVisible="{Binding InspectionActivity.IsActive}" Spacing="4">
+              <TextBlock Text="{Binding InspectionActivity.StageText}" TextWrapping="Wrap" />
+              <TextBlock Text="{Binding InspectionActivity.ElapsedText}" />
+              <TextBlock Text="{Binding InspectionActivity.RemainingText}" Classes="muted" TextWrapping="Wrap" />
+              <TextBlock Text="{Binding InspectionActivity.SlowNoticeText}" IsVisible="{Binding InspectionActivity.HasSlowNotice}"
+                         Foreground="{DynamicResource MovieSiftWarningBrush}" TextWrapping="Wrap" />
+            </StackPanel>
             <ProgressBar Minimum="0" Maximum="100" Value="{Binding ProgressValue}" IsIndeterminate="{Binding IsProgressIndeterminate}" />
           </StackPanel>
           <TextBlock Text="{Binding PauseText}" IsVisible="{Binding HasPauseNotice}" TextWrapping="Wrap" />
@@ -108,9 +115,16 @@
             </Border>
           </Expander>
           <ScrollViewer Grid.Column="1" x:Name="WorkspaceScrollViewer" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-            <StackPanel Spacing="10">
-              <views:AggregateTracksView DataContext="{Binding AggregateTracks}" />
-              <Expander x:Name="SelectedFileDetails" Header="{Binding Localization[BatchSelectedFile]}" IsExpanded="{Binding IsDetailsOpen, Mode=TwoWay}">
+            <StackPanel Spacing="10" Margin="0,0,18,0">
+              <ContentControl x:Name="SingleFileEditor" Content="{Binding SingleFileItem}" IsVisible="{Binding IsSingleFile}" HorizontalContentAlignment="Stretch">
+                <ContentControl.ContentTemplate>
+                  <DataTemplate x:DataType="viewModels:BatchItemViewModel"><views:SingleFileTracksView /></DataTemplate>
+                </ContentControl.ContentTemplate>
+              </ContentControl>
+              <Border IsVisible="{Binding !IsSingleFile}">
+                <views:AggregateTracksView x:Name="AggregateEditor" DataContext="{Binding AggregateTracks}" />
+              </Border>
+              <Expander x:Name="SelectedFileDetails" Header="{Binding SelectedDetailsHeading}" IsExpanded="{Binding IsDetailsOpen, Mode=TwoWay}">
                 <StackPanel Spacing="8">
                   <WrapPanel>
                     <Button Content="{Binding Localization[BatchInspectSelected]}" Command="{Binding InspectSelectedCommand}" Margin="0,0,8,4" />
@@ -118,7 +132,9 @@
                   </WrapPanel>
                   <ContentControl Content="{Binding SelectedItem}" HorizontalContentAlignment="Stretch">
                     <ContentControl.ContentTemplate>
-                      <DataTemplate x:DataType="viewModels:BatchItemViewModel"><views:BatchFileDetailsView /></DataTemplate>
+                      <DataTemplate x:DataType="viewModels:BatchItemViewModel">
+                        <views:BatchFileDetailsView ShowTrackSelection="{Binding !$parent[views:BatchView].((viewModels:BatchViewModel)DataContext).IsSingleFile}" />
+                      </DataTemplate>
                     </ContentControl.ContentTemplate>
                   </ContentControl>
                 </StackPanel>

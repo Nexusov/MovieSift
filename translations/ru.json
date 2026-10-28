@@ -453,6 +453,14 @@
     "WindowMinimize": "Свернуть",
     "WindowMaximize": "Развернуть",
     "WindowRestore": "Восстановить окно",
-    "WindowClose": "Закрыть MovieSift"
+    "WindowClose": "Закрыть MovieSift",
+    "InspectionStageCheckingSource": "Проверка исходного файла…",
+    "InspectionStageCheckingTools": "Проверка встроенных медиатулзов…",
+    "InspectionStageReadingContainer": "Чтение контейнера и дорожек…",
+    "InspectionStageReadingMetadata": "Чтение глав и тегов…",
+    "InspectionStageRecheckingSource": "Повторная проверка неизменности исходника…",
+    "InspectionElapsed": "Прошло: {0}",
+    "InspectionRemainingUnknown": "Для этой инспекции оставшееся время пока неизвестно.",
+    "InspectionSlowNotice": "Инспекция ещё выполняется. Некоторые проверки могут сканировать файл; отмена не изменит исходник."
   }
 }

@@ -453,6 +453,14 @@
     "WindowMinimize": "Minimieren",
     "WindowMaximize": "Maximieren",
     "WindowRestore": "Fenster wiederherstellen",
-    "WindowClose": "MovieSift schließen"
+    "WindowClose": "MovieSift schließen",
+    "InspectionStageCheckingSource": "Quelldatei wird geprüft…",
+    "InspectionStageCheckingTools": "Mitgelieferte Medienwerkzeuge werden geprüft…",
+    "InspectionStageReadingContainer": "Container und Spuren werden gelesen…",
+    "InspectionStageReadingMetadata": "Kapitel und Tags werden gelesen…",
+    "InspectionStageRecheckingSource": "Unveränderte Quelldatei wird erneut geprüft…",
+    "InspectionElapsed": "Vergangen: {0}",
+    "InspectionRemainingUnknown": "Die verbleibende Zeit dieser Prüfung lässt sich nicht schätzen.",
+    "InspectionSlowNotice": "Die Prüfung läuft noch. Manche Prüfungen können die Datei durchsuchen; ein Abbruch verändert die Quelle nicht."
   }
 }

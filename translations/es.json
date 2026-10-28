@@ -453,6 +453,14 @@
     "WindowMinimize": "Minimizar",
     "WindowMaximize": "Maximizar",
     "WindowRestore": "Restaurar ventana",
-    "WindowClose": "Cerrar MovieSift"
+    "WindowClose": "Cerrar MovieSift",
+    "InspectionStageCheckingSource": "Comprobando el archivo de origen…",
+    "InspectionStageCheckingTools": "Comprobando herramientas multimedia incluidas…",
+    "InspectionStageReadingContainer": "Leyendo contenedor y pistas…",
+    "InspectionStageReadingMetadata": "Leyendo capítulos y etiquetas…",
+    "InspectionStageRecheckingSource": "Comprobando que el origen no cambió…",
+    "InspectionElapsed": "Transcurrido: {0}",
+    "InspectionRemainingUnknown": "No se puede estimar el tiempo restante de esta inspección.",
+    "InspectionSlowNotice": "La inspección continúa. Algunas comprobaciones pueden recorrer el archivo; cancelar no cambia el origen."
   }
 }

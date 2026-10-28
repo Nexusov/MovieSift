@@ -453,6 +453,14 @@
     "WindowMinimize": "最小化",
     "WindowMaximize": "最大化",
     "WindowRestore": "还原窗口",
-    "WindowClose": "关闭 MovieSift"
+    "WindowClose": "关闭 MovieSift",
+    "InspectionStageCheckingSource": "正在检查源文件…",
+    "InspectionStageCheckingTools": "正在检查随附的媒体工具…",
+    "InspectionStageReadingContainer": "正在读取容器和轨道信息…",
+    "InspectionStageReadingMetadata": "正在读取章节和标签…",
+    "InspectionStageRecheckingSource": "正在再次确认源文件未更改…",
+    "InspectionElapsed": "已用时间：{0}",
+    "InspectionRemainingUnknown": "无法估算本次检查的剩余时间。",
+    "InspectionSlowNotice": "检查仍在进行。某些检查可能需要扫描文件；取消不会更改源文件。"
   }
 }

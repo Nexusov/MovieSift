@@ -453,6 +453,14 @@
     "WindowMinimize": "Згорнути",
     "WindowMaximize": "Розгорнути",
     "WindowRestore": "Відновити вікно",
-    "WindowClose": "Закрити MovieSift"
+    "WindowClose": "Закрити MovieSift",
+    "InspectionStageCheckingSource": "Перевірка вихідного файлу…",
+    "InspectionStageCheckingTools": "Перевірка комплектних медіаінструментів…",
+    "InspectionStageReadingContainer": "Читання контейнера й доріжок…",
+    "InspectionStageReadingMetadata": "Читання розділів і тегів…",
+    "InspectionStageRecheckingSource": "Повторна перевірка незмінності джерела…",
+    "InspectionElapsed": "Минуло: {0}",
+    "InspectionRemainingUnknown": "Неможливо оцінити залишок часу цього дослідження.",
+    "InspectionSlowNotice": "Дослідження триває. Деякі перевірки можуть сканувати файл; скасування не змінює джерело."
   }
 }
