@@ -10,7 +10,7 @@ Choose tracks for a single movie or a whole series in one workspace. Available f
 
 ## Get started
 
-These controls describe current source builds. Published **1.0.0** still uses Keep checkboxes; its archives are unchanged.
+These controls describe **1.1.0**. Version **1.0.0** uses Keep checkboxes; its archives are unchanged.
 
 1. Download and extract the archive for your platform.
 2. Run `MovieSift.exe` on Windows or `./MovieSift` on Linux.

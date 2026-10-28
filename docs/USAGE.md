@@ -2,7 +2,7 @@
 
 See the [README](../README.md) for downloads and startup.
 
-**Version note:** this guide describes the current source. Published **1.0.0** creates copies in a selected output folder; it has neither source replacement nor an updater. Download and extract the first release containing those features manually.
+**Version note:** this guide describes **1.1.0**. Version **1.0.0** creates copies in a selected output folder; it has neither source replacement nor an updater. Install **1.1.0** manually in a separate directory as described below.
 
 ## Choose what to keep
 
