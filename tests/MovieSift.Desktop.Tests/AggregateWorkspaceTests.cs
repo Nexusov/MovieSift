@@ -19,9 +19,9 @@ public sealed class AggregateWorkspaceTests
     private const string SharedAudioTitle = "English soundtrack";
     private const string SpanishTitle = "Español — last episode only";
 
-    /// <summary>Exercises real three-state checkbox input rather than bypassing its toggle/command ordering.</summary>
+    /// <summary>Exercises real exclusion-button input, including the explicit mixed-group action and restoration.</summary>
     [AvaloniaFact]
-    public async Task AggregateCheckboxSpaceRemovesCheckedAndKeepsMixedMembers()
+    public async Task AggregateButtonSpaceExcludesRetainedAndMixedMembersThenRestores()
     {
         var fixture = CreateSimilarEpisodes();
         await fixture.LoadAsync();
@@ -33,27 +33,31 @@ public sealed class AggregateWorkspaceTests
         try
         {
             Dispatcher.UIThread.RunJobs();
-            var checkBox = Assert.Single(window.GetVisualDescendants().OfType<CheckBox>(), control =>
+            var action = Assert.Single(window.GetVisualDescendants().OfType<Button>(), control =>
                 ReferenceEquals(control.DataContext, group) && ReferenceEquals(control.Command, group.ToggleKeepCommand));
-            Assert.True(checkBox.IsChecked);
-            Assert.True(checkBox.IsThreeState);
-            Assert.True(checkBox.Focus());
+            Assert.Equal(fixture.Localization["TrackExclude"], group.SelectionActionText);
+            Assert.True(action.Focus());
             window.KeyPressQwerty(PhysicalKey.Space, RawInputModifiers.None);
             window.KeyReleaseQwerty(PhysicalKey.Space, RawInputModifiers.None);
             Dispatcher.UIThread.RunJobs();
             Assert.False(group.Keep);
-            Assert.False(checkBox.IsChecked);
+            Assert.Equal(fixture.Localization["TrackRestore"], group.SelectionActionText);
             Assert.All(group.Members, member => Assert.False(member.Keep));
             group.Members[0].Keep = true;
             Dispatcher.UIThread.RunJobs();
             Assert.Null(group.Keep);
-            Assert.Null(checkBox.IsChecked);
-            Assert.True(checkBox.Focus());
+            Assert.Equal(fixture.Localization["TrackExclude"], group.SelectionActionText);
+            Assert.True(action.Focus());
+            window.KeyPressQwerty(PhysicalKey.Space, RawInputModifiers.None);
+            window.KeyReleaseQwerty(PhysicalKey.Space, RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(group.Keep);
+            Assert.All(group.Members, member => Assert.False(member.Keep));
+            Assert.Equal(fixture.Localization["TrackRestore"], group.SelectionActionText);
             window.KeyPressQwerty(PhysicalKey.Space, RawInputModifiers.None);
             window.KeyReleaseQwerty(PhysicalKey.Space, RawInputModifiers.None);
             Dispatcher.UIThread.RunJobs();
             Assert.True(group.Keep);
-            Assert.True(checkBox.IsChecked);
             Assert.All(group.Members, member => Assert.True(member.Keep));
             Assert.All(fixture.Batch.Items, item => Assert.Null(item.ApprovedPlan));
             Assert.False(fixture.Batch.HasReview);
@@ -148,8 +152,6 @@ public sealed class AggregateWorkspaceTests
         Assert.Null(group.Keep);
         Assert.False(member.Keep);
         Assert.True(group.Members[1].Keep);
-        group.ToggleKeepCommand.Execute(null);
-        Assert.True(group.Keep);
         group.ToggleKeepCommand.Execute(null);
         Assert.False(group.Keep);
         await batch.ReviewCommand.ExecuteAsync(null);

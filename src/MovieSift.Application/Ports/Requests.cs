@@ -4,7 +4,8 @@ using MovieSift.Core.Planning;
 
 namespace MovieSift.Application.Ports;
 
-public sealed record InspectRequest(string SourcePath, CancellationToken CancellationToken = default);
+public sealed record InspectRequest(string SourcePath, CancellationToken CancellationToken = default,
+    IProgress<MovieSift.Application.Inspection.InspectionStage>? Progress = null);
 public sealed record SourceRequest(string Path, CancellationToken CancellationToken = default);
 public sealed record RemuxRequest(RemuxPlan Plan, string CandidatePath, IProgress<double>? Progress, CancellationToken CancellationToken = default);
 public sealed record VerifyRequest(RemuxPlan Plan, string CandidatePath, CancellationToken CancellationToken = default);

@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MovieSift.Application;
 using MovieSift.Application.Batches;
+using MovieSift.Application.Inspection;
 using MovieSift.Application.Jobs;
 using MovieSift.Core.Failures;
 using MovieSift.Core.Planning;
@@ -48,6 +49,7 @@ public sealed partial class BatchViewModel : ObservableObject
     public BatchViewModel(BatchViewModelServices services)
     {
         this.services = services;
+        InspectionActivity = new(services.Localization);
         Snapshot = services.Session.Snapshot;
         LanguageRules = new(new(services.Session, services.Coordinator, services.Localization, () => CanEdit, OnEditorChanged));
         Presets = new(new(services.Presets, LanguageRules, services.Session, services.Localization,
@@ -60,6 +62,7 @@ public sealed partial class BatchViewModel : ObservableObject
         AddFolderCommand = new AsyncRelayCommand(AddFolderAsync, () => CanEdit);
         ChooseOutputCommand = new AsyncRelayCommand(ChooseOutputAsync, () => CanEdit && IsCopyMode);
         UseSourceFoldersCommand = new RelayCommand(() => ApplyOutputFolder(string.Empty), () => CanEdit && IsCopyMode && HasCustomOutputFolder);
+        SetOutputModeCommand = new RelayCommand<OutputMode>(mode => SelectedOutputModeIndex = (int)mode, _ => CanEdit);
         InspectPendingCommand = new AsyncRelayCommand(InspectPendingAsync, () => CanEdit && Items.Any(item => item.Snapshot.State == BatchItemState.PendingInspection));
         InspectSelectedCommand = new AsyncRelayCommand(InspectSelectedAsync, () => CanInspectSelected);
         RemoveSelectedCommand = new RelayCommand(RemoveSelected, () => CanRemoveSelected);
@@ -75,6 +78,7 @@ public sealed partial class BatchViewModel : ObservableObject
         ConfirmNewBatchCommand = new RelayCommand(ConfirmNewBatch, () => HasNewBatchConfirmation && IsWorkspaceAvailable);
         KeepCurrentBatchCommand = new RelayCommand(KeepCurrentBatch, () => HasNewBatchConfirmation);
         services.Session.Changed += OnSessionChanged;
+        services.Coordinator.InspectionProgressChanged += OnInspectionProgress;
         services.Localization.PropertyChanged += (_, _) => Refresh();
         Synchronize();
     }
@@ -86,6 +90,7 @@ public sealed partial class BatchViewModel : ObservableObject
     public RulePresetsViewModel Presets { get; }
     public QueueRecoveryViewModel Recovery { get; }
     public AggregateTracksViewModel AggregateTracks { get; }
+    public InspectionActivityViewModel InspectionActivity { get; }
     public BatchSnapshot Snapshot { get; private set; }
     public string OutputFolder => outputFolder;
     private IEnumerable<BatchItemViewModel> PendingOutputItems => Items.Where(item =>
@@ -93,6 +98,7 @@ public sealed partial class BatchViewModel : ObservableObject
     private OutputMode EffectiveOutputMode => PendingOutputItems.FirstOrDefault()?.Snapshot.OutputMode ?? outputMode;
     public bool HasMixedOutputModes => PendingOutputItems.Select(item => item.Snapshot.OutputMode).Distinct().Skip(1).Any();
     public bool IsCopyMode => !HasMixedOutputModes && EffectiveOutputMode == OutputMode.Copy;
+    public bool IsReplaceMode => !HasMixedOutputModes && EffectiveOutputMode == OutputMode.ReplaceSource;
     public bool HasCustomOutputFolder => IsCopyMode && !string.IsNullOrEmpty(outputFolder);
     private bool UsesAdjacentCopies => !HasCustomOutputFolder && PendingOutputItems.All(item =>
         MovieSift.Core.Media.MediaContainerPolicy.FromExtension(item.SourcePath) is not null &&
@@ -184,6 +190,7 @@ public sealed partial class BatchViewModel : ObservableObject
     public IAsyncRelayCommand AddFolderCommand { get; }
     public IAsyncRelayCommand ChooseOutputCommand { get; }
     public IRelayCommand UseSourceFoldersCommand { get; }
+    public IRelayCommand<OutputMode> SetOutputModeCommand { get; }
     public IAsyncRelayCommand InspectPendingCommand { get; }
     public IAsyncRelayCommand InspectSelectedCommand { get; }
     public IRelayCommand RemoveSelectedCommand { get; }
@@ -557,6 +564,7 @@ public sealed partial class BatchViewModel : ObservableObject
         }
         finally
         {
+            InspectionActivity.End();
             activeCancellation.Dispose();
             activeCancellation = null;
             IsBusy = false;
@@ -596,10 +604,49 @@ public sealed partial class BatchViewModel : ObservableObject
         Dispatcher.UIThread.Post(Synchronize);
     }
 
+    /// <summary>Applies observed inspection stages only while the same desktop operation still owns the file.</summary>
+    private void OnInspectionProgress(BatchInspectionProgress progress)
+    {
+        var revision = operationRevision;
+
+        void ApplyCurrentStage()
+        {
+            var item = services.Session.Snapshot.Items.FirstOrDefault(item => item.Id == progress.ItemId);
+            var isCurrent = IsBusy && revision == operationRevision && item?.State == BatchItemState.Inspecting;
+
+            if (!isCurrent)
+            {
+                return;
+            }
+
+            InspectionActivity.Begin(progress.ItemId);
+            InspectionActivity.Report(progress);
+        }
+
+        if (Dispatcher.UIThread.CheckAccess())
+        {
+            ApplyCurrentStage();
+            return;
+        }
+
+        Dispatcher.UIThread.Post(ApplyCurrentStage);
+    }
+
     /// <summary>Updates stable editor instances by ID and always reads the latest session snapshot.</summary>
     private void Synchronize()
     {
         Snapshot = services.Session.Snapshot;
+        var inspectingItem = Snapshot.Items.FirstOrDefault(item => item.State == BatchItemState.Inspecting);
+
+        if (IsBusy && inspectingItem is not null)
+        {
+            InspectionActivity.Begin(inspectingItem.Id);
+        }
+        else
+        {
+            InspectionActivity.End();
+        }
+
         var liveIds = Snapshot.Items.Select(item => item.Id).ToHashSet();
 
         foreach (var removed in Items.Where(item => !liveIds.Contains(item.Id)).ToArray())
@@ -691,6 +738,7 @@ public sealed partial class BatchViewModel : ObservableObject
         ChooseOutputCommand?.NotifyCanExecuteChanged();
         UseSourceFoldersCommand?.NotifyCanExecuteChanged();
         InspectPendingCommand?.NotifyCanExecuteChanged();
+        SetOutputModeCommand?.NotifyCanExecuteChanged();
         InspectSelectedCommand?.NotifyCanExecuteChanged();
         RemoveSelectedCommand?.NotifyCanExecuteChanged();
         ReviewCommand?.NotifyCanExecuteChanged();

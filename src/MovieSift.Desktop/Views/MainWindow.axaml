@@ -5,21 +5,32 @@
         xmlns:views="using:MovieSift.Desktop.Views"
         x:Class="MovieSift.Desktop.Views.MainWindow"
         x:DataType="viewModels:MainViewModel"
-        Title="MovieSift" Width="1040" Height="800" MinWidth="640" MinHeight="480">
+        Title="MovieSift" Icon="avares://MovieSift/Assets/moviesift.ico" Width="1040" Height="800" MinWidth="640" MinHeight="480">
   <DockPanel Margin="16" LastChildFill="True">
-    <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,12">
-      <StackPanel Orientation="Horizontal" Spacing="12">
-        <Border CornerRadius="9" Background="{DynamicResource MovieSiftAccentBrush}" Width="38" Height="38">
-          <TextBlock Text="MS" Foreground="{DynamicResource MovieSiftOnAccentBrush}" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
-        </Border>
-        <StackPanel Spacing="2">
-          <TextBlock Text="MovieSift" FontSize="20" FontWeight="Bold" />
-          <TextBlock Text="{Binding Localization[AppSubtitle]}" Classes="muted" FontSize="12" />
+    <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto,Auto,Auto,Auto" Margin="0,0,0,12" Background="Transparent" PointerPressed="OnWindowCaptionPressed">
+      <Grid x:Name="WindowDragRegion" ColumnDefinitions="Auto,*" ColumnSpacing="12" MinWidth="0">
+        <Image Source="avares://MovieSift/Assets/moviesift.png" Width="38" Height="38" AutomationProperties.Name="MovieSift" />
+        <StackPanel Grid.Column="1" Spacing="2" MinWidth="0" ClipToBounds="True">
+          <TextBlock Text="MovieSift" FontSize="20" FontWeight="Bold" TextTrimming="CharacterEllipsis" />
+          <TextBlock Text="{Binding Localization[AppSubtitle]}" Classes="muted" FontSize="12" TextTrimming="CharacterEllipsis" />
         </StackPanel>
-      </StackPanel>
+      </Grid>
       <Button x:Name="AvailableUpdateButton" Grid.Column="1" Content="{Binding UpdateActionText}"
               Command="{Binding UpdateActionCommand}" IsVisible="{Binding ShowUpdateAction}" VerticalAlignment="Center" Margin="0,0,8,0" />
-      <Button x:Name="AppearanceButton" Grid.Column="2" Content="{Binding Localization[WorkspaceSettings]}" Command="{Binding ToggleAppearanceCommand}" VerticalAlignment="Center" />
+      <Button x:Name="LanguageButton" Grid.Column="2" Command="{Binding ToggleLanguageCommand}" VerticalAlignment="Center" Margin="0,0,8,0"
+              AutomationProperties.Name="{Binding Localization[LanguageTitle]}" ToolTip.Tip="{Binding Localization[LanguageTitle]}">
+        <Path Width="21" Height="21" Stretch="Uniform" Stroke="{DynamicResource MovieSiftTextBrush}" StrokeThickness="1.6"
+              Data="M3,5 H15 M9,2 V5 M12,5 C11,11 8,14 3,17 M5,9 C6,12 8,14 11,16 M13,21 L17.5,10 L22,21 M14.5,17 H20.5" />
+      </Button>
+      <Button x:Name="AppearanceButton" Grid.Column="3" Command="{Binding ToggleAppearanceCommand}" VerticalAlignment="Center"
+              AutomationProperties.Name="{Binding Localization[WorkspaceSettings]}">
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <Path Width="19" Height="19" Stretch="Uniform" Stroke="{DynamicResource MovieSiftTextBrush}" StrokeThickness="1.6"
+                Data="M12,3 A9,9 0 1 0 12,21 H13 A2,2 0 0 0 14.6,17.8 A1.6,1.6 0 0 1 15.9,15.2 H18 A4,4 0 0 0 22,11.2 C22,6.8 17,3 12,3 M8,10 A1,1 0 1 1 6,10 A1,1 0 1 1 8,10 M12,7 A1,1 0 1 1 10,7 A1,1 0 1 1 12,7 M17,8 A1,1 0 1 1 15,8 A1,1 0 1 1 17,8" />
+          <TextBlock Text="{Binding Localization[WorkspaceSettings]}" />
+        </StackPanel>
+      </Button>
+      <views:WindowChrome x:Name="Caption" Grid.Column="4" Margin="8,0,0,0" VerticalAlignment="Center" />
     </Grid>
     <Border DockPanel.Dock="Top" Padding="12" BorderBrush="{DynamicResource MovieSiftWarningBrush}" BorderThickness="1" CornerRadius="9"
             Margin="0,0,0,16" IsVisible="{Binding HasWarningCloseDecision}">
@@ -68,7 +79,7 @@
       <views:QueueRecoveryView DataContext="{Binding Batch.Recovery}" />
     </Border>
     <Grid>
-      <Border IsEnabled="{Binding !IsAppearanceOpen}" IsHitTestVisible="{Binding !IsAppearanceOpen}">
+      <Border IsEnabled="{Binding !IsPreferencesOpen}" IsHitTestVisible="{Binding !IsPreferencesOpen}">
         <views:BatchView x:Name="Workspace" DataContext="{Binding Batch}" />
       </Border>
       <Border x:Name="AppearancePanel" Classes="panel" appearance:SoftMotion.Enter="True" IsVisible="{Binding IsAppearanceOpen}" KeyboardNavigation.TabNavigation="Cycle" HorizontalAlignment="Right" Width="460" MaxWidth="600" Margin="0,0,0,6" BoxShadow="{StaticResource MovieSiftPanelShadow}">
@@ -82,11 +93,6 @@
           </Border>
           <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
             <StackPanel Spacing="14">
-              <TextBlock Text="{Binding Localization[Language]}" FontWeight="SemiBold" />
-              <WrapPanel>
-                <Button x:Name="EnglishButton" Content="English" Command="{Binding ChangeLanguageCommand}" CommandParameter="en" Margin="0,0,8,0" />
-                <Button x:Name="RussianButton" Content="Русский" Command="{Binding ChangeLanguageCommand}" CommandParameter="ru" />
-              </WrapPanel>
               <Border IsEnabled="{Binding CanEditPreferences}">
                 <views:AppearanceView DataContext="{Binding Appearance}" />
               </Border>
@@ -95,6 +101,18 @@
               </Border>
             </StackPanel>
           </ScrollViewer>
+        </DockPanel>
+      </Border>
+      <Border x:Name="LanguagePanel" Classes="panel" appearance:SoftMotion.Enter="True" IsVisible="{Binding IsLanguageOpen}"
+              KeyboardNavigation.TabNavigation="Cycle" HorizontalAlignment="Right" VerticalAlignment="Top" Width="380" MaxWidth="600" MaxHeight="{Binding #Workspace.Bounds.Height}"
+              Margin="0,0,0,6" BoxShadow="{StaticResource MovieSiftPanelShadow}">
+        <DockPanel>
+          <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
+            <TextBlock Text="{Binding Localization[LanguageTitle]}" Classes="heading" VerticalAlignment="Center" />
+            <Button x:Name="CloseLanguageButton" Grid.Column="1" Content="×" Command="{Binding ToggleLanguageCommand}"
+                    AutomationProperties.Name="{Binding Localization[LanguageClose]}" />
+          </Grid>
+          <views:LanguagesView DataContext="{Binding Languages}" />
         </DockPanel>
       </Border>
     </Grid>

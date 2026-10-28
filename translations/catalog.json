@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "packs": [
+    {
+      "locale": "ru",
+      "file": "ru.json",
+      "sha256": "56695228025d6e2c04de143762fe059348f70ca3a3b4d866419ee0321976f352",
+      "bytes": 59424
+    },
+    {
+      "locale": "de",
+      "file": "de.json",
+      "sha256": "d35da23c967edf9cf2369bca8c6167e770eb71e92cc5eccdb23a03e8b53b9e4d",
+      "bytes": 43398
+    },
+    {
+      "locale": "es",
+      "file": "es.json",
+      "sha256": "0436a6311f46799fe4a4a855e145e31e250ef5ff7e907db525b45c1cfae09c44",
+      "bytes": 37653
+    },
+    {
+      "locale": "fr",
+      "file": "fr.json",
+      "sha256": "0ce4672efd848ac34ce2682de06e5396ea3eeb84f2e8454dffd44dcd5d981726",
+      "bytes": 39385
+    },
+    {
+      "locale": "pt-BR",
+      "file": "pt-BR.json",
+      "sha256": "215ec9589e2e0bfebe12cb50ac8b3cb4861cd1ed4d5b58449be3ad663b29df6c",
+      "bytes": 37624
+    },
+    {
+      "locale": "uk",
+      "file": "uk.json",
+      "sha256": "00d9faabb53fc4440e17f8d0df705c17e42bb562f4f86cb4f615c117165f3c5d",
+      "bytes": 55341
+    },
+    {
+      "locale": "pl",
+      "file": "pl.json",
+      "sha256": "0b3dabcaf4d4b026ebb2297dadd11fd9244548af2ec7abc5f820ccb307f50d78",
+      "bytes": 42449
+    },
+    {
+      "locale": "tr",
+      "file": "tr.json",
+      "sha256": "43a6eae9957d5e3296b59c5aa423a9998783f325b7e0a19fb60fed7138724506",
+      "bytes": 41740
+    },
+    {
+      "locale": "ja",
+      "file": "ja.json",
+      "sha256": "dcfaa106158ffc2bb80282824cbdef6383bde8604fcda60487c3edba9ca71dfe",
+      "bytes": 46122
+    },
+    {
+      "locale": "ko",
+      "file": "ko.json",
+      "sha256": "e8c9f2d2e657edd4e96bccc85295d60fcca1eb2fa04c312f433199b55509201e",
+      "bytes": 45552
+    },
+    {
+      "locale": "zh-Hans",
+      "file": "zh-Hans.json",
+      "sha256": "63e5f1b7485c9c176279220606a95ade70872c1b74e0ce0025251a2c01312ff1",
+      "bytes": 35244
+    }
+  ]
+}

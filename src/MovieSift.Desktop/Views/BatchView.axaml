@@ -3,6 +3,7 @@
              xmlns:appearance="using:MovieSift.Desktop.Appearance"
              xmlns:viewModels="using:MovieSift.Desktop.ViewModels"
              xmlns:views="using:MovieSift.Desktop.Views"
+             xmlns:planning="using:MovieSift.Core.Planning"
              x:Class="MovieSift.Desktop.Views.BatchView"
              x:DataType="viewModels:BatchViewModel">
   <Grid>
@@ -11,18 +12,13 @@
     <StackPanel x:Name="BatchRunControls" DockPanel.Dock="Bottom" Spacing="6" Margin="0,10,0,0">
       <Border Classes="panel" Padding="12">
         <StackPanel Spacing="8">
-          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
-            <ComboBox x:Name="OutputModeSelector" SelectedIndex="{Binding SelectedOutputModeIndex, Mode=TwoWay}" IsEnabled="{Binding CanEdit}" HorizontalAlignment="Stretch" AutomationProperties.Name="{Binding Localization[OutputModeLabel]}" AutomationProperties.HelpText="{Binding OutputSafetyText}" ToolTip.Tip="{Binding OutputSafetyText}">
-              <ComboBoxItem><TextBlock Text="{Binding Localization[OutputCopyMode]}" /></ComboBoxItem>
-              <ComboBoxItem><TextBlock Text="{Binding Localization[OutputReplaceMode]}" /></ComboBoxItem>
-            </ComboBox>
-            <Button Grid.Column="1" x:Name="BatchOutputFolderButton" Command="{Binding ChooseOutputCommand}" IsVisible="{Binding IsCopyMode}" ToolTip.Tip="{Binding OutputFolder}" AutomationProperties.Name="{Binding Localization[ChooseOutput]}">
-              <StackPanel MaxWidth="220" Spacing="2">
-                <TextBlock Text="{Binding Localization[ChooseOutput]}" />
-                <TextBlock Text="{Binding OutputFolder}" Classes="muted" TextTrimming="CharacterEllipsis" IsVisible="{Binding HasCustomOutputFolder}" />
-              </StackPanel>
-            </Button>
-          </Grid>
+          <Button x:Name="BatchOutputFolderButton" Command="{Binding ChooseOutputCommand}" IsVisible="{Binding IsCopyMode}"
+                  HorizontalAlignment="Left" HorizontalContentAlignment="Left" ToolTip.Tip="{Binding OutputFolder}" AutomationProperties.Name="{Binding Localization[ChooseOutput]}">
+            <StackPanel Spacing="2" MaxWidth="500">
+              <TextBlock Text="{Binding Localization[ChooseOutput]}" />
+              <TextBlock Text="{Binding OutputFolder}" Classes="muted" TextTrimming="CharacterEllipsis" IsVisible="{Binding HasCustomOutputFolder}" />
+            </StackPanel>
+          </Button>
           <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
             <StackPanel Spacing="3" VerticalAlignment="Center">
               <TextBlock x:Name="BatchStatusText" Text="{Binding StatusText}" TextWrapping="Wrap" FontWeight="SemiBold" />
@@ -33,6 +29,13 @@
           <StackPanel IsVisible="{Binding IsBusy}" Spacing="5">
             <TextBlock Text="{Binding CurrentItemText}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding CurrentItemText}" />
             <TextBlock Text="{Binding StageText}" />
+            <StackPanel x:Name="InspectionActivityNotice" IsVisible="{Binding InspectionActivity.IsActive}" Spacing="4">
+              <TextBlock Text="{Binding InspectionActivity.StageText}" TextWrapping="Wrap" />
+              <TextBlock Text="{Binding InspectionActivity.ElapsedText}" />
+              <TextBlock Text="{Binding InspectionActivity.RemainingText}" Classes="muted" TextWrapping="Wrap" />
+              <TextBlock Text="{Binding InspectionActivity.SlowNoticeText}" IsVisible="{Binding InspectionActivity.HasSlowNotice}"
+                         Foreground="{DynamicResource MovieSiftWarningBrush}" TextWrapping="Wrap" />
+            </StackPanel>
             <ProgressBar Minimum="0" Maximum="100" Value="{Binding ProgressValue}" IsIndeterminate="{Binding IsProgressIndeterminate}" />
           </StackPanel>
           <TextBlock Text="{Binding PauseText}" IsVisible="{Binding HasPauseNotice}" TextWrapping="Wrap" />
@@ -52,6 +55,7 @@
         </StackPanel>
       </Border>
     </StackPanel>
+
     <Grid RowDefinitions="Auto,*">
       <WrapPanel Margin="0,0,0,10">
         <Button x:Name="AddBatchFilesButton" Content="{Binding Localization[BatchAddFiles]}" Command="{Binding AddFilesCommand}" Margin="0,0,8,6" />
@@ -108,9 +112,45 @@
             </Border>
           </Expander>
           <ScrollViewer Grid.Column="1" x:Name="WorkspaceScrollViewer" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-            <StackPanel Spacing="10">
-              <views:AggregateTracksView DataContext="{Binding AggregateTracks}" />
-              <Expander x:Name="SelectedFileDetails" Header="{Binding Localization[BatchSelectedFile]}" IsExpanded="{Binding IsDetailsOpen, Mode=TwoWay}">
+            <StackPanel Spacing="10" Margin="0,0,18,0">
+              <Border x:Name="OutputChoicePanel" Classes="panel" Padding="12">
+                <StackPanel Spacing="8">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <TextBlock Text="{Binding Localization[OutputChoiceHeading]}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    <views:HelpHintView Text="{Binding Localization[OutputReplaceSpaceHelp]}" Label="{Binding Localization[Details]}" />
+                  </StackPanel>
+                  <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                    <RadioButton x:Name="CopyOutputChoice" Classes="accentChoice" GroupName="OutputModeChoices"
+                                 IsChecked="{Binding IsCopyMode, Mode=OneWay}" Command="{Binding SetOutputModeCommand}"
+                                 CommandParameter="{x:Static planning:OutputMode.Copy}" IsEnabled="{Binding CanEdit}"
+                                 HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" AutomationProperties.Name="{Binding Localization[OutputCopyMode]}">
+                      <StackPanel Spacing="3">
+                        <TextBlock Text="{Binding Localization[OutputCopyMode]}" TextWrapping="Wrap" FontWeight="SemiBold" />
+                        <TextBlock Text="{Binding Localization[WorkspaceOriginalShort]}" Classes="muted" TextWrapping="Wrap" />
+                      </StackPanel>
+                    </RadioButton>
+                    <RadioButton x:Name="ReplaceOutputChoice" Grid.Column="1" Classes="accentChoice" GroupName="OutputModeChoices"
+                                 IsChecked="{Binding IsReplaceMode, Mode=OneWay}" Command="{Binding SetOutputModeCommand}"
+                                 CommandParameter="{x:Static planning:OutputMode.ReplaceSource}" IsEnabled="{Binding CanEdit}"
+                                 HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" AutomationProperties.Name="{Binding Localization[OutputReplaceMode]}">
+                      <StackPanel Spacing="3">
+                        <TextBlock Text="{Binding Localization[OutputReplaceMode]}" TextWrapping="Wrap" FontWeight="SemiBold" />
+                        <TextBlock Text="{Binding Localization[OutputReplaceHelp]}" Classes="muted" TextWrapping="Wrap" />
+                      </StackPanel>
+                    </RadioButton>
+                  </Grid>
+
+                </StackPanel>
+              </Border>
+              <ContentControl x:Name="SingleFileEditor" Content="{Binding SingleFileItem}" IsVisible="{Binding IsSingleFile}" HorizontalContentAlignment="Stretch">
+                <ContentControl.ContentTemplate>
+                  <DataTemplate x:DataType="viewModels:BatchItemViewModel"><views:SingleFileTracksView /></DataTemplate>
+                </ContentControl.ContentTemplate>
+              </ContentControl>
+              <Border IsVisible="{Binding !IsSingleFile}">
+                <views:AggregateTracksView x:Name="AggregateEditor" DataContext="{Binding AggregateTracks}" />
+              </Border>
+              <Expander x:Name="SelectedFileDetails" Header="{Binding SelectedDetailsHeading}" IsExpanded="{Binding IsDetailsOpen, Mode=TwoWay}">
                 <StackPanel Spacing="8">
                   <WrapPanel>
                     <Button Content="{Binding Localization[BatchInspectSelected]}" Command="{Binding InspectSelectedCommand}" Margin="0,0,8,4" />
@@ -118,7 +158,9 @@
                   </WrapPanel>
                   <ContentControl Content="{Binding SelectedItem}" HorizontalContentAlignment="Stretch">
                     <ContentControl.ContentTemplate>
-                      <DataTemplate x:DataType="viewModels:BatchItemViewModel"><views:BatchFileDetailsView /></DataTemplate>
+                      <DataTemplate x:DataType="viewModels:BatchItemViewModel">
+                        <views:BatchFileDetailsView ShowTrackSelection="{Binding !$parent[views:BatchView].((viewModels:BatchViewModel)DataContext).IsSingleFile}" />
+                      </DataTemplate>
                     </ContentControl.ContentTemplate>
                   </ContentControl>
                 </StackPanel>

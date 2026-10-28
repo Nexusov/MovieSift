@@ -204,7 +204,7 @@ public sealed class BatchItemViewModel : ObservableObject
 
             foreach (var track in inspection.Tracks)
             {
-                Tracks.Add(new(new(track, Localization, OnTrackSelectionChanged)));
+                Tracks.Add(new(new(track, Localization, OnTrackSelectionChanged, () => CanEditPlan && Included)));
             }
         }
 

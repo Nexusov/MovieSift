@@ -64,6 +64,17 @@ try {
         throw 'Self-contained publish failed.'
     }
 
+    # Original translations live in the repository; the portable UI ships English only.
+    # Remove only our own generated Russian satellite, never dependency resources.
+    $russianSatellite = Join-Path $packageRoot 'ru/MovieSift.resources.dll'
+    if (Test-Path -LiteralPath $russianSatellite -PathType Leaf) {
+        Remove-Item -LiteralPath $russianSatellite
+        $russianDirectory = Split-Path -Parent $russianSatellite
+        if (-not (Get-ChildItem -LiteralPath $russianDirectory -Force | Select-Object -First 1)) {
+            Remove-Item -LiteralPath $russianDirectory
+        }
+    }
+
     # Both apphosts share the same pinned runtime in the archive. At update time the
     # helper/runtime is copied to private sibling storage before either tree moves.
     & $Dotnet restore $updaterProject --locked-mode

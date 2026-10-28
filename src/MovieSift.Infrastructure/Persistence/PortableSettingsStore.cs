@@ -1,5 +1,6 @@
 using System.Text.Json;
 using MovieSift.Application;
+using MovieSift.Application.Localization;
 using MovieSift.Application.Ports;
 using MovieSift.Core.Failures;
 
@@ -25,7 +26,8 @@ public sealed class PortableSettingsStore(string dataDirectory) : ISettingsStore
         try
         {
             var settings = await BoundedJson.ReadAsync<LanguageSettings>(path);
-            return settings is { Version: SettingsVersion, Language: "ru" } ? "ru" : "en";
+            return settings is { Version: SettingsVersion } && TranslationCatalog.IsSupported(settings.Language)
+                ? settings.Language : "en";
         }
         catch (Exception exception) when (exception is JsonException or OperationFailureException)
         {
@@ -41,7 +43,7 @@ public sealed class PortableSettingsStore(string dataDirectory) : ISettingsStore
     public async Task SaveLanguageAsync(SaveLanguageRequest request)
     {
         request.CancellationToken.ThrowIfCancellationRequested();
-        var language = request.Language == "ru" ? "ru" : "en";
+        var language = TranslationCatalog.IsSupported(request.Language) ? request.Language : "en";
 
         try
         {

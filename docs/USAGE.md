@@ -2,17 +2,21 @@
 
 See the [README](../README.md) for downloads and startup.
 
-**Version note:** this guide describes the current source. Published **1.0.0** creates copies in a selected output folder; it has neither source replacement nor an updater. Download and extract the first release containing those features manually.
+**Version note:** this guide describes **1.1.0**. Version **1.0.0** creates copies in a selected output folder; it has neither source replacement nor an updater. Install **1.1.0** manually in a separate directory as described below.
 
 ## Choose what to keep
 
-Add local files or a folder. **Audio** and **Subtitles** show tracks from every included file, including tracks found in only one episode. Checked tracks are kept; unchecked tracks are removed from the result. All tracks start selected, and video is always kept.
+Add local files or a folder. **Audio** and **Subtitles** show tracks from every included file, including tracks found in only one episode. All tracks initially stay in the result. Use **Exclude** (×) for an unwanted track. Its card stays in the same position, becomes muted, and offers **Restore**. Video is always kept and has no exclusion action.
 
-Use a group checkbox to change its tracks together, or expand it for per-file exceptions. Grouping uses metadata, not spoken content. Excluding a file removes it from these actions without deleting it.
+With one file, its actual tracks are shown directly; **Details** contains file information and destination editing without a second track list. With multiple files, exclude a group to change its editable tracks together, or expand it for per-file exceptions. A mixed group excludes its remaining editable tracks; Restore includes its editable tracks again. Completed results are unaffected. Grouping uses metadata, not spoken content. Excluding a file removes it from these actions without deleting it.
 
-**Remove all subtitles** clears subtitle selections for included, editable files. You can select them again before Review. Audio, video, attachments and completed results are unaffected.
+**Exclude all subtitles** clears subtitle selections for included, editable files. Their muted cards remain available for Restore before Review. Audio, video, attachments and completed results are unaffected.
+
+During inspection, the workspace shows the current backend stage and elapsed time for the active file. Remaining time is explicitly unavailable because the tools do not report a reliable fraction of inspection completed. A slow-check notice appears after 30 seconds; it is not a timeout prediction. Cancel remains available.
 
 ## Choose the result
+
+Choose either visible output card above **Review changes**. The folder chooser appears for Copy; Replace explains the temporary space needed. Changing mode invalidates affected plans and requires fresh Review.
 
 | Output mode | Result |
 | --- | --- |
@@ -25,9 +29,11 @@ Replacement still needs space for a complete temporary result. Read-only files, 
 
 ## Review and run
 
-Select **Review changes** and check each file's tracks and destination. Removing the last audio track requires separate confirmation for that file. Unresolved inspection errors in included files prevent Review.
+Select **Review changes** and check each file's destination and removed tracks. Retained video/audio/subtitle counts stay visible; expand retained details for the file-local IDs and metadata. Removing the last audio track requires separate confirmation for that file. Unresolved inspection errors in included files prevent Review.
 
 Review does not process files. Use the separate action to create copies or replace the stated number of originals. Selection, destination or output-mode changes require another Review; language and theme changes do not.
+
+Question-mark help sits beside its subject and opens on hover or keyboard focus. Escape dismisses the open help without changing choices or plans.
 
 ## Folders and rules
 
@@ -57,13 +63,19 @@ Interrupted-operation records are separate. Keep the old application directory a
 
 ## Appearance and language
 
-Open **Appearance & language** for English/Russian, themes, custom colors and reduced motion. Escape closes the panel. A preference that cannot be saved may still apply for the current session; MovieSift reports the problem without interrupting media work.
+Use the translation-icon button for **Interface language** and **Appearance** for themes, custom colors and reduced motion. Escape closes the current cosmetic panel and returns focus to its button. Neither action changes track selections, plans or media metadata. A preference that cannot be saved may still apply for the current session; MovieSift reports the problem without interrupting media work.
+
+Portable packages include English only. The language chooser offers English, Russian, German, Spanish, French, Brazilian Portuguese, Ukrainian, Polish, Turkish, Japanese, Korean and Simplified Chinese. Selecting another language explicitly downloads its complete translation from the MovieSift GitHub repository, with progress and cancellation. The current language stays active until validation completes. Network, compatibility and cache errors remain visible; **Retry** downloads a replacement without deleting the previous cache first.
+
+Downloaded packs are stored in `data/translations` and work offline after restart. Startup never downloads a translation automatically. If a saved language is unavailable or invalid, the application stays usable in English and explains how to download it. Preset names, source paths, track titles and backend diagnostics remain original. Translation packs are data, not executable extensions. New source-tree functionality requires a corresponding newly built application; the already published 1.0.0 archives are unchanged.
+
+On Windows, the application uses an integrated caption with minimize, maximize/restore and close buttons. Drag the header or double-click it to maximize/restore. Resizing remains available. Close retains the existing warning decisions and safe asynchronous shutdown. Linux retains the desktop's native decorations. Both platforms use the film/scissors application icon; no minimize-to-tray behavior is introduced.
 
 ## Upgrading a portable copy
 
 ### Install updates
 
-MovieSift checks GitHub for newer stable releases after startup. **Close** dismisses the notification; **Update available** remains in the header and **Appearance & language → Updates**. That panel also offers manual checks and an option to disable startup checks. Network errors do not block media use.
+MovieSift checks GitHub for newer stable releases after startup. **Close** dismisses the notification; **Update available** remains in the header and **Appearance → Updates**. That panel also offers manual checks and an option to disable startup checks. Network errors do not block media use.
 
 Only **Install and restart** downloads and installs. Finish processing, resolve recovery notices and allow settings saves to complete first. Settings and the unfinished list are retained; track choices and Review must be recreated after restart.
 

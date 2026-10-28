@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using System.Globalization;
 using MovieSift.Application;
+using MovieSift.Application.Inspection;
 using MovieSift.Application.Ports;
 using MovieSift.Core.Failures;
 using MovieSift.Core.Media;
@@ -23,8 +24,10 @@ public sealed class FfmpegBackend(FfmpegBackendOptions options) : IMediaBackend
     /// <summary>Checks actual MP4 boxes and the pinned probe rather than trusting an extension or MOV-family format label.</summary>
     public async Task<MediaInspection> InspectAsync(InspectRequest request)
     {
+        request.Progress?.Report(InspectionStage.CheckingTools);
         await ValidateToolsAsync(request.CancellationToken).ConfigureAwait(false);
         var revision = await options.SourceAccess.ReadRevisionAsync(new(request.SourcePath, request.CancellationToken)).ConfigureAwait(false);
+        request.Progress?.Report(InspectionStage.ReadingContainer);
         return await IdentifyAsync(revision, request.CancellationToken).ConfigureAwait(false);
     }
 

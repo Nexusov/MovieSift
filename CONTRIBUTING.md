@@ -26,6 +26,8 @@ Use `dotnet format --no-restore` when needed, inspect its diff, then repeat the 
 
 These commands do not provision media tools. Optional local C# media tests skip when tools/fixtures are absent; those skips are not media coverage. The [verification workflow](.github/workflows/verify.yml) sets `MOVIESIFT_REQUIRE_MEDIA_TOOLS=1` and fails when mandatory provisioning is missing.
 
+For interface-resource changes, update all 11 downloadable packs and run `python translations/validate-packs.py --write-catalog`, `python translations/validate-packs.py` and `python -m unittest discover -s translations -p "test_*.py"`. CI requires complete keys, exact format placeholders and the current byte/hash catalog. See [translation maintenance](translations/README.md); complete coverage does not replace native-speaker review.
+
 ## Media tool acquisition
 
 Acquisition requires network access and disk space. Its destination must be absent or empty; existing tools are not overwritten. Downloads and complete build receipts are verified against these inputs:

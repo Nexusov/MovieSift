@@ -12,6 +12,7 @@ using MovieSift.Desktop.Updates;
 using MovieSift.Desktop.ViewModels;
 using MovieSift.Desktop.Views;
 using MovieSift.Infrastructure.Files;
+using MovieSift.Infrastructure.Localization;
 using MovieSift.Infrastructure.MediaTools;
 using MovieSift.Infrastructure.Persistence;
 using MovieSift.Infrastructure.Updates;
@@ -68,7 +69,8 @@ internal static class AppBootstrap
         Environment.SetEnvironmentVariable("MOVIESIFT_UPDATE_FAILED", null);
         var updates = new UpdatesViewModel(new GitHubUpdateService(http, AppContext.BaseDirectory, currentVersion,
             runtime, canInstallUpdates), new PortableUpdatePreferencesStore(dataDirectory), localization, currentVersion, logger, previousInstallFailed);
-        window.DataContext = new MainViewModel(new(settings, outputs, localization, dataWritable, logger, batchViewModel, appearance, updates));
+        var translations = new GitHubTranslationPackStore(http, dataDirectory, LocalizationService.EnglishMessages);
+        window.DataContext = new MainViewModel(new(settings, outputs, localization, dataWritable, logger, batchViewModel, appearance, updates, translations));
         window.StartupCompleted += PortableUpdateInstaller.AcknowledgeStartup;
         window.Closed += (_, _) =>
         {

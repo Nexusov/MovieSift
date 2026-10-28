@@ -5,10 +5,14 @@
     <RootNamespace>MovieSift.Desktop</RootNamespace>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets/moviesift.ico</ApplicationIcon>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
     <RuntimeFrameworkVersion>10.0.13</RuntimeFrameworkVersion>
   </PropertyGroup>
+  <ItemGroup>
+    <AvaloniaResource Include="Assets/**" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Avalonia" />
     <PackageReference Include="Avalonia.Desktop" />

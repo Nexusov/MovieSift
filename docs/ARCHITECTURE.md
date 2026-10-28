@@ -20,15 +20,21 @@ One `BatchSession` serves one file or many. Its immutable snapshots hold each it
 
 Track IDs belong to a particular file and backend. They are distinct from Matroska UIDs, output indexes and UI rows. Audio and subtitle tracks initially have Keep selected; every video track is retained. Removing all subtitles is valid. Removing the last existing audio track requires consent for that file and selection revision.
 
+A sole queue entry uses the shared file-local track editor directly. Multiple entries use the aggregate editor, even when only one is included; both presentations retain the same item editors and session authority.
+
 The common list is the **union** of included inspections. `TrackGroupingPolicy` groups exact canonical language, title, codec/channels, forced status and semantic roles; unknown/conflicting metadata stays separate. Duplicates and per-file exceptions remain visible. Default/enabled flags are displayed separately.
+
+Exclude/Restore buttons are a presentation of the existing Keep choices, not a second selection model. Excluded cards remain in their source/group order with semantic muted colors; their restore controls remain readable. Video is locked. Mixed-group exclusion targets editable members only.
 
 The projection references authoritative session choices. Group, member and remove-all-subtitles edits validate the whole request before applying it atomically. Actual edits invalidate affected plans and Review; no-op edits preserve them. Completed results stay locked.
 
-**Review** creates independent immutable plans and validates every included unfinished item. Unresolved included files block Run. A plan captures source/backend identity, retained tracks, destination, output mode and relevant consent. Source, selection or output changes require another Review; language and appearance changes do not. Review neither runs workers nor creates output directories. The separate Run action consumes a current review once.
+**Review** creates independent immutable plans and validates every included unfinished item. Unresolved included files block Run. A plan captures source/backend identity, retained tracks, destination, output mode and relevant consent. Source, selection or output changes require another Review; language and appearance changes do not. Review neither runs workers nor creates output directories. Its compact projection lists actual removed identities and retained category counts with expandable details. The separate Run action remains outside the scrolling rows and consumes a current review once. Visible Copy/Replace cards delegate to the existing output-mode edit path, including approval invalidation and replacement confirmation.
 
 NoChange still validates the source and selection, but skips remuxing and destination-only checks. It neither creates a copy nor replaces the original. Other jobs must still avoid its source path, just as they must avoid excluded sources.
 
 Warnings, errors, cancellation or unresolved cleanup pause sequential dispatch. Warning decisions stay attached to the actual item/job even if another row is selected. Continuing requires explicit review/start. A new queue cannot discard unresolved ownership; a nonempty reset requires confirmation and creates a fresh session revision.
+
+Inspection publishes typed backend-stage observations through `InspectionService` and `BatchCoordinator`. Revision, cancellation and item checks reject stale observations. A Desktop-only monotonic timer displays elapsed time; it does not infer progress or remaining time from worker timeouts and does not change process ownership.
 
 ## Discovery and destinations
 
@@ -109,6 +115,7 @@ Application-controlled state and bounded logs live in `data` beside the executab
 | Record | Content |
 | --- | --- |
 | `settings.json` | UI language |
+| `translations/<locale>.json` | Validated downloaded UI text; no media or workflow authority |
 | `appearance.json` | Independent appearance preferences |
 | `rule-presets.json` | Named rule configurations |
 | `queue-list.json` | Unfinished listing intent |
@@ -118,6 +125,16 @@ Application-controlled state and bounded logs live in `data` beside the executab
 Missing settings use defaults. Malformed records remain visible rather than being silently repaired. JSON readers validate regular-file handles before reading or checking length, then enforce size/schema/depth limits. Catalog and queue writes use permanent interprocess locks and flushed, uniquely owned sibling temporary files for replacement. Cleanup never adopts a later occupant of a temporary path.
 
 Unavailable ownership storage disables media writes. An isolated language or appearance save failure instead reports a session-only preference; it does not invent a media-ownership failure.
+
+### Interface translations and window presentation
+
+The language chooser and appearance panel are separate, mutually exclusive cosmetic views. `LanguageSettingsViewModel` owns explicit download/cancel/retry intent; `LocalizationService` publishes a complete immutable dictionary only after validation and preserves full locale identifiers. Existing shell preference writes and shutdown remain authoritative. A translation request counts as an active shell operation so close cancels and drains it before disposing HTTP resources. It owns no media worker, approval or queue revision.
+
+`ITranslationPackStore` is a narrow Application port. `GitHubTranslationPackStore` resolves the small official `git/ref/heads/main` response, then reads catalog and pack from that one immutable commit. Fixed locale filenames, exact SHA256/length, complete English key coverage and composite-format placeholders are checked before caching. Responses are bounded (8 KiB reference, 64 KiB catalog, 256 KiB pack), depth-limited and subject to a 30-second deadline. Redirects and unsupported locales are rejected. Cache access uses regular-file/reparse checks, interprocess exclusion and owned temporary replacement. Invalid files remain untouched until an explicitly requested, fully validated replacement succeeds. Startup reads only local cache and falls back to English with a visible notice.
+
+English is built in; `package.ps1` removes only the original application's Russian satellite from portable output. All 11 downloadable source packs and their exact-byte catalog live under [translations](../translations/README.md); translated binaries or executable resources are never downloaded. A complete key set is a compatibility check, not a native-speaker quality certification or independently signed authenticity proof. A new incompatible English resource contract requires corresponding repository packs; old cached incompatible data is rejected visibly.
+
+The Desktop project embeds the original film/scissors SVG, PNG and multi-resolution Windows ICO. Windows uses an integrated client caption over a resizable border; Linux keeps native decorations. Caption Close calls the existing `Window.Close()` lifecycle, and localization/appearance affect presentation only. Headless caption/layout tests are not native Windows resizing, snap or scaling acceptance.
 
 Ownership schema 3 binds output mode and replacement source/candidate revisions; legacy schemas 1/2 allow only Copy and their original layouts. Restart validates the record, paths, marker, stage and process identity. Corrupt records authorize no action; a saved PID cannot authorize termination, nor a matching filename prove publication.
 

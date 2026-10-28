@@ -1,5 +1,6 @@
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using MovieSift.Application.Batches;
 using MovieSift.Core.Media;
 
@@ -18,6 +19,7 @@ public sealed class AggregateTrackMemberViewModel : ObservableObject
         this.member = member;
         this.projection = projection;
         this.options = options;
+        ToggleSelectionCommand = new RelayCommand(ToggleSelection, () => CanEdit);
     }
 
     public BatchTrackMember Snapshot => member;
@@ -32,7 +34,13 @@ public sealed class AggregateTrackMemberViewModel : ObservableObject
         [Localization[member.Track.Kind.ToString()], IdentifierText, SourcePath,
             string.Join(", ", new[] { LanguageText, TitleText, FlagsText }.Where(value => !string.IsNullOrWhiteSpace(value)))]));
     public bool CanEdit => options.CanEdit() && member.IsEditable;
-    public string StateText => Localization[member.State is BatchItemState.Completed or BatchItemState.NoChange ? "AggregateHistorical" : member.Track.Kind == TrackKind.Video ? "AlwaysKept" : "AggregateEditable"];
+    public bool IsExcluded => !Keep;
+    public string SelectionActionText => Localization[IsExcluded ? "TrackRestore" : "TrackExclude"];
+    public string SelectionActionAccessibleName => $"{SelectionActionText}: {Localization[member.Track.Kind.ToString()]} {IdentifierText}, {SourcePath}, {TitleText}";
+    public IRelayCommand ToggleSelectionCommand { get; }
+    public string StateText => Localization[IsExcluded ? "TrackExcluded"
+        : member.State is BatchItemState.Completed or BatchItemState.NoChange ? "AggregateHistorical"
+        : IsRequired ? "AlwaysKept" : "AggregateEditable"];
 
     public bool Keep
     {
@@ -51,6 +59,17 @@ public sealed class AggregateTrackMemberViewModel : ObservableObject
         }
     }
 
+    /// <summary>Rechecks current member availability before forwarding an explicit reversible selection edit.</summary>
+    private void ToggleSelection()
+    {
+        if (!CanEdit)
+        {
+            return;
+        }
+
+        Keep = !Keep;
+    }
+
     /// <summary>Matches presentation identity only; metadata grouping is owned by Core/Application.</summary>
     internal bool Represents(BatchTrackMember candidate) => member.ItemId == candidate.ItemId &&
         member.Track.Id == candidate.Track.Id && ReferenceEquals(member.Inspection, candidate.Inspection);
@@ -61,5 +80,6 @@ public sealed class AggregateTrackMemberViewModel : ObservableObject
         member = updated;
         projection = currentProjection;
         OnPropertyChanged(string.Empty);
+        ToggleSelectionCommand.NotifyCanExecuteChanged();
     }
 }

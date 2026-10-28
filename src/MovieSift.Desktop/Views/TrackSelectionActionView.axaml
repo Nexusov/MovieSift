@@ -1,0 +1,17 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:views="using:MovieSift.Desktop.Views"
+             x:Class="MovieSift.Desktop.Views.TrackSelectionActionView" x:Name="ActionRoot"
+             x:DataType="views:TrackSelectionActionView">
+  <Button x:Name="TrackSelectionActionButton" Command="{Binding #ActionRoot.Command}" MinWidth="96"
+          AutomationProperties.Name="{Binding #ActionRoot.AccessibleName}" AutomationProperties.HelpText="{Binding #ActionRoot.Help}"
+          ToolTip.Tip="{Binding #ActionRoot.Help}">
+    <StackPanel Orientation="Horizontal" Spacing="6">
+      <PathIcon Width="10" Height="10" IsVisible="{Binding !#ActionRoot.IsRestore}"
+                Data="M1,0 L5,4 L9,0 L10,1 L6,5 L10,9 L9,10 L5,6 L1,10 L0,9 L4,5 L0,1 Z" />
+      <PathIcon Width="12" Height="14" IsVisible="{Binding #ActionRoot.IsRestore}"
+                Data="M4,1 L0,5 L4,9 L4,6 L7,6 C9,6 10,7 10,9 C10,11 9,12 7,12 L6,12 L6,14 L7,14 C10,14 12,12 12,9 C12,6 10,4 7,4 L4,4 Z" />
+      <TextBlock Text="{Binding #ActionRoot.Text}" />
+    </StackPanel>
+  </Button>
+</UserControl>
