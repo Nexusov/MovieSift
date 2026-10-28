@@ -1,0 +1,44 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:localization="using:MovieSift.Desktop.Localization"
+             x:Class="MovieSift.Desktop.Views.LanguagesView" x:DataType="localization:LanguageSettingsViewModel">
+  <DockPanel LastChildFill="True">
+    <!-- Keep download feedback and cancellation visible while only the locale list scrolls. -->
+    <StackPanel DockPanel.Dock="Top" Spacing="12" Margin="0,0,0,12">
+      <TextBlock Text="{Binding Localization[LanguageHelp]}" Classes="muted" TextWrapping="Wrap"/>
+      <TextBox x:Name="LanguageSearch" Text="{Binding SearchText, Mode=TwoWay}" PlaceholderText="{Binding Localization[LanguageSearch]}" AutomationProperties.Name="{Binding Localization[LanguageSearch]}"/>
+    </StackPanel>
+    <StackPanel DockPanel.Dock="Bottom" Spacing="12" Margin="0,12,0,0">
+      <StackPanel Spacing="8" IsVisible="{Binding IsBusy}">
+        <TextBlock Text="{Binding DownloadText}" TextWrapping="Wrap"/>
+        <ProgressBar Minimum="0" Maximum="100" Value="{Binding ProgressValue}" IsIndeterminate="{Binding IsIndeterminate}"/>
+        <Button x:Name="CancelLanguageDownload" Content="{Binding Localization[LanguageCancel]}" Command="{Binding CancelCommand}"/>
+      </StackPanel>
+      <StackPanel Spacing="8" IsVisible="{Binding HasError}">
+        <TextBlock Text="{Binding ErrorText}" TextWrapping="Wrap" Foreground="{DynamicResource MovieSiftWarningBrush}"/>
+        <Button Content="{Binding Localization[LanguageRetry]}" Command="{Binding RetryCommand}"/>
+      </StackPanel>
+      <TextBlock Text="{Binding Localization[LanguageStorage]}" Classes="muted" FontSize="12" TextWrapping="Wrap"/>
+    </StackPanel>
+    <Grid>
+      <TextBlock Text="{Binding Localization[LanguageNoMatches]}" IsVisible="{Binding HasNoMatches}" Classes="muted"/>
+      <ScrollViewer MaxHeight="300" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <ItemsControl ItemsSource="{Binding Languages}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="localization:LanguageChoiceViewModel">
+              <Button Command="{Binding SelectCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Margin="0,0,0,6" AutomationProperties.Name="{Binding NativeName}">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                  <StackPanel Spacing="2">
+                    <TextBlock Text="{Binding NativeName}" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                    <TextBlock Text="{Binding Code}" Classes="muted" FontSize="11"/>
+                  </StackPanel>
+                  <TextBlock Grid.Column="1" Text="{Binding StateText}" Classes="muted" VerticalAlignment="Center"/>
+                </Grid>
+              </Button>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+    </Grid>
+  </DockPanel>
+</UserControl>

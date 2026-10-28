@@ -1,3 +1,4 @@
+using MovieSift.Application.Localization;
 using MovieSift.Application.Ports;
 using MovieSift.Desktop.Appearance;
 using MovieSift.Desktop.Localization;
@@ -15,4 +16,5 @@ public sealed record MainViewModelServices(
     ILogger Log,
     BatchViewModel Batch,
     AppearanceViewModel? Appearance = null,
-    UpdatesViewModel? Updates = null);
+    UpdatesViewModel? Updates = null,
+    ITranslationPackStore? TranslationPacks = null);

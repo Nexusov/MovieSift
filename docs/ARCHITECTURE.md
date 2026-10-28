@@ -109,6 +109,7 @@ Application-controlled state and bounded logs live in `data` beside the executab
 | Record | Content |
 | --- | --- |
 | `settings.json` | UI language |
+| `translations/<locale>.json` | Validated downloaded UI text; no media or workflow authority |
 | `appearance.json` | Independent appearance preferences |
 | `rule-presets.json` | Named rule configurations |
 | `queue-list.json` | Unfinished listing intent |
@@ -118,6 +119,16 @@ Application-controlled state and bounded logs live in `data` beside the executab
 Missing settings use defaults. Malformed records remain visible rather than being silently repaired. JSON readers validate regular-file handles before reading or checking length, then enforce size/schema/depth limits. Catalog and queue writes use permanent interprocess locks and flushed, uniquely owned sibling temporary files for replacement. Cleanup never adopts a later occupant of a temporary path.
 
 Unavailable ownership storage disables media writes. An isolated language or appearance save failure instead reports a session-only preference; it does not invent a media-ownership failure.
+
+### Interface translations and window presentation
+
+The language chooser and appearance panel are separate, mutually exclusive cosmetic views. `LanguageSettingsViewModel` owns explicit download/cancel/retry intent; `LocalizationService` publishes a complete immutable dictionary only after validation and preserves full locale identifiers. Existing shell preference writes and shutdown remain authoritative. A translation request counts as an active shell operation so close cancels and drains it before disposing HTTP resources. It owns no media worker, approval or queue revision.
+
+`ITranslationPackStore` is a narrow Application port. `GitHubTranslationPackStore` resolves the small official `git/ref/heads/main` response, then reads catalog and pack from that one immutable commit. Fixed locale filenames, exact SHA256/length, complete English key coverage and composite-format placeholders are checked before caching. Responses are bounded (8 KiB reference, 64 KiB catalog, 256 KiB pack), depth-limited and subject to a 30-second deadline. Redirects and unsupported locales are rejected. Cache access uses regular-file/reparse checks, interprocess exclusion and owned temporary replacement. Invalid files remain untouched until an explicitly requested, fully validated replacement succeeds. Startup reads only local cache and falls back to English with a visible notice.
+
+English is built in; `package.ps1` removes only the original application's Russian satellite from portable output. All 11 downloadable source packs and their exact-byte catalog live under [translations](../translations/README.md); translated binaries or executable resources are never downloaded. A complete key set is a compatibility check, not a native-speaker quality certification or independently signed authenticity proof. A new incompatible English resource contract requires corresponding repository packs; old cached incompatible data is rejected visibly.
+
+The Desktop project embeds the original film/scissors SVG, PNG and multi-resolution Windows ICO. Windows uses an integrated client caption over a resizable border; Linux keeps native decorations. Caption Close calls the existing `Window.Close()` lifecycle, and localization/appearance affect presentation only. Headless caption/layout tests are not native Windows resizing, snap or scaling acceptance.
 
 Ownership schema 3 binds output mode and replacement source/candidate revisions; legacy schemas 1/2 allow only Copy and their original layouts. Restart validates the record, paths, marker, stage and process identity. Corrupt records authorize no action; a saved PID cannot authorize termination, nor a matching filename prove publication.
 

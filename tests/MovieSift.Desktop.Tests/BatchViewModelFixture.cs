@@ -3,6 +3,7 @@ using MovieSift.Application;
 using MovieSift.Application.Batches;
 using MovieSift.Application.Inspection;
 using MovieSift.Application.Jobs;
+using MovieSift.Application.Localization;
 using MovieSift.Application.Ports;
 using MovieSift.Application.Presets;
 using MovieSift.Core.Failures;
@@ -37,7 +38,8 @@ internal sealed class BatchViewModelFixture
     public Task QueueInitialization { get; }
 
     /// <summary>Shares one job coordinator for every file in the unified workspace.</summary>
-    public BatchViewModelFixture(IRulePresetStore? presetStore = null, IQueueListStore? queueStore = null, bool initializeQueue = true)
+    public BatchViewModelFixture(IRulePresetStore? presetStore = null, IQueueListStore? queueStore = null, bool initializeQueue = true,
+        ITranslationPackStore? translationPacks = null)
     {
         Dialogs = new(Backend.Inspections.Keys.ToArray());
         Discovery = new(Backend.Inspections.Values.Select(inspection => inspection.Source).ToImmutableArray());
@@ -47,7 +49,7 @@ internal sealed class BatchViewModelFixture
         var logger = new LoggerConfiguration().CreateLogger();
         Batch = new(new(Session, Coordinator, Discovery, Dialogs, Localization, true, logger, new(presetStore ?? PresetStore), queueStore ?? QueueStore));
         Appearance = new(new(new WorkspaceAppearanceStore(), Localization, new AppearanceApplier(Avalonia.Application.Current)));
-        Main = new(new(Settings, Outputs, Localization, true, logger, Batch, Appearance));
+        Main = new(new(Settings, Outputs, Localization, true, logger, Batch, Appearance, TranslationPacks: translationPacks));
 
         QueueInitialization = initializeQueue ? Batch.Recovery.InitializeAsync() : Task.CompletedTask;
     }

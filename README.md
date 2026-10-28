@@ -22,7 +22,8 @@ The runtime and media tools are included. Linux requires the [listed system libr
 - Select tracks across multiple files, with individual adjustments.
 - Remove all subtitle tracks in one action.
 - Save language rules as reusable presets.
-- Use English or Russian, light or dark themes, and custom colors.
+- Choose from 12 interface languages, with explicit on-demand translation downloads and offline reuse.
+- Use light or dark themes and custom colors independently of language.
 
 ## Formats
 

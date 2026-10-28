@@ -28,6 +28,9 @@ public sealed partial class MainViewModel : ObservableObject
     private bool isAppearanceOpen;
 
     [ObservableProperty]
+    private bool isLanguageOpen;
+
+    [ObservableProperty]
     private bool isBusy;
 
     [ObservableProperty]
@@ -43,9 +46,12 @@ public sealed partial class MainViewModel : ObservableObject
     public MainViewModel(MainViewModelServices services)
     {
         this.services = services;
-        PersistenceFailed = !services.DataWritable;
+        persistenceFailed = !services.DataWritable;
         ChangeLanguageCommand = new AsyncRelayCommand<string>(ChangeLanguageAsync, _ => Updates?.IsInstalling != true);
         ToggleAppearanceCommand = new RelayCommand(() => IsAppearanceOpen = !IsAppearanceOpen);
+        ToggleLanguageCommand = new RelayCommand(() => IsLanguageOpen = !IsLanguageOpen);
+        Languages = new(new(services.TranslationPacks, Localization, ChangeLanguageAsync));
+        Languages.PropertyChanged += (_, _) => NotifyPresentation();
         RemainInWarningReviewCommand = new RelayCommand(Batch.RemainInWarningReview, () => CanRespondToWarningClose);
         CleanInterruptedCommand = new AsyncRelayCommand(CleanInterruptedAsync, () => HasCleanableInterrupted && CanEdit);
         Localization.PropertyChanged += (_, _) => NotifyPresentation();
@@ -63,6 +69,8 @@ public sealed partial class MainViewModel : ObservableObject
     }
 
     public LocalizationService Localization => services.Localization;
+    public LanguageSettingsViewModel Languages { get; }
+    public bool IsPreferencesOpen => IsAppearanceOpen || IsLanguageOpen;
     public BatchViewModel Batch => services.Batch;
     public AppearanceViewModel? Appearance => services.Appearance;
     public UpdatesViewModel? Updates => services.Updates;
@@ -74,11 +82,12 @@ public sealed partial class MainViewModel : ObservableObject
     public IRelayCommand? UpdateActionCommand => HasUpdateFailureNotice ? ToggleAppearanceCommand : Updates?.ShowCommand;
     public bool CanEditPreferences => Updates?.IsInstalling != true;
     public IRelayCommand ToggleAppearanceCommand { get; }
+    public IRelayCommand ToggleLanguageCommand { get; }
     public IAsyncRelayCommand<string> ChangeLanguageCommand { get; }
     public IRelayCommand RemainInWarningReviewCommand { get; }
     public IAsyncRelayCommand CleanInterruptedCommand { get; }
     public bool HasOwnedOperation => IsBusy || Batch.IsBusy || Batch.Presets.IsBusy || Batch.Recovery.HasPendingWork;
-    public bool HasActiveOperation => HasOwnedOperation || pendingLanguageSaves != 0 || Appearance?.HasPendingSave == true || Updates?.HasPendingWork == true;
+    public bool HasActiveOperation => HasOwnedOperation || Languages.IsBusy || pendingLanguageSaves != 0 || Appearance?.HasPendingSave == true || Updates?.HasPendingWork == true;
     public bool HasBlockingOperation => IsBusy || Batch.HasBlockingOperation || HasShellCleanupIssue || Updates?.IsInstalling == true;
     public bool CanEdit => !HasBlockingOperation;
     public bool RequiresCloseDecision => Batch.HasSafetyBlock || HasShellCleanupIssue;
@@ -100,7 +109,7 @@ public sealed partial class MainViewModel : ObservableObject
     public string Diagnostics => string.Join(Environment.NewLine, new[] { cleanupFailure?.Detail, CleanupDetails }
         .Where(detail => !string.IsNullOrWhiteSpace(detail)));
     public bool HasDiagnostics => !string.IsNullOrWhiteSpace(Diagnostics);
-    public bool CanInstallUpdate => initializationCompleted && !HasOwnedOperation && !Batch.HasBlockingOperation && pendingLanguageSaves == 0 &&
+    public bool CanInstallUpdate => initializationCompleted && !Languages.IsBusy && !HasOwnedOperation && !Batch.HasBlockingOperation && pendingLanguageSaves == 0 &&
         !HasPendingMediaDecision && !HasInterrupted && !HasCleanupIssue && !PersistenceFailed;
     private bool HasShellCleanupIssue => cleanupFailure is not null || !string.IsNullOrWhiteSpace(CleanupDetails);
 
@@ -117,7 +126,7 @@ public sealed partial class MainViewModel : ObservableObject
 
             if (initialRevision == languageRevision)
             {
-                Localization.SetLanguage(language);
+                await Languages.RestoreCachedAsync(language);
                 LanguagePreferenceFailed = false;
             }
         }
@@ -163,6 +172,7 @@ public sealed partial class MainViewModel : ObservableObject
     public async Task ShutdownAsync()
     {
         var batchShutdown = Batch.ShutdownAsync();
+        var languageShutdown = Languages.ShutdownAsync();
 
         if (cleanupCancellation is not null)
         {
@@ -171,6 +181,7 @@ public sealed partial class MainViewModel : ObservableObject
 
         await cleanupOperation;
         await batchShutdown;
+        await languageShutdown;
 
         if (languageWritesIdle is { } languageSaving)
         {
@@ -194,7 +205,9 @@ public sealed partial class MainViewModel : ObservableObject
     /// <summary>Awaits the existing explicit warning-discard lifecycle before allowing close.</summary>
     public async Task<bool> DiscardWarningsForCloseAsync()
     {
+        var languageShutdown = Languages.ShutdownAsync();
         var canClose = await Batch.DiscardWarningsForCloseAsync();
+        await languageShutdown;
 
         if (canClose && Appearance is not null)
         {
@@ -208,7 +221,26 @@ public sealed partial class MainViewModel : ObservableObject
     partial void OnIsBusyChanged(bool value) => NotifyPresentation();
 
     /// <summary>Defers automatic update dialogs while the user is editing preferences.</summary>
-    partial void OnIsAppearanceOpenChanged(bool value) => NotifyPresentation();
+    partial void OnIsAppearanceOpenChanged(bool value)
+    {
+        if (value)
+        {
+            IsLanguageOpen = false;
+        }
+
+        NotifyPresentation();
+    }
+
+    /// <summary>Maintains one cosmetic panel without affecting selection or media execution.</summary>
+    partial void OnIsLanguageOpenChanged(bool value)
+    {
+        if (value)
+        {
+            IsAppearanceOpen = false;
+        }
+
+        NotifyPresentation();
+    }
 
     /// <summary>Propagates a storage failure to the unified workspace's write gate.</summary>
     partial void OnPersistenceFailedChanged(bool value) => NotifyPresentation();
@@ -330,9 +362,11 @@ public sealed partial class MainViewModel : ObservableObject
         if (newlyPendingDecision)
         {
             IsAppearanceOpen = false;
+            IsLanguageOpen = false;
         }
 
-        Updates?.SetAvailability(CanInstallUpdate, CanInstallUpdate && !IsAppearanceOpen && Appearance?.HasPendingSave != true);
+        Languages.SetAvailability(CanEditPreferences);
+        Updates?.SetAvailability(CanInstallUpdate, CanInstallUpdate && !IsPreferencesOpen && Appearance?.HasPendingSave != true);
 
         OnPropertyChanged(string.Empty);
         ToggleAppearanceCommand?.NotifyCanExecuteChanged();

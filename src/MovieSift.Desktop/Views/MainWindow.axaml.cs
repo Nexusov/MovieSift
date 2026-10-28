@@ -22,13 +22,23 @@ public sealed partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+
+        if (OperatingSystem.IsWindows())
+        {
+            WindowDecorations = WindowDecorations.BorderOnly;
+        }
+
         AppearanceMotionPolicy.Track(this);
         AppearancePanel.PropertyChanged += OnAppearancePanelChanged;
+        LanguagePanel.PropertyChanged += OnLanguagePanelChanged;
         AddHandler(KeyDownEvent, OnAppearanceKeyDown, RoutingStrategies.Tunnel);
         Opened += OnOpened;
         Closing += OnClosing;
         Closed += OnClosed;
     }
+
+    /// <summary>Uses only non-button header space for native Windows caption gestures.</summary>
+    private void OnWindowCaptionPressed(object? sender, PointerPressedEventArgs eventArguments) => Caption.HandleCaptionPress(eventArguments);
 
     /// <summary>Moves focus only on an actual open/close transition, preserving ordinary editor navigation.</summary>
     private void OnAppearancePanelChanged(object? sender, AvaloniaPropertyChangedEventArgs eventArguments)
@@ -71,10 +81,32 @@ public sealed partial class MainWindow : Window
         return AppearanceButton;
     }
 
+    /// <summary>Returns focus to the language trigger while respecting mandatory media decisions.</summary>
+    private void OnLanguagePanelChanged(object? sender, AvaloniaPropertyChangedEventArgs eventArguments)
+    {
+        if (eventArguments.Property != IsVisibleProperty)
+        {
+            return;
+        }
+
+        var wasOpen = LanguagePanel.IsVisible;
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (!IsVisible || LanguagePanel.IsVisible != wasOpen)
+            {
+                return;
+            }
+
+            var target = wasOpen ? CloseLanguageButton : DataContext is MainViewModel { HasPendingMediaDecision: true }
+                ? AppearanceFocusTarget(false) : LanguageButton;
+            target.Focus();
+        });
+    }
+
     /// <summary>Escape closes only cosmetic UI; media cancellation and warning decisions remain explicit actions.</summary>
     private void OnAppearanceKeyDown(object? sender, KeyEventArgs eventArguments)
     {
-        var closesAppearance = eventArguments.Key == Key.Escape && DataContext is MainViewModel { IsAppearanceOpen: true };
+        var closesAppearance = eventArguments.Key == Key.Escape && DataContext is MainViewModel { IsPreferencesOpen: true };
 
         if (!closesAppearance)
         {
@@ -82,6 +114,7 @@ public sealed partial class MainWindow : Window
         }
 
         ((MainViewModel)DataContext!).IsAppearanceOpen = false;
+        ((MainViewModel)DataContext!).IsLanguageOpen = false;
         eventArguments.Handled = true;
     }
 
@@ -192,6 +225,7 @@ public sealed partial class MainWindow : Window
             var warningReviewViewModel = (MainViewModel)DataContext!;
             warningReviewViewModel.RequestWarningCloseReview();
             warningReviewViewModel.IsAppearanceOpen = false;
+            warningReviewViewModel.IsLanguageOpen = false;
             this.FindControl<Button>("RemainInWarningReviewButton")?.Focus();
             return;
         }
@@ -202,6 +236,7 @@ public sealed partial class MainWindow : Window
         {
             eventArguments.Cancel = true;
             ((MainViewModel)DataContext!).IsAppearanceOpen = false;
+            ((MainViewModel)DataContext!).IsLanguageOpen = false;
             return;
         }
 
@@ -260,9 +295,28 @@ public sealed partial class MainWindow : Window
     }
 
     /// <summary>Honors the explicit close choice without deleting an unconfirmed worker's files.</summary>
-    private void OnCloseDespiteUncertainty(object? sender, RoutedEventArgs eventArguments)
+    private async void OnCloseDespiteUncertainty(object? sender, RoutedEventArgs eventArguments)
     {
-        shutdownCompleted = true;
-        Close();
+        if (shutdownInProgress)
+        {
+            return;
+        }
+
+        shutdownInProgress = true;
+
+        try
+        {
+            if (DataContext is MainViewModel viewModel)
+            {
+                await viewModel.Languages.ShutdownAsync();
+            }
+
+            shutdownCompleted = true;
+            Close();
+        }
+        finally
+        {
+            shutdownInProgress = false;
+        }
     }
 }

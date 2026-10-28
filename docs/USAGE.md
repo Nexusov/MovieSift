@@ -57,13 +57,19 @@ Interrupted-operation records are separate. Keep the old application directory a
 
 ## Appearance and language
 
-Open **Appearance & language** for English/Russian, themes, custom colors and reduced motion. Escape closes the panel. A preference that cannot be saved may still apply for the current session; MovieSift reports the problem without interrupting media work.
+Use the translation-icon button for **Interface language** and **Appearance** for themes, custom colors and reduced motion. Escape closes the current cosmetic panel and returns focus to its button. Neither action changes track selections, plans or media metadata. A preference that cannot be saved may still apply for the current session; MovieSift reports the problem without interrupting media work.
+
+Portable packages include English only. The language chooser offers English, Russian, German, Spanish, French, Brazilian Portuguese, Ukrainian, Polish, Turkish, Japanese, Korean and Simplified Chinese. Selecting another language explicitly downloads its complete translation from the MovieSift GitHub repository, with progress and cancellation. The current language stays active until validation completes. Network, compatibility and cache errors remain visible; **Retry** downloads a replacement without deleting the previous cache first.
+
+Downloaded packs are stored in `data/translations` and work offline after restart. Startup never downloads a translation automatically. If a saved language is unavailable or invalid, the application stays usable in English and explains how to download it. Preset names, source paths, track titles and backend diagnostics remain original. Translation packs are data, not executable extensions. New source-tree functionality requires a corresponding newly built application; the already published 1.0.0 archives are unchanged.
+
+On Windows, the application uses an integrated caption with minimize, maximize/restore and close buttons. Drag the header or double-click it to maximize/restore. Resizing remains available. Close retains the existing warning decisions and safe asynchronous shutdown. Linux retains the desktop's native decorations. Both platforms use the film/scissors application icon; no minimize-to-tray behavior is introduced.
 
 ## Upgrading a portable copy
 
 ### Install updates
 
-MovieSift checks GitHub for newer stable releases after startup. **Close** dismisses the notification; **Update available** remains in the header and **Appearance & language → Updates**. That panel also offers manual checks and an option to disable startup checks. Network errors do not block media use.
+MovieSift checks GitHub for newer stable releases after startup. **Close** dismisses the notification; **Update available** remains in the header and **Appearance → Updates**. That panel also offers manual checks and an option to disable startup checks. Network errors do not block media use.
 
 Only **Install and restart** downloads and installs. Finish processing, resolve recovery notices and allow settings saves to complete first. Settings and the unfinished list are retained; track choices and Review must be recreated after restart.
 

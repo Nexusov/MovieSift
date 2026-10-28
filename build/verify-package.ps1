@@ -97,6 +97,9 @@ if ($PSCmdlet.ParameterSetName -eq 'Archive') {
 }
 
 $PackageDirectory = [IO.Path]::GetFullPath($PackageDirectory)
+if (Test-Path -LiteralPath (Join-Path $PackageDirectory 'ru/MovieSift.resources.dll')) {
+    throw 'Portable packages must include only English UI resources; other languages are explicit downloads.'
+}
 $applicationLicense = Join-Path $PackageDirectory 'LICENSE'
 $repositoryLicense = Join-Path $PSScriptRoot '../LICENSE'
 
