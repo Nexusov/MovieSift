@@ -4,6 +4,8 @@
 
 /* Keep Review/Run reachable and reserve a real gutter beside all scrolling content. */
 .app{display:flex;flex-direction:column;height:900px}.app-header{flex-shrink:0}.scene{display:flex;flex-direction:column;min-height:0;flex:1}.scene-scroll{overflow-y:auto;scrollbar-gutter:stable;min-height:0;flex:1;padding-right:14px}.actions{flex-shrink:0;margin-top:16px}.scene.inspection{overflow-y:auto}.window-actions .icon{white-space:nowrap;flex-shrink:0}.study-foot{max-width:980px}@media(max-width:480px){.app{height:960px}.scene-scroll{padding-right:8px}}
+
+.track-row.excluded{background-color:var(--surface);border-style:dashed}.track-row.excluded .track-primary,.track-row.excluded .track-meta{color:var(--muted);opacity:1}.track-row.excluded .undo-track{color:var(--text);border:1px solid var(--line);background-color:var(--panel)}
 </style></head>
 <body>
 <main>
@@ -15,11 +17,10 @@
       <div class="workspace-toolbar"><div><button>＋ Добавить файлы</button><button>Добавить папку</button><button>Правила и пресеты</button></div><span class="muted">1 файл</span></div>
       <div class="source-line"><div><span class="file-badge">MKV</span><strong>Фильм.mkv</strong><small>D:\Movies · дорожки прочитаны</small></div><details><summary>Подробности <span class="chevron"></span></summary><div class="file-info">Matroska · H.264 · 1920 × 1080<br>6 аудиодорожек · 5 дорожек субтитров<br>Индивидуальные дорожки этого файла показаны ниже.</div></details></div>
       <section class="destination"><div class="section-label">Как сохранить результат <span class="help"><button aria-label="О способах сохранения" aria-describedby="output-tip">?</button><span id="output-tip" role="tooltip" hidden>Новая копия сохраняет оригинал. При замене сначала создаётся и проверяется временный результат, затем заменяется исходный файл.</span></span></div><div class="mode-options"><label><input type="radio" name="output-mode" value="copy" checked><span><strong>Новая копия</strong><small>Оригинал останется на месте</small></span></label><label><input type="radio" name="output-mode" value="replace"><span><strong>Заменить исходный файл</strong><small>Без отдельного итогового файла</small></span></label></div><div id="destination-path" class="destination-path"><span>Куда: <strong>рядом с исходным</strong> · Фильм.trimmed.mkv</span><button>Изменить папку…</button></div><p id="replace-notice" class="notice" hidden>Для замены потребуется место для временного файла. Исходник заменяется только после проверки; согласие запрашивается перед запуском.</p></section>
-      <div class="section-heading"><div><h2>Какие дорожки оставить <span class="help"><button aria-label="Как исключать дорожки" aria-describedby="selection-tip">?</button><span id="selection-tip" role="tooltip" hidden>Изначально сохраняются все дорожки. Нажмите ×, чтобы исключить ненужную из результата. Исключённую дорожку можно вернуть. Исходный файл на этом экране не изменяется.</span></span></h2><p class="muted">Нажмите × у ненужной дорожки. Ошиблись — верните её.</p></div><span id="choice-count" class="count"></span></div>
+      <div class="section-heading"><div><h2>Какие дорожки оставить <span class="help"><button aria-label="Как исключать дорожки" aria-describedby="selection-tip">?</button><span id="selection-tip" role="tooltip" hidden>Изначально сохраняются все дорожки. Нажмите ×, чтобы исключить ненужную из результата. Исключённая дорожка остаётся на месте серой карточкой с кнопкой «Вернуть». Исходный файл на этом экране не изменяется.</span></span></h2><p class="muted">Нажмите × у ненужной дорожки. Она останется серой на своём месте — нажмите «Вернуть», если передумали.</p></div><span id="choice-count" class="count"></span></div>
       <div class="video-summary"><span class="lock" aria-hidden="true">▣</span><strong>Видео</strong><span>H.264 · 1080p</span><span class="muted">Всегда сохраняется</span></div>
       <div class="category-heading"><h3>Аудио <span id="audio-count" class="muted"></span></h3></div><div id="audio-tracks" class="track-list"></div>
       <div class="category-heading"><h3>Субтитры <span id="subtitle-count" class="muted"></span></h3><button id="remove-subtitles" class="text-button">Исключить все</button></div><div id="subtitle-tracks" class="track-list"></div>
-      <details class="excluded-section" id="excluded-section"><summary><span id="excluded-heading"></span><span class="chevron"></span></summary><div id="excluded-tracks" class="track-list"></div></details>
       </div><footer class="actions"><div><strong id="footer-summary"></strong><small id="footer-safety"></small></div><button id="open-review" class="primary">Проверить изменения →</button></footer>
     </section>
     <section id="review-scene" class="scene" hidden><div class="scene-scroll">
@@ -89,7 +90,7 @@
     primary.append(title, language);
     const metadata = document.createElement('div');
     metadata.className = 'track-meta';
-    metadata.textContent = `${track.codec} · ID ${track.id}${track.default ? ' · по умолчанию' : ''}`;
+    metadata.textContent = `${track.codec} · ID ${track.id}${track.default ? ' · по умолчанию' : ''}${excluded ? ' · Исключена из результата' : ''}`;
     content.append(primary, metadata);
     const action = document.createElement('button');
     action.type = 'button';
@@ -124,14 +125,11 @@
     const retained = selected();
     const audio = retained.filter(({ kind }) => kind === 'audio');
     const subtitles = retained.filter(({ kind }) => kind === 'subtitle');
-    document.getElementById('audio-tracks').replaceChildren(...audio.map((track) => trackRow({ track, excluded: false })));
-    document.getElementById('subtitle-tracks').replaceChildren(...subtitles.map((track) => trackRow({ track, excluded: false })));
-    document.getElementById('excluded-tracks').replaceChildren(...tracks.filter(({ id }) => removed.has(id)).map((track) => trackRow({ track, excluded: true })));
+    document.getElementById('audio-tracks').replaceChildren(...tracks.filter(({ kind }) => kind === 'audio').map((track) => trackRow({ track, excluded: removed.has(track.id) })));
+    document.getElementById('subtitle-tracks').replaceChildren(...tracks.filter(({ kind }) => kind === 'subtitle').map((track) => trackRow({ track, excluded: removed.has(track.id) })));
     document.getElementById('audio-count').textContent = `${audio.length} из 6`;
     document.getElementById('subtitle-count').textContent = `${subtitles.length} из 5`;
     document.getElementById('choice-count').textContent = `В результате: ${retained.length} из 12`;
-    document.getElementById('excluded-heading').textContent = `Исключены из результата: ${removed.size}`;
-    document.getElementById('excluded-section').hidden = !removed.size;
     document.getElementById('footer-summary').textContent = `Исключить: ${removed.size} · Оставить: ${retained.length}`;
     document.getElementById('footer-safety').textContent = mode === 'copy' ? 'Исходный файл останется без изменений.' : 'Замена потребует отдельного подтверждения перед запуском.';
     document.getElementById('destination-path').hidden = mode !== 'copy';

@@ -62,6 +62,7 @@ public sealed partial class BatchViewModel : ObservableObject
         AddFolderCommand = new AsyncRelayCommand(AddFolderAsync, () => CanEdit);
         ChooseOutputCommand = new AsyncRelayCommand(ChooseOutputAsync, () => CanEdit && IsCopyMode);
         UseSourceFoldersCommand = new RelayCommand(() => ApplyOutputFolder(string.Empty), () => CanEdit && IsCopyMode && HasCustomOutputFolder);
+        SetOutputModeCommand = new RelayCommand<OutputMode>(mode => SelectedOutputModeIndex = (int)mode, _ => CanEdit);
         InspectPendingCommand = new AsyncRelayCommand(InspectPendingAsync, () => CanEdit && Items.Any(item => item.Snapshot.State == BatchItemState.PendingInspection));
         InspectSelectedCommand = new AsyncRelayCommand(InspectSelectedAsync, () => CanInspectSelected);
         RemoveSelectedCommand = new RelayCommand(RemoveSelected, () => CanRemoveSelected);
@@ -97,6 +98,7 @@ public sealed partial class BatchViewModel : ObservableObject
     private OutputMode EffectiveOutputMode => PendingOutputItems.FirstOrDefault()?.Snapshot.OutputMode ?? outputMode;
     public bool HasMixedOutputModes => PendingOutputItems.Select(item => item.Snapshot.OutputMode).Distinct().Skip(1).Any();
     public bool IsCopyMode => !HasMixedOutputModes && EffectiveOutputMode == OutputMode.Copy;
+    public bool IsReplaceMode => !HasMixedOutputModes && EffectiveOutputMode == OutputMode.ReplaceSource;
     public bool HasCustomOutputFolder => IsCopyMode && !string.IsNullOrEmpty(outputFolder);
     private bool UsesAdjacentCopies => !HasCustomOutputFolder && PendingOutputItems.All(item =>
         MovieSift.Core.Media.MediaContainerPolicy.FromExtension(item.SourcePath) is not null &&
@@ -188,6 +190,7 @@ public sealed partial class BatchViewModel : ObservableObject
     public IAsyncRelayCommand AddFolderCommand { get; }
     public IAsyncRelayCommand ChooseOutputCommand { get; }
     public IRelayCommand UseSourceFoldersCommand { get; }
+    public IRelayCommand<OutputMode> SetOutputModeCommand { get; }
     public IAsyncRelayCommand InspectPendingCommand { get; }
     public IAsyncRelayCommand InspectSelectedCommand { get; }
     public IRelayCommand RemoveSelectedCommand { get; }
@@ -735,6 +738,7 @@ public sealed partial class BatchViewModel : ObservableObject
         ChooseOutputCommand?.NotifyCanExecuteChanged();
         UseSourceFoldersCommand?.NotifyCanExecuteChanged();
         InspectPendingCommand?.NotifyCanExecuteChanged();
+        SetOutputModeCommand?.NotifyCanExecuteChanged();
         InspectSelectedCommand?.NotifyCanExecuteChanged();
         RemoveSelectedCommand?.NotifyCanExecuteChanged();
         ReviewCommand?.NotifyCanExecuteChanged();

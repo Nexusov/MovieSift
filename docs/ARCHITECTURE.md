@@ -24,9 +24,11 @@ A sole queue entry uses the shared file-local track editor directly. Multiple en
 
 The common list is the **union** of included inspections. `TrackGroupingPolicy` groups exact canonical language, title, codec/channels, forced status and semantic roles; unknown/conflicting metadata stays separate. Duplicates and per-file exceptions remain visible. Default/enabled flags are displayed separately.
 
+Exclude/Restore buttons are a presentation of the existing Keep choices, not a second selection model. Excluded cards remain in their source/group order with semantic muted colors; their restore controls remain readable. Video is locked. Mixed-group exclusion targets editable members only.
+
 The projection references authoritative session choices. Group, member and remove-all-subtitles edits validate the whole request before applying it atomically. Actual edits invalidate affected plans and Review; no-op edits preserve them. Completed results stay locked.
 
-**Review** creates independent immutable plans and validates every included unfinished item. Unresolved included files block Run. A plan captures source/backend identity, retained tracks, destination, output mode and relevant consent. Source, selection or output changes require another Review; language and appearance changes do not. Review neither runs workers nor creates output directories. The separate Run action consumes a current review once.
+**Review** creates independent immutable plans and validates every included unfinished item. Unresolved included files block Run. A plan captures source/backend identity, retained tracks, destination, output mode and relevant consent. Source, selection or output changes require another Review; language and appearance changes do not. Review neither runs workers nor creates output directories. Its compact projection lists actual removed identities and retained category counts with expandable details. The separate Run action remains outside the scrolling rows and consumes a current review once. Visible Copy/Replace cards delegate to the existing output-mode edit path, including approval invalidation and replacement confirmation.
 
 NoChange still validates the source and selection, but skips remuxing and destination-only checks. It neither creates a copy nor replaces the original. Other jobs must still avoid its source path, just as they must avoid excluded sources.
 

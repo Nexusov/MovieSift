@@ -93,8 +93,8 @@ public sealed class BatchOutputModeTests
         {
             var previous = fixture.Session.Snapshot.Review;
             fixture.Batch.CloseReviewCommand.Execute(null);
-            var selector = view.FindControl<ComboBox>("OutputModeSelector")!;
-            selector.SelectedIndex = 1;
+            var selector = view.FindControl<RadioButton>("ReplaceOutputChoice")!;
+            selector.Command!.Execute(selector.CommandParameter);
             Dispatcher.UIThread.RunJobs();
             Assert.Equal(1, fixture.Batch.SelectedOutputModeIndex);
             Assert.False(fixture.Batch.HasCurrentReview);
@@ -116,6 +116,64 @@ public sealed class BatchOutputModeTests
             Assert.Same(snapshot, fixture.Session.Snapshot);
             Assert.Contains("Заменить", fixture.Batch.RunActionText, StringComparison.Ordinal);
             Assert.Empty(fixture.Backend.RemuxRequests);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    /// <summary>Both choices stay visible at the supported minimum width, preserve no-op review, and respect the workspace gate.</summary>
+    [AvaloniaFact]
+    public async Task VisibleOutputChoicesPreserveNoOpReviewAndRejectConflictingWork()
+    {
+        var fixture = new BatchViewModelFixture();
+        await fixture.PrepareAsync();
+        fixture.Batch.CloseReviewCommand.Execute(null);
+        var view = new BatchView { DataContext = fixture.Batch };
+        var window = new Window { Width = 640, Height = 800, Content = view };
+        window.Show();
+
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            var copy = view.FindControl<RadioButton>("CopyOutputChoice")!;
+            var replace = view.FindControl<RadioButton>("ReplaceOutputChoice")!;
+            var folder = view.FindControl<Button>("BatchOutputFolderButton")!;
+            Assert.True(copy.IsVisible);
+            Assert.True(replace.IsVisible);
+            Assert.True(copy.IsChecked);
+            Assert.False(replace.IsChecked);
+            Assert.True(folder.IsVisible);
+            var originalReview = fixture.Session.Snapshot.Review;
+            copy.Command!.Execute(copy.CommandParameter);
+            Assert.Same(originalReview, fixture.Session.Snapshot.Review);
+            Assert.All(fixture.Batch.Items, item => Assert.NotNull(item.ApprovedPlan));
+            fixture.Main.IsBusy = true;
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(copy.IsEffectivelyEnabled);
+            Assert.False(replace.IsEffectivelyEnabled);
+            Assert.False(replace.Command!.CanExecute(replace.CommandParameter));
+            replace.Command.Execute(replace.CommandParameter);
+            Assert.Same(originalReview, fixture.Session.Snapshot.Review);
+            Assert.Equal(0, fixture.Batch.SelectedOutputModeIndex);
+            fixture.Main.IsBusy = false;
+            replace.Command.Execute(replace.CommandParameter);
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(replace.IsChecked);
+            Assert.False(folder.IsVisible);
+            Assert.Null(fixture.Session.Snapshot.Review);
+            Assert.All(fixture.Batch.Items, item => Assert.Null(item.ApprovedPlan));
+            Assert.Empty(fixture.Backend.RemuxRequests);
+            var replacementSnapshot = fixture.Session.Snapshot;
+            fixture.Localization.SetLanguage("ru");
+            Assert.Same(replacementSnapshot, fixture.Session.Snapshot);
+            Assert.True(replace.IsChecked);
+            copy.Command.Execute(copy.CommandParameter);
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(copy.IsChecked);
+            Assert.True(folder.IsVisible);
+            Assert.False(fixture.Batch.CanRun);
         }
         finally
         {

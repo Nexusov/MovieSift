@@ -1,5 +1,7 @@
+using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MovieSift.Core.Failures;
+using MovieSift.Core.Media;
 using MovieSift.Core.Planning;
 using MovieSift.Desktop.Localization;
 
@@ -35,10 +37,16 @@ public sealed class BatchReviewRowViewModel : ObservableObject
     public string FailureReasonText => Failure is { Reason: not ErrorReason.None } failure
         ? Localization[$"ErrorReason{failure.Reason}"] : string.Empty;
     public string DefaultAudioText => PlanPresentation.DescribeDefaultAudio(Plan, Localization);
+    public string DefaultAudioHelpText => RemovesDefaultAudio ? Localization["SelectionWarning"] : DefaultAudioText;
     public bool RemovesDefaultAudio => Plan?.RemovesDefaultAudio == true;
     public bool NeedsZeroAudioConfirmation => Item.NeedsZeroAudioConfirmation;
     public string RetainedTracksText => DescribeTracks(true);
     public string RemovedTracksText => DescribeTracks(false);
+    public IReadOnlyList<BatchReviewTrackViewModel> RemovedTracks => DescribeTrackRows(false);
+    public string RetainedSummaryText => Plan is null ? string.Empty : Localization.Format(new("ReviewKeptSummary",
+        [Plan.RetainedTracks.Count(track => track.Kind == TrackKind.Video),
+            Plan.RetainedTracks.Count(track => track.Kind == TrackKind.Audio),
+            Plan.RetainedTracks.Count(track => track.Kind == TrackKind.Subtitles)]));
     public string NextActionText => Failure?.Code switch
     {
         ErrorCode.ZeroAudioConfirmationRequired => Localization["ReviewNextConfirmAudio"],
@@ -72,18 +80,33 @@ public sealed class BatchReviewRowViewModel : ObservableObject
             return retained ? Localization["ReviewNoRetainedTracks"] : string.Empty;
         }
 
-        var identifiers = Plan.RetainedTracks.Select(track => track.Id).ToHashSet();
-        var tracks = Plan.Inspection.Tracks.Where(track => identifiers.Contains(track.Id) == retained).ToArray();
+        var tracks = DescribeTrackRows(retained);
 
-        if (tracks.Length == 0)
+        if (tracks.Count == 0)
         {
             return Localization["ReviewNoRemovedTracks"];
         }
 
-        return string.Join(Environment.NewLine, tracks.Select(track =>
+        return string.Join(Environment.NewLine, tracks.Select(track => track.HasTitle
+            ? $"{track.IdentityText} — {track.TitleText}" : track.IdentityText));
+    }
+
+    /// <summary>Uses the frozen inspection and file-local IDs; video titles do not repeat the source filename.</summary>
+    private IReadOnlyList<BatchReviewTrackViewModel> DescribeTrackRows(bool retained)
+    {
+        if (Plan is null)
         {
-            var title = string.IsNullOrWhiteSpace(track.Title) ? Localization["Untitled"] : track.Title;
-            return $"{Localization[track.Kind.ToString()]} {track.Id} — {title} ({track.Codec}, {track.LanguageIetf ?? track.Language})";
-        }));
+            return [];
+        }
+
+        var identifiers = Plan.RetainedTracks.Select(track => track.Id).ToHashSet();
+        return Plan.Inspection.Tracks.Where(track => identifiers.Contains(track.Id) == retained).Select(track =>
+        {
+            var title = track.Kind == TrackKind.Video ? string.Empty
+                : string.IsNullOrWhiteSpace(track.Title) ? Localization["Untitled"] : track.Title;
+            var language = track.LanguageIetf ?? track.Language ?? Localization["Unknown"];
+            var identity = $"{Localization[track.Kind.ToString()]} {track.Id.ToString(CultureInfo.InvariantCulture)} · {track.Codec} · {language}";
+            return new BatchReviewTrackViewModel(track.Id, identity, title);
+        }).ToArray();
     }
 }

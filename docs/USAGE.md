@@ -6,15 +6,17 @@ See the [README](../README.md) for downloads and startup.
 
 ## Choose what to keep
 
-Add local files or a folder. **Audio** and **Subtitles** show tracks from every included file, including tracks found in only one episode. Checked tracks are kept; unchecked tracks are removed from the result. All tracks start selected, and video is always kept.
+Add local files or a folder. **Audio** and **Subtitles** show tracks from every included file, including tracks found in only one episode. All tracks initially stay in the result. Use **Exclude** (×) for an unwanted track. Its card stays in the same position, becomes muted, and offers **Restore**. Video is always kept and has no exclusion action.
 
-With one file, its actual tracks are shown directly; **Details** contains file information and destination editing without a second track list. With multiple files, use a group checkbox to change its tracks together, or expand it for per-file exceptions. Grouping uses metadata, not spoken content. Excluding a file removes it from these actions without deleting it.
+With one file, its actual tracks are shown directly; **Details** contains file information and destination editing without a second track list. With multiple files, exclude a group to change its editable tracks together, or expand it for per-file exceptions. A mixed group excludes its remaining editable tracks; Restore includes its editable tracks again. Completed results are unaffected. Grouping uses metadata, not spoken content. Excluding a file removes it from these actions without deleting it.
 
-**Remove all subtitles** clears subtitle selections for included, editable files. You can select them again before Review. Audio, video, attachments and completed results are unaffected.
+**Exclude all subtitles** clears subtitle selections for included, editable files. Their muted cards remain available for Restore before Review. Audio, video, attachments and completed results are unaffected.
 
 During inspection, the workspace shows the current backend stage and elapsed time for the active file. Remaining time is explicitly unavailable because the tools do not report a reliable fraction of inspection completed. A slow-check notice appears after 30 seconds; it is not a timeout prediction. Cancel remains available.
 
 ## Choose the result
+
+Choose either visible output card above **Review changes**. The folder chooser appears for Copy; Replace explains the temporary space needed. Changing mode invalidates affected plans and requires fresh Review.
 
 | Output mode | Result |
 | --- | --- |
@@ -27,9 +29,11 @@ Replacement still needs space for a complete temporary result. Read-only files, 
 
 ## Review and run
 
-Select **Review changes** and check each file's tracks and destination. Removing the last audio track requires separate confirmation for that file. Unresolved inspection errors in included files prevent Review.
+Select **Review changes** and check each file's destination and removed tracks. Retained video/audio/subtitle counts stay visible; expand retained details for the file-local IDs and metadata. Removing the last audio track requires separate confirmation for that file. Unresolved inspection errors in included files prevent Review.
 
 Review does not process files. Use the separate action to create copies or replace the stated number of originals. Selection, destination or output-mode changes require another Review; language and theme changes do not.
+
+Question-mark help sits beside its subject and opens on hover or keyboard focus. Escape dismisses the open help without changing choices or plans.
 
 ## Folders and rules
 
