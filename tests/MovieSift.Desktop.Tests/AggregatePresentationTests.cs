@@ -163,8 +163,8 @@ public sealed class AggregatePresentationTests
         Assert.Single(view.GetVisualDescendants().OfType<TextBlock>(), control =>
             control.Name == "AggregateGroupFlagsText" && ReferenceEquals(control.DataContext, group)).Text!;
 
-    /// <summary>Reads the actual checkbox automation property rather than only its ViewModel source.</summary>
+    /// <summary>Reads the actual action-button automation property rather than only its ViewModel source.</summary>
     private static string AccessibleName(AggregateTracksView view, AggregateTrackGroupViewModel group) =>
-        AutomationProperties.GetName(Assert.Single(view.GetVisualDescendants().OfType<CheckBox>(), control =>
+        AutomationProperties.GetName(Assert.Single(view.GetVisualDescendants().OfType<Button>(), control =>
             ReferenceEquals(control.DataContext, group) && ReferenceEquals(control.Command, group.ToggleKeepCommand)))!;
 }

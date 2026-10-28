@@ -88,10 +88,11 @@ public sealed class SingleFileWorkspaceTests
             Assert.True(view.FindControl<ContentControl>("SingleFileEditor")!.IsEffectivelyVisible);
             Assert.False(view.FindControl<AggregateTracksView>("AggregateEditor")!.IsEffectivelyVisible);
             var editor = Assert.Single(view.GetVisualDescendants().OfType<SingleFileTracksView>(), control => control.IsEffectivelyVisible);
-            var checkboxes = editor.GetVisualDescendants().OfType<CheckBox>().Where(control => control.DataContext is TrackViewModel).ToArray();
-            Assert.Equal([0, 1, 2, 3], checkboxes.Select(control => ((TrackViewModel)control.DataContext!).Track.Id));
-            var video = Assert.Single(checkboxes, control => ((TrackViewModel)control.DataContext!).Track.Kind == TrackKind.Video);
-            Assert.False(video.IsEnabled);
+            var cards = editor.GetVisualDescendants().OfType<Border>().Where(control => control.Classes.Contains("trackCard")).ToArray();
+            Assert.Equal([0, 1, 2, 3], cards.Select(control => ((TrackViewModel)control.DataContext!).Track.Id));
+            var video = Assert.Single(cards, control => ((TrackViewModel)control.DataContext!).Track.Kind == TrackKind.Video);
+            Assert.False(((TrackViewModel)video.DataContext!).ToggleSelectionCommand.CanExecute(null));
+            Assert.DoesNotContain(video.GetVisualDescendants().OfType<TrackSelectionActionView>(), control => control.IsEffectivelyVisible);
             item.Tracks[0].Keep = false;
             Assert.True(item.Tracks[0].Keep);
             item.Tracks.Single(track => track.Track.Id == 1).Keep = false;

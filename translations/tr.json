@@ -386,9 +386,9 @@
     "ReviewSourceTracks": "Kaynak parçalar (inceleme)",
     "LanguagePreferenceFailure": "Dil tercihi kaydedilemedi veya geri yüklenemedi. Geçerli dil bu oturumda çalışır; depolama sağlıklı olduğunda medya işleme kullanılabilir durumdadır.",
     "IncludeFileAccessible": "Dosyayı seçime dahil et: {0}",
-    "AggregateSelectionHelp": "İşaretli parçalar saklanır; işaretlenmemiş parçalar sonuçtan kaldırılır. İşlemeden önce değişiklikleri gözden geçirin.",
+    "AggregateSelectionHelp": "Hariç tutulan izler kaynakta kalır ve yalnızca sonuçtan çıkarılır. Yeniden dahil etmek için Geri al kullanın. İşlemeden önce değişiklikleri gözden geçirin.",
     "AggregateSectionSummary": "{0} · Grup: {1} · Parça: {2}",
-    "RemoveAllSubtitles": "Tüm altyazıları kaldır",
+    "RemoveAllSubtitles": "Tüm altyazıları hariç tut",
     "AggregateMemberKeep": "{2} içindeki {0} türündeki {1} parçasını sakla: {3}",
     "OutputModeLabel": "Çıktı",
     "OutputCopyMode": "Ayıklanmış kopyalar oluştur",
@@ -461,6 +461,16 @@
     "InspectionStageRecheckingSource": "Kaynağın değişmediği yeniden denetleniyor…",
     "InspectionElapsed": "Geçen süre: {0}",
     "InspectionRemainingUnknown": "Bu incelemenin kalan süresi tahmin edilemiyor.",
-    "InspectionSlowNotice": "İnceleme sürüyor. Bazı denetimler dosyayı tarayabilir; iptal etmek kaynağı değiştirmez."
+    "InspectionSlowNotice": "İnceleme sürüyor. Bazı denetimler dosyayı tarayabilir; iptal etmek kaynağı değiştirmez.",
+    "TrackExclude": "Hariç tut",
+    "TrackRestore": "Geri al",
+    "TrackExcluded": "Çıktıdan hariç tutuldu",
+    "TrackExcludeGroupHelp": "Bu gruptaki düzenlenebilir tutulan izleri hariç tut. Zaten hariç tutulanlar değişmez.",
+    "TrackRestoreGroupHelp": "Bu gruptaki düzenlenebilir hariç tutulan izleri geri al.",
+    "ReviewKeptSummary": "Tutulan: {0} video · {1} ses · {2} altyazı",
+    "ReviewRetainedDetails": "Tutulan iz ayrıntıları",
+    "ReviewDefaultAudioHelp": "Varsayılan ses",
+    "OutputChoiceHeading": "Sonuçlar nasıl kaydedilsin?",
+    "OutputReplaceSpaceHelp": "Değiştirme de doğrulama bitene kadar geçici disk alanı gerektirir."
   }
 }

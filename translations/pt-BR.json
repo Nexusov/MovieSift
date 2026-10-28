@@ -386,9 +386,9 @@
     "ReviewSourceTracks": "Faixas de origem (inspeção)",
     "LanguagePreferenceFailure": "Não foi possível salvar ou restaurar o idioma. Ele funciona nesta sessão; o processamento continua disponível se seu armazenamento estiver funcionando.",
     "IncludeFileAccessible": "Incluir arquivo na seleção: {0}",
-    "AggregateSelectionHelp": "As faixas marcadas são mantidas; as desmarcadas são removidas do resultado. Revise antes de processar.",
+    "AggregateSelectionHelp": "As faixas excluídas permanecem na origem e são omitidas apenas do resultado. Use Restaurar para incluí-las novamente. Revise as alterações antes de processar.",
     "AggregateSectionSummary": "{0} · Grupos: {1} · Faixas: {2}",
-    "RemoveAllSubtitles": "Remover todas as legendas",
+    "RemoveAllSubtitles": "Excluir todas as legendas",
     "AggregateMemberKeep": "Manter {0} faixa {1} em {2}: {3}",
     "OutputModeLabel": "Saída",
     "OutputCopyMode": "Criar cópias filtradas",
@@ -461,6 +461,16 @@
     "InspectionStageRecheckingSource": "Verificando novamente se a origem não mudou…",
     "InspectionElapsed": "Decorrido: {0}",
     "InspectionRemainingUnknown": "Não é possível estimar o tempo restante desta inspeção.",
-    "InspectionSlowNotice": "A inspeção continua. Algumas verificações podem percorrer o arquivo; cancelar não altera a origem."
+    "InspectionSlowNotice": "A inspeção continua. Algumas verificações podem percorrer o arquivo; cancelar não altera a origem.",
+    "TrackExclude": "Excluir",
+    "TrackRestore": "Restaurar",
+    "TrackExcluded": "Excluída da saída",
+    "TrackExcludeGroupHelp": "Excluir as faixas mantidas editáveis deste grupo. As já excluídas continuam excluídas.",
+    "TrackRestoreGroupHelp": "Restaurar as faixas excluídas editáveis deste grupo.",
+    "ReviewKeptSummary": "Mantidas: {0} vídeo · {1} áudio · {2} legendas",
+    "ReviewRetainedDetails": "Detalhes das faixas mantidas",
+    "ReviewDefaultAudioHelp": "Áudio padrão",
+    "OutputChoiceHeading": "Como salvar os resultados?",
+    "OutputReplaceSpaceHelp": "Substituir também exige espaço temporário até concluir a verificação."
   }
 }

@@ -386,9 +386,9 @@
     "ReviewSourceTracks": "Quellspuren (Prüfung)",
     "LanguagePreferenceFailure": "Die Spracheinstellung konnte nicht gespeichert oder wiederhergestellt werden. Die aktuelle Sprache gilt für diese Sitzung; Medienverarbeitung bleibt bei nutzbarem Medienspeicher möglich.",
     "IncludeFileAccessible": "Datei in Auswahl einbeziehen: {0}",
-    "AggregateSelectionHelp": "Markierte Spuren werden beibehalten; nicht markierte aus dem Ergebnis entfernt. Prüfen Sie die Änderungen vor der Verarbeitung.",
+    "AggregateSelectionHelp": "Ausgeschlossene Spuren bleiben in der Quelle und fehlen nur im Ergebnis. Mit Wiederherstellen werden sie erneut aufgenommen. Änderungen vor der Verarbeitung prüfen.",
     "AggregateSectionSummary": "{0} · Gruppen: {1} · Spuren: {2}",
-    "RemoveAllSubtitles": "Alle Untertitel entfernen",
+    "RemoveAllSubtitles": "Alle Untertitel ausschließen",
     "AggregateMemberKeep": "{0}-Spur {1} in {2} behalten: {3}",
     "OutputModeLabel": "Ausgabe",
     "OutputCopyMode": "Bereinigte Kopien erstellen",
@@ -461,6 +461,16 @@
     "InspectionStageRecheckingSource": "Unveränderte Quelldatei wird erneut geprüft…",
     "InspectionElapsed": "Vergangen: {0}",
     "InspectionRemainingUnknown": "Die verbleibende Zeit dieser Prüfung lässt sich nicht schätzen.",
-    "InspectionSlowNotice": "Die Prüfung läuft noch. Manche Prüfungen können die Datei durchsuchen; ein Abbruch verändert die Quelle nicht."
+    "InspectionSlowNotice": "Die Prüfung läuft noch. Manche Prüfungen können die Datei durchsuchen; ein Abbruch verändert die Quelle nicht.",
+    "TrackExclude": "Ausschließen",
+    "TrackRestore": "Wiederherstellen",
+    "TrackExcluded": "Von der Ausgabe ausgeschlossen",
+    "TrackExcludeGroupHelp": "Bearbeitbare beibehaltene Spuren dieser Gruppe ausschließen. Bereits ausgeschlossene Spuren bleiben ausgeschlossen.",
+    "TrackRestoreGroupHelp": "Bearbeitbare ausgeschlossene Spuren dieser Gruppe wiederherstellen.",
+    "ReviewKeptSummary": "Beibehalten: {0} Video · {1} Audio · {2} Untertitel",
+    "ReviewRetainedDetails": "Details der beibehaltenen Spuren",
+    "ReviewDefaultAudioHelp": "Standardaudio",
+    "OutputChoiceHeading": "Wie sollen Ergebnisse gespeichert werden?",
+    "OutputReplaceSpaceHelp": "Auch beim Ersetzen wird bis zum Abschluss der Prüfung temporärer Speicherplatz benötigt."
   }
 }

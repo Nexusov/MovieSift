@@ -3,4 +3,5 @@ using MovieSift.Desktop.Localization;
 
 namespace MovieSift.Desktop.ViewModels;
 
-public sealed record TrackViewModelOptions(MediaTrack Track, LocalizationService Localization, Action SelectionChanged);
+public sealed record TrackViewModelOptions(MediaTrack Track, LocalizationService Localization, Action SelectionChanged,
+    Func<bool>? CanEdit = null);

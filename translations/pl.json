@@ -386,9 +386,9 @@
     "ReviewSourceTracks": "Ścieżki źródłowe (analiza)",
     "LanguagePreferenceFailure": "Nie można zapisać lub przywrócić preferencji języka. Bieżący język działa w tej sesji; przetwarzanie multimediów nadal jest dostępne, gdy ich zaplecze zapisu działa prawidłowo.",
     "IncludeFileAccessible": "Uwzględnij plik w wyborze: {0}",
-    "AggregateSelectionHelp": "Zaznaczone ścieżki zostaną zachowane, a niezaznaczone usunięte z wyniku. Sprawdź zmiany przed przetwarzaniem.",
+    "AggregateSelectionHelp": "Wykluczone ścieżki pozostają w źródle i są pomijane tylko w wyniku. Użyj Przywróć, aby ponownie je uwzględnić. Sprawdź zmiany przed przetwarzaniem.",
     "AggregateSectionSummary": "{0} · Grupy: {1} · Ścieżki: {2}",
-    "RemoveAllSubtitles": "Usuń wszystkie napisy",
+    "RemoveAllSubtitles": "Wyklucz wszystkie napisy",
     "AggregateMemberKeep": "Zachowaj ścieżkę {0} {1} w {2}: {3}",
     "OutputModeLabel": "Wynik",
     "OutputCopyMode": "Utwórz kopie z wybranymi ścieżkami",
@@ -461,6 +461,16 @@
     "InspectionStageRecheckingSource": "Ponowne sprawdzanie niezmienionego źródła…",
     "InspectionElapsed": "Upłynęło: {0}",
     "InspectionRemainingUnknown": "Nie można oszacować pozostałego czasu tej inspekcji.",
-    "InspectionSlowNotice": "Inspekcja nadal trwa. Niektóre kontrole mogą skanować plik; anulowanie nie zmienia źródła."
+    "InspectionSlowNotice": "Inspekcja nadal trwa. Niektóre kontrole mogą skanować plik; anulowanie nie zmienia źródła.",
+    "TrackExclude": "Wyklucz",
+    "TrackRestore": "Przywróć",
+    "TrackExcluded": "Wykluczona z wyniku",
+    "TrackExcludeGroupHelp": "Wyklucz edytowalne zachowane ścieżki w tej grupie. Już wykluczone ścieżki pozostaną wykluczone.",
+    "TrackRestoreGroupHelp": "Przywróć edytowalne wykluczone ścieżki w tej grupie.",
+    "ReviewKeptSummary": "Zachowane: {0} wideo · {1} audio · {2} napisy",
+    "ReviewRetainedDetails": "Szczegóły zachowanych ścieżek",
+    "ReviewDefaultAudioHelp": "Domyślne audio",
+    "OutputChoiceHeading": "Jak zapisać wyniki?",
+    "OutputReplaceSpaceHelp": "Zastępowanie także wymaga miejsca tymczasowego do zakończenia weryfikacji."
   }
 }

@@ -386,9 +386,9 @@
     "ReviewSourceTracks": "원본 트랙(분석 결과)",
     "LanguagePreferenceFailure": "언어 설정을 저장하거나 복원하지 못했습니다. 현재 언어는 이 세션에서 사용할 수 있습니다. 미디어 저장 기능이 정상이라면 미디어 처리도 계속 사용할 수 있습니다.",
     "IncludeFileAccessible": "선택 항목에 파일 포함: {0}",
-    "AggregateSelectionHelp": "선택한 트랙은 유지되고 선택하지 않은 트랙은 결과에서 삭제됩니다. 처리 전에 변경 사항을 검토하세요.",
+    "AggregateSelectionHelp": "제외한 트랙은 원본에 남고 결과에서만 생략됩니다. 복원을 사용하면 다시 포함할 수 있습니다. 처리 전에 변경 사항을 검토하세요.",
     "AggregateSectionSummary": "{0} · 그룹: {1} · 트랙: {2}",
-    "RemoveAllSubtitles": "모든 자막 삭제",
+    "RemoveAllSubtitles": "모든 자막 제외",
     "AggregateMemberKeep": "{2}의 {0} 트랙 {1} 유지: {3}",
     "OutputModeLabel": "출력",
     "OutputCopyMode": "선택한 트랙만 포함하는 복사본 만들기",
@@ -461,6 +461,16 @@
     "InspectionStageRecheckingSource": "원본이 변경되지 않았는지 다시 확인 중…",
     "InspectionElapsed": "경과 시간: {0}",
     "InspectionRemainingUnknown": "이 검사의 남은 시간은 예상할 수 없습니다.",
-    "InspectionSlowNotice": "검사가 진행 중입니다. 일부 검사는 파일을 스캔할 수 있습니다. 취소해도 원본은 변경되지 않습니다."
+    "InspectionSlowNotice": "검사가 진행 중입니다. 일부 검사는 파일을 스캔할 수 있습니다. 취소해도 원본은 변경되지 않습니다.",
+    "TrackExclude": "제외",
+    "TrackRestore": "복원",
+    "TrackExcluded": "출력에서 제외됨",
+    "TrackExcludeGroupHelp": "이 그룹에서 편집 가능한 유지 트랙을 제외합니다. 이미 제외된 트랙은 그대로 유지됩니다.",
+    "TrackRestoreGroupHelp": "이 그룹에서 편집 가능한 제외 트랙을 복원합니다.",
+    "ReviewKeptSummary": "유지: 비디오 {0} · 오디오 {1} · 자막 {2}",
+    "ReviewRetainedDetails": "유지할 트랙 세부 정보",
+    "ReviewDefaultAudioHelp": "기본 오디오",
+    "OutputChoiceHeading": "결과를 어떻게 저장할까요?",
+    "OutputReplaceSpaceHelp": "교체도 검증이 끝날 때까지 임시 디스크 공간이 필요합니다."
   }
 }

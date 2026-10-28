@@ -386,9 +386,9 @@
     "ReviewSourceTracks": "Pistes source (examen)",
     "LanguagePreferenceFailure": "Préférence de langue non enregistrée ou restaurée. La langue fonctionne pour cette session ; le traitement reste disponible si son stockage fonctionne.",
     "IncludeFileAccessible": "Inclure le fichier dans la sélection : {0}",
-    "AggregateSelectionHelp": "Les pistes cochées sont gardées ; les autres sont retirées du résultat. Vérifiez avant de traiter.",
+    "AggregateSelectionHelp": "Les pistes exclues restent dans la source et sont omises uniquement du résultat. Utilisez Restaurer pour les inclure à nouveau. Vérifiez les modifications avant le traitement.",
     "AggregateSectionSummary": "{0} · Groupes : {1} · Pistes : {2}",
-    "RemoveAllSubtitles": "Retirer tous les sous-titres",
+    "RemoveAllSubtitles": "Exclure tous les sous-titres",
     "AggregateMemberKeep": "Garder {0} piste {1} dans {2} : {3}",
     "OutputModeLabel": "Sortie",
     "OutputCopyMode": "Créer des copies filtrées",
@@ -461,6 +461,16 @@
     "InspectionStageRecheckingSource": "Nouvelle vérification de la source inchangée…",
     "InspectionElapsed": "Écoulé : {0}",
     "InspectionRemainingUnknown": "Le temps restant de cet examen ne peut pas être estimé.",
-    "InspectionSlowNotice": "L’examen continue. Certaines vérifications peuvent parcourir le fichier ; annuler ne modifie pas la source."
+    "InspectionSlowNotice": "L’examen continue. Certaines vérifications peuvent parcourir le fichier ; annuler ne modifie pas la source.",
+    "TrackExclude": "Exclure",
+    "TrackRestore": "Restaurer",
+    "TrackExcluded": "Exclue de la sortie",
+    "TrackExcludeGroupHelp": "Exclure les pistes conservées modifiables de ce groupe. Les pistes déjà exclues restent exclues.",
+    "TrackRestoreGroupHelp": "Restaurer les pistes exclues modifiables de ce groupe.",
+    "ReviewKeptSummary": "Conservées : {0} vidéo · {1} audio · {2} sous-titres",
+    "ReviewRetainedDetails": "Détails des pistes conservées",
+    "ReviewDefaultAudioHelp": "Audio par défaut",
+    "OutputChoiceHeading": "Comment enregistrer les résultats ?",
+    "OutputReplaceSpaceHelp": "Le remplacement nécessite aussi de l’espace temporaire jusqu’à la fin de la vérification."
   }
 }

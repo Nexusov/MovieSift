@@ -91,9 +91,9 @@ public sealed class WorkspaceActionClarityTests
         }
     }
 
-    /// <summary>Exposes the actual grouping explanation through a keyboard-operated flyout without editing media choices.</summary>
+    /// <summary>Exposes adjacent grouping help on keyboard focus without a click flyout or media edit.</summary>
     [AvaloniaFact]
-    public async Task GroupingHelpKeyboardActivationShowsLocalizedExplanationWithoutMutation()
+    public async Task GroupingHelpFocusShowsLocalizedExplanationWithoutMutation()
     {
         var fixture = new BatchViewModelFixture();
         await fixture.PrepareAsync();
@@ -107,12 +107,13 @@ public sealed class WorkspaceActionClarityTests
         try
         {
             Dispatcher.UIThread.RunJobs();
-            var help = Assert.Single(view.GetVisualDescendants().OfType<Button>(), control => control.Name == "GroupingHelpButton");
+            var hint = Assert.Single(view.GetVisualDescendants().OfType<HelpHintView>(), control => control.Name == "GroupingHelpHint");
+            var help = hint.FindControl<Button>("HintButton")!;
             Assert.True(help.Focus());
-            Press(window, PhysicalKey.Space);
-            var flyout = Assert.IsType<Flyout>(help.Flyout);
-            Assert.True(flyout.IsOpen);
-            var explanation = Assert.IsType<TextBlock>(flyout.Content);
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(ToolTip.GetIsOpen(help));
+            Assert.Null(help.Flyout);
+            var explanation = Assert.IsType<TextBlock>(ToolTip.GetTip(help));
             Assert.Equal(fixture.Localization["AggregateNotice"], explanation.Text);
             await fixture.Main.ChangeLanguageCommand.ExecuteAsync("ru");
             Dispatcher.UIThread.RunJobs();
@@ -121,7 +122,7 @@ public sealed class WorkspaceActionClarityTests
             Assert.Same(review, fixture.Batch.Snapshot.Review);
             Assert.Equal(choices, fixture.Batch.Items.SelectMany(item => item.Tracks.Select(track => track.Keep)).ToArray());
             Assert.Empty(fixture.Backend.RemuxRequests);
-            flyout.Hide();
+            ToolTip.SetIsOpen(help, false);
         }
         finally
         {

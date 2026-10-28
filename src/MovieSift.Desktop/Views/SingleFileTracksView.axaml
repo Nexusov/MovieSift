@@ -5,7 +5,10 @@
              x:Class="MovieSift.Desktop.Views.SingleFileTracksView"
              x:DataType="viewModels:BatchItemViewModel">
   <StackPanel Spacing="8">
-    <TextBlock Classes="heading" Text="{Binding Localization[AggregateHeading]}" />
+    <WrapPanel>
+      <TextBlock Classes="heading" Text="{Binding Localization[AggregateHeading]}" VerticalAlignment="Center" Margin="0,0,6,0" />
+      <views:HelpHintView Text="{Binding Localization[AggregateSelectionHelp]}" Label="{Binding Localization[AggregateHeading]}" />
+    </WrapPanel>
     <TextBlock Text="{Binding FileName}" FontWeight="SemiBold" TextWrapping="Wrap" ToolTip.Tip="{Binding SourcePath}" />
     <TextBlock Text="{Binding StateText}" Classes="muted" TextWrapping="Wrap" />
     <TextBlock Text="{Binding Localization[BatchExcluded]}" IsVisible="{Binding !Included}" TextWrapping="Wrap" />

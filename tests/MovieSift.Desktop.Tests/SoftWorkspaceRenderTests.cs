@@ -77,8 +77,9 @@ public sealed class SoftWorkspaceRenderTests
             Assert.True(scroll.Viewport.Height > 0, "Expanding the file shelf must preserve a usable track viewport.");
             Save(window, $"{theme}-{language}-{width}x{height}-{density}-files-selection", density);
             fileSidebar.IsExpanded = expandedBeforeCapture;
-            var editableGroup = workspace.GetVisualDescendants().OfType<CheckBox>().First(control =>
-                control.DataContext is AggregateTrackGroupViewModel { IsRequired: false });
+            var editableGroup = workspace.GetVisualDescendants().OfType<Button>().First(control =>
+                control.DataContext is AggregateTrackGroupViewModel { IsRequired: false } group &&
+                ReferenceEquals(control.Command, group.ToggleKeepCommand));
             editableGroup.BringIntoView();
             Dispatcher.UIThread.RunJobs();
             window.UpdateLayout();

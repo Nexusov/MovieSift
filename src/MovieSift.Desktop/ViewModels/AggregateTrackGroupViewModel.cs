@@ -31,6 +31,12 @@ public sealed class AggregateTrackGroupViewModel : ObservableObject
     public bool? Keep => group.Keep;
     public bool CanEdit => options.CanEdit() && group.Members.Any(member => member.IsEditable);
     public bool IsRequired => group.Key.Kind == TrackKind.Video;
+    public bool IsExcluded => Keep == false;
+    public bool IsMixed => Keep is null;
+    public bool RestoresExcluded => group.Members.Any(member => member.IsEditable)
+        ? !group.Members.Any(member => member.IsEditable && member.Keep) : IsExcluded;
+    public string SelectionActionText => Localization[RestoresExcluded ? "TrackRestore" : "TrackExclude"];
+    public string SelectionActionHelp => Localization[RestoresExcluded ? "TrackRestoreGroupHelp" : "TrackExcludeGroupHelp"];
     public string KindText => Localization[group.Key.Kind.ToString()];
     public string LanguageText => group.Key.CanonicalLanguage ?? Localization["Unknown"];
     public string TitleText => string.IsNullOrWhiteSpace(group.Key.Title) ? Localization["Untitled"] : group.Key.Title;
@@ -42,14 +48,16 @@ public sealed class AggregateTrackGroupViewModel : ObservableObject
     public string CoverageText => Localization.Format(new("AggregateCoverage", [group.FileCoverage, projection.IncludedFileCount, group.OccurrenceCount]));
     public bool HasLanguageIssue => group.LanguageIssue is not null;
     public string LanguageIssueText => group.LanguageIssue is { } issue ? Localization[$"RuleIssue{issue}"] : string.Empty;
-    public string KeepAccessibleName => string.Join(", ", new[]
+    private string TrackDescription => string.Join(", ", new[]
     {
-        $"{Localization["Keep"]}: {KindText}", LanguageText, TitleText, CodecText, ChannelsText, FlagsText, CoverageText,
+        KindText, LanguageText, TitleText, CodecText, ChannelsText, FlagsText, CoverageText,
         group.LanguageIssue is not null ? $"{group.Members[0].Inspection.Source.FullPath} / {group.Members[0].Track.Id}" : string.Empty
     }.Where(value => !string.IsNullOrWhiteSpace(value)));
+    public string KeepAccessibleName => $"{Localization["Keep"]}: {TrackDescription}";
+    public string SelectionActionAccessibleName => $"{SelectionActionText}: {TrackDescription}";
     public string MembersAccessibleName => $"{Localization["AggregateMembers"]}: {KeepAccessibleName}";
     public bool HasChoiceNotice => Keep != true;
-    public string ChoiceText => Localization[Keep is true ? "AggregateAllKept" : Keep is false ? "AggregateAllRemoved" : "AggregateMixed"];
+    public string ChoiceText => Localization[Keep is true ? "AggregateAllKept" : Keep is false ? "TrackExcluded" : "AggregateMixed"];
     public IRelayCommand ToggleKeepCommand { get; }
 
     public bool IsExpanded
@@ -114,7 +122,7 @@ public sealed class AggregateTrackGroupViewModel : ObservableObject
         ToggleKeepCommand.NotifyCanExecuteChanged();
     }
 
-    /// <summary>Mixed and unchecked keep all editable members; checked removes only those represented members.</summary>
+    /// <summary>Excludes editable retained members first; restores only when every editable member is already excluded.</summary>
     private void ToggleKeep()
     {
         if (!CanEdit)
@@ -123,7 +131,7 @@ public sealed class AggregateTrackGroupViewModel : ObservableObject
         }
 
         var result = options.Session.SetTrackSelection(new(projection,
-            group.Members.Where(member => member.IsEditable).ToImmutableArray(), Keep != true));
+            group.Members.Where(member => member.IsEditable).ToImmutableArray(), RestoresExcluded));
         options.SelectionEdited(result.Failure);
         OnPropertyChanged(nameof(Keep));
     }

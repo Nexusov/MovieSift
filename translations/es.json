@@ -386,9 +386,9 @@
     "ReviewSourceTracks": "Pistas de origen (inspección)",
     "LanguagePreferenceFailure": "No se pudo guardar o restaurar el idioma. Funciona durante esta sesión; el procesamiento sigue disponible si su almacenamiento funciona.",
     "IncludeFileAccessible": "Incluir archivo en la selección: {0}",
-    "AggregateSelectionHelp": "Las pistas marcadas se conservan; las desmarcadas se eliminan del resultado. Revisa antes de procesar.",
+    "AggregateSelectionHelp": "Las pistas excluidas siguen en el origen y solo se omiten del resultado. Usa Restaurar para incluirlas de nuevo. Revisa los cambios antes de procesar.",
     "AggregateSectionSummary": "{0} · Grupos: {1} · Pistas: {2}",
-    "RemoveAllSubtitles": "Quitar todos los subtítulos",
+    "RemoveAllSubtitles": "Excluir todos los subtítulos",
     "AggregateMemberKeep": "Conservar {0} pista {1} en {2}: {3}",
     "OutputModeLabel": "Salida",
     "OutputCopyMode": "Crear copias filtradas",
@@ -461,6 +461,16 @@
     "InspectionStageRecheckingSource": "Comprobando que el origen no cambió…",
     "InspectionElapsed": "Transcurrido: {0}",
     "InspectionRemainingUnknown": "No se puede estimar el tiempo restante de esta inspección.",
-    "InspectionSlowNotice": "La inspección continúa. Algunas comprobaciones pueden recorrer el archivo; cancelar no cambia el origen."
+    "InspectionSlowNotice": "La inspección continúa. Algunas comprobaciones pueden recorrer el archivo; cancelar no cambia el origen.",
+    "TrackExclude": "Excluir",
+    "TrackRestore": "Restaurar",
+    "TrackExcluded": "Excluida de la salida",
+    "TrackExcludeGroupHelp": "Excluir las pistas conservadas editables de este grupo. Las ya excluidas siguen excluidas.",
+    "TrackRestoreGroupHelp": "Restaurar las pistas excluidas editables de este grupo.",
+    "ReviewKeptSummary": "Conservadas: {0} vídeo · {1} audio · {2} subtítulos",
+    "ReviewRetainedDetails": "Detalles de pistas conservadas",
+    "ReviewDefaultAudioHelp": "Audio predeterminado",
+    "OutputChoiceHeading": "¿Cómo guardar los resultados?",
+    "OutputReplaceSpaceHelp": "Reemplazar también requiere espacio temporal hasta completar la verificación."
   }
 }

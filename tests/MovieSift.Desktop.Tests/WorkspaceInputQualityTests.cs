@@ -151,8 +151,8 @@ public sealed class WorkspaceInputQualityTests
                 Assert.True(InWindow(inclusion, window).Bottom <= InWindow(fileScroll, window).Bottom + BoundsTolerance);
             }
 
-            var editableTrack = view.GetVisualDescendants().OfType<CheckBox>().First(control =>
-                control.IsEffectivelyVisible && control.DataContext is AggregateTrackGroupViewModel { IsRequired: false });
+            var editableTrack = view.GetVisualDescendants().OfType<Button>().Where(control => control.IsEffectivelyVisible).First(control =>
+                control.DataContext is AggregateTrackGroupViewModel { IsRequired: false } group && ReferenceEquals(control.Command, group.ToggleKeepCommand));
             editableTrack.BringIntoView();
             Dispatcher.UIThread.RunJobs();
             window.UpdateLayout();

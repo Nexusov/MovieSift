@@ -386,9 +386,9 @@
   <data name="ReviewSourceTracks" xml:space="preserve"><value>Дорожки исходного файла (инспекция)</value></data>
   <data name="LanguagePreferenceFailure" xml:space="preserve"><value>Не удалось сохранить или восстановить язык. Текущий язык действует в этом сеансе; обработка доступна, если её хранилище исправно.</value></data>
   <data name="IncludeFileAccessible" xml:space="preserve"><value>Включить файл в выбор: {0}</value></data>
-  <data name="AggregateSelectionHelp" xml:space="preserve"><value>Отмеченные дорожки сохраняются; неотмеченные удаляются из результата. Проверьте изменения перед обработкой.</value></data>
+  <data name="AggregateSelectionHelp" xml:space="preserve"><value>Исключённые дорожки остаются в исходнике и не попадут только в результат. Нажмите «Вернуть», чтобы включить их снова. Проверьте изменения перед обработкой.</value></data>
   <data name="AggregateSectionSummary" xml:space="preserve"><value>{0} · Групп: {1} · Дорожек: {2}</value></data>
-  <data name="RemoveAllSubtitles" xml:space="preserve"><value>Удалить все субтитры</value></data>
+  <data name="RemoveAllSubtitles" xml:space="preserve"><value>Исключить все субтитры</value></data>
   <data name="AggregateMemberKeep" xml:space="preserve"><value>Сохранить дорожку {0} с ID {1} в файле {2}: {3}</value></data>
   <data name="OutputModeLabel" xml:space="preserve"><value>Результат</value></data>
   <data name="OutputCopyMode" xml:space="preserve"><value>Создать копии</value></data>
@@ -462,4 +462,14 @@
   <data name="InspectionElapsed" xml:space="preserve"><value>Прошло: {0}</value></data>
   <data name="InspectionRemainingUnknown" xml:space="preserve"><value>Для этой инспекции оставшееся время пока неизвестно.</value></data>
   <data name="InspectionSlowNotice" xml:space="preserve"><value>Инспекция ещё выполняется. Некоторые проверки могут сканировать файл; отмена не изменит исходник.</value></data>
+  <data name="TrackExclude" xml:space="preserve"><value>Исключить</value></data>
+  <data name="TrackRestore" xml:space="preserve"><value>Вернуть</value></data>
+  <data name="TrackExcluded" xml:space="preserve"><value>Исключена из результата</value></data>
+  <data name="TrackExcludeGroupHelp" xml:space="preserve"><value>Исключить сохраняемые дорожки этой группы, доступные для редактирования. Уже исключённые останутся исключёнными.</value></data>
+  <data name="TrackRestoreGroupHelp" xml:space="preserve"><value>Вернуть исключённые дорожки этой группы, доступные для редактирования.</value></data>
+  <data name="ReviewKeptSummary" xml:space="preserve"><value>Останется: видео — {0} · аудио — {1} · субтитры — {2}</value></data>
+  <data name="ReviewRetainedDetails" xml:space="preserve"><value>Подробности сохраняемых дорожек</value></data>
+  <data name="ReviewDefaultAudioHelp" xml:space="preserve"><value>Аудио по умолчанию</value></data>
+  <data name="OutputChoiceHeading" xml:space="preserve"><value>Как сохранить результаты?</value></data>
+  <data name="OutputReplaceSpaceHelp" xml:space="preserve"><value>До завершения проверки замене тоже требуется временное место на диске.</value></data>
 </root>

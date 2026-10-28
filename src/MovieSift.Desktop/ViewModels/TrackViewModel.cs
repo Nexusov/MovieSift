@@ -1,5 +1,6 @@
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using MovieSift.Core.Media;
 using MovieSift.Desktop.Localization;
 
@@ -15,12 +16,19 @@ public sealed class TrackViewModel : ObservableObject
     public TrackViewModel(TrackViewModelOptions options)
     {
         this.options = options;
+        ToggleSelectionCommand = new RelayCommand(ToggleSelection, () => CanEditSelection);
     }
 
     public MediaTrack Track => options.Track;
     public bool IsSelectable => Track.Kind != TrackKind.Video;
     public bool IsAudio => Track.Kind == TrackKind.Audio;
     public bool IsRequired => !IsSelectable;
+    public bool IsExcluded => !Keep;
+    public bool CanEditSelection => IsSelectable && (options.CanEdit?.Invoke() ?? true);
+    public string SelectionActionText => Localization[IsExcluded ? "TrackRestore" : "TrackExclude"];
+    public string SelectionStateText => Localization[IsRequired ? "AlwaysKept" : IsExcluded ? "TrackExcluded" : "AggregateAllKept"];
+    public string SelectionActionAccessibleName => $"{SelectionActionText}: {KindText} {IdentifierText}, {TitleText}";
+    public IRelayCommand ToggleSelectionCommand { get; }
     public LocalizationService Localization => options.Localization;
     public string KindText => Localization[Track.Kind.ToString()];
     public string IdentifierText => Track.Id.ToString(CultureInfo.InvariantCulture);
@@ -45,13 +53,26 @@ public sealed class TrackViewModel : ObservableObject
             if (SetProperty(ref keep, value))
             {
                 options.SelectionChanged();
+                RefreshLocalization();
             }
         }
+    }
+
+    /// <summary>Checks the current editor gate even when a caller directly invokes a disabled command.</summary>
+    private void ToggleSelection()
+    {
+        if (!CanEditSelection)
+        {
+            return;
+        }
+
+        Keep = !Keep;
     }
 
     /// <summary>Refreshes current localized metadata labels without retaining old inspected rows.</summary>
     public void RefreshLocalization()
     {
         OnPropertyChanged(string.Empty);
+        ToggleSelectionCommand.NotifyCanExecuteChanged();
     }
 }

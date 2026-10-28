@@ -386,7 +386,7 @@
     "ReviewSourceTracks": "入力のトラック（調査結果）",
     "LanguagePreferenceFailure": "言語設定を保存または復元できませんでした。現在の言語はこのセッションで使えます。メディア用ストレージに問題がなければ処理できます。",
     "IncludeFileAccessible": "ファイルを対象に含める: {0}",
-    "AggregateSelectionHelp": "チェックしたトラックを残し、チェックしていないトラックを出力から除外します。処理前に変更を確認してください。",
+    "AggregateSelectionHelp": "除外したトラックは入力に残り、出力からだけ省かれます。「戻す」で再び含められます。処理前に変更を確認してください。",
     "AggregateSectionSummary": "{0} · グループ: {1} · トラック: {2}",
     "RemoveAllSubtitles": "すべての字幕を除外",
     "AggregateMemberKeep": "{2} の {0} トラック {1} を残す: {3}",
@@ -461,6 +461,16 @@
     "InspectionStageRecheckingSource": "入力が変更されていないことを再確認中…",
     "InspectionElapsed": "経過時間: {0}",
     "InspectionRemainingUnknown": "この調査の残り時間は推定できません。",
-    "InspectionSlowNotice": "調査を続けています。一部の確認ではファイルを走査します。キャンセルしても入力は変更しません。"
+    "InspectionSlowNotice": "調査を続けています。一部の確認ではファイルを走査します。キャンセルしても入力は変更しません。",
+    "TrackExclude": "除外",
+    "TrackRestore": "戻す",
+    "TrackExcluded": "出力から除外",
+    "TrackExcludeGroupHelp": "このグループの編集可能な残すトラックを除外します。既に除外されたトラックはそのままです。",
+    "TrackRestoreGroupHelp": "このグループの編集可能な除外済みトラックを戻します。",
+    "ReviewKeptSummary": "残す: 映像 {0} · 音声 {1} · 字幕 {2}",
+    "ReviewRetainedDetails": "残すトラックの詳細",
+    "ReviewDefaultAudioHelp": "既定の音声",
+    "OutputChoiceHeading": "結果をどのように保存しますか？",
+    "OutputReplaceSpaceHelp": "置き換えでも検証が終わるまでは一時的なディスク容量が必要です。"
   }
 }

@@ -386,9 +386,9 @@
     "ReviewSourceTracks": "源轨道（检查结果）",
     "LanguagePreferenceFailure": "无法保存或恢复语言偏好。当前语言在此会话中可用；媒体存储正常时仍可处理媒体。",
     "IncludeFileAccessible": "将文件包含在选择中：{0}",
-    "AggregateSelectionHelp": "选中的轨道会保留；未选中的轨道从结果中移除。处理前请检查更改。",
+    "AggregateSelectionHelp": "被排除的轨道仍保留在源文件中，仅从结果中省略。使用“恢复”可重新包含。处理前请检查更改。",
     "AggregateSectionSummary": "{0} · 分组：{1} · 轨道：{2}",
-    "RemoveAllSubtitles": "移除所有字幕",
+    "RemoveAllSubtitles": "排除所有字幕",
     "AggregateMemberKeep": "保留 {2} 中的 {0} 轨道 {1}：{3}",
     "OutputModeLabel": "输出",
     "OutputCopyMode": "创建精简副本",
@@ -461,6 +461,16 @@
     "InspectionStageRecheckingSource": "正在再次确认源文件未更改…",
     "InspectionElapsed": "已用时间：{0}",
     "InspectionRemainingUnknown": "无法估算本次检查的剩余时间。",
-    "InspectionSlowNotice": "检查仍在进行。某些检查可能需要扫描文件；取消不会更改源文件。"
+    "InspectionSlowNotice": "检查仍在进行。某些检查可能需要扫描文件；取消不会更改源文件。",
+    "TrackExclude": "排除",
+    "TrackRestore": "恢复",
+    "TrackExcluded": "已从输出中排除",
+    "TrackExcludeGroupHelp": "排除此组中可编辑的保留轨道。已排除的轨道保持排除。",
+    "TrackRestoreGroupHelp": "恢复此组中可编辑的已排除轨道。",
+    "ReviewKeptSummary": "保留：{0} 视频 · {1} 音频 · {2} 字幕",
+    "ReviewRetainedDetails": "保留轨道详情",
+    "ReviewDefaultAudioHelp": "默认音频",
+    "OutputChoiceHeading": "如何保存结果？",
+    "OutputReplaceSpaceHelp": "替换也需要临时磁盘空间，直到验证完成。"
   }
 }

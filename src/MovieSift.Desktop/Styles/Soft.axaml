@@ -91,6 +91,12 @@
     <Setter Property="Cursor" Value="Hand" />
     <Setter Property="RenderTransform" Value="none" />
   </Style>
+  <Style Selector="Button.helpHint">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource MovieSiftMutedBrush}" />
+    <Setter Property="CornerRadius" Value="12" />
+    <Setter Property="RenderTransform" Value="none" />
+  </Style>
   <Style Selector="Button.fileName:focus-visible">
     <Setter Property="BorderBrush" Value="{DynamicResource MovieSiftFocusBrush}" />
     <Setter Property="BorderThickness" Value="2" />

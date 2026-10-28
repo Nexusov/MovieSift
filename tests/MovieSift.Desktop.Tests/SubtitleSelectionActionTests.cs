@@ -147,8 +147,9 @@ public sealed class SubtitleSelectionActionTests
         try
         {
             Dispatcher.UIThread.RunJobs();
-            var members = window.GetVisualDescendants().OfType<CheckBox>()
-                .Where(control => control.DataContext is AggregateTrackMemberViewModel).ToArray();
+            var members = window.GetVisualDescendants().OfType<Button>()
+                .Where(control => control.DataContext is AggregateTrackMemberViewModel member &&
+                    ReferenceEquals(control.Command, member.ToggleSelectionCommand)).ToArray();
             Assert.NotEmpty(members);
             Assert.Equal(members.Length, members.Select(AutomationProperties.GetName).Distinct(StringComparer.Ordinal).Count());
             foreach (var control in members)
@@ -156,7 +157,9 @@ public sealed class SubtitleSelectionActionTests
                 var member = (AggregateTrackMemberViewModel)control.DataContext!;
                 Assert.Contains(member.SourcePath, AutomationProperties.GetName(control));
                 Assert.Contains(member.IdentifierText, AutomationProperties.GetName(control));
-                Assert.Equal(!member.IsRequired, control.IsVisible);
+                Assert.Equal(member.SelectionActionAccessibleName, AutomationProperties.GetName(control));
+                Assert.Equal(!member.IsRequired, control.IsEffectivelyVisible);
+                Assert.Equal(member.CanEdit, control.IsEffectivelyEnabled);
             }
 
             var inclusions = window.GetVisualDescendants().OfType<CheckBox>()
