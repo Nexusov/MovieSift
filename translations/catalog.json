@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "packs": [
+    {
+      "locale": "ru",
+      "file": "ru.json",
+      "sha256": "e6fa97f0fda3a12e7e70cd83dac7e35cb5b12123732299d58f2416f0898c37d2",
+      "bytes": 57829
+    },
+    {
+      "locale": "de",
+      "file": "de.json",
+      "sha256": "56646fef138e14403cb09423631190c0203ad8a04a34565726d27f03eca7eed3",
+      "bytes": 42345
+    },
+    {
+      "locale": "es",
+      "file": "es.json",
+      "sha256": "8d5c52f8cf0d1bf02d248742747a2d51351a3beba5447254fbcacc1e883629ff",
+      "bytes": 36690
+    },
+    {
+      "locale": "fr",
+      "file": "fr.json",
+      "sha256": "c69999d1a419a25a11177ef39e1348723a67a770db609f6431f3423692ca22be",
+      "bytes": 38344
+    },
+    {
+      "locale": "pt-BR",
+      "file": "pt-BR.json",
+      "sha256": "3060ee72d21586c10a36c8e01d78b6e53dc1bfb3d8697c85a391643ec9aa4bdf",
+      "bytes": 36681
+    },
+    {
+      "locale": "uk",
+      "file": "uk.json",
+      "sha256": "04e8372aafd04dc477d0897d0b82d0691e0140b9f4b8b056d4ae0936487d5bb1",
+      "bytes": 53791
+    },
+    {
+      "locale": "pl",
+      "file": "pl.json",
+      "sha256": "6979f99f76c8a38ee6b06034d4807f7a4ac4b5af058f394bda4454daf7467b8e",
+      "bytes": 41491
+    },
+    {
+      "locale": "tr",
+      "file": "tr.json",
+      "sha256": "e1921b2b33130cb1c6087743c3126b6493b5b040f7f11971e4e5437ce2bdb145",
+      "bytes": 40817
+    },
+    {
+      "locale": "ja",
+      "file": "ja.json",
+      "sha256": "351490c94c243694bfd390b11bb807cb40a55c747cd91981fccfed3ae3df4035",
+      "bytes": 45051
+    },
+    {
+      "locale": "ko",
+      "file": "ko.json",
+      "sha256": "921cd73b381b57f4429d3d71d9aa291323175194921dca150de98249f373a7f6",
+      "bytes": 44064
+    },
+    {
+      "locale": "zh-Hans",
+      "file": "zh-Hans.json",
+      "sha256": "39e7a09e87616e944b7c5de21024b3d93983c34889b07068966224635ac22268",
+      "bytes": 34432
+    }
+  ]
+}

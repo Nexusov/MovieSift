@@ -312,7 +312,7 @@
   <data name="AggregateFlags" xml:space="preserve"><value>Принудительная: {0}; по умолчанию: {1}; включена: {2}</value></data>
   <data name="Varies" xml:space="preserve"><value>различается</value></data>
   <data name="SizeEqual" xml:space="preserve"><value>Результат имеет тот же размер, что и исходный файл.</value></data>
-  <data name="WorkspaceSettings" xml:space="preserve"><value>Вид и язык</value></data>
+  <data name="WorkspaceSettings" xml:space="preserve"><value>Оформление</value></data>
   <data name="WorkspaceClose" xml:space="preserve"><value>Закрыть</value></data>
   <data name="WorkspaceBack" xml:space="preserve"><value>К выбору дорожек</value></data>
   <data name="WorkspaceRules" xml:space="preserve"><value>Правила и пресеты</value></data>
@@ -434,4 +434,24 @@
   <data name="UpdatesCleanupFailed" xml:space="preserve"><value>Не удалось удалить часть временных файлов обновления. Они сохранены в: {0}</value></data>
   <data name="ErrorReasonReplacementPermissions" xml:space="preserve"><value>Нельзя безопасно сохранить права доступа оригинала. Создайте копию.</value></data>
   <data name="UpdatesPreviousFailure" xml:space="preserve"><value>Обновление не завершилось. Предыдущая версия сохранена. Повторить попытку можно в разделе «Обновления» в настройках.</value></data>
+  <data name="LanguageTitle" xml:space="preserve"><value>Язык интерфейса</value></data>
+  <data name="LanguageHelp" xml:space="preserve"><value>Скачайте один раз. Используйте без интернета.</value></data>
+  <data name="LanguageSearch" xml:space="preserve"><value>Найти язык…</value></data>
+  <data name="LanguageCurrent" xml:space="preserve"><value>Текущий</value></data>
+  <data name="LanguageIncluded" xml:space="preserve"><value>В комплекте</value></data>
+  <data name="LanguageDownloaded" xml:space="preserve"><value>Скачан</value></data>
+  <data name="LanguageDownload" xml:space="preserve"><value>Скачать</value></data>
+  <data name="LanguageDownloading" xml:space="preserve"><value>Скачивание: {0}…</value></data>
+  <data name="LanguageCancel" xml:space="preserve"><value>Отменить скачивание</value></data>
+  <data name="LanguageRetry" xml:space="preserve"><value>Повторить</value></data>
+  <data name="LanguageStorage" xml:space="preserve"><value>В комплекте только English. Другие языки скачиваются из репозитория MovieSift при выборе.</value></data>
+  <data name="LanguageFailure" xml:space="preserve"><value>Не удалось загрузить перевод. Текущий язык сохранён.</value></data>
+  <data name="LanguageInvalidPack" xml:space="preserve"><value>Перевод повреждён или несовместим с этой версией. Текущий язык сохранён.</value></data>
+  <data name="LanguageCacheMissing" xml:space="preserve"><value>Сохранённый язык недоступен локально. Включён English; выберите язык, чтобы скачать его.</value></data>
+  <data name="LanguageNoMatches" xml:space="preserve"><value>Языки не найдены.</value></data>
+  <data name="LanguageClose" xml:space="preserve"><value>Закрыть выбор языка</value></data>
+  <data name="WindowMinimize" xml:space="preserve"><value>Свернуть</value></data>
+  <data name="WindowMaximize" xml:space="preserve"><value>Развернуть</value></data>
+  <data name="WindowRestore" xml:space="preserve"><value>Восстановить окно</value></data>
+  <data name="WindowClose" xml:space="preserve"><value>Закрыть MovieSift</value></data>
 </root>
