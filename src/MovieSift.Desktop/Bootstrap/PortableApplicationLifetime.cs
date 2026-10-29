@@ -1,4 +1,5 @@
 using MovieSift.Application.Updates;
+using MovieSift.Infrastructure.Files;
 using MovieSift.Infrastructure.Updates;
 
 namespace MovieSift.Desktop.Bootstrap;
@@ -22,7 +23,8 @@ internal sealed class PortableApplicationLifetime : IDisposable
     {
         try
         {
-            return new(UpdateApplicationLease.Acquire(AppContext.BaseDirectory), false);
+            var root = PortableLayout.ApplicationRootFromBaseDirectory(AppContext.BaseDirectory);
+            return new(UpdateApplicationLease.Acquire(root), false);
         }
         catch (UpdateException exception) when (exception.Code == UpdateErrorCode.Busy)
         {

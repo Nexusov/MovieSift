@@ -117,15 +117,20 @@ internal static class UpdatePackage
         }
         var executable = runtimeIdentifier == "win-x64" ? "MovieSift.exe" : "MovieSift";
         var updater = runtimeIdentifier == "win-x64" ? "MovieSift.Updater.exe" : "MovieSift.Updater";
-        foreach (var required in new[] { executable, updater, "MovieSift.dll", "MovieSift.Updater.dll", "MovieSift.Updater.deps.json",
-            "MovieSift.Updater.runtimeconfig.json", "portable.flag", "LICENSE", "build-provenance.json" })
+        var payload = PortableLayout.PayloadDirectory(directory);
+        var payloadPrefix = Path.GetRelativePath(directory, payload).Replace(Path.DirectorySeparatorChar, '/');
+        payloadPrefix = payloadPrefix == "." ? string.Empty : payloadPrefix + "/";
+        var requiredFiles = new[] { executable, "portable.flag", "LICENSE", "build-provenance.json" }
+            .Concat(new[] { updater, "MovieSift.dll", "MovieSift.Updater.dll", "MovieSift.Updater.deps.json",
+                "MovieSift.Updater.runtimeconfig.json" }.Select(name => payloadPrefix + name));
+        foreach (var required in requiredFiles)
         {
             if (!entries.ContainsKey(required))
             {
                 throw Invalid($"The update is missing a required package file: {required}");
             }
         }
-        var assembly = AssemblyName.GetAssemblyName(Path.Combine(directory, "MovieSift.dll"));
+        var assembly = AssemblyName.GetAssemblyName(Path.Combine(payload, "MovieSift.dll"));
         if (assembly.Name != "MovieSift" || assembly.Version is not { } actualVersion ||
             actualVersion.Major != version.Major || actualVersion.Minor != version.Minor || actualVersion.Build != version.Patch)
         {

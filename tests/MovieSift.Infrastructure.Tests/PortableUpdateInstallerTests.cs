@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using MovieSift.Application.Updates;
+using MovieSift.Infrastructure.Files;
 using MovieSift.Infrastructure.Persistence;
 using MovieSift.Infrastructure.Updates;
 using Xunit;
@@ -99,6 +100,49 @@ public sealed class PortableUpdateInstallerTests(ITestOutputHelper output)
         Assert.Equal("personal preferences", await File.ReadAllTextAsync(Path.Combine(fixture.App, "data", "settings.json"), TestContext.Current.CancellationToken));
         Assert.Equal("user file", await File.ReadAllTextAsync(Path.Combine(fixture.App, "personal.txt"), TestContext.Current.CancellationToken));
         Assert.Equal("old version", await File.ReadAllTextAsync(Path.Combine(fixture.Session, "previous", "version.txt"), TestContext.Current.CancellationToken));
+    }
+
+    /// <summary>A nested payload still replaces the whole installation while preserving data beside the root launcher.</summary>
+    [Fact]
+    public async Task NestedPayloadSwitchPreservesRootDataAndRecognizesItsActualAssembly()
+    {
+        using var fixture = new InstallationFixture();
+        await fixture.PrepareNestedPayloadAsync();
+        await PortableUpdateInstaller.ApplyAsync(fixture.Session, fixture.Plan!, Directory.Move, TestContext.Current.CancellationToken);
+        Assert.False(File.Exists(Path.Combine(fixture.App, "MovieSift.dll")));
+        Assert.True(File.Exists(Path.Combine(fixture.App, "app", "MovieSift.dll")));
+        Assert.False(Directory.Exists(Path.Combine(fixture.App, "app", "data")));
+        Assert.Equal("personal preferences", await File.ReadAllTextAsync(Path.Combine(fixture.App, "data", "settings.json"), TestContext.Current.CancellationToken));
+        Assert.Equal("user file", await File.ReadAllTextAsync(Path.Combine(fixture.App, "personal.txt"), TestContext.Current.CancellationToken));
+        Assert.Equal(fixture.App, PortableLayout.ApplicationRootFromBaseDirectory(Path.Combine(fixture.App, "app")));
+        Assert.Equal("old version", await File.ReadAllTextAsync(Path.Combine(fixture.Session, "previous", "version.txt"), TestContext.Current.CancellationToken));
+    }
+
+    /// <summary>Neither a misplaced root DLL nor an unrecognized marker can substitute for the nested package contract.</summary>
+    [Theory]
+    [InlineData("misplaced-assembly")]
+    [InlineData("unknown-marker")]
+    public async Task InvalidNestedLayoutCannotMoveTheOriginalInstallation(string mutation)
+    {
+        using var fixture = new InstallationFixture();
+        await fixture.PrepareNestedPayloadAsync();
+        var payload = Path.Combine(fixture.Session, "payload");
+
+        if (mutation == "misplaced-assembly")
+        {
+            File.Move(Path.Combine(payload, "app", "MovieSift.dll"), Path.Combine(payload, "MovieSift.dll"));
+        }
+
+        if (mutation == "unknown-marker")
+        {
+            await File.WriteAllTextAsync(Path.Combine(payload, "portable.flag"), "MovieSift portable data policy version 99", TestContext.Current.CancellationToken);
+        }
+
+        await fixture.RefreshPayloadManifestAsync();
+        await Assert.ThrowsAsync<UpdateException>(() => PortableUpdateInstaller.ApplyAsync(fixture.Session, fixture.Plan!, Directory.Move, TestContext.Current.CancellationToken));
+        Assert.False(Directory.Exists(Path.Combine(fixture.Session, "previous")));
+        Assert.Equal("old version", await File.ReadAllTextAsync(Path.Combine(fixture.App, "version.txt"), TestContext.Current.CancellationToken));
+        Assert.Equal("personal preferences", await File.ReadAllTextAsync(Path.Combine(fixture.App, "data", "settings.json"), TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -323,6 +367,39 @@ public sealed class PortableUpdateInstallerTests(ITestOutputHelper output)
             {
                 File.SetUnixFileMode(Path.Combine(payload, application), UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
             }
+            await WriteManifestAsync(payload);
+            Plan = Plan! with { ManifestSha256 = await UpdatePackage.HashAsync(Path.Combine(payload, "SHA256SUMS"), TestContext.Current.CancellationToken) };
+        }
+
+        /// <summary>Moves only fixture-owned runtime files; production layout does not ship compatibility DLLs in its root.</summary>
+        internal async Task PrepareNestedPayloadAsync()
+        {
+            await PrepareAsync();
+            var payload = Path.Combine(Session, "payload");
+            var nested = Path.Combine(payload, PortableLayout.PayloadDirectoryName);
+            Directory.CreateDirectory(nested);
+            var executable = OperatingSystem.IsWindows() ? "MovieSift.exe" : "MovieSift";
+            var rootFiles = new HashSet<string>(StringComparer.Ordinal)
+            {
+                executable, "portable.flag", "LICENSE", "SHA256SUMS", "build-provenance.json", "version.txt"
+            };
+            foreach (var file in Directory.GetFiles(payload))
+            {
+                if (rootFiles.Contains(Path.GetFileName(file)))
+                {
+                    continue;
+                }
+
+                File.Move(file, Path.Combine(nested, Path.GetFileName(file)));
+            }
+            await File.WriteAllTextAsync(Path.Combine(payload, "portable.flag"), PortableLayout.NestedMarker, TestContext.Current.CancellationToken);
+            await RefreshPayloadManifestAsync();
+        }
+
+        /// <summary>Binds controlled payload edits to a fresh transaction without relaxing production manifest validation.</summary>
+        internal async Task RefreshPayloadManifestAsync()
+        {
+            var payload = Path.Combine(Session, "payload");
             await WriteManifestAsync(payload);
             Plan = Plan! with { ManifestSha256 = await UpdatePackage.HashAsync(Path.Combine(payload, "SHA256SUMS"), TestContext.Current.CancellationToken) };
         }

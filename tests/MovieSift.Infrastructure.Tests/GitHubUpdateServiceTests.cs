@@ -1,3 +1,5 @@
+using System.Formats.Tar;
+using System.IO.Compression;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text.Json;
@@ -91,6 +93,81 @@ public sealed class GitHubUpdateServiceTests
         Assert.Equal(UpdateErrorCode.Integrity, error.Code);
         Assert.Equal("original", await File.ReadAllTextAsync(Path.Combine(app, "unchanged.txt"), TestContext.Current.CancellationToken));
         Assert.Single(Directory.GetDirectories(workspace.Path));
+    }
+
+    /// <summary>Future updates copy the verified shared helper/runtime from app, never just the root launcher.</summary>
+    [Fact]
+    public async Task NestedInstallationStagesAndDiscardsWithoutChangingItsCurrentFiles()
+    {
+        using var fixture = new PortableUpdateInstallerTests.InstallationFixture();
+        await fixture.PrepareNestedPayloadAsync();
+        var current = Path.Combine(fixture.Session, "payload");
+        var runtime = OperatingSystem.IsWindows() ? "win-x64" : "linux-x64";
+        var name = $"MovieSift-{runtime}" + (OperatingSystem.IsWindows() ? ".zip" : ".tar.gz");
+        var archive = await CreateArchiveAsync(current, runtime);
+        var before = await UpdatePackage.HashAsync(Path.Combine(current, "SHA256SUMS"), TestContext.Current.CancellationToken);
+        using var client = new HttpClient(new FeedHandler(_ => new(HttpStatusCode.OK) { Content = new ByteArrayContent(archive) }));
+        var service = new GitHubUpdateService(client, current, new(1, 0, 0), runtime);
+        var release = new UpdateRelease(new(1, 1, 0), new("https://github.com/Nexusov/MovieSift/releases/tag/v1.1.0"),
+            new(name, new($"https://github.com/Nexusov/MovieSift/releases/download/v1.1.0/{name}"),
+                archive.Length, Convert.ToHexString(SHA256.HashData(archive))));
+        var prepared = await service.StageAsync(release, cancellationToken: TestContext.Current.CancellationToken);
+        var helperRoot = Path.Combine(prepared.SessionDirectory, "helper");
+        foreach (var helperName in new[] { "MovieSift.Updater.dll", "MovieSift.Updater.deps.json", "MovieSift.Updater.runtimeconfig.json", "MovieSift.dll" })
+        {
+            Assert.Equal(await UpdatePackage.HashAsync(Path.Combine(current, "app", helperName), TestContext.Current.CancellationToken),
+                await UpdatePackage.HashAsync(Path.Combine(helperRoot, helperName), TestContext.Current.CancellationToken));
+        }
+        Assert.False(File.Exists(Path.Combine(helperRoot, OperatingSystem.IsWindows() ? "MovieSift.exe" : "MovieSift")));
+        Assert.False(File.Exists(Path.Combine(helperRoot, "portable.flag")));
+        Assert.Equal(before, await UpdatePackage.HashAsync(Path.Combine(current, "SHA256SUMS"), TestContext.Current.CancellationToken));
+        await service.DiscardAsync(prepared, TestContext.Current.CancellationToken);
+        Assert.False(Directory.Exists(prepared.SessionDirectory));
+        Assert.Equal(before, await UpdatePackage.VerifyAsync(current, runtime, new(1, 1, 0), before, TestContext.Current.CancellationToken));
+    }
+
+    /// <summary>Uses the same real ZIP/tar readers as production with a small controlled complete payload.</summary>
+    private static async Task<byte[]> CreateArchiveAsync(string directory, string runtime)
+    {
+        using var result = new MemoryStream();
+        var files = Directory.GetFiles(directory, "*", SearchOption.AllDirectories);
+
+        if (runtime == "win-x64")
+        {
+            using (var zip = new ZipArchive(result, ZipArchiveMode.Create, leaveOpen: true))
+            {
+                foreach (var file in files)
+                {
+                    var relative = Path.GetRelativePath(directory, file).Replace(Path.DirectorySeparatorChar, '/');
+                    await using var entry = zip.CreateEntry($"MovieSift-{runtime}/{relative}").Open();
+                    await using var input = File.OpenRead(file);
+                    await input.CopyToAsync(entry, TestContext.Current.CancellationToken);
+                }
+            }
+            return result.ToArray();
+        }
+
+        if (OperatingSystem.IsWindows())
+        {
+            throw new InvalidOperationException("The Linux fixture archive requires Unix file modes.");
+        }
+
+        await using (var gzip = new GZipStream(result, CompressionLevel.Fastest, leaveOpen: true))
+        await using (var tar = new TarWriter(gzip))
+        {
+            foreach (var file in files)
+            {
+                var relative = Path.GetRelativePath(directory, file).Replace(Path.DirectorySeparatorChar, '/');
+                await using var input = File.OpenRead(file);
+                var entry = new PaxTarEntry(TarEntryType.RegularFile, $"MovieSift-{runtime}/{relative}")
+                {
+                    DataStream = input,
+                    Mode = File.GetUnixFileMode(file)
+                };
+                await tar.WriteEntryAsync(entry, TestContext.Current.CancellationToken);
+            }
+        }
+        return result.ToArray();
     }
 
     private static GitHubUpdateService Service(HttpClient client) => new(client, Path.GetTempPath(), new(1, 0, 0), "linux-x64");

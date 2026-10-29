@@ -3,6 +3,10 @@ set -euo pipefail
 
 package_directory="$(realpath "$1")"
 report_path="$2"
+payload_directory="$package_directory"
+if [[ -d "$package_directory/app" ]]; then
+    payload_directory="$package_directory/app"
+fi
 temporary_report="$(mktemp)"
 trap 'rm -f "$temporary_report"' EXIT
 missing_dependency=0
@@ -13,7 +17,7 @@ while IFS= read -r -d '' candidate; do
     fi
 
     printf '%s\n' "${candidate#"$package_directory"/}" >> "$temporary_report"
-    dependency_output="$(LD_LIBRARY_PATH="$package_directory/tools/lib:$package_directory/tools/app-root/usr/lib:$package_directory/tools/app-root/usr/lib/x86_64-linux-gnu" ldd "$candidate" 2>&1 || true)"
+    dependency_output="$(LD_LIBRARY_PATH="$payload_directory/tools/lib:$payload_directory/tools/app-root/usr/lib:$payload_directory/tools/app-root/usr/lib/x86_64-linux-gnu" ldd "$candidate" 2>&1 || true)"
     printf '%s\n\n' "$dependency_output" >> "$temporary_report"
 
     if grep -q 'not found' <<< "$dependency_output"; then
@@ -34,8 +38,8 @@ while IFS= read -r -d '' candidate; do
 done < <(
     # ldd resolves transitive dependencies of the CLI pair. Unused retained AppImage
     # GUI libraries are provenance material, not additional application requirements.
-    find "$package_directory" -path "$package_directory/tools/app-root" -prune -o -type f -print0
-    printf '%s\0' "$package_directory/tools/app-root/usr/bin/mkvmerge" "$package_directory/tools/app-root/usr/bin/mkvextract"
+    find "$package_directory" -path "$payload_directory/tools/app-root" -prune -o -type f -print0
+    printf '%s\0' "$payload_directory/tools/app-root/usr/bin/mkvmerge" "$payload_directory/tools/app-root/usr/bin/mkvextract"
 )
 
 mv "$temporary_report" "$report_path"

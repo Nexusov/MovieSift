@@ -156,7 +156,7 @@ public static class PortableUpdateInstaller
         try
         {
             PathSafety.RejectReparsePoints(session);
-            var app = Path.TrimEndingDirectorySeparator(Path.GetFullPath(AppContext.BaseDirectory));
+            var app = PortableLayout.ApplicationRootFromBaseDirectory(AppContext.BaseDirectory);
             var bytes = UpdatePackage.ReadBoundedAsync(Path.Combine(session, UpdateInstallPlan.FileName), 16_384, CancellationToken.None).GetAwaiter().GetResult();
             var plan = JsonSerializer.Deserialize<UpdateInstallPlan>(bytes);
             if (plan is null || plan.Token != token || !SamePath(plan.ApplicationDirectory, app) ||

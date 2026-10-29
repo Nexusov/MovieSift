@@ -234,10 +234,15 @@ public sealed class GitHubUpdateService(HttpClient client, string applicationDir
         var manifest = await UpdatePackage.ReadManifestAsync(directory, cancellationToken);
         var destination = Path.Combine(session, "helper");
         Directory.CreateDirectory(destination);
-        var copiedManifest = manifest.Where(entry => !entry.Key.Contains('/')).ToDictionary(entry => entry.Key, entry => entry.Value);
+        var payload = PortableLayout.PayloadDirectory(directory);
+        var prefix = Path.GetRelativePath(directory, payload).Replace(Path.DirectorySeparatorChar, '/');
+        prefix = prefix == "." ? string.Empty : prefix + "/";
+        var copiedManifest = manifest.Where(entry => entry.Key.StartsWith(prefix, StringComparison.Ordinal))
+            .Select(entry => new KeyValuePair<string, string>(entry.Key[prefix.Length..], entry.Value))
+            .Where(entry => !entry.Key.Contains('/')).ToDictionary(entry => entry.Key, entry => entry.Value);
         foreach (var entry in copiedManifest)
         {
-            var source = Path.Combine(directory, entry.Key);
+            var source = Path.Combine(payload, entry.Key);
             var target = Path.Combine(destination, entry.Key);
             await using (var input = FileSourceAccess.OpenRegularReadStream(source))
             await using (var output = new FileStream(target, FileMode.CreateNew, FileAccess.Write, FileShare.None))
@@ -310,7 +315,8 @@ public sealed class GitHubUpdateService(HttpClient client, string applicationDir
 
     private void ValidateInstallation()
     {
-        var helper = Path.Combine(directory, runtimeIdentifier == "win-x64" ? "MovieSift.Updater.exe" : "MovieSift.Updater");
+        var payload = PortableLayout.PayloadDirectory(directory);
+        var helper = Path.Combine(payload, runtimeIdentifier == "win-x64" ? "MovieSift.Updater.exe" : "MovieSift.Updater");
         if (!installationLeaseHeld || !File.Exists(Path.Combine(directory, "portable.flag")) || !File.Exists(helper) ||
             Path.GetDirectoryName(directory) is not { } parent || FileSourceAccess.GetContainingDrive(parent).DriveType == DriveType.Network)
         {

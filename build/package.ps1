@@ -49,6 +49,8 @@ if (($RuntimeIdentifier -eq 'win-x64') -and -not $IsWindows) {
 $stagingRoot = Join-Path $OutputDirectory ('staging-' + [Guid]::NewGuid().ToString('N'))
 $packageRoot = Join-Path $stagingRoot $archiveName
 New-Item -ItemType Directory -Path $packageRoot -Force | Out-Null
+$payloadRoot = Join-Path $packageRoot 'app'
+New-Item -ItemType Directory -Path $payloadRoot | Out-Null
 Push-Location $repositoryRoot
 
 try {
@@ -58,7 +60,7 @@ try {
         throw 'Locked runtime restore failed.'
     }
 
-    & $Dotnet publish $desktopProject --configuration Release --runtime $RuntimeIdentifier --self-contained true --no-restore --output $packageRoot "-p:RuntimeFrameworkVersion=$runtimeVersion" -p:PublishTrimmed=false -p:PublishSingleFile=false -p:PublishAot=false
+    & $Dotnet publish $desktopProject --configuration Release --runtime $RuntimeIdentifier --self-contained true --no-restore --output $payloadRoot "-p:RuntimeFrameworkVersion=$runtimeVersion" -p:PublishTrimmed=false -p:PublishSingleFile=false -p:PublishAot=false
 
     if ($LASTEXITCODE -ne 0) {
         throw 'Self-contained publish failed.'
@@ -66,7 +68,7 @@ try {
 
     # Original translations live in the repository; the portable UI ships English only.
     # Remove only our own generated Russian satellite, never dependency resources.
-    $russianSatellite = Join-Path $packageRoot 'ru/MovieSift.resources.dll'
+    $russianSatellite = Join-Path $payloadRoot 'ru/MovieSift.resources.dll'
     if (Test-Path -LiteralPath $russianSatellite -PathType Leaf) {
         Remove-Item -LiteralPath $russianSatellite
         $russianDirectory = Split-Path -Parent $russianSatellite
@@ -91,7 +93,7 @@ try {
     }
 
     foreach ($file in Get-ChildItem -LiteralPath $updaterPublish -File) {
-        $target = Join-Path $packageRoot $file.Name
+        $target = Join-Path $payloadRoot $file.Name
         if (Test-Path -LiteralPath $target) {
             if ((Get-FileHash -LiteralPath $target -Algorithm SHA256).Hash -ne (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash) {
                 throw "Desktop/updater shared payload mismatch: $($file.Name)"
@@ -103,26 +105,26 @@ try {
     }
     Remove-Item -LiteralPath $updaterPublish -Recurse
 
-    & (Join-Path $PSScriptRoot 'acquire-tools.ps1') -RuntimeIdentifier $RuntimeIdentifier -Destination (Join-Path $packageRoot 'tools') -CacheDirectory $ToolCacheDirectory -WindowsMkvBuildDirectory $WindowsMkvBuildDirectory
+    & (Join-Path $PSScriptRoot 'acquire-tools.ps1') -RuntimeIdentifier $RuntimeIdentifier -Destination (Join-Path $payloadRoot 'tools') -CacheDirectory $ToolCacheDirectory -WindowsMkvBuildDirectory $WindowsMkvBuildDirectory
     New-Item -ItemType Directory -Path (Join-Path $packageRoot 'data') -Force | Out-Null
-    Set-Content -LiteralPath (Join-Path $packageRoot 'portable.flag') -Value 'MovieSift portable data policy version 1' -Encoding utf8NoBOM
-    $licenseRoot = Join-Path $packageRoot 'licenses'
+    Set-Content -LiteralPath (Join-Path $packageRoot 'portable.flag') -Value 'MovieSift portable data policy version 2' -Encoding utf8NoBOM
+    $licenseRoot = Join-Path $payloadRoot 'licenses'
     New-Item -ItemType Directory -Path $licenseRoot -Force | Out-Null
 
     foreach ($document in @('LICENSE', 'README.md', 'THIRD_PARTY_NOTICES.md', 'CONTRIBUTING.md')) {
-        Copy-Item -LiteralPath (Join-Path $repositoryRoot $document) -Destination $packageRoot
+        Copy-Item -LiteralPath (Join-Path $repositoryRoot $document) -Destination $payloadRoot
     }
 
-    Copy-Item -LiteralPath (Join-Path $repositoryRoot 'docs') -Destination $packageRoot -Recurse
-    Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'tools.lock.json') -Destination (Join-Path $packageRoot 'tool-provenance.json')
+    Copy-Item -LiteralPath (Join-Path $repositoryRoot 'docs') -Destination $payloadRoot -Recurse
+    Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'tools.lock.json') -Destination (Join-Path $payloadRoot 'tool-provenance.json')
 
     if ($WindowsMkvBuildDirectory) {
-        Copy-Item -LiteralPath (Join-Path $packageRoot 'tools/mkv-source-provenance.json') -Destination (Join-Path $packageRoot 'mkv-source-provenance.json')
+        Copy-Item -LiteralPath (Join-Path $payloadRoot 'tools/mkv-source-provenance.json') -Destination (Join-Path $payloadRoot 'mkv-source-provenance.json')
     }
 
-    Copy-Item -LiteralPath (Join-Path $packageRoot 'tools/ffmpeg-provenance.json') -Destination (Join-Path $packageRoot 'ffmpeg-provenance.json')
+    Copy-Item -LiteralPath (Join-Path $payloadRoot 'tools/ffmpeg-provenance.json') -Destination (Join-Path $payloadRoot 'ffmpeg-provenance.json')
     & (Join-Path $PSScriptRoot 'collect-licenses.ps1') -AssetsFile (Join-Path $repositoryRoot 'src/MovieSift.Desktop/obj/project.assets.json') -Destination (Join-Path $licenseRoot 'nuget') -AdditionalPackages @("Microsoft.NETCore.App.Runtime.$RuntimeIdentifier/$runtimeVersion") -CacheDirectory (Join-Path $ToolCacheDirectory 'license-materials')
-    $runtimeConfiguration = Get-Content -LiteralPath (Join-Path $packageRoot 'MovieSift.runtimeconfig.json') -Raw | ConvertFrom-Json
+    $runtimeConfiguration = Get-Content -LiteralPath (Join-Path $payloadRoot 'MovieSift.runtimeconfig.json') -Raw | ConvertFrom-Json
     $shippedRuntime = $runtimeConfiguration.runtimeOptions.includedFrameworks | Where-Object name -EQ 'Microsoft.NETCore.App'
 
     if ($shippedRuntime.version -ne $runtimeVersion) {
@@ -174,10 +176,16 @@ try {
         operatingSystem = [Runtime.InteropServices.RuntimeInformation]::OSDescription
         artifactPurpose = 'review and acceptance testing; public-release obligations remain'
     }
-    $provenance | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $packageRoot 'build-provenance.json') -Encoding utf8NoBOM
+    $provenance | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $payloadRoot 'build-provenance.json') -Encoding utf8NoBOM
+
+    Copy-Item -LiteralPath (Join-Path $payloadRoot 'LICENSE') -Destination (Join-Path $packageRoot 'LICENSE')
+    Copy-Item -LiteralPath (Join-Path $payloadRoot 'build-provenance.json') -Destination (Join-Path $packageRoot 'build-provenance.json')
+    & (Join-Path $PSScriptRoot 'create-portable-apphost.ps1') -PackageRoot $packageRoot -RuntimeIdentifier $RuntimeIdentifier -AssetsFile (Join-Path $repositoryRoot 'src/MovieSift.Desktop/obj/project.assets.json') -RuntimeVersion $runtimeVersion -Dotnet $Dotnet
+    $internalApphost = if ($RuntimeIdentifier -eq 'win-x64') { 'MovieSift.exe' } else { 'MovieSift' }
+    Remove-Item -LiteralPath (Join-Path $payloadRoot $internalApphost)
 
     if ($RuntimeIdentifier -eq 'linux-x64') {
-        & bash (Join-Path $PSScriptRoot 'inspect-native-dependencies.sh') $packageRoot (Join-Path $packageRoot 'native-dependencies.txt')
+        & bash (Join-Path $PSScriptRoot 'inspect-native-dependencies.sh') $packageRoot (Join-Path $payloadRoot 'native-dependencies.txt')
 
         if ($LASTEXITCODE -ne 0) {
             throw 'A packaged ELF dependency was unresolved.'
