@@ -12,6 +12,8 @@ import subprocess
 import sys
 import wave
 
+from dts_fixture import create_fixture as create_dts_fixture
+
 FRAME_COUNT = 20
 CANCELLATION_FRAME_COUNT = 60000
 FRAME_RATE = 10
@@ -128,6 +130,7 @@ def main():
     run([str(executable), "--deterministic", "MovieSift-live-cancellation-v1", "--disable-track-statistics-tags",
          "--output", str(destination / "cancellation.mkv"), str(cancellation_video),
          str(destination / "low.wav"), str(destination / "high.wav"), str(destination / "captions.srt")])
+    create_dts_fixture((arguments.tool_directory, destination))
     manifest = {"generator": "MovieSift original synthetic fixture v1", "tool": version,
                 "files": {path.name: hashlib.sha256(path.read_bytes()).hexdigest()
                           for path in sorted(destination.glob("*.mkv"))}}

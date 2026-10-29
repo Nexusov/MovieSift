@@ -27,6 +27,12 @@ Separate generated real-tool chapter/tag fixtures keep `ger`/`fre` legacy fields
 
 Use `build/generate-ffmpeg-fixture.py` with an explicitly provided matching encoder to regenerate a sample and its JSON provenance. These MKV regressions read the checked-in inputs. Exact output hashes may depend on the recorded encoder build; inspect any fixture/provenance change independently.
 
+## Generated DTS fixtures
+
+`build/generate-fixtures.py` also creates original VP8/DTS/PCM fixtures through `build/dts_fixture.py`. Two embedded original DTS core frames contain six synthetic sine tones; their encoder command, development tool/archive hashes and frame hashes are recorded in the helper. CI needs only Python and pinned MKVToolNix, not an additional encoder. Generated provenance records the exact repeated stream and container hashes.
+
+The fixtures replace optional DTS `DefaultDuration` and `BitDepth` elements and affected CRCs with equal-length EBML Void; encoded payloads and offsets remain unchanged. One fixture disables lacing, preserving explicit frame times. The other keeps fixed lacing and exercises codec-derived times inside each real source block. Copy and replacement cases compare retained video/DTS bytes, metadata, source hashes and owned cleanup; a shifted-candidate negative control must still fail. No user media is included.
+
 ## Generated MP4 fixtures
 
 `build/generate-mp4-fixtures.py` verifies the original 7.1.1 input hash above, copies its encoded H.264/AAC, and creates small original mov_text captions, two chapters and PNG/JPEG covers using the pinned bundled FFmpeg. A separate native AAC encoding exercises priming with B-frame video. Ordinary, reordered, multiple-video, priming and deliberately fragmented files are generated under `artifacts/fixtures/mp4`; `mp4-provenance.json` records every command, actual tool version/configuration and complete file SHA256. They are required CI inputs, not shipped application media.

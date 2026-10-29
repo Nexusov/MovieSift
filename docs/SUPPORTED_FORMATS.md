@@ -36,6 +36,16 @@ An absent AAC `DefaultDuration` may be added only when unchanged codec configura
 
 The extractor appends a synthetic boundary after actual frame timestamps. If the source boundary duplicates its last frame timestamp, that boundary alone may gain the proven duration above, within the same 1 ms tolerance. Actual frames remain checked. This does not permit HE-AAC, 960-sample frames, changed configuration or changes to a known duration; some ordinary AAC files therefore fail verification.
 
+### DTS derived-header exception
+
+MKVToolNix can add missing DTS `DefaultDuration` and `BitDepth` from its first core frame. These additions are accepted only when bounded, independent source/candidate reads recognize the same ordinary 16-bit big/little-endian DTS core header, including sample rate, frame sample count, PCM precision, channels and frame size. Existing duration/precision values remain strict. The added duration must equal the proven samples-per-frame/rate within **1 ns**; precision must match the core header.
+
+The inspection reader examines at most **4,096 elements**, **256 KiB** of headers/prefixes and the first **64 MiB** of file offsets, supporting ordinary Matroska lacing. Unrecognized first blocks/encodings or exhausted bounds provide no exception authority. It does not decode audio or claim full payload equality.
+
+For a missing default, the pinned extractor repeats a SimpleBlock's timestamp for every laced frame. Verification can reconstruct unknown offsets inside **fixed-laced SimpleBlocks** from the proven DTS duration. A separate streaming reference checks every source block anchor, TimestampScale, signed offset, lace/frame length, frame count and original extractor line. Every frame's core prefix must retain sample rate, samples per frame, channels and size; valid per-frame PCM precision may vary, without changing the first-frame property proof. No source bytes are rewritten. The pass is bounded to **10,000,000 elements/frames**, **128 MiB** of read headers/prefixes and four nesting levels. Other target block/lace layouts, unsupported frames and exhausted bounds retain the original strict comparison.
+
+Every candidate frame timestamp/count is checked against that reference with the existing **1 ms** tolerance; explicit block anchors cannot move. As with AAC, only a duplicated unknown extractor terminal boundary may gain the proven duration. Other metadata, known durations and known terminal boundaries remain strict. This is not general timestamp repair or permission to accept arbitrary DTS timing changes.
+
 ### Unsupported MKV structures
 
 Inspection rejects:

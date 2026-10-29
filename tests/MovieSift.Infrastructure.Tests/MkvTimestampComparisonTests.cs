@@ -10,6 +10,24 @@ public sealed class MkvTimestampComparisonTests
 {
     private const string AacDuration = "21333333";
 
+    /// <summary>DTS end inference requires matching packet evidence and still compares every actual timestamp.</summary>
+    [Theory]
+    [InlineData("0|10|21|21", "0|10.666667|21.333334|32.000001", true)]
+    [InlineData("0|10|21|21", "0|10.666667|21.333334|42.666668", false)]
+    [InlineData("0|10|21|31", "0|10.666667|21.333334|32.000001", false)]
+    [InlineData("0|10|21|21", "0|12|21.333334|32.000001", false)]
+    public async Task ChecksProvenDtsUnknownEnd(string sourceValues, string candidateValues, bool equivalent)
+    {
+        var source = SourceTrack() with
+        {
+            Properties = ImmutableDictionary<string, string>.Empty.Add("codec_id", "A_DTS")
+                .Add("audio_sampling_frequency", "48000")
+                .Add(DtsDerivedPropertiesPolicy.EvidenceKey, "48000:512:24:6:2013")
+        };
+        var candidate = source with { Properties = source.Properties.Add("default_duration", "10666667") };
+        Assert.Equal(equivalent, await CompareAsync(new(sourceValues, candidateValues, source, candidate)));
+    }
+
     /// <summary>Permits the unknown-to-derived AAC end only when every real timestamp and frame count still matches.</summary>
     [Theory]
     [InlineData("0|21|42|42", "0|21.333333|42.666666|63.999999", true)]

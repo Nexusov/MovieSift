@@ -26,6 +26,7 @@ public sealed class MkvBackend(MkvBackendOptions options) : IMediaBackend
     {
         "uid", "number", "num_index_entries", "minimum_timestamp", "language_ietf",
         "default_track", "forced_track", "enabled_track", "language", "track_name", "_source_writing_application",
+        DtsDerivedPropertiesPolicy.EvidenceKey,
     };
     private readonly OwnedProcessRunner processRunner = new();
 
@@ -147,8 +148,11 @@ public sealed class MkvBackend(MkvBackendOptions options) : IMediaBackend
             {
                 var sourceTrack = request.Plan.RetainedTracks[trackIndex];
                 var outputTrack = candidate.Tracks[trackIndex];
+                var sourceTimestamps = await DtsTimestampReferenceAsync(new(
+                    sourceInspection.Source.FullPath, sourceScratch, sourceTrack, outputTrack,
+                    request.CancellationToken)).ConfigureAwait(false);
                 var timestampsMatch = await MkvTimestampComparison.EquivalentAsync(new TrackTimestampComparison(
-                    TimestampPath(new TrackPath(sourceScratch, sourceTrack.Id)),
+                    sourceTimestamps,
                     TimestampPath(new TrackPath(outputScratch, outputTrack.Id)), sourceTrack, outputTrack,
                     request.CancellationToken)).ConfigureAwait(false);
 
@@ -227,7 +231,7 @@ public sealed class MkvBackend(MkvBackendOptions options) : IMediaBackend
         var structureStarted = Stopwatch.GetTimestamp();
         await MkvSegmentInfoReader.ValidateAsync(new(request.Source.FullPath, request.CancellationToken)).ConfigureAwait(false);
         ReportInspectionTiming("structure", structureStarted);
-        return inspection;
+        return await DtsDerivedPropertiesPolicy.AnnotateAsync(inspection, request.CancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>Records bounded stage timings without paths or media metadata to diagnose large-file latency honestly.</summary>
@@ -285,6 +289,33 @@ public sealed class MkvBackend(MkvBackendOptions options) : IMediaBackend
         return new ExtractedMetadata(chapters, tags);
     }
 
+    /// <summary>Resolves only proven missing DTS lace durations; unsupported evidence retains the strict extracted reference.</summary>
+    private static async Task<string> DtsTimestampReferenceAsync(DtsTimestampReference request)
+    {
+        var extracted = TimestampPath(new TrackPath(request.Directory, request.SourceTrack.Id));
+        var provenDuration = DtsDerivedPropertiesPolicy.PermitsAddition(
+            new(request.SourceTrack, request.CandidateTrack), DtsDerivedPropertiesPolicy.DurationProperty);
+
+        if (!provenDuration || !ulong.TryParse(request.SourceTrack.Properties.GetValueOrDefault("number"),
+            NumberStyles.None, CultureInfo.InvariantCulture, out var number))
+        {
+            return extracted;
+        }
+
+        var evidence = await DtsCoreHeaderEvidence.ReadAsync(new(request.SourcePath,
+            new HashSet<ulong> { number }, request.CancellationToken)).ConfigureAwait(false);
+
+        if (!evidence.TryGetValue(number, out var header))
+        {
+            return extracted;
+        }
+
+        var reference = Path.Combine(request.Directory, $"track-{request.SourceTrack.Id.ToString(CultureInfo.InvariantCulture)}.dts-reference.txt");
+        var written = await DtsLacedTimestampEvidence.WriteReferenceAsync(new(request.SourcePath, number, header,
+            extracted, reference, request.CancellationToken)).ConfigureAwait(false);
+        return written ? reference : extracted;
+    }
+
     /// <summary>Extracts frame timestamps using local backend IDs and application-owned filenames.</summary>
     private async Task ExtractTimestampsAsync(TimestampExtraction request)
     {
@@ -339,12 +370,22 @@ public sealed class MkvBackend(MkvBackendOptions options) : IMediaBackend
                 actualProperties.Remove(AacDefaultDurationPolicy.PropertyName);
             }
 
+            foreach (var property in new[] { DtsDerivedPropertiesPolicy.DurationProperty, DtsDerivedPropertiesPolicy.BitDepthProperty })
+            {
+                if (DtsDerivedPropertiesPolicy.PermitsAddition(new(expected, actual), property))
+                {
+                    actualProperties.Remove(property);
+                }
+            }
+
             var propertiesMatch = expectedProperties.Count == actualProperties.Count
                 && expectedProperties.All(property => actualProperties.TryGetValue(property.Key, out var value) && property.Value == value);
 
             if (!propertiesMatch || !LanguageIetfMatches(new TrackLanguageComparison(expected, actual)))
             {
-                return $"Known codec, timing-header, disposition, or metadata properties changed for retained input track {expected.Id}.";
+                var changes = expectedProperties.Keys.Union(actualProperties.Keys).Order(StringComparer.Ordinal)
+                    .Where(key => expectedProperties.GetValueOrDefault(key) != actualProperties.GetValueOrDefault(key));
+                return $"Known codec, timing-header, disposition, or metadata properties changed for retained input track {expected.Id}. Differing properties: {string.Join(", ", changes)}; language_ietf: {expected.LanguageIetf ?? "absent"} -> {actual.LanguageIetf ?? "absent"}.";
             }
         }
 
@@ -479,6 +520,8 @@ public sealed class MkvBackend(MkvBackendOptions options) : IMediaBackend
     private sealed record MetadataExtraction(MediaInspection Inspection, string Directory, CancellationToken CancellationToken);
     private sealed record ExtractedMetadata(XDocument? Chapters, XDocument? Tags);
     private sealed record TimestampExtraction(string SourcePath, IReadOnlyList<MediaTrack> Tracks, string Directory, CancellationToken CancellationToken);
+    private sealed record DtsTimestampReference(string SourcePath, string Directory, MediaTrack SourceTrack,
+        MediaTrack CandidateTrack, CancellationToken CancellationToken);
     private sealed record TrackComparison(IReadOnlyList<MediaTrack> Expected, IReadOnlyList<MediaTrack> Actual);
     private sealed record AttachmentComparison(IReadOnlyList<Attachment> Expected, IReadOnlyList<Attachment> Actual);
     private sealed record TrackLanguageComparison(MediaTrack Expected, MediaTrack Actual);
