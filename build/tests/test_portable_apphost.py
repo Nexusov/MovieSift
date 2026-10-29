@@ -64,7 +64,7 @@ class PortableApphostTests(unittest.TestCase):
                 cached_template.write_bytes(cached_template.read_bytes() + b"changed")
             assets = root / "assets.json"
             assets.write_text(json.dumps({"packageFolders": {str(cache) + os.sep: {}}}), encoding="utf-8")
-            command = root / ("dotnet.cmd" if os.name == "nt" else "dotnet")
+            command = root / ("controlled-dotnet.cmd" if os.name == "nt" else "controlled-dotnet")
             if os.name == "nt":
                 command.write_text(f'@echo off\nif "%~1"=="--version" echo {self.sdk_version}\nif "%~1"=="--list-sdks" echo {self.sdk_version} [{root / "dotnet/sdk"}]\nexit /b 0\n', encoding="utf-8")
             else:
