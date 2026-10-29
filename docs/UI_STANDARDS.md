@@ -1,0 +1,17 @@
+# Desktop UI standards
+
+Apply these rules to new controls and regressions; extend the existing Soft styles and small shared views before adding a new visual implementation.
+
+- Keep one sticky heading and one accessible vector Close button per cosmetic panel. Use `iconClose` / `closeGlyph`, the shared caption template and the same rounded stroke family. Glyphs must be geometry, not font characters. Destructive workflow decisions still need explicit explanatory text.
+- Theme, Language and Updates are mutually exclusive cosmetic views. Their backdrop blocks workspace input without applying disabled colors. Outside click and Escape dismiss only cosmetics, never approvals, warnings or cleanup decisions. Focus returns to the current trigger; an outgoing animation must not steal focus from another open panel.
+- Keep a finite viewport, one settings scroller and a real non-overlay scrollbar gutter. Test control bounds against the actual scrollbar at the minimum window size. Do not fix overlay problems with per-field offsets or assertions against unrelated popup scrollbars.
+- Use the shared `accentChoice` radio template. Padding surrounds the indicator and label together; normal, selected, hover, focus and disabled states use semantic brushes. Color editors show effective HEX values and matching swatches, while unchanged defaults remain defaults in storage.
+- Use the shared disclosure and panel durations with reduced-motion support. Interruptions and reopened panels supersede old callbacks. Expansion must not call `BringIntoView` or recreate lists; additional content extends below the current viewport. Scrolling remains user controlled.
+- Keep per-category track collections and file editors stable. Tabs are presentation only. Removed tracks remain in place with Restore, while video stays required. Track IDs belong to each actual inspection. Cosmetic state does not change Review or approval.
+- Put file removal in its queue row and target that exact item. New queue explicitly confirms clearing a nonempty list. Neither action deletes source media or published outputs.
+- Keep source metadata, preset names and original titles untranslated. Use complete, validated data-only language packs. Indicate active and installed languages separately; show download progress only for a network download.
+- UI phrases have no terminal full stop. Preserve internal sentence punctuation, meaningful ellipses and question marks. Enforce the rule in English and every pack through `lang/validate-packs.py`; never rewrite original media titles, filenames, diagnostics or user-provided preset text.
+- Keep portable preferences and cached translations under root `data/`. Updates preserve all user data. A background translation refresh must be bounded, cancellable and compatible with the new English contract; offline failures retain valid cached data. Never present a corrupt or incompatible cache as installed.
+- Report real inspection stages and elapsed time. Show an ETA only when there is a measured progress denominator. Track-size statistics are reported/estimated, not payload proof; do not scan a movie solely to decorate a row with an exact size.
+
+Verify changed behavior with actual compiled bindings, focused lifecycle tests and minimum-size headless geometry. Offscreen renders are not Windows/Linux native, snap, focus-visibility or scaling acceptance. Record that distinction in the PR and build handoff.

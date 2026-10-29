@@ -89,9 +89,9 @@ jobs:
         run: |
           python -m unittest discover -s build/tests -v
           if ($LASTEXITCODE -ne 0) { throw 'Distribution evidence regression checks failed.' }
-          python translations/validate-packs.py
+          python lang/validate-packs.py
           if ($LASTEXITCODE -ne 0) { throw 'Translation catalog verification failed.' }
-          python -m unittest discover -s translations -p 'test_*.py' -v
+          python -m unittest discover -s lang -p 'test_*.py' -v
           if ($LASTEXITCODE -ne 0) { throw 'Translation validation regression checks failed.' }
       - name: Unit, headless UI and required real-backend tests
         run: dotnet test --configuration Release --no-build --no-restore --logger trx --results-directory ./TestResults

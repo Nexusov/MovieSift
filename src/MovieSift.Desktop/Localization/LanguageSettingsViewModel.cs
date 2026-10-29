@@ -20,6 +20,8 @@ public sealed partial class LanguageSettingsViewModel : ObservableObject
 
     [ObservableProperty] private string searchText = string.Empty;
     [ObservableProperty] private bool isBusy;
+    [ObservableProperty] private bool isDownloading;
+    [ObservableProperty] private bool isSynchronizing;
     [ObservableProperty] private double progressValue;
     [ObservableProperty] private bool isIndeterminate;
 
@@ -29,7 +31,7 @@ public sealed partial class LanguageSettingsViewModel : ObservableObject
         this.options = options;
         choices = TranslationCatalog.Languages.Select(language => new LanguageChoiceViewModel(this, language.Code, language.NativeName)).ToArray();
         CancelCommand = new RelayCommand(() => cancellation?.Cancel(), () => IsBusy);
-        RetryCommand = new AsyncRelayCommand(() => StartSelectionAsync(requestedLocale!, true), () => CanChoose && requestedLocale is not null);
+        RetryCommand = new AsyncRelayCommand(() => errorKey == "LanguageSyncFailed" ? StartSynchronizationAsync() : StartSelectionAsync(requestedLocale!, true), () => CanChoose && requestedLocale is not null);
         Localization.PropertyChanged += (_, _) => Refresh();
         Refresh();
     }
@@ -63,6 +65,7 @@ public sealed partial class LanguageSettingsViewModel : ObservableObject
     public async Task RestoreCachedAsync(string locale)
     {
         var requestRevision = ++revision;
+        requestedLocale = TranslationCatalog.IsSupported(locale) ? locale : null;
 
         if (options.Store is null)
         {
@@ -104,6 +107,7 @@ public sealed partial class LanguageSettingsViewModel : ObservableObject
             {
                 Localization.SetLanguage(locale);
                 Refresh();
+                _ = StartSynchronizationAsync();
                 return;
             }
         }
@@ -118,6 +122,7 @@ public sealed partial class LanguageSettingsViewModel : ObservableObject
             errorKey = "LanguageCacheMissing";
             requestedLocale = TranslationCatalog.IsSupported(locale) ? locale : null;
             Refresh();
+            _ = StartSynchronizationAsync();
         }
     }
 
@@ -154,6 +159,7 @@ public sealed partial class LanguageSettingsViewModel : ObservableObject
         cancellation = new CancellationTokenSource();
         var token = cancellation.Token;
         IsBusy = true;
+        IsDownloading = false;
         ProgressValue = 0;
         IsIndeterminate = true;
         Refresh();
@@ -178,6 +184,11 @@ public sealed partial class LanguageSettingsViewModel : ObservableObject
                     ProgressValue = value.TotalBytes is > 0 ? Math.Clamp(100d * value.BytesReceived / value.TotalBytes.Value, 0, 100) : 0;
                 });
                 var cached = forceDownload ? null : await store.LoadCachedAsync(locale, token);
+                if (cached is null)
+                {
+                    IsDownloading = true;
+                }
+
                 var pack = cached ?? await store.DownloadAsync(locale, progress, token);
                 token.ThrowIfCancellationRequested();
 
@@ -200,13 +211,87 @@ public sealed partial class LanguageSettingsViewModel : ObservableObject
         }
         catch (TranslationPackException exception)
         {
-            errorKey = exception.Code is TranslationErrorCode.InvalidPack or TranslationErrorCode.Incompatible ? "LanguageInvalidPack" : "LanguageFailure";
+            errorKey = exception.Code is TranslationErrorCode.InvalidPack or TranslationErrorCode.Incompatible or TranslationErrorCode.ResourceContractMismatch ? "LanguageInvalidPack" : "LanguageFailure";
         }
         finally
         {
             cancellation.Dispose();
             cancellation = null;
             IsBusy = false;
+            IsDownloading = false;
+            Refresh();
+        }
+    }
+
+    /// <summary>Tracks a retry through the same shutdown-drained operation as startup synchronization.</summary>
+    private Task StartSynchronizationAsync()
+    {
+        operation = SynchronizeAsync();
+        return operation;
+    }
+
+    /// <summary>Refreshes cached dictionaries after upgrades without showing a fake user-download progress bar.</summary>
+    private async Task SynchronizeAsync()
+    {
+        if (options.Store is null)
+        {
+            return;
+        }
+
+        var requestRevision = revision;
+        var initialLanguage = Localization.Language;
+        cancellation = new CancellationTokenSource();
+        var token = cancellation.Token;
+        IsBusy = true;
+        IsSynchronizing = true;
+        Refresh();
+
+        try
+        {
+            var packs = await options.Store.SynchronizeCachedAsync(token);
+
+            if (requestRevision != revision || token.IsCancellationRequested)
+            {
+                return;
+            }
+
+            if (errorKey == "LanguageSyncFailed")
+            {
+                errorKey = null;
+            }
+
+            foreach (var pack in packs)
+            {
+                Localization.InstallPack(pack);
+                installed.Add(pack.Locale);
+            }
+
+            var canRestoreMissingPreference = initialLanguage == "en" && Localization.Language == initialLanguage &&
+                requestedLocale is not null && requestedLocale != initialLanguage && packs.Any(pack => pack.Locale == requestedLocale);
+
+            if (canRestoreMissingPreference)
+            {
+                await options.ApplyLanguage(requestedLocale!);
+                errorKey = null;
+            }
+        }
+        catch (OperationCanceledException) when (token.IsCancellationRequested)
+        {
+        }
+        catch (TranslationPackException) when (requestRevision == revision)
+        {
+            errorKey = "LanguageSyncFailed";
+        }
+        catch (TranslationPackException)
+        {
+            // A late failure after shutdown no longer owns presentation state.
+        }
+        finally
+        {
+            cancellation.Dispose();
+            cancellation = null;
+            IsBusy = false;
+            IsSynchronizing = false;
             Refresh();
         }
     }

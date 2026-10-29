@@ -43,8 +43,8 @@ public sealed class TranslationPackStoreTests : IDisposable
             new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit, XmlResolver = null });
         var english = XDocument.Load(resourceReader).Root!.Elements("data").ToDictionary(
             element => element.Attribute("name")!.Value, element => element.Element("value")!.Value, StringComparer.Ordinal);
-        var payload = await File.ReadAllBytesAsync(Path.Combine(repository, "translations", locale + ".json"), TestContext.Current.CancellationToken);
-        var catalog = await File.ReadAllBytesAsync(Path.Combine(repository, "translations", "catalog.json"), TestContext.Current.CancellationToken);
+        var payload = await File.ReadAllBytesAsync(Path.Combine(repository, "lang", locale + ".json"), TestContext.Current.CancellationToken);
+        var catalog = await File.ReadAllBytesAsync(Path.Combine(repository, "lang", "catalog.json"), TestContext.Current.CancellationToken);
         using var source = JsonDocument.Parse(payload);
         var expected = source.RootElement.GetProperty("messages").EnumerateObject().ToDictionary(
             property => property.Name, property => property.Value.GetString()!, StringComparer.Ordinal);
@@ -141,7 +141,7 @@ public sealed class TranslationPackStoreTests : IDisposable
         Assert.Equal("Русский", pack.Messages["Title"]);
         Assert.Equal(3, calls.Count);
         Assert.Equal("https://api.github.com/repos/Nexusov/MovieSift/git/ref/heads/main", calls[0]);
-        Assert.All(calls.Skip(1), address => Assert.Contains("/" + Revision + "/translations/", address));
+        Assert.All(calls.Skip(1), address => Assert.Contains("/" + Revision + "/lang/", address));
         Assert.Equal(bytes.Length, progress.Last!.BytesReceived);
         using var offline = Client((_, _) => throw new InvalidOperationException("No network permitted."));
         var restored = await new GitHubTranslationPackStore(offline, directory, English).LoadCachedAsync("ru", TestContext.Current.CancellationToken);
@@ -286,6 +286,203 @@ public sealed class TranslationPackStoreTests : IDisposable
         var settings = new PortableSettingsStore(directory);
         await settings.SaveLanguageAsync(new(locale, TestContext.Current.CancellationToken));
         Assert.Equal(locale, await new PortableSettingsStore(directory).LoadLanguageAsync(TestContext.Current.CancellationToken));
+    }
+
+    /// <summary>A new build refreshes existing dictionaries from one snapshot; a fresh same-build store stays offline.</summary>
+    [Fact]
+    public async Task StartupSynchronizationRefreshesInstalledPackOncePerBuild()
+    {
+        var cachedPath = CachePath();
+        await File.WriteAllBytesAsync(cachedPath, Pack(), TestContext.Current.CancellationToken);
+        var updated = Pack("{0:N0} updated · {1}");
+        var requests = 0;
+        using var client = Client((request, _) =>
+        {
+            requests++;
+            return Task.FromResult(Response(request, Body(request, updated)));
+        });
+        var store = new GitHubTranslationPackStore(client, directory, English);
+        var packs = await store.SynchronizeCachedAsync(TestContext.Current.CancellationToken);
+        Assert.Equal("{0:N0} updated · {1}", Assert.Single(packs).Messages["Count"]);
+        Assert.Equal(3, requests);
+        using var offline = Client((_, _) => throw new InvalidOperationException("An already synchronized build must remain offline."));
+        var restarted = new GitHubTranslationPackStore(offline, directory, English);
+        Assert.Empty(await restarted.SynchronizeCachedAsync(TestContext.Current.CancellationToken));
+        Assert.Equal("{0:N0} updated · {1}", (await restarted.LoadCachedAsync("ru", TestContext.Current.CancellationToken))!.Messages["Count"]);
+    }
+
+    /// <summary>Network or incompatible new resources never replace an otherwise usable offline dictionary.</summary>
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task FailedStartupSynchronizationPreservesPreviousBytes(bool networkFailure)
+    {
+        var original = Pack();
+        var path = CachePath();
+        await File.WriteAllBytesAsync(path, original, TestContext.Current.CancellationToken);
+        using var client = Client((request, _) => networkFailure
+            ? throw new HttpRequestException("Controlled offline mode")
+            : Task.FromResult(Response(request, Body(request, Pack("Invalid missing placeholder")))));
+        var store = new GitHubTranslationPackStore(client, directory, English);
+        await Assert.ThrowsAsync<TranslationPackException>(() => store.SynchronizeCachedAsync(TestContext.Current.CancellationToken));
+        Assert.Equal(original, await File.ReadAllBytesAsync(path, TestContext.Current.CancellationToken));
+        Assert.NotNull(await store.LoadCachedAsync("ru", TestContext.Current.CancellationToken));
+        Assert.False(File.Exists(Path.Combine(directory, "translations", "synchronization.json")));
+    }
+
+    /// <summary>Both explicit download and upgrade refresh can use their exact official build when main's keys differ.</summary>
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task DifferentMainContractUsesExactBuiltOfficialSnapshot(bool synchronize)
+    {
+        const string builtRevision = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+        var oldPack = JsonSerializer.SerializeToUtf8Bytes(new
+        {
+            version = 1,
+            locale = "ru",
+            messages = new Dictionary<string, string> { ["Title"] = "Old title" }
+        });
+        var current = Pack();
+        var addresses = new List<Uri>();
+        using var client = Client((request, _) =>
+        {
+            addresses.Add(request.RequestUri!);
+            var payload = request.RequestUri!.AbsolutePath.Contains(builtRevision, StringComparison.Ordinal) ? current : oldPack;
+            return Task.FromResult(Response(request, Body(request, payload)));
+        });
+        var store = new GitHubTranslationPackStore(client, directory, English, builtRevision);
+
+        if (synchronize)
+        {
+            await File.WriteAllBytesAsync(CachePath(), current, TestContext.Current.CancellationToken);
+            Assert.Single(await store.SynchronizeCachedAsync(TestContext.Current.CancellationToken));
+        }
+
+        if (!synchronize)
+        {
+            await store.DownloadAsync("ru", cancellationToken: TestContext.Current.CancellationToken);
+        }
+
+        Assert.Equal(5, addresses.Count);
+        Assert.Contains(addresses, address => address.AbsoluteUri ==
+            "https://raw.githubusercontent.com/Nexusov/MovieSift/" + builtRevision + "/lang/ru.json");
+        Assert.Equal("{0:N0} files · {1}", (await store.LoadCachedAsync("ru", TestContext.Current.CancellationToken))!.Messages["Count"]);
+    }
+
+    /// <summary>A newly supported locale absent from main is resolved only from the exact built source catalog.</summary>
+    [Fact]
+    public async Task NewLocaleMissingFromMainUsesItsBuiltCatalog()
+    {
+        const string builtRevision = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+        var payload = Pack(locale: "sv");
+        using var client = Client((request, _) =>
+        {
+            var isBuilt = request.RequestUri!.AbsolutePath.Contains(builtRevision, StringComparison.Ordinal);
+            var bytes = Body(request, Pack());
+
+            if (isBuilt)
+            {
+                bytes = request.RequestUri.AbsolutePath.EndsWith("catalog.json", StringComparison.Ordinal)
+                    ? JsonSerializer.SerializeToUtf8Bytes(new
+                    {
+                        version = 1,
+                        packs = new[]
+                    { new { locale = "sv", file = "sv.json", sha256 = Convert.ToHexStringLower(SHA256.HashData(payload)), bytes = payload.Length } }
+                    })
+                    : payload;
+            }
+
+            return Task.FromResult(Response(request, bytes));
+        });
+        var pack = await new GitHubTranslationPackStore(client, directory, English, builtRevision)
+            .DownloadAsync("sv", cancellationToken: TestContext.Current.CancellationToken);
+        Assert.Equal("sv", pack.Locale);
+        Assert.True(File.Exists(Path.Combine(directory, "translations", "sv.json")));
+    }
+
+    /// <summary>A failed digest is an integrity failure and cannot be hidden by requesting a second snapshot.</summary>
+    [Fact]
+    public async Task IntegrityFailureNeverUsesBuiltSnapshotFallback()
+    {
+        const string builtRevision = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+        var addresses = new List<Uri>();
+        using var client = Client((request, _) =>
+        {
+            addresses.Add(request.RequestUri!);
+            var bytes = Body(request, Pack());
+
+            if (request.RequestUri!.AbsolutePath.EndsWith("ru.json", StringComparison.Ordinal))
+            {
+                bytes = Pack("{0:N0} altered · {1}");
+            }
+
+            return Task.FromResult(Response(request, bytes));
+        });
+        var store = new GitHubTranslationPackStore(client, directory, English, builtRevision);
+        var failure = await Assert.ThrowsAsync<TranslationPackException>(() =>
+            store.DownloadAsync("ru", cancellationToken: TestContext.Current.CancellationToken));
+        Assert.Equal(TranslationErrorCode.InvalidPack, failure.Code);
+        Assert.DoesNotContain(addresses, address => address.AbsolutePath.Contains(builtRevision, StringComparison.Ordinal));
+        Assert.False(File.Exists(Path.Combine(directory, "translations", "ru.json")));
+    }
+
+    /// <summary>Only an absent fixed official catalog permits fallback; server errors remain visible.</summary>
+    [Theory]
+    [InlineData(HttpStatusCode.NotFound)]
+    [InlineData(HttpStatusCode.InternalServerError)]
+    public async Task MissingOfficialCatalogUsesBuiltLangLocationButServerFailureDoesNot(HttpStatusCode status)
+    {
+        const string builtRevision = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+        var addresses = new List<Uri>();
+        using var client = Client((request, _) =>
+        {
+            addresses.Add(request.RequestUri!);
+
+            if (request.RequestUri!.AbsolutePath == "/Nexusov/MovieSift/" + Revision + "/lang/catalog.json")
+            {
+                return Task.FromResult(new HttpResponseMessage(status) { RequestMessage = request });
+            }
+
+            return Task.FromResult(Response(request, Body(request, Pack())));
+        });
+        var store = new GitHubTranslationPackStore(client, directory, English, builtRevision);
+
+        if (status == HttpStatusCode.NotFound)
+        {
+            Assert.Equal("ru", (await store.DownloadAsync("ru", cancellationToken: TestContext.Current.CancellationToken)).Locale);
+            Assert.Contains(addresses, address => address.AbsoluteUri ==
+                "https://raw.githubusercontent.com/Nexusov/MovieSift/" + builtRevision + "/lang/ru.json");
+        }
+
+        if (status == HttpStatusCode.InternalServerError)
+        {
+            var failure = await Assert.ThrowsAsync<TranslationPackException>(() =>
+                store.DownloadAsync("ru", cancellationToken: TestContext.Current.CancellationToken));
+            Assert.Equal(TranslationErrorCode.Unavailable, failure.Code);
+            Assert.DoesNotContain(addresses, address => address.AbsolutePath.Contains(builtRevision, StringComparison.Ordinal));
+        }
+    }
+
+    /// <summary>An absent pack after a valid manifest cannot be masked as a catalog migration.</summary>
+    [Fact]
+    public async Task MissingPackDoesNotUseBuiltSnapshotFallback()
+    {
+        const string builtRevision = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+        var addresses = new List<Uri>();
+        using var client = Client((request, _) =>
+        {
+            addresses.Add(request.RequestUri!);
+            return Task.FromResult(request.RequestUri!.AbsolutePath.EndsWith("ru.json", StringComparison.Ordinal)
+                ? new HttpResponseMessage(HttpStatusCode.NotFound) { RequestMessage = request }
+                : Response(request, Body(request, Pack())));
+        });
+        var store = new GitHubTranslationPackStore(client, directory, English, builtRevision);
+        var failure = await Assert.ThrowsAsync<TranslationPackException>(() =>
+            store.DownloadAsync("ru", cancellationToken: TestContext.Current.CancellationToken));
+        Assert.Equal(TranslationErrorCode.Unavailable, failure.Code);
+        Assert.DoesNotContain(addresses, address => address.AbsolutePath.Contains(builtRevision, StringComparison.Ordinal));
+        Assert.False(File.Exists(Path.Combine(directory, "translations", "ru.json")));
     }
 
     /// <summary>Removes only this fixture's temporary test directory.</summary>

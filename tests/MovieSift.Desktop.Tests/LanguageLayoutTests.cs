@@ -34,7 +34,7 @@ public sealed class LanguageLayoutTests
 
         if (locale != "en")
         {
-            using var pack = JsonDocument.Parse(File.ReadAllText(Path.Combine(RepositoryRoot(), "translations", locale + ".json")));
+            using var pack = JsonDocument.Parse(File.ReadAllText(Path.Combine(RepositoryRoot(), "lang", locale + ".json")));
             fixture.Localization.InstallPack(new(locale, pack.RootElement.GetProperty("messages").EnumerateObject()
                 .ToImmutableDictionary(property => property.Name, property => property.Value.GetString()!)));
         }
@@ -89,7 +89,7 @@ public sealed class LanguageLayoutTests
 
         while (directory is not null)
         {
-            if (File.Exists(Path.Combine(directory.FullName, "translations", "catalog.json")))
+            if (File.Exists(Path.Combine(directory.FullName, "lang", "catalog.json")))
             {
                 return directory.FullName;
             }

@@ -272,7 +272,35 @@ internal static class Mp4Probe
             tags.GetValueOrDefault("title", tags.GetValueOrDefault("name", string.Empty)),
             kind == TrackKind.Audio ? stream.GetProperty("channels").GetInt32() : null,
             dispositions.GetValueOrDefault("default") == "1", dispositions.GetValueOrDefault("forced") == "1", enabled,
-            properties.ToImmutable(), SemanticDispositions(dispositions));
+            properties.ToImmutable(), SemanticDispositions(dispositions), EstimatePayloadSize(stream));
+    }
+
+    /// <summary>Uses existing bounded probe facts for a display estimate; no extra packets are read.</summary>
+    private static TrackPayloadSize? EstimatePayloadSize(JsonElement stream)
+    {
+        const decimal bitsPerByte = 8;
+        decimal rate = 0;
+        decimal duration = 0;
+        var validRate = stream.TryGetProperty("bit_rate", out var rateElement)
+            && decimal.TryParse(rateElement.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out rate);
+        var validDuration = stream.TryGetProperty("duration", out var durationElement)
+            && decimal.TryParse(durationElement.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out duration);
+
+        if (!validRate || !validDuration)
+        {
+            return null;
+        }
+
+        var bytesPerSecond = rate / bitsPerByte;
+        var outsideBounds = bytesPerSecond <= 0 || duration <= 0 || bytesPerSecond > long.MaxValue;
+
+        if (outsideBounds || duration > long.MaxValue / bytesPerSecond)
+        {
+            return null;
+        }
+
+        var bytes = (long)(bytesPerSecond * duration);
+        return bytes > 0 ? new(bytes, TrackPayloadSizeKind.Estimated) : null;
     }
 
     /// <summary>Projects the existing shared descriptive flags while retaining every admitted raw disposition in properties.</summary>

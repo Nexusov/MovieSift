@@ -63,6 +63,7 @@
                       </WrapPanel>
                       <TextBlock Text="{Binding TitleText}" TextWrapping="Wrap" />
                       <TextBlock Text="{Binding FlagsText}" TextWrapping="Wrap" />
+                      <TextBlock Text="{Binding SizeText}" Classes="muted" ToolTip.Tip="{Binding Localization[TrackSizeHelp]}" />
                       <TextBlock Text="{Binding StateText}" TextWrapping="Wrap" />
                     </StackPanel>
                     <views:TrackSelectionActionView Grid.Column="1" VerticalAlignment="Top" IsVisible="{Binding !IsRequired}"
@@ -90,13 +91,25 @@
       <TextBlock Text="{Binding Localization[AggregateUnresolved]}" TextWrapping="Wrap" Foreground="{DynamicResource MovieSiftErrorBrush}" />
       <TextBlock Text="{Binding UnresolvedText}" TextWrapping="Wrap" />
     </StackPanel>
-    <TextBlock x:Name="VideoSectionHeading" Text="{Binding VideoSummaryText}" FontWeight="SemiBold" TextWrapping="Wrap" />
-    <ItemsControl ItemsSource="{Binding VideoGroups}" ItemTemplate="{StaticResource AggregateGroupTemplate}" />
-    <TextBlock x:Name="AudioSectionHeading" Text="{Binding AudioSummaryText}" FontWeight="SemiBold" TextWrapping="Wrap" />
-    <ItemsControl ItemsSource="{Binding AudioGroups}" ItemTemplate="{StaticResource AggregateGroupTemplate}" />
-    <TextBlock x:Name="SubtitleSectionHeading" Text="{Binding SubtitleSummaryText}" FontWeight="SemiBold" TextWrapping="Wrap" />
-    <Button x:Name="RemoveAllSubtitlesButton" Content="{Binding Localization[RemoveAllSubtitles]}"
-            Command="{Binding RemoveAllSubtitlesCommand}" HorizontalAlignment="Left" />
-    <ItemsControl ItemsSource="{Binding SubtitleGroups}" ItemTemplate="{StaticResource AggregateGroupTemplate}" />
+    <Expander x:Name="AggregateVideoSection" Header="{Binding VideoSummaryText}" ToolTip.Tip="{Binding Localization[AlwaysKept]}"
+              IsExpanded="False" HorizontalContentAlignment="Stretch">
+      <ItemsControl ItemsSource="{Binding VideoGroups}" ItemTemplate="{StaticResource AggregateGroupTemplate}" />
+    </Expander>
+    <TabControl x:Name="AggregateTrackCategories" Classes="trackCategories" SelectedIndex="{Binding SelectedTrackTab, Mode=TwoWay}">
+      <TabItem Header="{Binding Localization[Audio]}">
+        <StackPanel Spacing="8">
+          <TextBlock x:Name="AudioSectionHeading" Text="{Binding AudioSummaryText}" FontWeight="SemiBold" TextWrapping="Wrap" />
+          <ItemsControl ItemsSource="{Binding AudioGroups}" ItemTemplate="{StaticResource AggregateGroupTemplate}" />
+        </StackPanel>
+      </TabItem>
+      <TabItem Header="{Binding Localization[Subtitles]}">
+        <StackPanel Spacing="8">
+          <TextBlock x:Name="SubtitleSectionHeading" Text="{Binding SubtitleSummaryText}" FontWeight="SemiBold" TextWrapping="Wrap" />
+          <Button x:Name="RemoveAllSubtitlesButton" Content="{Binding Localization[RemoveAllSubtitles]}" Classes="danger"
+                  Command="{Binding RemoveAllSubtitlesCommand}" HorizontalAlignment="Left" />
+          <ItemsControl ItemsSource="{Binding SubtitleGroups}" ItemTemplate="{StaticResource AggregateGroupTemplate}" />
+        </StackPanel>
+      </TabItem>
+    </TabControl>
   </StackPanel>
 </UserControl>

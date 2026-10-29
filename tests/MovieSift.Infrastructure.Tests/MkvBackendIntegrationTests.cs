@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Globalization;
 using System.Security.Cryptography;
+using MovieSift.Application.Inspection;
 using MovieSift.Application.Jobs;
 using MovieSift.Application.Ports;
 using MovieSift.Core.Media;
@@ -16,6 +17,35 @@ namespace MovieSift.Infrastructure.Tests;
 /// <summary>Exercises real MKVToolNix identification, remux, verification, and retained encoded payloads.</summary>
 public sealed class MkvBackendIntegrationTests
 {
+    /// <summary>Exposes the structural scan separately and records bounded timings without adding packet extraction.</summary>
+    [MediaFact]
+    public async Task InspectionReportsItsRealBoundariesAndStageTimings()
+    {
+        using var workspace = new TestWorkspace();
+        var stages = new List<InspectionStage>();
+        var diagnostics = new List<string>();
+        var backend = new MkvBackend(new(new FileSourceAccess(),
+            MkvToolPaths.FromDirectory(MediaTestEnvironment.ToolDirectory) with { IsDevelopmentOverride = true },
+            Path.Combine(workspace.Path, "scratch"), diagnostics.Add));
+        var fixture = Path.Combine(MediaTestEnvironment.FixtureDirectory, "ordinary.mkv");
+
+        var result = await backend.InspectAsync(new(fixture, TestContext.Current.CancellationToken,
+            new ImmediateInspectionProgress(stages)));
+
+        Assert.NotEmpty(result.Tracks);
+        Assert.Equal([InspectionStage.CheckingTools, InspectionStage.ReadingContainer,
+            InspectionStage.CheckingStructure, InspectionStage.ReadingMetadata], stages);
+        Assert.Equal(4, diagnostics.Count);
+        Assert.All(diagnostics, message => Assert.Matches("^Inspection timing: (tools|identification|structure|metadata) [0-9]+ ms$", message));
+        Assert.Empty(Directory.EnumerateFileSystemEntries(Path.Combine(workspace.Path, "scratch")));
+    }
+
+    /// <summary>Records backend observations synchronously without introducing UI scheduling into media tests.</summary>
+    private sealed class ImmediateInspectionProgress(List<InspectionStage> stages) : IProgress<InspectionStage>
+    {
+        public void Report(InspectionStage value) => stages.Add(value);
+    }
+
     /// <summary>Replaces one original through the real job owner and verifies published media against the untouched fixture.</summary>
     [MediaFact]
     public async Task ReplaceSourcePreservesRetainedMediaAndCleansOwnedBackupAndJournal()

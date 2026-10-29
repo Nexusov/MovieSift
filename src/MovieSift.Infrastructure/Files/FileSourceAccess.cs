@@ -72,11 +72,11 @@ public sealed class FileSourceAccess : ISourceAccess
     }
 
     /// <summary>Opens Linux files without following a final symlink or blocking on a substituted FIFO.</summary>
-    private static SafeFileHandle OpenReadHandle(string path)
+    private static SafeFileHandle OpenReadHandle(string path, FileOptions options = FileOptions.None)
     {
         if (!OperatingSystem.IsLinux())
         {
-            return File.OpenHandle(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+            return File.OpenHandle(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete, options);
         }
 
         var descriptor = NativeMethods.Open(path, LinuxNonBlocking | LinuxNoFollow | LinuxCloseOnExec);
@@ -90,10 +90,10 @@ public sealed class FileSourceAccess : ISourceAccess
     }
 
     /// <summary>Provides a read-only regular-file stream without blocking on a substituted Linux FIFO.</summary>
-    internal static FileStream OpenRegularReadStream(string path)
+    internal static FileStream OpenRegularReadStream(string path, FileOptions options = FileOptions.None)
     {
         PathSafety.RejectReparsePoints(path);
-        var handle = OpenReadHandle(path);
+        var handle = OpenReadHandle(path, options);
 
         try
         {

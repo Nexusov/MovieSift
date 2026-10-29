@@ -95,7 +95,22 @@ public sealed class PortableUpdateInstallerTests(ITestOutputHelper output)
     {
         using var fixture = new InstallationFixture();
         await fixture.PrepareAsync();
+        var personalRecords = new[] { "appearance.json", "rule-presets.json", "translations/ru.json", "translations/da.json" };
+
+        foreach (var relative in personalRecords)
+        {
+            var path = Path.Combine(fixture.App, "data", relative);
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            await File.WriteAllTextAsync(path, "preserve " + relative, TestContext.Current.CancellationToken);
+        }
+
         await PortableUpdateInstaller.ApplyAsync(fixture.Session, fixture.Plan!, Directory.Move, TestContext.Current.CancellationToken);
+
+        foreach (var relative in personalRecords)
+        {
+            Assert.Equal("preserve " + relative, await File.ReadAllTextAsync(Path.Combine(fixture.App, "data", relative), TestContext.Current.CancellationToken));
+        }
+
         Assert.Equal("new version", await File.ReadAllTextAsync(Path.Combine(fixture.App, "version.txt"), TestContext.Current.CancellationToken));
         Assert.Equal("personal preferences", await File.ReadAllTextAsync(Path.Combine(fixture.App, "data", "settings.json"), TestContext.Current.CancellationToken));
         Assert.Equal("user file", await File.ReadAllTextAsync(Path.Combine(fixture.App, "personal.txt"), TestContext.Current.CancellationToken));

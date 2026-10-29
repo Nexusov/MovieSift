@@ -32,7 +32,7 @@ public sealed class LanguageSettingsTests
         try
         {
             Dispatcher.UIThread.RunJobs();
-            Assert.Equal(12, languages.Languages.Count);
+            Assert.Equal(TranslationCatalog.Languages.Length, languages.Languages.Count);
             Assert.False(string.IsNullOrWhiteSpace(AutomationProperties.GetName(window.FindControl<Button>("LanguageButton")!)));
             fixture.Main.ToggleLanguageCommand.Execute(null);
             Dispatcher.UIThread.RunJobs();
@@ -83,6 +83,111 @@ public sealed class LanguageSettingsTests
             await languages.ShutdownAsync();
             window.Close();
         }
+    }
+
+    /// <summary>Cached and English switches never announce a download or change workspace authority.</summary>
+    [AvaloniaFact]
+    public async Task CachedAndEnglishSwitchesDoNotFlashDownloadProgress()
+    {
+        var store = new ControlledTranslations();
+        store.Complete.TrySetResult(ControlledTranslations.Pack("ru"));
+        var localization = new LocalizationService();
+        var languages = new LanguageSettingsViewModel(new(store, localization, locale =>
+        {
+            localization.SetLanguage(locale);
+            return Task.CompletedTask;
+        }));
+        await languages.SelectAsync("ru");
+        var progressStates = new List<bool>();
+        languages.PropertyChanged += (_, change) =>
+        {
+            if (change.PropertyName == nameof(languages.IsDownloading))
+            {
+                progressStates.Add(languages.IsDownloading);
+            }
+        };
+        await languages.SelectAsync("en");
+        await languages.SelectAsync("ru");
+        Assert.DoesNotContain(true, progressStates);
+        Assert.Equal(1, store.Downloads);
+        Assert.False(languages.IsDownloading);
+    }
+
+    /// <summary>Startup keeps the validated offline language visible while refreshed dictionaries arrive or fail.</summary>
+    [AvaloniaTheory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task StartupRefreshKeepsOfflineLanguageAndDoesNotShowDownload(bool fails)
+    {
+        var store = new ControlledRefreshTranslations();
+        var localization = new LocalizationService();
+        var languages = new LanguageSettingsViewModel(new(store, localization, locale =>
+        {
+            localization.SetLanguage(locale);
+            return Task.CompletedTask;
+        }));
+        var finished = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        languages.PropertyChanged += (_, change) =>
+        {
+            if (change.PropertyName == nameof(languages.IsBusy) && !languages.IsBusy)
+            {
+                finished.TrySetResult();
+            }
+        };
+        await languages.RestoreCachedAsync("ru");
+        Assert.Equal("ru", localization.Language);
+        Assert.True(languages.IsSynchronizing);
+        Assert.False(languages.IsDownloading);
+
+        if (fails)
+        {
+            store.Complete.TrySetException(new TranslationPackException(TranslationErrorCode.Unavailable, "Controlled offline refresh"));
+        }
+
+        if (!fails)
+        {
+            store.Complete.TrySetResult([ControlledTranslations.Pack("ru") with
+            { Messages = ControlledTranslations.Pack("ru").Messages.SetItem("LanguageTitle", "Обновлённый язык") }]);
+        }
+
+        await BatchViewModelFixture.Await(finished.Task);
+        Assert.Equal("ru", localization.Language);
+        Assert.Equal(fails, languages.HasError);
+        Assert.Equal(fails ? "Язык интерфейса" : "Обновлённый язык", localization["LanguageTitle"]);
+        Assert.False(languages.IsDownloading);
+        Assert.False(languages.IsSynchronizing);
+        await languages.ShutdownAsync();
+    }
+
+    /// <summary>A cosmetic language choice made during refresh is never replaced by the old startup preference.</summary>
+    [AvaloniaFact]
+    public async Task StartupRefreshCannotRestoreAnObsoleteLanguageChoice()
+    {
+        var store = new ControlledRefreshTranslations();
+        var localization = new LocalizationService();
+        var writes = 0;
+        var languages = new LanguageSettingsViewModel(new(store, localization, locale =>
+        {
+            writes++;
+            localization.SetLanguage(locale);
+            return Task.CompletedTask;
+        }));
+        var finished = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        languages.PropertyChanged += (_, change) =>
+        {
+            if (change.PropertyName == nameof(languages.IsBusy) && !languages.IsBusy)
+            {
+                finished.TrySetResult();
+            }
+        };
+        await languages.RestoreCachedAsync("ru");
+        localization.SetLanguage("en");
+        store.Complete.TrySetResult([ControlledTranslations.Pack("ru")]);
+        await BatchViewModelFixture.Await(finished.Task);
+        Assert.Equal("en", localization.Language);
+        Assert.Equal(0, writes);
+        Assert.True(languages.IsInstalled("ru"));
+        await languages.ShutdownAsync();
     }
 
     /// <summary>Cancellation and availability gates retain the actual language without installing partial data.</summary>
@@ -220,4 +325,19 @@ internal sealed class ControlledTranslations : ITranslationPackStore
     /// <summary>Creates controlled translated values, not evidence of a real downloaded or linguistically reviewed pack.</summary>
     public static TranslationPack Pack(string locale) => new(locale, LocalizationService.EnglishMessages.ToImmutableDictionary()
         .SetItem("LanguageTitle", locale == "ru" ? "Язык интерфейса" : "translated title"));
+}
+
+/// <summary>Controls startup refresh independently of local cache reading and manual downloads.</summary>
+internal sealed class ControlledRefreshTranslations : ITranslationPackStore
+{
+    public TaskCompletionSource<IReadOnlyList<TranslationPack>> Complete { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+    public Task<TranslationPack?> LoadCachedAsync(string locale, CancellationToken cancellationToken = default)
+        => Task.FromResult<TranslationPack?>(locale == "ru" ? ControlledTranslations.Pack("ru") : null);
+
+    public Task<IReadOnlyList<TranslationPack>> SynchronizeCachedAsync(CancellationToken cancellationToken = default)
+        => Complete.Task.WaitAsync(cancellationToken);
+
+    public Task<TranslationPack> DownloadAsync(string locale, IProgress<TranslationDownloadProgress>? progress = null,
+        CancellationToken cancellationToken = default) => throw new InvalidOperationException("Startup must use cache synchronization.");
 }

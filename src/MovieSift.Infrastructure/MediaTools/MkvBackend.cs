@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using System.Xml.Linq;
 using MovieSift.Application;
@@ -32,19 +33,23 @@ public sealed class MkvBackend(MkvBackendOptions options) : IMediaBackend
     public async Task<MediaInspection> InspectAsync(InspectRequest request)
     {
         request.Progress?.Report(InspectionStage.CheckingTools);
+        var toolsStarted = Stopwatch.GetTimestamp();
         await ValidateToolsAsync(request.CancellationToken).ConfigureAwait(false);
+        ReportInspectionTiming("tools", toolsStarted);
         var revision = await options.SourceAccess.ReadRevisionAsync(new SourceRequest(
             request.SourcePath, request.CancellationToken)).ConfigureAwait(false);
         request.Progress?.Report(InspectionStage.ReadingContainer);
-        var inspection = await IdentifyAsync(new IdentifyRequest(revision, request.CancellationToken)).ConfigureAwait(false);
+        var inspection = await IdentifyAsync(new IdentifyRequest(revision, request.CancellationToken, request.Progress)).ConfigureAwait(false);
         var scratch = CreateScratchDirectory();
         var terminationConfirmed = true;
 
         try
         {
             request.Progress?.Report(InspectionStage.ReadingMetadata);
-            await ExtractMetadataAsync(new MetadataExtraction(inspection, scratch, request.CancellationToken)).ConfigureAwait(false);
-            return inspection;
+            var metadataStarted = Stopwatch.GetTimestamp();
+            var metadata = await ExtractMetadataAsync(new MetadataExtraction(inspection, scratch, request.CancellationToken)).ConfigureAwait(false);
+            ReportInspectionTiming("metadata", metadataStarted);
+            return MkvReportedTrackSizes.Apply(inspection, metadata.Tags);
         }
         catch (OperationFailureException exception) when (exception.Failure.Code == ErrorCode.ProcessTerminationFailed)
         {
@@ -204,6 +209,7 @@ public sealed class MkvBackend(MkvBackendOptions options) : IMediaBackend
     /// <summary>Rejects incomplete identification and snapshots the real probe properties.</summary>
     private async Task<MediaInspection> IdentifyAsync(IdentifyRequest request)
     {
+        var identificationStarted = Stopwatch.GetTimestamp();
         // JSON field names and values are invariant without selecting a platform-specific tool UI locale.
         var result = await RunAsync(new ProcessRequest(options.Tools.MkvMerge,
             ["--output-charset", "UTF-8", "-J", request.Source.FullPath],
@@ -216,8 +222,19 @@ public sealed class MkvBackend(MkvBackendOptions options) : IMediaBackend
         }
 
         var inspection = MkvIdentification.Parse(new MkvIdentification.IdentificationRequest(result.StandardOutput, request.Source));
+        ReportInspectionTiming("identification", identificationStarted);
+        request.Progress?.Report(InspectionStage.CheckingStructure);
+        var structureStarted = Stopwatch.GetTimestamp();
         await MkvSegmentInfoReader.ValidateAsync(new(request.Source.FullPath, request.CancellationToken)).ConfigureAwait(false);
+        ReportInspectionTiming("structure", structureStarted);
         return inspection;
+    }
+
+    /// <summary>Records bounded stage timings without paths or media metadata to diagnose large-file latency honestly.</summary>
+    private void ReportInspectionTiming(string stage, long started)
+    {
+        options.Diagnostic?.Invoke(FormattableString.Invariant(
+            $"Inspection timing: {stage} {Stopwatch.GetElapsedTime(started).TotalMilliseconds:F0} ms"));
     }
 
     /// <summary>Extracts complete XML into application-owned names and validates unsupported structures.</summary>
@@ -457,7 +474,8 @@ public sealed class MkvBackend(MkvBackendOptions options) : IMediaBackend
         return new OperationFailureException(new Failure(failure.Code, failure.Detail));
     }
 
-    private sealed record IdentifyRequest(SourceRevision Source, CancellationToken CancellationToken);
+    private sealed record IdentifyRequest(SourceRevision Source, CancellationToken CancellationToken,
+        IProgress<InspectionStage>? Progress = null);
     private sealed record MetadataExtraction(MediaInspection Inspection, string Directory, CancellationToken CancellationToken);
     private sealed record ExtractedMetadata(XDocument? Chapters, XDocument? Tags);
     private sealed record TimestampExtraction(string SourcePath, IReadOnlyList<MediaTrack> Tracks, string Directory, CancellationToken CancellationToken);

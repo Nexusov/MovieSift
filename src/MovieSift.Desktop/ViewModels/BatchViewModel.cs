@@ -49,6 +49,8 @@ public sealed partial class BatchViewModel : ObservableObject
     public BatchViewModel(BatchViewModelServices services)
     {
         this.services = services;
+        OutputPreferences = new(services.OutputPreferences, services.Localization, () => CanRememberOutputChoice, () => EffectiveOutputMode, services.Log);
+        OutputPreferences.PropertyChanged += (_, _) => Refresh();
         InspectionActivity = new(services.Localization);
         Snapshot = services.Session.Snapshot;
         LanguageRules = new(new(services.Session, services.Coordinator, services.Localization, () => CanEdit, OnEditorChanged));
@@ -66,6 +68,8 @@ public sealed partial class BatchViewModel : ObservableObject
         InspectPendingCommand = new AsyncRelayCommand(InspectPendingAsync, () => CanEdit && Items.Any(item => item.Snapshot.State == BatchItemState.PendingInspection));
         InspectSelectedCommand = new AsyncRelayCommand(InspectSelectedAsync, () => CanInspectSelected);
         RemoveSelectedCommand = new RelayCommand(RemoveSelected, () => CanRemoveSelected);
+        RemoveItemCommand = new RelayCommand<BatchItemViewModel>(RemoveItem,
+            item => CanEdit && item is { Snapshot.Result: null } && Items.Contains(item));
         CloseReviewCommand = new RelayCommand(CloseReview);
         OpenSelectedDetailsCommand = new RelayCommand(() => IsDetailsOpen = true, () => SelectedItem is not null);
         ReviewCommand = new AsyncRelayCommand(ReviewAsync, () => CanEdit && Items.Count != 0 && !HasMixedOutputModes);
@@ -91,6 +95,7 @@ public sealed partial class BatchViewModel : ObservableObject
     public QueueRecoveryViewModel Recovery { get; }
     public AggregateTracksViewModel AggregateTracks { get; }
     public InspectionActivityViewModel InspectionActivity { get; }
+    public OutputPreferencesViewModel OutputPreferences { get; }
     public BatchSnapshot Snapshot { get; private set; }
     public string OutputFolder => outputFolder;
     private IEnumerable<BatchItemViewModel> PendingOutputItems => Items.Where(item =>
@@ -129,6 +134,7 @@ public sealed partial class BatchViewModel : ObservableObject
                 editor.ApplyOutputMode(outputMode, outputFolder);
             }
 
+            OutputPreferences.SaveCurrent();
             OnEditorChanged();
         }
     }
@@ -147,12 +153,13 @@ public sealed partial class BatchViewModel : ObservableObject
         }
     }
     public bool CanEdit => IsWorkspaceAvailable && !HasNewBatchConfirmation && !Presets.IsBusy && Recovery.CanEditBatch;
+    public bool CanRememberOutputChoice => CanEdit && !HasMixedOutputModes;
     public bool CanRun => CanEdit && !writesBlocked && !HasMixedOutputModes && HasCurrentReview;
     public bool CanRemoveSelected => CanEdit && SelectedItem is { Snapshot.Result: null };
     public bool CanInspectSelected => CanEdit && SelectedItem is { } selected && selected.Snapshot.State is not (BatchItemState.Completed or BatchItemState.NoChange);
     public bool HasSafetyBlock => Snapshot.HasSafetyBlock;
     public bool HasWarningCandidate => WarningOwner is not null;
-    public bool HasBlockingOperation => IsBusy || Presets.IsBusy || Recovery.IsBusy || HasWarningCandidate || HasSafetyBlock || HasNewBatchConfirmation;
+    public bool HasBlockingOperation => IsBusy || Presets.IsBusy || Recovery.IsBusy || OutputPreferences.IsSaving || HasWarningCandidate || HasSafetyBlock || HasNewBatchConfirmation;
     public bool HasNewBatchConfirmation => newBatchConfirmationRevision is not null;
     public bool HasCleanupIssue => Snapshot.Items.Any(item => item.Result is { CleanupIssues.IsDefaultOrEmpty: false });
     public bool HasWarningCloseDecision => warningCloseRequested && HasWarningCandidate;
@@ -194,6 +201,7 @@ public sealed partial class BatchViewModel : ObservableObject
     public IAsyncRelayCommand InspectPendingCommand { get; }
     public IAsyncRelayCommand InspectSelectedCommand { get; }
     public IRelayCommand RemoveSelectedCommand { get; }
+    public IRelayCommand<BatchItemViewModel> RemoveItemCommand { get; }
     public IAsyncRelayCommand ReviewCommand { get; }
     public IAsyncRelayCommand RunCommand { get; }
     public IRelayCommand CancelCommand { get; }
@@ -205,6 +213,19 @@ public sealed partial class BatchViewModel : ObservableObject
     public IRelayCommand KeepCurrentBatchCommand { get; }
     public IRelayCommand CloseReviewCommand { get; }
     public IRelayCommand OpenSelectedDetailsCommand { get; }
+
+    /// <summary>Restores only the default for later inputs; recovered rows keep their saved destination intent.</summary>
+    public async Task InitializePreferencesAsync()
+    {
+        await OutputPreferences.InitializeAsync();
+
+        if (Items.Count == 0)
+        {
+            outputMode = OutputPreferences.DefaultMode;
+        }
+
+        Refresh();
+    }
 
     /// <summary>Requests explicit consent before clearing any existing list, plans or results.</summary>
     private void RequestNewBatch()
@@ -258,7 +279,7 @@ public sealed partial class BatchViewModel : ObservableObject
         }
 
         operationRevision++;
-        outputMode = OutputMode.Copy;
+        outputMode = OutputPreferences.DefaultMode;
         IsReviewOpen = false;
         IsDetailsOpen = false;
         IsRulesOpen = false;
@@ -294,6 +315,7 @@ public sealed partial class BatchViewModel : ObservableObject
         await activeOperation;
         await Presets.WhenIdleAsync();
         await Recovery.WhenIdleAsync();
+        await OutputPreferences.WhenIdleAsync();
     }
 
     /// <summary>Asks about the frozen warning owner even when another row or tab is selected.</summary>
@@ -416,7 +438,20 @@ public sealed partial class BatchViewModel : ObservableObject
     /// <summary>Removes an unstarted row instead of silently omitting a failed inspection.</summary>
     private void RemoveSelected()
     {
-        if (SelectedItem is not { } selected)
+        RemoveItem(SelectedItem);
+    }
+
+    /// <summary>Removes the explicitly targeted unfinished row without changing another row's selection or result.</summary>
+    private void RemoveItem(BatchItemViewModel? selected)
+    {
+        if (selected is null)
+        {
+            return;
+        }
+
+        var canRemove = CanEdit && selected.Snapshot.Result is null && Items.Contains(selected);
+
+        if (!canRemove)
         {
             return;
         }
@@ -741,6 +776,7 @@ public sealed partial class BatchViewModel : ObservableObject
         SetOutputModeCommand?.NotifyCanExecuteChanged();
         InspectSelectedCommand?.NotifyCanExecuteChanged();
         RemoveSelectedCommand?.NotifyCanExecuteChanged();
+        RemoveItemCommand?.NotifyCanExecuteChanged();
         ReviewCommand?.NotifyCanExecuteChanged();
         RunCommand?.NotifyCanExecuteChanged();
         CancelCommand?.NotifyCanExecuteChanged();

@@ -98,7 +98,7 @@ public sealed class AggregateWorkspaceTests
         var spanishMember = Assert.Single(spanishGroup.Members);
         Assert.Equal(1, spanishGroup.Snapshot.FileCoverage);
         Assert.Equal(1, spanishGroup.Snapshot.OccurrenceCount);
-        Assert.Contains("1 of 5", spanishGroup.CoverageText);
+        Assert.Equal("Files: 1/5 · Tracks: 1", spanishGroup.CoverageText);
         Assert.Equal(fourth.Source.FullPath, spanishMember.SourcePath);
         Assert.Equal("0", spanishMember.IdentifierText);
         var shared = Assert.Single(batch.AggregateTracks.Groups, group => group.Snapshot.Key.Title == SharedAudioTitle);
@@ -210,7 +210,7 @@ public sealed class AggregateWorkspaceTests
             Assert.Equal(plans, batch.Items.Select(item => item.ApprovedPlan));
             Assert.Same(group, Assert.Single(batch.AggregateTracks.Groups, row => row.Snapshot.Key.Title == "Captions"));
             Assert.True(group.IsExpanded);
-            Assert.Contains("из", group.CoverageText);
+            Assert.Equal("Файлы: 2/2 · Дорожки: 2", group.CoverageText);
             await fixture.Main.ChangeLanguageCommand.ExecuteAsync("en");
             Assert.Same(originalReview, batch.Snapshot.Review);
             Assert.True(group.Keep);

@@ -63,6 +63,17 @@ class TranslationValidationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "empty, invalid or excessive"):
             self.validate()
 
+    def test_terminal_period_is_rejected_without_removing_loading_ellipsis(self):
+        """Make the UI copy policy a mechanical gate rather than a remembered manual convention."""
+        for text in ("Pistas.", "Pistas。", "Pistas．"):
+            with self.subTest(text=text):
+                self.pack["messages"]["Title"] = text
+                with self.assertRaisesRegex(ValueError, "terminal period"):
+                    self.validate()
+        for text in ("Pistas…", "Pistas...", "¿Pistas?"):
+            self.pack["messages"]["Title"] = text
+            self.validate()
+
     def test_duplicate_json_properties_are_rejected(self):
         """Reject duplicate keys rather than validating a lossy dictionary view."""
         self.path.write_text('{"version":1,"version":1}', encoding="utf-8")

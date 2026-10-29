@@ -1,11 +1,70 @@
 <!-- Rounded Soft interaction patterns adapted from Filee (MIT); see third-party notices. -->
-<Styles xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+<Styles xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:appearance="using:MovieSift.Desktop.Appearance">
   <Styles.Resources>
     <CornerRadius x:Key="MovieSiftPanelRadius">16</CornerRadius>
     <CornerRadius x:Key="MovieSiftControlRadius">9</CornerRadius>
     <BackEaseOut x:Key="MovieSiftPressEase" />
     <BoxShadows x:Key="MovieSiftPanelShadow">0 2 8 0 #10000000</BoxShadows>
+    <!-- Pinned Fluent's chevron animation is hard-coded to 62.5ms. Keep its accessible header theme,
+         but supply one rounded glyph with the application's interruptible, reduced-motion-aware timing. -->
+    <ControlTheme x:Key="MovieSiftExpanderHeader" TargetType="ToggleButton" BasedOn="{StaticResource FluentExpanderToggleButtonTheme}">
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border x:Name="ToggleButtonBackground" CornerRadius="{TemplateBinding CornerRadius}" Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+            <Grid ColumnDefinitions="*,Auto">
+              <ContentPresenter x:Name="PART_ContentPresenter" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
+                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                Foreground="{TemplateBinding Foreground}" Margin="{TemplateBinding Padding}" />
+              <Path x:Name="MovieSiftChevron" Grid.Column="1" Margin="20,0,12,0" Width="14" Height="8" VerticalAlignment="Center"
+                    Stroke="{DynamicResource MovieSiftTextBrush}" StrokeThickness="1.6" StrokeLineCap="Round" StrokeJoin="Round"
+                    Stretch="Uniform" Data="M1,1 L7,7 L13,1" RenderTransform="rotate(0deg)" RenderTransformOrigin="50%,50%">
+                <Path.Transitions>
+                  <Transitions><TransformOperationsTransition Property="RenderTransform" Duration="{DynamicResource MovieSiftDisclosureDuration}" Easing="CubicEaseOut" /></Transitions>
+                </Path.Transitions>
+              </Path>
+            </Grid>
+          </Border>
+        </ControlTemplate>
+      </Setter>
+      <Style Selector="^:checked /template/ Path#MovieSiftChevron">
+        <Setter Property="RenderTransform" Value="rotate(180deg)" />
+      </Style>
+    </ControlTheme>
+    <!-- Preserve Fluent's header/content names, direction rules and automation peers.
+         Only content visibility is delegated to the same interruptible cosmetic fade as shell panels. -->
+    <ControlTheme x:Key="MovieSiftExpander" TargetType="Expander" BasedOn="{StaticResource {x:Type Expander}}">
+      <Setter Property="Template">
+        <ControlTemplate>
+          <DockPanel MinWidth="{TemplateBinding MinWidth}" MaxWidth="{TemplateBinding MaxWidth}">
+            <ToggleButton x:Name="ExpanderHeader" MinHeight="{TemplateBinding MinHeight}" CornerRadius="{TemplateBinding CornerRadius}"
+                          IsEnabled="{TemplateBinding IsEnabled}" Content="{TemplateBinding Header}" ContentTemplate="{TemplateBinding HeaderTemplate}"
+                          IsChecked="{TemplateBinding IsExpanded, Mode=TwoWay}" />
+            <Border x:Name="ExpanderContent" appearance:SoftMotion.Visible="{TemplateBinding IsExpanded}"
+                    Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
+                    MinHeight="{TemplateBinding MinHeight}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="{TemplateBinding Padding}">
+              <ContentPresenter x:Name="PART_ContentPresenter" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
+                                Foreground="{TemplateBinding Foreground}" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+            </Border>
+          </DockPanel>
+        </ControlTemplate>
+      </Setter>
+    </ControlTheme>
   </Styles.Resources>
+  <Style Selector="Expander">
+    <Setter Property="Theme" Value="{StaticResource MovieSiftExpander}" />
+  </Style>
+  <Style Selector="Expander:down /template/ ToggleButton#ExpanderHeader">
+    <Setter Property="Theme" Value="{StaticResource MovieSiftExpanderHeader}" />
+  </Style>
+  <Style Selector="ToggleButton.memberExpand PathIcon">
+    <Setter Property="Transitions">
+      <Transitions><TransformOperationsTransition Property="RenderTransform" Duration="{DynamicResource MovieSiftDisclosureDuration}" Easing="CubicEaseOut" /></Transitions>
+    </Setter>
+  </Style>
   <Style Selector="Window">
     <Setter Property="Background" Value="{DynamicResource MovieSiftWindowBrush}" />
     <Setter Property="Foreground" Value="{DynamicResource MovieSiftTextBrush}" />
@@ -102,12 +161,50 @@
     <Setter Property="BorderThickness" Value="2" />
   </Style>
   <Style Selector="RadioButton.accentChoice">
-    <Setter Property="Padding" Value="8,6" />
+    <Setter Property="Padding" Value="14,9" />
     <Setter Property="CornerRadius" Value="{StaticResource MovieSiftControlRadius}" />
     <Setter Property="Background" Value="{DynamicResource MovieSiftPanelBrush}" />
     <Setter Property="Foreground" Value="{DynamicResource MovieSiftTextBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource MovieSiftDecorativeBorderBrush}" />
     <Setter Property="BorderThickness" Value="1" />
+  </Style>
+  <Style Selector="RadioButton.accentChoice">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border x:Name="ChoiceSurface" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}" Padding="{TemplateBinding Padding}">
+          <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+            <Border Width="18" Height="18" CornerRadius="9" BorderThickness="1" BorderBrush="{DynamicResource MovieSiftBorderBrush}" VerticalAlignment="Center">
+              <Ellipse x:Name="ChoiceIndicator" Margin="4" Fill="{DynamicResource MovieSiftAccentBrush}" IsVisible="False" />
+            </Border>
+            <ContentPresenter Grid.Column="1" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" VerticalAlignment="Center" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  <Style Selector="RadioButton.accentChoice:checked /template/ Ellipse#ChoiceIndicator">
+    <Setter Property="IsVisible" Value="True" />
+  </Style>
+  <Style Selector="ScrollViewer">
+    <!-- Auto-hiding Fluent bars overlay content. A permanent layout gutter prevents overlap in every view. -->
+    <Setter Property="AllowAutoHide" Value="False" />
+  </Style>
+  <Style Selector="Button.iconClose">
+    <Setter Property="Width" Value="36" />
+    <Setter Property="Height" Value="36" />
+    <Setter Property="Padding" Value="9" />
+    <Setter Property="RenderTransform" Value="none" />
+  </Style>
+  <Style Selector="Path.closeGlyph">
+    <Setter Property="Data" Value="M4,4 L16,16 M16,4 L4,16" />
+    <Setter Property="Width" Value="16" />
+    <Setter Property="Height" Value="16" />
+    <Setter Property="Stretch" Value="Uniform" />
+    <Setter Property="Stroke" Value="{DynamicResource MovieSiftTextBrush}" />
+    <Setter Property="StrokeThickness" Value="1.6" />
+    <Setter Property="StrokeLineCap" Value="Round" />
+    <Setter Property="StrokeJoin" Value="Round" />
   </Style>
   <Style Selector="RadioButton.accentChoice:checked, RadioButton.accentChoice:focus-visible">
     <Setter Property="BorderBrush" Value="{DynamicResource MovieSiftFocusBrush}" />
@@ -115,6 +212,19 @@
   </Style>
   <Style Selector="Button.danger">
     <Setter Property="Foreground" Value="{DynamicResource MovieSiftErrorBrush}" />
+  </Style>
+  <Style Selector="Button.danger Path.closeGlyph">
+    <Setter Property="Stroke" Value="{DynamicResource MovieSiftErrorBrush}" />
+  </Style>
+  <Style Selector="TabControl.trackCategories">
+    <Setter Property="Padding" Value="0,10,0,0" />
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+  <Style Selector="TabControl.trackCategories TabItem">
+    <Setter Property="Padding" Value="16,9" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{DynamicResource MovieSiftTextBrush}" />
   </Style>
   <Style Selector="Button:disabled /template/ ContentPresenter#PART_ContentPresenter">
     <Setter Property="Foreground" Value="{DynamicResource MovieSiftMutedBrush}" />

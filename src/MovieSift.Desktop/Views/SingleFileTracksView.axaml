@@ -12,7 +12,7 @@
     <TextBlock Text="{Binding FileName}" FontWeight="SemiBold" TextWrapping="Wrap" ToolTip.Tip="{Binding SourcePath}" />
     <TextBlock Text="{Binding StateText}" Classes="muted" TextWrapping="Wrap" />
     <TextBlock Text="{Binding Localization[BatchExcluded]}" IsVisible="{Binding !Included}" TextWrapping="Wrap" />
-    <Button x:Name="SingleFileRemoveAllSubtitlesButton" Content="{Binding Localization[RemoveAllSubtitles]}"
+    <Button x:Name="SingleFileRemoveAllSubtitlesButton" Classes="danger" Content="{Binding Localization[RemoveAllSubtitles]}"
             Command="{Binding $parent[views:BatchView].((viewModels:BatchViewModel)DataContext).AggregateTracks.RemoveAllSubtitlesCommand}"
             HorizontalAlignment="Left" />
     <views:FileTracksView />

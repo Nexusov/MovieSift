@@ -12,6 +12,7 @@ public sealed class AggregateTracksViewModel : ObservableObject
 {
     private readonly AggregateTracksViewModelOptions options;
     private BatchTrackProjection projection;
+    private int selectedTrackTab;
 
     /// <summary>Connects the aggregate presentation to the existing revision-bound session edits.</summary>
     public AggregateTracksViewModel(AggregateTracksViewModelOptions options)
@@ -26,6 +27,7 @@ public sealed class AggregateTracksViewModel : ObservableObject
     public ObservableCollection<AggregateTrackGroupViewModel> VideoGroups { get; } = [];
     public ObservableCollection<AggregateTrackGroupViewModel> AudioGroups { get; } = [];
     public ObservableCollection<AggregateTrackGroupViewModel> SubtitleGroups { get; } = [];
+    public int SelectedTrackTab { get => selectedTrackTab; set => SetProperty(ref selectedTrackTab, value); }
     public string VideoSummaryText => DescribeSection(TrackKind.Video);
     public string AudioSummaryText => DescribeSection(TrackKind.Audio);
     public string SubtitleSummaryText => DescribeSection(TrackKind.Subtitles);

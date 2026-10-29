@@ -24,8 +24,10 @@ internal sealed class MkvSegmentInfoReader
     private const int FirstSizeMarker = 0x80;
     private readonly FileStream stream;
     private readonly CancellationToken cancellationToken;
-    private readonly byte[] buffer = new byte[MaximumSizeBytes];
+    private readonly byte[] buffer = new byte[MaximumIdentifierBytes + MaximumSizeBytes];
+    private long position;
     private int headerCount;
+    private long headerBytesRead;
 
     /// <summary>Owns one bounded inspection cursor without interpreting tracks, clusters or encoded data.</summary>
     private MkvSegmentInfoReader(SourceScan request)
@@ -35,15 +37,16 @@ internal sealed class MkvSegmentInfoReader
     }
 
     /// <summary>Rejects unsupported linkage or a layout whose absence of linkage cannot be established safely.</summary>
-    internal static async Task ValidateAsync(SourceRequest request)
+    internal static async Task<SegmentScanMetrics> ValidateAsync(SourceRequest request)
     {
         request.CancellationToken.ThrowIfCancellationRequested();
-        await using var stream = FileSourceAccess.OpenRegularReadStream(request.Path);
+        await using var stream = FileSourceAccess.OpenRegularReadStream(request.Path, FileOptions.RandomAccess);
         var reader = new MkvSegmentInfoReader(new(stream, request.CancellationToken));
 
         try
         {
             await reader.ValidateDocumentAsync().ConfigureAwait(false);
+            return new(reader.headerCount, reader.headerBytesRead);
         }
         catch (EndOfStreamException)
         {
@@ -61,7 +64,7 @@ internal sealed class MkvSegmentInfoReader
             throw UnsupportedStructure("A bounded Matroska EBML header is required.");
         }
 
-        stream.Position = header.EndOffset;
+        position = header.EndOffset;
         var segment = await ReadElementAsync(stream.Length).ConfigureAwait(false);
 
         while (IsPadding(segment.Identifier))
@@ -77,7 +80,7 @@ internal sealed class MkvSegmentInfoReader
 
         var hasInfo = false;
 
-        while (stream.Position < segment.EndOffset)
+        while (position < segment.EndOffset)
         {
             var element = await ReadElementAsync(segment.EndOffset).ConfigureAwait(false);
             var invalidInfo = element.Identifier == InfoIdentifier && (hasInfo || element.HasUnknownSize);
@@ -107,7 +110,7 @@ internal sealed class MkvSegmentInfoReader
             throw UnsupportedStructure("The Segment Info element could not be located.");
         }
 
-        while (stream.Position < stream.Length)
+        while (position < stream.Length)
         {
             var trailing = await ReadElementAsync(stream.Length).ConfigureAwait(false);
 
@@ -123,7 +126,7 @@ internal sealed class MkvSegmentInfoReader
     /// <summary>Detects real linkage element IDs at their defined Info level, never by searching arbitrary bytes.</summary>
     private async Task ValidateInfoAsync(long endOffset)
     {
-        while (stream.Position < endOffset)
+        while (position < endOffset)
         {
             var element = await ReadElementAsync(endOffset).ConfigureAwait(false);
 
@@ -149,9 +152,35 @@ internal sealed class MkvSegmentInfoReader
             throw UnsupportedStructure("The bounded Segment/Info element-header budget was exceeded.");
         }
 
-        var identifier = await ReadVariableIntegerAsync(new(parentEnd, MaximumIdentifierBytes, true)).ConfigureAwait(false);
-        var size = await ReadVariableIntegerAsync(new(parentEnd, MaximumSizeBytes, false)).ConfigureAwait(false);
-        var dataOffset = stream.Position;
+        var availableBytes = (int)Math.Min(buffer.Length, parentEnd - position);
+
+        if (availableBytes <= 0)
+        {
+            throw UnsupportedStructure("An element header exceeds its parent boundary.");
+        }
+
+        // One bounded positional read avoids per-byte async calls and discarding a 4 KiB stream buffer at every cluster.
+        var bytesRead = 0;
+
+        while (bytesRead < availableBytes)
+        {
+            var count = await RandomAccess.ReadAsync(stream.SafeFileHandle,
+                buffer.AsMemory(bytesRead, availableBytes - bytesRead), position + bytesRead, cancellationToken).ConfigureAwait(false);
+
+            if (count == 0)
+            {
+                throw new EndOfStreamException();
+            }
+
+            bytesRead += count;
+            headerBytesRead += count;
+        }
+
+        var cursor = 0;
+        var identifier = ReadVariableInteger(new(availableBytes, MaximumIdentifierBytes, true), ref cursor);
+        var size = ReadVariableInteger(new(availableBytes, MaximumSizeBytes, false), ref cursor);
+        position += cursor;
+        var dataOffset = position;
 
         if (!size.IsUnknown && size.Value > (ulong)(parentEnd - dataOffset))
         {
@@ -163,37 +192,37 @@ internal sealed class MkvSegmentInfoReader
     }
 
     /// <summary>Decodes only the bounded EBML ID/size prefixes needed to seek between Segment/Info elements.</summary>
-    private async Task<VariableInteger> ReadVariableIntegerAsync(IntegerRequest request)
+    private VariableInteger ReadVariableInteger(IntegerRequest request, ref int cursor)
     {
-        if (stream.Position >= request.EndOffset)
+        if (cursor >= request.AvailableBytes)
         {
             throw UnsupportedStructure("An element header exceeds its parent boundary.");
         }
 
-        await stream.ReadExactlyAsync(buffer.AsMemory(0, 1), cancellationToken).ConfigureAwait(false);
+        var first = buffer[cursor];
         var marker = FirstSizeMarker;
         var length = 1;
 
-        while ((buffer[0] & marker) == 0 && length <= request.MaximumBytes)
+        while ((first & marker) == 0 && length <= request.MaximumBytes)
         {
             marker >>= 1;
             length++;
         }
 
-        if (length > request.MaximumBytes || stream.Position + length - 1 > request.EndOffset)
+        if (length > request.MaximumBytes || cursor + length > request.AvailableBytes)
         {
             throw UnsupportedStructure("An EBML ID or size has an invalid or unsupported length.");
         }
 
-        await stream.ReadExactlyAsync(buffer.AsMemory(1, length - 1), cancellationToken).ConfigureAwait(false);
-        ulong value = request.IsIdentifier ? buffer[0] : (byte)(buffer[0] & (marker - 1));
+        ulong value = request.IsIdentifier ? first : (byte)(first & (marker - 1));
 
         for (var byteIndex = 1; byteIndex < length; byteIndex++)
         {
-            value = (value << BitsPerByte) | buffer[byteIndex];
+            value = (value << BitsPerByte) | buffer[cursor + byteIndex];
         }
 
         var unknownSize = !request.IsIdentifier && value == (1UL << (DataBitsPerSizeByte * length)) - 1;
+        cursor += length;
         return new(value, unknownSize);
     }
 
@@ -205,7 +234,7 @@ internal sealed class MkvSegmentInfoReader
             throw UnsupportedStructure("An unknown-sized element prevents bounded Segment Info inspection; streaming clusters are unsupported.");
         }
 
-        stream.Position = element.EndOffset;
+        position = element.EndOffset;
     }
 
     /// <summary>Allows only schema-defined global padding outside the single Segment.</summary>
@@ -216,6 +245,9 @@ internal sealed class MkvSegmentInfoReader
         new(new(ErrorCode.UnsupportedFeature, detail, ErrorReason.SegmentStructure));
 
     private sealed record SourceScan(FileStream Stream, CancellationToken CancellationToken);
-    private sealed record IntegerRequest(long EndOffset, int MaximumBytes, bool IsIdentifier);
+    private sealed record IntegerRequest(int AvailableBytes, int MaximumBytes, bool IsIdentifier);
     private sealed record VariableInteger(ulong Value, bool IsUnknown);
 }
+
+/// <summary>Counts bounded prefix I/O without decoding or retaining encoded media payloads.</summary>
+internal sealed record SegmentScanMetrics(int ElementHeaders, long HeaderBytesRead);

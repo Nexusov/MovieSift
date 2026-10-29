@@ -15,7 +15,9 @@
     <WrapPanel HorizontalAlignment="Right">
       <Button x:Name="InstallButton" Content="{Binding Localization[UpdatesInstall]}" Command="{Binding InstallCommand}" Margin="0,0,8,8" />
       <Button Content="{Binding Localization[Cancel]}" Command="{Binding CancelCommand}" IsVisible="{Binding CanCancel}" Margin="0,0,8,8" />
-      <Button Content="{Binding Localization[WorkspaceClose]}" Click="OnCloseClick" Margin="0,0,0,8" />
+      <Button Classes="iconClose" Click="OnCloseClick" Margin="0,0,0,8" HorizontalAlignment="Right" AutomationProperties.Name="{Binding Localization[WorkspaceClose]}" ToolTip.Tip="{Binding Localization[WorkspaceClose]}">
+        <Path Classes="closeGlyph" />
+      </Button>
     </WrapPanel>
   </StackPanel>
 </Window>

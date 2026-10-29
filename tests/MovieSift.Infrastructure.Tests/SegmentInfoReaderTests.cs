@@ -13,9 +13,42 @@ public sealed class SegmentInfoReaderTests
     [InlineData("1A45DFA38018538067851549A96680")]
     [InlineData("1A45DFA38018538067FF1549A96680")]
     [InlineData("1A45DFA380185380678D1549A966801F43B67583444480")]
+    [InlineData("1A45DFA301000000000000001853806701FFFFFFFFFFFFFF1549A9660100000000000000")]
     public async Task ReadsOnlyDefinedInfoChildren(string hexadecimal)
     {
         await ValidateBytesAsync(Convert.FromHexString(hexadecimal));
+    }
+
+    /// <summary>Still examines Info beyond skipped media while ignoring linkage-like payload bytes.</summary>
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task PositionalHeaderReadsPreserveTheCompleteWalk(bool linked)
+    {
+        using var workspace = new TestWorkspace();
+        const int payloadBytes = 16384;
+        var payload = new byte[payloadBytes];
+        Convert.FromHexString("1549A96683444480").CopyTo(payload, 0);
+        byte[] document = [.. Convert.FromHexString("1A45DFA38018538067FF1F43B675204000"), .. payload,
+            .. Convert.FromHexString(linked ? "1549A96683444480" : "1549A96680")];
+        var path = Path.Combine(workspace.Path, "far-info.mkv");
+        await File.WriteAllBytesAsync(path, document, TestContext.Current.CancellationToken);
+
+        if (linked)
+        {
+            var failure = await Assert.ThrowsAsync<OperationFailureException>(() =>
+                MkvSegmentInfoReader.ValidateAsync(new(path, TestContext.Current.CancellationToken)));
+            Assert.Equal(ErrorReason.LinkedSegments, failure.Failure.Reason);
+        }
+
+        if (!linked)
+        {
+            var metrics = await MkvSegmentInfoReader.ValidateAsync(new(path, TestContext.Current.CancellationToken));
+            Assert.Equal(4, metrics.ElementHeaders);
+            Assert.InRange(metrics.HeaderBytesRead, 1, metrics.ElementHeaders * 12L);
+        }
+
+        Assert.Equal(document, await File.ReadAllBytesAsync(path, TestContext.Current.CancellationToken));
     }
 
     /// <summary>Fails closed when the narrow reader cannot establish complete single-Segment Info boundaries.</summary>

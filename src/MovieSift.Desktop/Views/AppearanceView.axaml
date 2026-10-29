@@ -1,9 +1,9 @@
 <UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:appearance="using:MovieSift.Desktop.Appearance"
              x:Class="MovieSift.Desktop.Views.AppearanceView" x:DataType="appearance:AppearanceViewModel">
+  <Grid RowDefinitions="*,Auto">
+  <ScrollViewer x:Name="AppearanceSettingsScroll" AllowAutoHide="False" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
   <StackPanel Spacing="12">
-    <TextBlock Classes="heading" Text="{Binding Localization[AppearanceTitle]}" />
-    <TextBlock Classes="muted" Text="{Binding Localization[AppearanceHelp]}" TextWrapping="Wrap" />
     <TextBlock Text="{Binding Localization[AppearanceTheme]}" />
     <ComboBox x:Name="AppearanceTheme" ItemsSource="{Binding ThemeOptions}" SelectedIndex="{Binding ThemeIndex, Mode=TwoWay}" HorizontalAlignment="Stretch"
               AutomationProperties.Name="{Binding Localization[AppearanceTheme]}">
@@ -57,28 +57,58 @@
         <TextBlock Text="{Binding Localization[AppearanceLight]}" FontWeight="SemiBold" />
         <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="8">
           <TextBlock Text="{Binding Localization[AppearancePage]}" VerticalAlignment="Center" TextWrapping="Wrap" />
-          <TextBox Grid.Column="1" Text="{Binding LightPage, Mode=TwoWay}" PlaceholderText="#RRGGBB" AutomationProperties.Name="{Binding Localization[AppearancePage]}" />
+          <Grid Grid.Column="1" ColumnDefinitions="Auto,*" ColumnSpacing="8">
+            <Ellipse Width="18" Height="18" Fill="{Binding LightPageBrush}" Stroke="{DynamicResource MovieSiftBorderBrush}" StrokeThickness="1" VerticalAlignment="Center" />
+            <TextBox Grid.Column="1" Text="{Binding LightPage, Mode=TwoWay}" PlaceholderText="#RRGGBB" AutomationProperties.Name="{Binding Localization[AppearancePage]}" />
+          </Grid>
           <TextBlock Grid.Row="1" Text="{Binding Localization[AppearanceSurface]}" VerticalAlignment="Center" TextWrapping="Wrap" />
-          <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding LightSurface, Mode=TwoWay}" PlaceholderText="#RRGGBB" AutomationProperties.Name="{Binding Localization[AppearanceSurface]}" />
+          <Grid Grid.Row="1" Grid.Column="1" ColumnDefinitions="Auto,*" ColumnSpacing="8">
+            <Ellipse Width="18" Height="18" Fill="{Binding LightSurfaceBrush}" Stroke="{DynamicResource MovieSiftBorderBrush}" StrokeThickness="1" VerticalAlignment="Center" />
+            <TextBox Grid.Column="1" Text="{Binding LightSurface, Mode=TwoWay}" PlaceholderText="#RRGGBB" AutomationProperties.Name="{Binding Localization[AppearanceSurface]}" />
+          </Grid>
           <TextBlock Grid.Row="2" Text="{Binding Localization[AppearancePrimaryText]}" VerticalAlignment="Center" TextWrapping="Wrap" />
-          <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding LightText, Mode=TwoWay}" PlaceholderText="#RRGGBB" AutomationProperties.Name="{Binding Localization[AppearancePrimaryText]}" />
+          <Grid Grid.Row="2" Grid.Column="1" ColumnDefinitions="Auto,*" ColumnSpacing="8">
+            <Ellipse Width="18" Height="18" Fill="{Binding LightTextBrush}" Stroke="{DynamicResource MovieSiftBorderBrush}" StrokeThickness="1" VerticalAlignment="Center" />
+            <TextBox Grid.Column="1" Text="{Binding LightText, Mode=TwoWay}" PlaceholderText="#RRGGBB" AutomationProperties.Name="{Binding Localization[AppearancePrimaryText]}" />
+          </Grid>
           <TextBlock Grid.Row="3" Text="{Binding Localization[AppearanceSecondaryText]}" VerticalAlignment="Center" TextWrapping="Wrap" />
-          <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding LightMuted, Mode=TwoWay}" PlaceholderText="#RRGGBB" AutomationProperties.Name="{Binding Localization[AppearanceSecondaryText]}" />
+          <Grid Grid.Row="3" Grid.Column="1" ColumnDefinitions="Auto,*" ColumnSpacing="8">
+            <Ellipse Width="18" Height="18" Fill="{Binding LightMutedBrush}" Stroke="{DynamicResource MovieSiftBorderBrush}" StrokeThickness="1" VerticalAlignment="Center" />
+            <TextBox Grid.Column="1" Text="{Binding LightMuted, Mode=TwoWay}" PlaceholderText="#RRGGBB" AutomationProperties.Name="{Binding Localization[AppearanceSecondaryText]}" />
+          </Grid>
           <TextBlock Grid.Row="4" Text="{Binding Localization[AppearanceBorder]}" VerticalAlignment="Center" TextWrapping="Wrap" />
-          <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding LightBorder, Mode=TwoWay}" PlaceholderText="#RRGGBB" AutomationProperties.Name="{Binding Localization[AppearanceBorder]}" />
+          <Grid Grid.Row="4" Grid.Column="1" ColumnDefinitions="Auto,*" ColumnSpacing="8">
+            <Ellipse Width="18" Height="18" Fill="{Binding LightBorderBrush}" Stroke="{DynamicResource MovieSiftBorderBrush}" StrokeThickness="1" VerticalAlignment="Center" />
+            <TextBox Grid.Column="1" Text="{Binding LightBorder, Mode=TwoWay}" PlaceholderText="#RRGGBB" AutomationProperties.Name="{Binding Localization[AppearanceBorder]}" />
+          </Grid>
         </Grid>
         <TextBlock Text="{Binding Localization[AppearanceDark]}" FontWeight="SemiBold" />
         <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="8">
           <TextBlock Text="{Binding Localization[AppearancePage]}" VerticalAlignment="Center" TextWrapping="Wrap" />
-          <TextBox Grid.Column="1" Text="{Binding DarkPage, Mode=TwoWay}" PlaceholderText="#RRGGBB" AutomationProperties.Name="{Binding Localization[AppearancePage]}" />
+          <Grid Grid.Column="1" ColumnDefinitions="Auto,*" ColumnSpacing="8">
+            <Ellipse Width="18" Height="18" Fill="{Binding DarkPageBrush}" Stroke="{DynamicResource MovieSiftBorderBrush}" StrokeThickness="1" VerticalAlignment="Center" />
+            <TextBox Grid.Column="1" Text="{Binding DarkPage, Mode=TwoWay}" PlaceholderText="#RRGGBB" AutomationProperties.Name="{Binding Localization[AppearancePage]}" />
+          </Grid>
           <TextBlock Grid.Row="1" Text="{Binding Localization[AppearanceSurface]}" VerticalAlignment="Center" TextWrapping="Wrap" />
-          <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding DarkSurface, Mode=TwoWay}" PlaceholderText="#RRGGBB" AutomationProperties.Name="{Binding Localization[AppearanceSurface]}" />
+          <Grid Grid.Row="1" Grid.Column="1" ColumnDefinitions="Auto,*" ColumnSpacing="8">
+            <Ellipse Width="18" Height="18" Fill="{Binding DarkSurfaceBrush}" Stroke="{DynamicResource MovieSiftBorderBrush}" StrokeThickness="1" VerticalAlignment="Center" />
+            <TextBox Grid.Column="1" Text="{Binding DarkSurface, Mode=TwoWay}" PlaceholderText="#RRGGBB" AutomationProperties.Name="{Binding Localization[AppearanceSurface]}" />
+          </Grid>
           <TextBlock Grid.Row="2" Text="{Binding Localization[AppearancePrimaryText]}" VerticalAlignment="Center" TextWrapping="Wrap" />
-          <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding DarkText, Mode=TwoWay}" PlaceholderText="#RRGGBB" AutomationProperties.Name="{Binding Localization[AppearancePrimaryText]}" />
+          <Grid Grid.Row="2" Grid.Column="1" ColumnDefinitions="Auto,*" ColumnSpacing="8">
+            <Ellipse Width="18" Height="18" Fill="{Binding DarkTextBrush}" Stroke="{DynamicResource MovieSiftBorderBrush}" StrokeThickness="1" VerticalAlignment="Center" />
+            <TextBox Grid.Column="1" Text="{Binding DarkText, Mode=TwoWay}" PlaceholderText="#RRGGBB" AutomationProperties.Name="{Binding Localization[AppearancePrimaryText]}" />
+          </Grid>
           <TextBlock Grid.Row="3" Text="{Binding Localization[AppearanceSecondaryText]}" VerticalAlignment="Center" TextWrapping="Wrap" />
-          <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding DarkMuted, Mode=TwoWay}" PlaceholderText="#RRGGBB" AutomationProperties.Name="{Binding Localization[AppearanceSecondaryText]}" />
+          <Grid Grid.Row="3" Grid.Column="1" ColumnDefinitions="Auto,*" ColumnSpacing="8">
+            <Ellipse Width="18" Height="18" Fill="{Binding DarkMutedBrush}" Stroke="{DynamicResource MovieSiftBorderBrush}" StrokeThickness="1" VerticalAlignment="Center" />
+            <TextBox Grid.Column="1" Text="{Binding DarkMuted, Mode=TwoWay}" PlaceholderText="#RRGGBB" AutomationProperties.Name="{Binding Localization[AppearanceSecondaryText]}" />
+          </Grid>
           <TextBlock Grid.Row="4" Text="{Binding Localization[AppearanceBorder]}" VerticalAlignment="Center" TextWrapping="Wrap" />
-          <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding DarkBorder, Mode=TwoWay}" PlaceholderText="#RRGGBB" AutomationProperties.Name="{Binding Localization[AppearanceBorder]}" />
+          <Grid Grid.Row="4" Grid.Column="1" ColumnDefinitions="Auto,*" ColumnSpacing="8">
+            <Ellipse Width="18" Height="18" Fill="{Binding DarkBorderBrush}" Stroke="{DynamicResource MovieSiftBorderBrush}" StrokeThickness="1" VerticalAlignment="Center" />
+            <TextBox Grid.Column="1" Text="{Binding DarkBorder, Mode=TwoWay}" PlaceholderText="#RRGGBB" AutomationProperties.Name="{Binding Localization[AppearanceBorder]}" />
+          </Grid>
         </Grid>
       </StackPanel>
     </Expander>
@@ -92,6 +122,9 @@
     <Expander Header="{Binding Localization[Diagnostics]}" IsVisible="{Binding HasDiagnostics}">
       <TextBox Text="{Binding Diagnostics}" IsReadOnly="True" TextWrapping="Wrap" MaxHeight="120" />
     </Expander>
-    <Button x:Name="AppearanceReset" Content="{Binding Localization[AppearanceReset]}" Command="{Binding ResetCommand}" HorizontalAlignment="Left" />
+
   </StackPanel>
+  </ScrollViewer>
+    <Button Grid.Row="1" Margin="0,16,0,0" x:Name="AppearanceReset" Content="{Binding Localization[AppearanceReset]}" Command="{Binding ResetCommand}" HorizontalAlignment="Left" />
+  </Grid>
 </UserControl>

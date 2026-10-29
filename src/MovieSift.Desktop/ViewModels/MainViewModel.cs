@@ -157,6 +157,7 @@ public sealed partial class MainViewModel : ObservableObject
             services.Log.Warning(exception, "Portable ownership records could not be read");
         }
 
+        await Batch.InitializePreferencesAsync();
         await Batch.Presets.InitializeAsync();
         await Batch.Recovery.InitializeAsync();
 

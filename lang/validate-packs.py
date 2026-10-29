@@ -11,8 +11,14 @@ import xml.etree.ElementTree as ElementTree
 PACK_VERSION = 1
 MAX_PACK_BYTES = 256 * 1024
 MAX_VALUE_CHARACTERS = 8192
-LOCALES = ("ru", "de", "es", "fr", "pt-BR", "uk", "pl", "tr", "ja", "ko", "zh-Hans")
+LOCALES = ("ru", "de", "es", "fr", "pt-BR", "uk", "pl", "tr", "ja", "ko", "zh-Hans", "sv", "da", "cs")
 PLACEHOLDERS = re.compile(r"(?<!\{)\{\d+(?:,-?\d+)?(?::[^{}]*)?\}(?!\})")
+
+
+def has_terminal_period(value):
+    """Keep short UI copy free of final full stops while preserving intentional loading ellipses."""
+    trimmed = value.rstrip()
+    return trimmed.endswith((".", "。", "．")) and not trimmed.endswith("...")
 
 
 def reject_duplicates(pairs):
@@ -32,6 +38,8 @@ def load_contract(repository):
     messages = {entry.attrib["name"]: entry.findtext("value") or "" for entry in entries}
     if len(messages) != len(entries):
         raise ValueError("Duplicate English resource key")
+    if any(has_terminal_period(value) for value in messages.values()):
+        raise ValueError("English UI text contains a terminal period")
     return messages
 
 
@@ -56,6 +64,8 @@ def validate_pack(request):
     for key, value in messages.items():
         if not isinstance(value, str) or not value.strip() or len(value) > MAX_VALUE_CHARACTERS:
             raise ValueError(f"{locale}/{key}: empty, invalid or excessive text")
+        if has_terminal_period(value):
+            raise ValueError(f"{locale}/{key}: terminal period in UI text")
         if Counter(PLACEHOLDERS.findall(value)) != Counter(PLACEHOLDERS.findall(contract[key])):
             raise ValueError(f"{locale}/{key}: format placeholder mismatch")
     return {"locale": locale, "file": path.name, "sha256": hashlib.sha256(payload).hexdigest(), "bytes": len(payload)}

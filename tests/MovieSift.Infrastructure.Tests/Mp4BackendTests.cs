@@ -15,6 +15,27 @@ namespace MovieSift.Infrastructure.Tests;
 /// <summary>Checks normalized outcomes, exact arguments and untrusted structured MP4 facts without running media workers.</summary>
 public sealed class Mp4BackendTests
 {
+    /// <summary>Labels existing probe bitrate/duration as an estimate and refuses unusable optional statistics.</summary>
+    [Theory]
+    [InlineData("128000", "2.5", 40000L)]
+    [InlineData("0", "2", null)]
+    [InlineData("128000", "N/A", null)]
+    [InlineData("99999999999999999999999999", "99999999999999999999999999", null)]
+    public void OptionalSizeEstimateDoesNotRequireASecondMediaScan(string rate, string duration, long? expectedBytes)
+    {
+        var root = JsonNode.Parse(Probe)!;
+        root["streams"]![1]!["bit_rate"] = rate;
+        root["streams"]![1]!["duration"] = duration;
+        var track = Parse(root.ToJsonString()).Tracks[1];
+
+        Assert.Equal(expectedBytes, track.PayloadSize?.Bytes);
+
+        if (expectedBytes is not null)
+        {
+            Assert.Equal(TrackPayloadSizeKind.Estimated, track.PayloadSize?.Kind);
+        }
+    }
+
     private const string Probe = """
         {"streams":[
         {"index":3,"id":"0x7","codec_type":"video","codec_name":"h264","codec_tag_string":"avc1","time_base":"1/10240","disposition":{"default":1,"forced":0,"attached_pic":0},"tags":{"language":"und","handler_name":"VideoHandler"}},

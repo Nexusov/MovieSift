@@ -322,7 +322,11 @@ public sealed class WorkspaceInputQualityTests
             var snapshot = fixture.Batch.Snapshot;
             fixture.Main.ToggleAppearanceCommand.Execute(null);
             Dispatcher.UIThread.RunJobs();
-            Assert.False(window.FindControl<BatchView>("Workspace")!.IsEffectivelyEnabled);
+            var workspace = window.FindControl<BatchView>("Workspace")!;
+            Assert.True(workspace.IsEffectivelyEnabled);
+            var workspaceInputSurface = Assert.IsType<Border>(workspace.GetVisualParent());
+            Assert.False(workspaceInputSurface.IsHitTestVisible);
+            Assert.True(window.FindControl<Border>("PreferencesBackdrop")!.IsEffectivelyVisible);
             Press(window, PhysicalKey.Escape);
             Assert.False(fixture.Main.IsAppearanceOpen);
             Assert.Same(snapshot, fixture.Batch.Snapshot);

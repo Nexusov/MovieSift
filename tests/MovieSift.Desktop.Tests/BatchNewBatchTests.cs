@@ -39,9 +39,9 @@ public sealed class BatchNewBatchTests
             options.Flyout!.ShowAt(options);
             Dispatcher.UIThread.RunJobs();
             var newBatch = view.FindControl<Button>("NewBatchButton")!;
-            Assert.Equal(fixture.Localization["BatchNew"], newBatch.Content);
+            Assert.Equal(fixture.Localization["BatchNew"], Avalonia.Automation.AutomationProperties.GetName(newBatch));
             Assert.True(newBatch.IsEffectivelyEnabled);
-            newBatch.Command!.Execute(null);
+            newBatch.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Button.ClickEvent));
             Dispatcher.UIThread.RunJobs();
             Assert.True(view.FindControl<Border>("NewBatchConfirmation")!.IsVisible);
             Assert.Same(completed, fixture.Batch.Snapshot);

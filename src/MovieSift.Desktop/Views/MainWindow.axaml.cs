@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -15,6 +16,7 @@ public sealed partial class MainWindow : Window
     private bool shutdownCompleted;
     private bool shutdownInProgress;
     private UpdateWindow? updateWindow;
+    private MainViewModel? preferenceFocusOwner;
 
     public event Action? StartupCompleted;
 
@@ -25,10 +27,11 @@ public sealed partial class MainWindow : Window
 
         if (OperatingSystem.IsWindows())
         {
-            WindowDecorations = WindowDecorations.BorderOnly;
+            WindowDecorations = WindowDecorations.None;
         }
 
         AppearanceMotionPolicy.Track(this);
+        DataContextChanged += OnPreferenceFocusContextChanged;
         AppearancePanel.PropertyChanged += OnAppearancePanelChanged;
         LanguagePanel.PropertyChanged += OnLanguagePanelChanged;
         UpdatesPanel.PropertyChanged += OnUpdatesPanelChanged;
@@ -36,6 +39,63 @@ public sealed partial class MainWindow : Window
         Opened += OnOpened;
         Closing += OnClosing;
         Closed += OnClosed;
+    }
+
+    /// <summary>Connects logical panel opening to focus independently of an outgoing visibility animation.</summary>
+    private void OnPreferenceFocusContextChanged(object? sender, EventArgs eventArguments)
+    {
+        if (preferenceFocusOwner is not null)
+        {
+            preferenceFocusOwner.PropertyChanged -= OnPreferenceFocusChanged;
+        }
+
+        preferenceFocusOwner = DataContext as MainViewModel;
+
+        if (preferenceFocusOwner is not null)
+        {
+            preferenceFocusOwner.PropertyChanged += OnPreferenceFocusChanged;
+            QueuePreferenceFocus();
+        }
+    }
+
+    /// <summary>Reopening a still-visible outgoing panel must focus its current controls, not the previous panel.</summary>
+    private void OnPreferenceFocusChanged(object? sender, PropertyChangedEventArgs eventArguments)
+    {
+        var changesPanel = eventArguments.PropertyName is nameof(MainViewModel.IsAppearanceOpen)
+            or nameof(MainViewModel.IsLanguageOpen) or nameof(MainViewModel.IsUpdatesOpen);
+
+        if (changesPanel)
+        {
+            QueuePreferenceFocus();
+        }
+    }
+
+    /// <summary>Uses the latest logical panel after bindings settle and ignores callbacks from a former context.</summary>
+    private void QueuePreferenceFocus()
+    {
+        var owner = preferenceFocusOwner;
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (!IsVisible || !ReferenceEquals(owner, DataContext))
+            {
+                return;
+            }
+
+            FocusOpenPreference();
+        });
+    }
+
+    /// <summary>Focuses only the currently requested cosmetic panel; outgoing frames cannot own keyboard input.</summary>
+    private void FocusOpenPreference()
+    {
+        if (DataContext is not MainViewModel viewModel)
+        {
+            return;
+        }
+
+        var target = viewModel.IsAppearanceOpen ? CloseAppearanceButton : viewModel.IsLanguageOpen ? CloseLanguageButton
+            : viewModel.IsUpdatesOpen ? CloseUpdatesButton : null;
+        target?.Focus();
     }
 
     /// <summary>Uses only non-button header space for native Windows caption gestures.</summary>
@@ -57,7 +117,19 @@ public sealed partial class MainWindow : Window
                 return;
             }
 
-            AppearanceFocusTarget(appearanceIsOpen).Focus();
+            // An outgoing fade must not steal focus from a newly opened cosmetic panel.
+            if (!appearanceIsOpen && DataContext is MainViewModel { IsPreferencesOpen: true })
+            {
+                return;
+            }
+
+            if (appearanceIsOpen)
+            {
+                FocusOpenPreference();
+                return;
+            }
+
+            AppearanceFocusTarget(false).Focus();
         });
     }
 
@@ -98,7 +170,19 @@ public sealed partial class MainWindow : Window
                 return;
             }
 
-            var target = wasOpen ? CloseLanguageButton : DataContext is MainViewModel { HasPendingMediaDecision: true }
+            // An outgoing fade must not steal focus from a newly opened cosmetic panel.
+            if (!wasOpen && DataContext is MainViewModel { IsPreferencesOpen: true })
+            {
+                return;
+            }
+
+            if (wasOpen)
+            {
+                FocusOpenPreference();
+                return;
+            }
+
+            var target = DataContext is MainViewModel { HasPendingMediaDecision: true }
                 ? AppearanceFocusTarget(false) : LanguageButton;
             target.Focus();
         });
@@ -120,10 +204,36 @@ public sealed partial class MainWindow : Window
                 return;
             }
 
-            var target = isOpen ? CloseUpdatesButton : DataContext is MainViewModel { HasPendingMediaDecision: true }
+            // An outgoing fade must not steal focus from a newly opened cosmetic panel.
+            if (!isOpen && DataContext is MainViewModel { IsPreferencesOpen: true })
+            {
+                return;
+            }
+
+            if (isOpen)
+            {
+                FocusOpenPreference();
+                return;
+            }
+
+            var target = DataContext is MainViewModel { HasPendingMediaDecision: true }
                 ? AppearanceFocusTarget(false) : AvailableUpdateButton;
             target.Focus();
         });
+    }
+
+    /// <summary>Dismisses only cosmetic panels when the user presses their inert backdrop.</summary>
+    private void OnPreferencesBackdropPressed(object? sender, PointerPressedEventArgs eventArguments)
+    {
+        if (DataContext is not MainViewModel viewModel)
+        {
+            return;
+        }
+
+        viewModel.IsAppearanceOpen = false;
+        viewModel.IsLanguageOpen = false;
+        viewModel.IsUpdatesOpen = false;
+        eventArguments.Handled = true;
     }
 
     /// <summary>Escape closes only cosmetic UI; media cancellation and warning decisions remain explicit actions.</summary>
@@ -220,6 +330,14 @@ public sealed partial class MainWindow : Window
     /// <summary>Detaches view callbacks when the window lifetime ends.</summary>
     private void OnClosed(object? sender, EventArgs eventArguments)
     {
+        if (preferenceFocusOwner is not null)
+        {
+            preferenceFocusOwner.PropertyChanged -= OnPreferenceFocusChanged;
+            preferenceFocusOwner = null;
+        }
+
+        DataContextChanged -= OnPreferenceFocusContextChanged;
+
         if (DataContext is MainViewModel { Updates: { } updates })
         {
             updates.ShowRequested -= OnShowUpdate;

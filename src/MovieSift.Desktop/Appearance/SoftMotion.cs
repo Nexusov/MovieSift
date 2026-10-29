@@ -15,12 +15,14 @@ public sealed class SoftMotion : AvaloniaObject
     private static readonly TimeSpan PanelDuration = TimeSpan.FromMilliseconds(240);
     private static readonly TimeSpan ResultDuration = TimeSpan.FromMilliseconds(220);
     private static readonly ConditionalWeakTable<Control, MotionState> States = new();
+    public static readonly AttachedProperty<bool> VisibleProperty = AvaloniaProperty.RegisterAttached<SoftMotion, Control, bool>("Visible", true);
     public static readonly AttachedProperty<bool> EnterProperty = AvaloniaProperty.RegisterAttached<SoftMotion, Control, bool>("Enter");
     public static readonly AttachedProperty<string?> ResultKeyProperty = AvaloniaProperty.RegisterAttached<SoftMotion, Control, string?>("ResultKey");
 
     /// <summary>Connects declarative view markers to visibility and immutable publication presentation.</summary>
     static SoftMotion()
     {
+        VisibleProperty.Changed.AddClassHandler<Control>((control, arguments) => ChangeVisibility(control, arguments.NewValue is true));
         EnterProperty.Changed.AddClassHandler<Control>((control, arguments) =>
         {
             if (arguments.NewValue is not true)
@@ -54,6 +56,73 @@ public sealed class SoftMotion : AvaloniaObject
             state.ResultKey = key;
             Animate(control, false);
         });
+    }
+
+    /// <summary>Reads the intended cosmetic visibility independently of an outgoing frame.</summary>
+    public static bool GetVisible(Control control) => control.GetValue(VisibleProperty);
+    /// <summary>Requests an interruptible cosmetic transition without deferring application state.</summary>
+    public static void SetVisible(Control control, bool value) => control.SetValue(VisibleProperty, value);
+
+    /// <summary>Fades outgoing panels before hiding them; a new request always wins.</summary>
+    private static async void ChangeVisibility(Control control, bool visible)
+    {
+        var state = States.GetOrCreateValue(control);
+        var revision = ++state.VisibilityRevision;
+        state.Cancellation?.Cancel();
+
+        if (visible)
+        {
+            control.IsVisible = true;
+            Animate(control, true);
+            return;
+        }
+
+        if (AppearanceMotionPolicy.Reduced || TopLevel.GetTopLevel(control) is null)
+        {
+            control.IsVisible = false;
+            return;
+        }
+
+        using var cancellation = new CancellationTokenSource();
+        state.Cancellation = cancellation;
+        EventHandler reduce = (_, _) =>
+        {
+            if (AppearanceMotionPolicy.Reduced)
+            {
+                cancellation.Cancel();
+            }
+        };
+        AppearanceMotionPolicy.Changed += reduce;
+        var animation = new Animation { Duration = PanelDuration, Easing = new CubicEaseOut() };
+        var start = new KeyFrame { Cue = new Cue(0) };
+        start.Setters.Add(new Setter(Visual.OpacityProperty, 1d));
+        var end = new KeyFrame { Cue = new Cue(1) };
+        end.Setters.Add(new Setter(Visual.OpacityProperty, 0d));
+        animation.Children.Add(start);
+        animation.Children.Add(end);
+
+        try
+        {
+            await animation.RunAsync(control, cancellation.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            // A subsequent open or close supersedes only the outgoing presentation.
+        }
+        finally
+        {
+            AppearanceMotionPolicy.Changed -= reduce;
+
+            if (ReferenceEquals(state.Cancellation, cancellation))
+            {
+                state.Cancellation = null;
+            }
+
+            if (revision == state.VisibilityRevision && !GetVisible(control))
+            {
+                control.IsVisible = false;
+            }
+        }
     }
 
     /// <summary>Reads the declarative finite-panel entry marker.</summary>
@@ -126,5 +195,6 @@ public sealed class SoftMotion : AvaloniaObject
     {
         public CancellationTokenSource? Cancellation { get; set; }
         public string? ResultKey { get; set; }
+        public long VisibilityRevision { get; set; }
     }
 }
