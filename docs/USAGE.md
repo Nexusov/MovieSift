@@ -73,6 +73,8 @@ Portable packages include English only. The language chooser offers English plus
 
 Downloaded packs are stored in `data/translations` and work offline after restart. On the first launch of a new build, installed packs are checked/refreshed in the background against one immutable official catalog snapshot, with a shared 30-second limit. It does not install additional languages. Valid offline translations remain usable if refresh fails; incompatible old files remain on disk while the UI falls back to English. A successful refresh updates the active dictionary without changing language or media choices. Preset names, source paths, track titles and backend diagnostics remain original. Translation packs are data, not executable extensions. Complete key coverage does not constitute native-speaker review.
 
+Repository translation sources now live in `lang`. The released 1.2.0 downloader uses the previous repository path and cannot install new languages after that move; update MovieSift first. Existing cached packs remain on disk and the updater is independent of the translation endpoint. New builds can use their own immutable source snapshot when the current catalog has an incompatible text contract.
+
 On Windows, the application uses an integrated caption with minimize, maximize/restore and close buttons. Drag the header or double-click it to maximize/restore. Resizing remains available. Close retains the existing warning decisions and safe asynchronous shutdown. Linux retains the desktop's native decorations. Both platforms use the film/scissors application icon; no minimize-to-tray behavior is introduced.
 
 ## Upgrading a portable copy
