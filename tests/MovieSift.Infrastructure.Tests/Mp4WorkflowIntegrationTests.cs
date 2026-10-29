@@ -282,6 +282,7 @@ public sealed class Mp4WorkflowIntegrationTests(ITestOutputHelper evidence)
                 inspected.Tracks.Where(track => track.Kind != TrackKind.Subtitles).Select(track => track.Id).ToArray(),
                 Path.Combine(workspace.Path, "cancelled output.mp4"), false)).Plan);
             var result = await CreateCoordinator(workspace.Path, backend).RunAsync(new(plan, CancellationToken: cancellation.Token));
+            evidence.WriteLine($"Cancellation result: {result.Phase}; failure: {result.Failure}; cleanup: {string.Join("; ", result.CleanupIssues)}");
             Assert.True(liveAtCancellation, "Cancellation must be requested while the retained owned worker is still active.");
             Assert.Equal(JobPhase.Cancelled, result.Phase);
             Assert.True(worker!.HasExited);

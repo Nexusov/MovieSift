@@ -83,6 +83,8 @@ Cancellation terminates and awaits the owned worker, including inspection/verifi
 
 On Linux, cancellation captures descendants from the owned worker's procfs task/children records before the existing tree-kill request. PID, parent and birth identities are checked; captured descendants must disappear, change birth identity, or enter a non-writing Z/X state before cleanup. Observation is bounded to 256 descendants, 4,096 tasks, 16 KiB per record and the existing 15-second termination budget. Unreadable or incomplete ownership evidence preserves the candidate instead of treating pipe EOF or parent exit as proof that descendants stopped. This observer sends no additional signals.
 
+A retained root already confirmed exited with code 0 before descendant observation follows the existing normal-completion path, including mandatory bounded pipe drainage. This does not waive a partial-observation failure, a nonzero root exit or any captured descendant wait.
+
 ## Job ownership and publication
 
 `JobCoordinator` is the single owner of the plan, process, candidate, verification, warning decision, publication fact and cleanup result:

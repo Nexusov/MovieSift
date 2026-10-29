@@ -7,6 +7,7 @@
 - Use the supplied circular-arrow icon for update controls, tinted for the active theme. The MovieSift application icon is unchanged.
 - Find one application launcher at the portable root. Internal DLLs, the self-contained runtime, helper, media tools and documentation now live in `app/`. Settings and saved lists stay in root `data/`.
 - The root launcher loads the nested assembly directly in the same process using the pinned .NET apphost; it does not extract runtime files or launch a second GUI process.
+- Recognize an already-successful worker at the start of Linux cancellation observation. Partial or uncertain descendant observations still preserve owned working files.
 
 ## Install and migrate
 
