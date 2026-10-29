@@ -17,6 +17,7 @@ public sealed partial class BatchView : UserControl
     private const double NarrowWorkspaceWidth = 850;
     private const double NarrowFileListHeight = 140;
     private const double NarrowExpandedShelfFraction = 0.75;
+    private const double NarrowMinimumTrackHeight = 48;
     private const double FileSidebarWidth = 330;
     private BatchViewModel? observedWorkspace;
     private bool? narrowLayout;
@@ -114,8 +115,12 @@ public sealed partial class BatchView : UserControl
         }
 
         WorkspaceColumns.RowDefinitions = new("Auto,*");
+        // Wrapped footer text can leave too little space for even one track action under a fractional cap alone.
+        var availableHeight = WorkspaceColumns.Bounds.Height;
+        var expandedShelfHeight = Math.Min(availableHeight * NarrowExpandedShelfFraction,
+            Math.Max(0, availableHeight - NarrowMinimumTrackHeight));
         FileSidebar.MaxHeight = FileSidebar.IsExpanded
-            ? WorkspaceColumns.Bounds.Height * NarrowExpandedShelfFraction : double.PositiveInfinity;
+            ? expandedShelfHeight : double.PositiveInfinity;
     }
 
     /// <summary>Opens deliberately activated row details while inclusion and filename controls retain their own actions.</summary>

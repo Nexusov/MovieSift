@@ -23,6 +23,7 @@ public sealed class WorkspaceInputQualityTests
     private const double BoundsTolerance = 1;
     private const int MaximumFocusTraversalSteps = 100;
     private const int PlatformFooterBudgetDifference = 4;
+    private const double ConstrainedPreparationHeight = 149;
 
     /// <summary>Composes actual helper text against its displayed surface rather than trusting the source palette alone.</summary>
     [AvaloniaTheory]
@@ -171,6 +172,47 @@ public sealed class WorkspaceInputQualityTests
             var point = folderBounds.Center;
             var hit = window.InputHitTest(point);
             Assert.True(ReferenceEquals(hit, folder) || hit is Visual visual && visual.GetVisualAncestors().Contains(folder));
+            Assert.Empty(fixture.Backend.RemuxRequests);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    /// <summary>Reproduces the Linux footer budget independently of the host font metrics.</summary>
+    [AvaloniaTheory]
+    [InlineData("en")]
+    [InlineData("ru")]
+    public async Task ConstrainedNarrowShelfKeepsFileAndTrackActionsReachable(string language)
+    {
+        var fixture = SoftWorkspaceRenderTests.CreateLongNameFixture();
+        await fixture.LoadAsync();
+        await fixture.Main.ChangeLanguageCommand.ExecuteAsync(language);
+        var window = new MainWindow { DataContext = fixture.Main, Width = 640, Height = 480 };
+        window.Show();
+
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            window.UpdateLayout();
+            var view = window.FindControl<BatchView>("Workspace")!;
+            var shelf = view.FindControl<Expander>("FileSidebar")!;
+            shelf.IsExpanded = true;
+            window.UpdateLayout();
+            var columns = view.FindControl<Grid>("WorkspaceColumns")!;
+            var footer = view.FindControl<StackPanel>("BatchRunControls")!;
+            var margin = footer.Margin;
+            footer.Margin = new(margin.Left, margin.Top + columns.Bounds.Height - ConstrainedPreparationHeight,
+                margin.Right, margin.Bottom);
+            Dispatcher.UIThread.RunJobs();
+            window.UpdateLayout();
+            Assert.InRange(columns.Bounds.Height, ConstrainedPreparationHeight - BoundsTolerance,
+                ConstrainedPreparationHeight + BoundsTolerance);
+            var tracks = view.FindControl<ScrollViewer>("WorkspaceScrollViewer")!;
+            var files = Assert.Single(view.FindControl<ListBox>("BatchFileList")!.GetVisualDescendants().OfType<ScrollViewer>());
+            Assert.True(tracks.Viewport.Height >= MinimumTrackViewport, $"Track viewport was {tracks.Viewport.Height}");
+            Assert.True(files.Viewport.Height >= MinimumFileViewport, $"File viewport was {files.Viewport.Height}");
             Assert.Empty(fixture.Backend.RemuxRequests);
         }
         finally

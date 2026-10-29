@@ -85,7 +85,8 @@
       <Grid Grid.Row="1">
         <!-- One native collection remains alive when the responsive layout changes. -->
         <Grid x:Name="WorkspaceColumns" ColumnDefinitions="330,*" ColumnSpacing="12" IsVisible="{Binding HasItems}" ClipToBounds="True">
-          <Expander x:Name="FileSidebar" IsExpanded="True" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True">
+          <!-- The file panel owns its inset; duplicated Expander padding would consume the narrow file viewport. -->
+          <Expander x:Name="FileSidebar" Padding="0" IsExpanded="True" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True">
             <Expander.Header>
               <TextBlock x:Name="FileCountSummary" Text="{Binding SummaryText}" TextWrapping="Wrap" FontWeight="SemiBold" />
             </Expander.Header>
