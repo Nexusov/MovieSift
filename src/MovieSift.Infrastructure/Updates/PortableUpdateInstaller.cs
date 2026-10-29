@@ -11,6 +11,10 @@ public static class PortableUpdateInstaller
     private const string SessionEnvironment = "MOVIESIFT_UPDATE_SESSION";
     private const string TokenEnvironment = "MOVIESIFT_UPDATE_TOKEN";
     private const string ReadyFile = "ready.txt";
+    private const int MaximumStartupReceiptBytes = 128;
+    private static readonly TimeSpan ProcessPollInterval = TimeSpan.FromMilliseconds(100);
+    private static readonly TimeSpan ParentExitTimeout = TimeSpan.FromMinutes(2);
+    private static readonly TimeSpan StartupConfirmationTimeout = TimeSpan.FromSeconds(60);
 
     /// <summary>Checks a produced archive through the installer's parser without touching an installation.</summary>
     public static async Task<string> VerifyArchiveAsync(string archivePath, string runtimeIdentifier, AppVersion version,
@@ -74,7 +78,15 @@ public static class PortableUpdateInstaller
             }
             restarted = StartApplication(plan.ApplicationDirectory, session, plan.Token);
             var started = await WaitForStartupAsync(restarted, session, plan.Token, cancellationToken);
-            if (!started && restarted.HasExited)
+            var terminatedWithoutAcknowledgement = !started && restarted.WaitForExit(TimeSpan.Zero);
+
+            if (terminatedWithoutAcknowledgement)
+            {
+                // Receipt publication may have raced the last observer check at its deadline.
+                started = await HasStartupReceiptAsync(session, plan.Token, cancellationToken);
+            }
+
+            if (terminatedWithoutAcknowledgement && !started)
             {
                 using (UpdateApplicationLease.AcquireInstaller(plan.ApplicationDirectory))
                 {
@@ -94,7 +106,7 @@ public static class PortableUpdateInstaller
         {
             if (plan is not null)
             {
-                if (installed && (restarted is null || restarted.HasExited))
+                if (installed && (restarted is null || restarted.WaitForExit(TimeSpan.Zero)))
                 {
                     try
                     {
@@ -310,13 +322,19 @@ public static class PortableUpdateInstaller
         }
         using (parent)
         {
+            // Retain this exact kernel process object across identity validation and every poll.
+            _ = parent.SafeHandle;
             if (parent.StartTime.ToUniversalTime().Ticks != plan.ParentStartedUtcTicks)
             {
                 throw new UpdateException(UpdateErrorCode.Installer, "The original application process identity no longer matches.");
             }
             using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            timeout.CancelAfter(TimeSpan.FromMinutes(2));
-            await parent.WaitForExitAsync(timeout.Token);
+            timeout.CancelAfter(ParentExitTimeout);
+
+            while (!parent.WaitForExit(TimeSpan.Zero))
+            {
+                await Task.Delay(ProcessPollInterval, timeout.Token);
+            }
         }
     }
 
@@ -339,24 +357,38 @@ public static class PortableUpdateInstaller
         return Process.Start(info) ?? throw new IOException("The application did not restart.");
     }
 
-    private static async Task<bool> WaitForStartupAsync(Process process, string session, string token, CancellationToken cancellationToken)
+    /// <summary>Requires the OS termination signal rather than the earlier Windows exit-code observation.</summary>
+    private static Task<bool> WaitForStartupAsync(Process process, string session, string token, CancellationToken cancellationToken)
+        => ObserveStartupAsync(() => process.WaitForExit(TimeSpan.Zero), session, token, cancellationToken);
+
+    /// <summary>Observes the startup receipt around an explicit process-termination boundary.</summary>
+    internal static async Task<bool> ObserveStartupAsync(Func<bool> terminationConfirmed, string session, string token, CancellationToken cancellationToken)
     {
         var deadline = Stopwatch.StartNew();
-        while (deadline.Elapsed < TimeSpan.FromSeconds(60))
+        while (deadline.Elapsed < StartupConfirmationTimeout)
         {
             var path = Path.Combine(session, ReadyFile);
-            if (File.Exists(path))
+            if (File.Exists(path) || terminationConfirmed())
             {
-                var bytes = await UpdatePackage.ReadBoundedAsync(path, 128, cancellationToken);
-                return System.Text.Encoding.UTF8.GetString(bytes) == token;
+                return await HasStartupReceiptAsync(session, token, cancellationToken);
             }
-            if (process.HasExited)
-            {
-                return false;
-            }
-            await Task.Delay(100, cancellationToken);
+            await Task.Delay(ProcessPollInterval, cancellationToken);
         }
         return false;
+    }
+
+    /// <summary>Reads the final bounded receipt only after a positive publication or confirmed process termination.</summary>
+    private static async Task<bool> HasStartupReceiptAsync(string session, string token, CancellationToken cancellationToken)
+    {
+        var path = Path.Combine(session, ReadyFile);
+
+        if (!File.Exists(path))
+        {
+            return false;
+        }
+
+        var bytes = await UpdatePackage.ReadBoundedAsync(path, MaximumStartupReceiptBytes, cancellationToken);
+        return System.Text.Encoding.UTF8.GetString(bytes) == token;
     }
 
     private static void Rollback(string session, string target, Action<string, string> moveDirectory)

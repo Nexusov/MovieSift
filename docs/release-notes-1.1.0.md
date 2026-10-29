@@ -10,6 +10,8 @@
 - Choose interface language independently from Appearance. English is bundled; eleven additional translations download explicitly from the official repository and are cached for offline use.
 - Use the film/scissors application icon and integrated Windows caption controls. Linux retains native window decorations.
 - Check for future stable releases and install verified portable updates using the bundled helper.
+- Confirm process termination before updater rollback, and honor startup receipts written just as the new application exits.
+- Wait for captured Linux worker descendants before cancellation cleanup; uncertain termination preserves owned working files.
 
 ## Install or upgrade
 
