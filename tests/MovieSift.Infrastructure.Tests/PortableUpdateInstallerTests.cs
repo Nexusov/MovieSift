@@ -14,8 +14,33 @@ using Xunit;
 namespace MovieSift.Infrastructure.Tests;
 
 /// <summary>Checks the actual updater filesystem boundary, including preserved data and rollback after a failed rename.</summary>
-public sealed class PortableUpdateInstallerTests
+public sealed class PortableUpdateInstallerTests(ITestOutputHelper output)
 {
+    /// <summary>A receipt written between the initial check and confirmed termination must be evaluated before rollback.</summary>
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task StartupReceiptCreatedAtTerminationIsReadAgain(bool validReceipt)
+    {
+        using var workspace = new TestWorkspace();
+        var readyPath = Path.Combine(workspace.Path, "ready.txt");
+        var token = Guid.NewGuid().ToString("N");
+        var terminationChecks = 0;
+
+        bool ConfirmTermination()
+        {
+            terminationChecks++;
+            Assert.False(File.Exists(readyPath));
+            File.WriteAllText(readyPath, validReceipt ? token : "unrelated-token");
+            return true;
+        }
+
+        var started = await PortableUpdateInstaller.ObserveStartupAsync(ConfirmTermination, workspace.Path, token,
+            TestContext.Current.CancellationToken);
+        Assert.Equal(validReceipt, started);
+        Assert.Equal(1, terminationChecks);
+    }
+
     [Theory]
     [InlineData("MovieSift-win-x64/../outside.txt")]
     [InlineData("MovieSift-win-x64/C:/outside.txt")]
@@ -193,6 +218,7 @@ public sealed class PortableUpdateInstallerTests
             await parent.WaitForExitAsync(timeout.Token);
             await helper.WaitForExitAsync(timeout.Token);
             var report = await File.ReadAllTextAsync(Path.Combine(fixture.Session, "UPDATE-RESULT.txt"), timeout.Token);
+            output.WriteLine($"Updater result: {report}");
             Assert.True(helper.ExitCode == expectedExit, $"Helper exit {helper.ExitCode}; {report}");
             Assert.Equal(expectedVersion, await File.ReadAllTextAsync(Path.Combine(fixture.App, "version.txt"), timeout.Token));
             Assert.Equal("personal preferences", await File.ReadAllTextAsync(Path.Combine(fixture.App, "data", "settings.json"), timeout.Token));
