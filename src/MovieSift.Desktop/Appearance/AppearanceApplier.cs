@@ -54,6 +54,9 @@ public sealed class AppearanceApplier
             ["MovieSiftWindowBrush"] = palette.Window,
             ["MovieSiftPanelBrush"] = palette.Panel,
             ["MovieSiftSecondaryBrush"] = palette.Secondary,
+            // Keep transparent RGB equal to its hover surface: straight-alpha interpolation from transparent white flashes.
+            ["MovieSiftTransparentSecondaryBrush"] = Color.FromArgb(0, palette.Secondary.R, palette.Secondary.G, palette.Secondary.B),
+            ["MovieSiftTransparentSelectionBrush"] = Color.FromArgb(0, palette.Selection.R, palette.Selection.G, palette.Selection.B),
             ["MovieSiftTextBrush"] = palette.Text,
             ["MovieSiftMutedBrush"] = palette.Muted,
             ["MovieSiftBorderBrush"] = palette.Border,
