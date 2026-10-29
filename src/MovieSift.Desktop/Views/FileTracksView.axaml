@@ -39,7 +39,7 @@
         </DataTemplate>
   </UserControl.Resources>
   <StackPanel Spacing="8">
-    <Expander x:Name="FileVideoSection" Header="{Binding VideoSummaryText}" IsExpanded="False" HorizontalContentAlignment="Stretch">
+    <Expander x:Name="FileVideoSection" Header="{Binding VideoSummaryText}" IsVisible="{Binding ShowVideoSection}" IsExpanded="False" HorizontalContentAlignment="Stretch">
       <ItemsControl x:Name="FileVideoTracks" ItemsSource="{Binding VideoTracks}" ItemTemplate="{StaticResource FileTrackTemplate}" />
     </Expander>
     <TabControl x:Name="FileTrackCategories" Classes="trackCategories" SelectedIndex="{Binding SelectedTrackTab, Mode=TwoWay}">

@@ -48,6 +48,7 @@ public sealed class BatchItemViewModel : ObservableObject
     public ObservableCollection<TrackViewModel> VideoTracks { get; } = [];
     public ObservableCollection<TrackViewModel> AudioTracks { get; } = [];
     public ObservableCollection<TrackViewModel> SubtitleTracks { get; } = [];
+    public bool ShowVideoSection => VideoTracks.Count > 1;
     public string VideoSummaryText => $"{Localization["Video"]} · {VideoTracks.Count} — {Localization["AlwaysKept"]}";
     public int SelectedTrackTab { get => selectedTrackTab; set => SetProperty(ref selectedTrackTab, value); }
     public BatchItem Snapshot => item;
