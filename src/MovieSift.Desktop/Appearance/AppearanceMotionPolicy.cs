@@ -11,7 +11,7 @@ public static class AppearanceMotionPolicy
     private const uint GetClientAreaAnimation = 0x1042;
     private static readonly TimeSpan PressDuration = TimeSpan.FromMilliseconds(220);
     private static readonly TimeSpan HoverDuration = TimeSpan.FromMilliseconds(150);
-    private static readonly TimeSpan DisclosureDuration = TimeSpan.FromMilliseconds(240);
+    internal static readonly TimeSpan DisclosureDuration = TimeSpan.FromMilliseconds(240);
     private static readonly TimeSpan DropDuration = TimeSpan.FromMilliseconds(300);
     private static readonly List<WeakReference<Window>> Windows = [];
     private static AppearanceMotion configured = AppearanceMotion.System;

@@ -12,7 +12,6 @@ namespace MovieSift.Desktop.Appearance;
 public sealed class SoftMotion : AvaloniaObject
 {
     private const double PanelOffset = 8;
-    private static readonly TimeSpan PanelDuration = TimeSpan.FromMilliseconds(240);
     private static readonly TimeSpan ResultDuration = TimeSpan.FromMilliseconds(220);
     private static readonly ConditionalWeakTable<Control, MotionState> States = new();
     public static readonly AttachedProperty<bool> VisibleProperty = AvaloniaProperty.RegisterAttached<SoftMotion, Control, bool>("Visible", true);
@@ -93,7 +92,7 @@ public sealed class SoftMotion : AvaloniaObject
             }
         };
         AppearanceMotionPolicy.Changed += reduce;
-        var animation = new Animation { Duration = PanelDuration, Easing = new CubicEaseOut() };
+        var animation = new Animation { Duration = AppearanceMotionPolicy.DisclosureDuration, Easing = new CubicEaseOut() };
         var start = new KeyFrame { Cue = new Cue(0) };
         start.Setters.Add(new Setter(Visual.OpacityProperty, 1d));
         var end = new KeyFrame { Cue = new Cue(1) };
@@ -156,7 +155,7 @@ public sealed class SoftMotion : AvaloniaObject
             }
         };
         AppearanceMotionPolicy.Changed += reduce;
-        var animation = new Animation { Duration = panel ? PanelDuration : ResultDuration, Easing = new CubicEaseOut() };
+        var animation = new Animation { Duration = panel ? AppearanceMotionPolicy.DisclosureDuration : ResultDuration, Easing = new CubicEaseOut() };
         var start = new KeyFrame { Cue = new Cue(0) };
         start.Setters.Add(new Setter(Visual.OpacityProperty, 0d));
         var end = new KeyFrame { Cue = new Cue(1) };

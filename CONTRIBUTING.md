@@ -26,7 +26,7 @@ Use `dotnet format --no-restore` when needed, inspect its diff, then repeat the 
 
 These commands do not provision media tools. Optional local C# media tests skip when tools/fixtures are absent; those skips are not media coverage. The [verification workflow](.github/workflows/verify.yml) sets `MOVIESIFT_REQUIRE_MEDIA_TOOLS=1` and fails when mandatory provisioning is missing.
 
-For interface-resource changes, update all 11 downloadable packs and run `python translations/validate-packs.py --write-catalog`, `python translations/validate-packs.py` and `python -m unittest discover -s translations -p "test_*.py"`. CI requires complete keys, exact format placeholders and the current byte/hash catalog. See [translation maintenance](translations/README.md); complete coverage does not replace native-speaker review.
+For interface-resource changes, update all 14 downloadable packs and run `python lang/validate-packs.py --write-catalog`, `python lang/validate-packs.py` and `python -m unittest discover -s lang -p "test_*.py"`. CI requires complete keys, exact format placeholders and the current byte/hash catalog. See [translation maintenance](lang/README.md); complete coverage does not replace native-speaker review.
 
 ## Media tool acquisition
 
@@ -204,6 +204,8 @@ Native file dialogs, keyboard focus, OS scaling and window closure during work s
 Keep pull requests focused on a concrete behavior or defect. Include reproduction steps, what changed, checks actually run and material limitations. For media support changes, update the preservation matrix and relevant real-media tests.
 
 Project conventions:
+
+Desktop changes must follow the shared [UI standards](docs/UI_STANDARDS.md). Extend existing semantic styles and controls; preserve finite scroll viewports, stable rows and cosmetic/workflow separation. Add regression coverage for a demonstrated layout or lifecycle failure instead of introducing per-screen workarounds.
 
 - Keep code, documentation and commit messages in English; align English/Russian UI resource keys and formatting arguments.
 - Respect the [project boundaries](docs/ARCHITECTURE.md#project-boundaries). Use explicit constructor injection, nullable reference types and immutable workflow snapshots.

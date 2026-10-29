@@ -199,4 +199,3 @@ public sealed class CosmeticPanelConsistencyTests
         Assert.Empty(fixture.Backend.RemuxRequests);
     }
 }
-

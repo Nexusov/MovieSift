@@ -212,6 +212,7 @@
   </Style>
   <Style Selector="Button.danger">
     <Setter Property="Foreground" Value="{DynamicResource MovieSiftErrorBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource MovieSiftErrorBrush}" />
   </Style>
   <Style Selector="Button.danger Path.closeGlyph">
     <Setter Property="Stroke" Value="{DynamicResource MovieSiftErrorBrush}" />

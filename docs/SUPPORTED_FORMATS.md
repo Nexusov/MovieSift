@@ -83,7 +83,7 @@ The track list is the union of all included, successfully inspected files. Track
 
 Groups match kind, exact canonical language, title trimmed at its edges, codec, audio channels, forced status and semantic roles. Titles are case-sensitive here. Regional/script language distinctions remain; unknown/conflicting language tracks stay separate. Default/enabled differences remain individual metadata, unchanged by selection.
 
-Duplicate tracks remain distinct occurrences. Group actions affect only their represented tracks; per-file exceptions produce a mixed checkbox state. New or reinspected tracks start kept. Excluded files and completed results are not edited. Grouping does not establish content equivalence or spoken language.
+Duplicate tracks remain distinct occurrences. Group actions affect only their represented tracks; per-file exceptions produce a mixed selection state. New or reinspected tracks start kept. Excluded files and completed results are not edited. Grouping does not establish content equivalence or spoken language.
 
 ## Input discovery scope
 
