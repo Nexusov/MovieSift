@@ -19,7 +19,7 @@ Build and local verification commands are in [CONTRIBUTING](../CONTRIBUTING.md).
 - [ ] Verify the uploaded assets and public download links against the prepared set. Retain the matching source materials with the binaries; expiring CI artifacts are insufficient.
 - [ ] Use the intended stable/prerelease and Latest settings. Publish changed binaries under a new version rather than replacing an existing release's files.
 
-Version 1.0.0 has no built-in updater. The first updater-enabled version requires a manual installation, as described in the [user guide](USAGE.md).
+Version 1.0.0 has no built-in updater; 1.1.0's updater accepts only flat packages. Both require one manual migration to the 1.2 nested portable layout, as described in the [user guide](USAGE.md#upgrade-manually). Subsequent updates use the layout-aware updater.
 
 ## Optional candidate handoff
 

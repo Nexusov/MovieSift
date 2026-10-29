@@ -28,6 +28,9 @@ public sealed partial class MainViewModel : ObservableObject
     private bool isAppearanceOpen;
 
     [ObservableProperty]
+    private bool isUpdatesOpen;
+
+    [ObservableProperty]
     private bool isLanguageOpen;
 
     [ObservableProperty]
@@ -49,6 +52,7 @@ public sealed partial class MainViewModel : ObservableObject
         persistenceFailed = !services.DataWritable;
         ChangeLanguageCommand = new AsyncRelayCommand<string>(ChangeLanguageAsync, _ => Updates?.IsInstalling != true);
         ToggleAppearanceCommand = new RelayCommand(() => IsAppearanceOpen = !IsAppearanceOpen);
+        ToggleUpdatesCommand = new RelayCommand(() => IsUpdatesOpen = !IsUpdatesOpen, () => HasUpdates);
         ToggleLanguageCommand = new RelayCommand(() => IsLanguageOpen = !IsLanguageOpen);
         Languages = new(new(services.TranslationPacks, Localization, ChangeLanguageAsync));
         Languages.PropertyChanged += (_, _) => NotifyPresentation();
@@ -70,19 +74,22 @@ public sealed partial class MainViewModel : ObservableObject
 
     public LocalizationService Localization => services.Localization;
     public LanguageSettingsViewModel Languages { get; }
-    public bool IsPreferencesOpen => IsAppearanceOpen || IsLanguageOpen;
+    public bool IsPreferencesOpen => IsAppearanceOpen || IsLanguageOpen || IsUpdatesOpen;
     public BatchViewModel Batch => services.Batch;
     public AppearanceViewModel? Appearance => services.Appearance;
     public UpdatesViewModel? Updates => services.Updates;
     public bool HasUpdates => Updates is not null;
     public bool HasAvailableUpdate => Updates?.HasUpdate == true;
     public bool HasUpdateFailureNotice => Updates?.PreviousInstallFailed == true;
-    public bool ShowUpdateAction => HasAvailableUpdate || HasUpdateFailureNotice;
-    public string UpdateActionText => Localization[HasUpdateFailureNotice ? "UpdatesFailureBadge" : "UpdatesBadge"];
-    public IRelayCommand? UpdateActionCommand => HasUpdateFailureNotice ? ToggleAppearanceCommand : Updates?.ShowCommand;
+    public bool ShowUpdateAction => HasUpdates;
+    public string UpdateActionText => Localization["UpdatesHeading"];
+    public string UpdateSummaryText => HasUpdateFailureNotice ? Localization["UpdatesFailureBadge"] : Updates?.AvailableVersionText ?? string.Empty;
+    public bool ShowUpdateSummary => HasAvailableUpdate || HasUpdateFailureNotice;
+    public IRelayCommand UpdateActionCommand => ToggleUpdatesCommand;
     public bool CanEditPreferences => Updates?.IsInstalling != true;
     public IRelayCommand ToggleAppearanceCommand { get; }
     public IRelayCommand ToggleLanguageCommand { get; }
+    public IRelayCommand ToggleUpdatesCommand { get; }
     public IAsyncRelayCommand<string> ChangeLanguageCommand { get; }
     public IRelayCommand RemainInWarningReviewCommand { get; }
     public IAsyncRelayCommand CleanInterruptedCommand { get; }
@@ -226,6 +233,7 @@ public sealed partial class MainViewModel : ObservableObject
         if (value)
         {
             IsLanguageOpen = false;
+            IsUpdatesOpen = false;
         }
 
         NotifyPresentation();
@@ -237,6 +245,19 @@ public sealed partial class MainViewModel : ObservableObject
         if (value)
         {
             IsAppearanceOpen = false;
+            IsUpdatesOpen = false;
+        }
+
+        NotifyPresentation();
+    }
+
+    /// <summary>Keeps update checks independently reachable without mixing them with appearance edits.</summary>
+    partial void OnIsUpdatesOpenChanged(bool value)
+    {
+        if (value)
+        {
+            IsAppearanceOpen = false;
+            IsLanguageOpen = false;
         }
 
         NotifyPresentation();
@@ -363,6 +384,7 @@ public sealed partial class MainViewModel : ObservableObject
         {
             IsAppearanceOpen = false;
             IsLanguageOpen = false;
+            IsUpdatesOpen = false;
         }
 
         Languages.SetAvailability(CanEditPreferences);

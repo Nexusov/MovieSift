@@ -109,6 +109,88 @@ class DistributionInventoryTests(unittest.TestCase):
         self.json("tools/file-provenance.json", tool_records)
         self.pack()
 
+    def nest_payload(self):
+        """Rearrange only this test's owned payload into the actual v2 archive structure."""
+        payload = self.root / "app"
+        payload.mkdir()
+        (self.root / "SHA256SUMS").unlink()
+        for entry in list(self.root.iterdir()):
+            if entry != payload:
+                entry.rename(payload / entry.name)
+        for name in ("LICENSE", "build-provenance.json"):
+            self.write(name, (payload / name).read_bytes())
+        self.write("portable.flag", b"MovieSift portable data policy version 2\n")
+        self.write("MovieSift.exe", b"controlled SDK bootstrap")
+
+    def test_nested_layout_accounts_for_every_actual_file_and_nuget_origin(self):
+        """Path projection retains exact nested byte/member evidence and root records."""
+        self.nest_payload()
+        self.pack()
+        report = self.generate()
+        actual = INVENTORY.staged_files(self.root)
+        self.assertEqual(set(actual), {row["path"] for row in report["files"]})
+        sample = next(row for row in report["files"] if row["path"] == "app/Sample.dll")
+        self.assertEqual("third-party-payload", sample["category"])
+        component = next(row for row in report["nugetComponents"] if row["id"] == "nuget:Sample/1.0.0")
+        self.assertIn("app/Sample.dll", component["matchedPayloads"])
+        self.assertTrue(all((self.root / path).is_file() for path in component["includedMaterials"]))
+        license_evidence = next(row for row in component["materialEvidence"] if row["path"].endswith("/LICENSE"))
+        self.assertEqual("LICENSE", license_evidence["member"])
+        self.assertEqual("app/licenses/nuget/Sample/1.0.0/LICENSE", license_evidence["path"])
+        self.assertEqual("LICENSE", report["originalApplicationLicense"]["path"])
+
+    def test_layout_projection_preserves_upstream_evidence_and_maps_only_shipped_references(self):
+        """An upstream member or signed receipt value is not a package-local path even when its text matches one."""
+        component = {"id": "nuget:Sample/1", "licenseExpressionOrFile": "LICENSE",
+                     "includedMaterials": ["licenses/Sample/LICENSE"], "matchedPayloads": ["Sample.dll"],
+                     "materialEvidence": [{"path": "licenses/Sample/LICENSE", "member": "LICENSE"}],
+                     "supplementalMaterials": [{"path": "LICENSE", "member": "Sample.dll"}]}
+        receipt = {"workers": [{"path": "Sample.dll"}], "source": {"fileName": "LICENSE"}}
+        report = {"files": [{"path": "Sample.dll", "origins": [{"member": "Sample.dll"}]}],
+                  "manifest": {"path": "SHA256SUMS"}, "nugetComponents": [component],
+                  "nativeComponentEvidence": [{"component": "Sample.dll", "paths": ["Sample.dll"],
+                      "availableMaterials": ["LICENSE"], "provenance": "build-provenance.json", "receipt": "LICENSE"}],
+                  "mkvSourceBuildEvidence": receipt, "ffmpegProvenance": receipt, "toolPayloadSelection": receipt}
+        paths = {name: "app/" + name for name in ("Sample.dll", "LICENSE", "licenses/Sample/LICENSE", "build-provenance.json")}
+        actual = INVENTORY.actual_payload_paths(report, paths)
+        self.assertEqual("app/Sample.dll", actual["files"][0]["path"])
+        self.assertEqual("Sample.dll", actual["files"][0]["origins"][0]["member"])
+        self.assertEqual("LICENSE", actual["nugetComponents"][0]["materialEvidence"][0]["member"])
+        self.assertEqual("LICENSE", actual["nugetComponents"][0]["licenseExpressionOrFile"])
+        self.assertEqual(component["supplementalMaterials"], actual["nugetComponents"][0]["supplementalMaterials"])
+        self.assertEqual(["app/licenses/Sample/LICENSE"], actual["nugetComponents"][0]["includedMaterials"])
+        self.assertEqual(["app/Sample.dll"], actual["nugetComponents"][0]["matchedPayloads"])
+        observation = actual["nativeComponentEvidence"][0]
+        self.assertEqual("Sample.dll", observation["component"])
+        self.assertEqual(["app/Sample.dll"], observation["paths"])
+        self.assertEqual(["app/LICENSE"], observation["availableMaterials"])
+        self.assertEqual("app/build-provenance.json", observation["provenance"])
+        self.assertEqual("app/LICENSE", observation["receipt"])
+        for key in ("mkvSourceBuildEvidence", "ffmpegProvenance", "toolPayloadSelection"):
+            self.assertEqual(receipt, actual[key])
+        self.assertEqual("Sample.dll", report["files"][0]["path"])
+
+    def test_nested_layout_rejects_changed_root_copy_and_root_dll_clutter(self):
+        """A self-consistent outer manifest cannot hide incompatible root/payload data."""
+        self.nest_payload()
+        self.write("build-provenance.json", b"{}")
+        self.pack()
+        with self.assertRaisesRegex(ValueError, "copies differ"):
+            self.generate()
+        self.write("build-provenance.json", (self.root / "app/build-provenance.json").read_bytes())
+        self.write("stray.dll", b"unexpected runtime payload")
+        self.pack()
+        with self.assertRaisesRegex(ValueError, "Unexpected root"):
+            self.generate()
+
+    def test_nested_layout_keeps_missing_notice_failure_mandatory(self):
+        """The existing NuGet notice gate still reads the actual nested material bytes."""
+        self.nest_payload()
+        (self.root / "app/licenses/nuget/Sample/1.0.0/LICENSE").unlink()
+        self.pack()
+        with self.assertRaisesRegex(ValueError, "not shipped"):
+            self.generate()
+
     def write(self, name, value):
         """Write a fixture payload under the owned temporary directory."""
         destination = self.root / name

@@ -410,7 +410,7 @@
     "UpdatesAvailableVersion": "MovieSift {0} está disponível",
     "UpdatesCheckOnStartup": "Verificar atualizações ao iniciar",
     "UpdatesCheckNow": "Verificar atualizações",
-    "UpdatesInstall": "Instalar e reiniciar",
+    "UpdatesInstall": "Baixar e atualizar",
     "UpdatesInstallNotice": "MovieSift baixará a atualização, fechará com segurança e reiniciará. As configurações e a lista salva serão preservadas.",
     "UpdatesNotChecked": "As atualizações ainda não foram verificadas.",
     "UpdatesChecking": "Procurando nova versão no GitHub…",

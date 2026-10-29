@@ -410,7 +410,7 @@
   <data name="UpdatesAvailableVersion" xml:space="preserve"><value>MovieSift {0} is available</value></data>
   <data name="UpdatesCheckOnStartup" xml:space="preserve"><value>Check for updates at startup</value></data>
   <data name="UpdatesCheckNow" xml:space="preserve"><value>Check for updates</value></data>
-  <data name="UpdatesInstall" xml:space="preserve"><value>Install and restart</value></data>
+  <data name="UpdatesInstall" xml:space="preserve"><value>Download and update</value></data>
   <data name="UpdatesInstallNotice" xml:space="preserve"><value>MovieSift will download the update, close safely and restart. Your settings and saved list will be kept.</value></data>
   <data name="UpdatesNotChecked" xml:space="preserve"><value>Updates have not been checked yet.</value></data>
   <data name="UpdatesChecking" xml:space="preserve"><value>Checking GitHub for a new release…</value></data>

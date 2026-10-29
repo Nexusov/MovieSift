@@ -5,6 +5,7 @@ using MovieSift.Application.Inspection;
 using MovieSift.Application.Ports;
 using MovieSift.Core.Failures;
 using MovieSift.Core.Media;
+using MovieSift.Infrastructure.Files;
 using MovieSift.Infrastructure.Processes;
 
 namespace MovieSift.Infrastructure.MediaTools;
@@ -405,7 +406,8 @@ public sealed class MkvBackend(MkvBackendOptions options) : IMediaBackend
     /// <summary>Allocates a uniquely owned metadata directory in portable application data.</summary>
     private string CreateScratchDirectory()
     {
-        var root = options.ScratchDirectory ?? Path.Combine(AppContext.BaseDirectory, "data", "inspection");
+        var root = options.ScratchDirectory ?? Path.Combine(
+            PortableLayout.ApplicationRootFromBaseDirectory(AppContext.BaseDirectory), "data", "inspection");
         var directory = Path.Combine(root, Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture));
         Directory.CreateDirectory(directory);
         return directory;

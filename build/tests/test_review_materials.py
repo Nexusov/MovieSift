@@ -27,7 +27,7 @@ class ReviewMaterialTests(unittest.TestCase):
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
-        self.repository = self.root / "source Кириллица"
+        self.repository = self.root / "source РљРёСЂРёР»Р»РёС†Р°"
         self.repository.mkdir()
         self.git("init", "--quiet")
         self.git("config", "core.autocrlf", "true")
@@ -89,6 +89,23 @@ class ReviewMaterialTests(unittest.TestCase):
     def prepare(self):
         """Exercise the same function invoked by platform CI."""
         return MATERIALS.prepare(self.repository, self.archive, self.inventory_path, self.output)
+
+    def test_nested_payload_collects_exact_materials_without_workers(self):
+        """The clean layout retains its required nested sources/notices and root binding."""
+        root_names = {"LICENSE", "SHA256SUMS", "build-provenance.json", "MovieSift.exe"}
+        original = self.payloads
+        self.payloads = {("app/" + name if name not in root_names else name): contents for name, contents in original.items()}
+        self.payloads["app/LICENSE"] = LICENSE
+        self.payloads["app/MovieSift.dll"] = b"controlled application identity"
+        self.pack()
+        summary = self.prepare()
+        with tarfile.open(self.output / summary["archive"]["name"], "r:gz") as archive:
+            names = set(archive.getnames())
+        prefix = "MovieSift-review-materials/win-x64/"
+        self.assertIn(prefix + "app/tools/licenses/source.tar.xz", names)
+        self.assertIn(prefix + "app/licenses/nuget/notice.txt", names)
+        self.assertNotIn(prefix + "app/tools/mkvmerge.exe", names)
+        self.assertNotIn(prefix + "MovieSift.exe", names)
 
     def test_exact_materials_license_source_and_summary_are_bound_without_workers(self):
         """Copy material bytes and committed source, keeping compact public-safe evidence."""

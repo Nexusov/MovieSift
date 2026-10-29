@@ -404,6 +404,59 @@ def verify_archive(archive, root_name, records):
         raise ValueError("The final archive is missing staged payloads")
 
 
+def payload_layout(root, actual_records):
+    """Project the complete v2 payload for existing checks without losing actual archive paths."""
+    if not (root / "app").is_dir():
+        return root, actual_records, {}, []
+    if (root / "portable.flag").read_text(encoding="utf-8-sig").strip() != "MovieSift portable data policy version 2":
+        raise ValueError("The nested portable payload requires its exact v2 root marker")
+    if "app/portable.flag" in actual_records:
+        raise ValueError("A nested payload cannot establish a separate portable data root")
+    allowed_root = {"MovieSift", "MovieSift.exe", "portable.flag", "LICENSE", "SHA256SUMS", "build-provenance.json"}
+    if any("/" not in name and name not in allowed_root for name in actual_records):
+        raise ValueError("Unexpected root file in the clean portable layout")
+    for name in ("LICENSE", "build-provenance.json"):
+        if actual_records.get(name, {}).get("sha256") != actual_records.get("app/" + name, {}).get("sha256") or name not in actual_records:
+            raise ValueError("Root and payload provenance/license copies differ")
+    paths = {name.removeprefix("app/"): name for name in actual_records if name.startswith("app/")}
+    logical = {name: dict(actual_records[actual], path=name) for name, actual in paths.items()}
+    for name in ("MovieSift", "MovieSift.exe", "portable.flag", "SHA256SUMS"):
+        if name in actual_records:
+            if name in logical:
+                raise ValueError("The nested payload must not duplicate the launcher or root control records")
+            logical[name] = dict(actual_records[name])
+    extras = [dict(actual_records[name], category="original-or-generated-project-output", origin="Validated portable-root copy")
+              for name in ("LICENSE", "build-provenance.json")]
+    return root / "app", logical, paths, extras
+
+
+def actual_payload_paths(report, paths):
+    """Project only package-local references; upstream archive members and signed receipts stay original."""
+    result = dict(report)
+    result["files"] = [dict(row, path=paths.get(row["path"], row["path"])) for row in report["files"]]
+    manifest = report["manifest"]
+    result["manifest"] = dict(manifest, path=paths.get(manifest["path"], manifest["path"]))
+    result["nugetComponents"] = []
+    for component in report["nugetComponents"]:
+        projected = dict(component)
+        for key in ("includedMaterials", "matchedPayloads"):
+            projected[key] = [paths.get(name, name) for name in component[key]]
+        projected["materialEvidence"] = [dict(row, path=paths.get(row["path"], row["path"]))
+                                         for row in component["materialEvidence"]]
+        result["nugetComponents"].append(projected)
+    result["nativeComponentEvidence"] = []
+    for observation in report["nativeComponentEvidence"]:
+        projected = dict(observation)
+        for key in ("paths", "availableMaterials"):
+            if key in observation:
+                projected[key] = [paths.get(name, name) for name in observation[key]]
+        for key in ("provenance", "receipt"):
+            if key in observation:
+                projected[key] = paths.get(observation[key], observation[key])
+        result["nativeComponentEvidence"].append(projected)
+    return result
+
+
 def nuget_origins(assets, packages, records):
     """Match published bytes to signed nupkg members and retain source evidence."""
     candidates = {(Path(name).name.casefold(), record["size"]) for name, record in records.items() if "/" not in name}
@@ -816,6 +869,9 @@ def generate(package_root, archive, assets_file, output, profile_file, mkv_lock_
     if "licenses/APPLICATION-LICENSE-PENDING.txt" in records:
         raise ValueError("The obsolete application-license-pending marker must not be packaged")
 
+    actual_root = root
+    actual_records = records
+    root, records, payload_paths, root_copies = payload_layout(root, actual_records)
     build = read_json(root / "build-provenance.json")
     tool_lock = read_json(root / "tool-provenance.json")
     packages = read_json(root / "licenses/nuget/inventory.json")
@@ -889,7 +945,7 @@ def generate(package_root, archive, assets_file, output, profile_file, mkv_lock_
         "files": list(records.values()), "nugetComponents": components,
         "buildOnlyDependencies": [".NET SDK (version in build provenance)", "xUnit, Microsoft.NET.Test.Sdk, test runner and Avalonia.Headless (test projects only)", "Python, PowerShell, archive utilities and Linux build/container tools", "GCC/MinGW-w64, binutils, Make, NASM and MSYS2; actual compiler/target and build-tool evidence is bound by the FFmpeg source-build receipt"],
         "nativeComponentEvidence": observations,
-        "unresolved": profile["unresolved"] + [{"component": name, "missing": "Exact origin/version and applicable materials", "nextAction": "Inspect the unmatched actual payload before release"} for name in unknowns],
+        "unresolved": profile["unresolved"] + [{"component": payload_paths.get(name, name), "missing": "Exact origin/version and applicable materials", "nextAction": "Inspect the unmatched actual payload before release"} for name in unknowns],
         "limits": [
             "NuGet match proves byte identity to a signed archive member, not complete source or legal compliance.",
             "Omissions are limited to the hash-pinned CLI selection, backed by source, dependency, representative runtime and mandatory packaged-workflow evidence.",
@@ -897,6 +953,11 @@ def generate(package_root, archive, assets_file, output, profile_file, mkv_lock_
             "Original MovieSift code is MIT; combined-work analysis and actual covered-source/build delivery remain independent requirements.",
         ],
     }
+    report = actual_payload_paths(report, payload_paths)
+    report["files"].extend(root_copies)
+    if {row["path"] for row in report["files"]} != set(actual_records) or len(report["files"]) != len(actual_records):
+        raise ValueError("Portable layout projection lost or duplicated actual shipped files")
+    report["counts"] = dict(Counter(row["category"] for row in report["files"]))
     output.mkdir(parents=True, exist_ok=True)
     report_path = output / f"distribution-{build['runtimeIdentifier']}.json"
     report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -907,7 +968,8 @@ def generate(package_root, archive, assets_file, output, profile_file, mkv_lock_
         "tools/file-provenance.json": "tool-file-provenance.json",
         "tools/licenses/upstream-materials.json": "upstream-materials.json",
     }.items():
-        shutil.copyfile(root / source, output / destination)
+        source_root = actual_root if source == "SHA256SUMS" else root
+        shutil.copyfile(source_root / source, output / destination)
 
     if selection:
         shutil.copyfile(root / "tools/payload-selection.json", output / "tool-payload-selection.json")

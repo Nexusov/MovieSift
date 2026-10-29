@@ -22,7 +22,15 @@ internal sealed class LinuxProcessTreeObservation : IDisposable
         var result = new LinuxProcessTreeObservation();
         try
         {
-            if (owner.WaitForExit(TimeSpan.Zero))
+            var completedBeforeObservation = owner.WaitForExit(TimeSpan.Zero);
+
+            if (completedBeforeObservation && owner.ExitCode == 0)
+            {
+                // Preserve the existing normal-completion contract; the runner still requires bounded pipe drainage.
+                return result;
+            }
+
+            if (completedBeforeObservation)
             {
                 throw new IOException("The worker exited before its descendants could be identified.");
             }

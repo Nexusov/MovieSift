@@ -83,6 +83,8 @@ Cancellation terminates and awaits the owned worker, including inspection/verifi
 
 On Linux, cancellation captures descendants from the owned worker's procfs task/children records before the existing tree-kill request. PID, parent and birth identities are checked; captured descendants must disappear, change birth identity, or enter a non-writing Z/X state before cleanup. Observation is bounded to 256 descendants, 4,096 tasks, 16 KiB per record and the existing 15-second termination budget. Unreadable or incomplete ownership evidence preserves the candidate instead of treating pipe EOF or parent exit as proof that descendants stopped. This observer sends no additional signals.
 
+A retained root already confirmed exited with code 0 before descendant observation follows the existing normal-completion path, including mandatory bounded pipe drainage. This does not waive a partial-observation failure, a nonzero root exit or any captured descendant wait.
+
 ## Job ownership and publication
 
 `JobCoordinator` is the single owner of the plan, process, candidate, verification, warning decision, publication fact and cleanup result:
@@ -162,9 +164,13 @@ Headless rendering and input tests do not establish native file-dialog behavior,
 
 ## Portable application updates
 
+Portable layout version 2 uses the pinned SDK's native apphost at the root, embedding `app/MovieSift.dll`. It loads the self-contained runtime directly in the same process: there is no second launcher process, additional framework or single-file temporary extraction. Runtime/tool/documentation payloads live under `app/`; data, installation leases, source-root ownership and startup receipts remain associated with the launcher root. `PortableLayout` recognizes only the fixed `app` relationship and bounded regular version-2 `portable.flag`; source builds and legacy flat packages retain their base directory. The root manifest inventories every actual nested file, and root license/provenance copies must match their payload copies.
+
 Startup can asynchronously check the public stable GitHub release. Disabled checks, network failure or invalid responses do not block media use. A newer compatible release opens a dismissible offer; downloading and installing require an explicit action.
 
-Staging validates archive size/hash, bounded extraction paths, the complete package manifest, runtime and assembly version. Linux internal file aliases become verified regular files; external links and special entries are rejected. The current bundled helper/runtime is copied to adjacent storage and checked before launch.
+Updates has a permanent dedicated header entry and panel, independent of language and appearance. A newer version is indicated beside it. Manual checks remain available after startup opt-out; the existing update ViewModel owns all checks, progress, cancellation and safe installation. The supplied circular-arrow silhouette is tinted with semantic foreground resources rather than maintaining theme-specific raster variants.
+
+Staging validates archive size/hash, bounded extraction paths, the complete package manifest, runtime and assembly version from the declared layout. Linux internal file aliases become verified regular files; external links and special entries are rejected. The current bundled helper/runtime is copied from the payload directory to adjacent storage and checked before launch. New-layout data migration still copies root `data/`, never an inferred `app/data/`.
 
 The shell waits for saves and refuses installation during media work or unresolved warning/recovery/cleanup decisions. A shared application lease prevents installation while a cooperating instance is alive. The external helper waits for the exact parent process to exit, takes the exclusive lease, preserves portable data and unknown user files, then moves the old tree to backup and the prepared tree into place. Conflicts fail before switching.
 
@@ -172,6 +178,6 @@ Migration preserves ordinary Linux permissions on the application root and retai
 
 On Windows, current allow/deny DACL entries become a protected snapshot, including inherited entries converted to explicit rules. Owner/group must match. EFS-encrypted data, noncanonical ACLs and unpreservable rules are rejected. Later parent permission changes no longer propagate automatically; SACL audit metadata is outside this contract.
 
-A failed switch rolls back where possible. The restarted desktop acknowledges initialization; an exited, unacknowledged new process permits rollback, while a still-running one is not killed or overwritten. The old tree and recovery report remain in the update session. Two directory moves are not one atomic operation; power loss between them may require manual restoration. Version 1.0.0 predates the updater, so the first updater-enabled package must be installed manually.
+A failed switch rolls back where possible. The restarted desktop acknowledges initialization; an exited, unacknowledged new process permits rollback, while a still-running one is not killed or overwritten. The old tree and recovery report remain in the update session. Two directory moves are not one atomic operation; power loss between them may require manual restoration. Version 1.0.0 predates the updater, and 1.1.0's immutable verifier requires root DLLs. Both need one manual migration to layout 2; new code cannot retroactively add support to those published binaries. The new verifier retains legacy flat-package recognition without creating fake compatibility DLLs or weakening manifest checks.
 
 See [distribution and licensing](DISTRIBUTION.md) for package contents and matching source/build materials.

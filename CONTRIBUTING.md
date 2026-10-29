@@ -170,7 +170,7 @@ pwsh ./build/package.ps1 -RuntimeIdentifier linux-x64 -FixturePath ./artifacts/f
 pwsh ./build/verify-package.ps1 -ArchivePath ./artifacts/MovieSift-linux-x64.tar.gz -FixturePath ./artifacts/fixtures/ordinary.mkv -Mp4FixturePath ./artifacts/fixtures/mp4/ordinary.mp4
 ```
 
-Packaging includes the complete self-contained runtime, app/helper and tool closure, notices, provenance and checksums. It verifies the shipped runtime, license inventory and packaged workflows. Use `-Overwrite` only when replacing an existing generated archive. Staging and relocation directories remain under `artifacts`.
+Packaging includes the complete self-contained runtime, app/helper and tool closure, notices, provenance and checksums. The pinned SDK HostWriter binds the root native apphost to `app/MovieSift.dll`; no separate launcher project/compiler or single-file extraction is introduced. `app/` contains the runtime/tool payload, while `data/`, license/provenance copies and the complete manifest remain beside the root launcher. Packaging verifies this layout, the shipped runtime, license inventory and actual MKV/MP4 workflows. Use `-Overwrite` only when replacing an existing generated archive. Staging and relocation directories remain under `artifacts`.
 
 Relocation clears development runtime/tool variables, changes the working directory and exercises spaces, Cyrillic and metacharacters. It checks real MKV/MP4 workflows; a host with an SDK still does not prove SDK-free deployment.
 

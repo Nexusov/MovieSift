@@ -76,7 +76,8 @@ internal static class PortableSmoke
                 return FailureExitCode;
             }
 
-            var dataDirectory = Path.Combine(AppContext.BaseDirectory, "data");
+            var applicationRoot = PortableLayout.ApplicationRootFromBaseDirectory(AppContext.BaseDirectory);
+            var dataDirectory = Path.Combine(applicationRoot, "data");
             var coordinator = new JobCoordinator(backend, sourceAccess, new OwnedOutputStore(dataDirectory));
             var result = await coordinator.RunAsync(new(plan, CancellationToken: cancellation.Token));
             var finalHash = await HashSourceAsync(new(sourcePath, cancellation.Token));

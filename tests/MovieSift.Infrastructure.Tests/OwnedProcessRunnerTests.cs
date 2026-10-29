@@ -97,6 +97,39 @@ public sealed class OwnedProcessRunnerTests
         Assert.Contains("not a real mkvmerge warning fixture", result.StandardError, StringComparison.Ordinal);
     }
 
+    /// <summary>A normal exit before Linux observation is already complete; a failed root cannot supply that authority.</summary>
+    [Theory]
+    [InlineData("echo", 0)]
+    [InlineData("warning", 1)]
+    public async Task AlreadyCompletedWorkerKeepsNormalCompletionDistinctFromUncertainTermination(string mode, int expectedExit)
+    {
+        var request = WorkerRequest(new WorkerOptions([mode]));
+        var startInfo = new ProcessStartInfo(request.ExecutablePath)
+        {
+            UseShellExecute = false,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true
+        };
+        foreach (var argument in request.Arguments)
+        {
+            startInfo.ArgumentList.Add(argument);
+        }
+        using var process = Process.Start(startInfo)!;
+        _ = process.SafeHandle;
+        await process.WaitForExitAsync(TestContext.Current.CancellationToken).WaitAsync(TestTimeout, TestContext.Current.CancellationToken);
+        Assert.True(process.WaitForExit(TimeSpan.Zero));
+        Assert.Equal(expectedExit, process.ExitCode);
+
+        if (expectedExit != 0)
+        {
+            Assert.Throws<IOException>(() => LinuxProcessTreeObservation.Capture(process, TestContext.Current.CancellationToken));
+            return;
+        }
+
+        using var observation = LinuxProcessTreeObservation.Capture(process, TestContext.Current.CancellationToken);
+        await observation.WaitAsync(TestContext.Current.CancellationToken);
+    }
+
     /// <summary>Reaps an already-started worker when a process-lifecycle observer itself fails.</summary>
     [Fact]
     public async Task FailingStartObserverCannotLeaveItsWorkerRunning()

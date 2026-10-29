@@ -97,7 +97,19 @@ if ($PSCmdlet.ParameterSetName -eq 'Archive') {
 }
 
 $PackageDirectory = [IO.Path]::GetFullPath($PackageDirectory)
-if (Test-Path -LiteralPath (Join-Path $PackageDirectory 'ru/MovieSift.resources.dll')) {
+$payloadDirectory = Join-Path $PackageDirectory 'app'
+$rootFiles = @(Get-ChildItem -LiteralPath $PackageDirectory -File -Force | Select-Object -ExpandProperty Name)
+$allowedRootFiles = @('MovieSift', 'MovieSift.exe', 'portable.flag', 'LICENSE', 'build-provenance.json', 'SHA256SUMS')
+
+if (@($rootFiles | Where-Object { $_ -notin $allowedRootFiles }).Count) {
+    throw 'Unexpected root payload; internal files belong under app.'
+}
+
+if ((Get-Content -LiteralPath (Join-Path $PackageDirectory 'portable.flag') -Raw).Trim() -ne 'MovieSift portable data policy version 2') {
+    throw 'The clean portable layout marker is missing.'
+}
+
+if (Test-Path -LiteralPath (Join-Path $payloadDirectory 'ru/MovieSift.resources.dll')) {
     throw 'Portable packages must include only English UI resources; other languages are explicit downloads.'
 }
 $applicationLicense = Join-Path $PackageDirectory 'LICENSE'
@@ -111,7 +123,7 @@ if ((Get-FileHash -LiteralPath $applicationLicense -Algorithm SHA256).Hash -ne (
     throw 'The packaged application license differs from the operative repository license.'
 }
 
-if (Test-Path -LiteralPath (Join-Path $PackageDirectory 'licenses/APPLICATION-LICENSE-PENDING.txt')) {
+if (Test-Path -LiteralPath (Join-Path $payloadDirectory 'licenses/APPLICATION-LICENSE-PENDING.txt')) {
     throw 'The obsolete application-license-pending marker must not be packaged.'
 }
 
@@ -123,14 +135,14 @@ if ($IsWindows) {
 
 $executablePath = Join-Path $PackageDirectory $executableName
 $updaterName = if ($IsWindows) { 'MovieSift.Updater.exe' } else { 'MovieSift.Updater' }
-$updaterPath = Join-Path $PackageDirectory $updaterName
+$updaterPath = Join-Path $payloadDirectory $updaterName
 $runtimeFiles = @('System.Private.CoreLib.dll', 'hostfxr.dll', 'coreclr.dll')
 
 if ($IsLinux) {
     $runtimeFiles = @('System.Private.CoreLib.dll', 'libhostfxr.so', 'libcoreclr.so')
 }
 
-foreach ($requiredPath in @($executablePath, (Join-Path $PackageDirectory 'portable.flag'), (Join-Path $PackageDirectory 'MovieSift.runtimeconfig.json'), (Join-Path $PackageDirectory 'tool-provenance.json'), (Join-Path $PackageDirectory 'ffmpeg-provenance.json'), (Join-Path $PackageDirectory 'licenses/nuget/inventory.json')) + @($runtimeFiles | ForEach-Object { Join-Path $PackageDirectory $_ })) {
+foreach ($requiredPath in @($executablePath, (Join-Path $PackageDirectory 'portable.flag'), (Join-Path $payloadDirectory 'MovieSift.runtimeconfig.json'), (Join-Path $payloadDirectory 'tool-provenance.json'), (Join-Path $payloadDirectory 'ffmpeg-provenance.json'), (Join-Path $payloadDirectory 'licenses/nuget/inventory.json')) + @($runtimeFiles | ForEach-Object { Join-Path $payloadDirectory $_ })) {
 
     if (-not (Test-Path -LiteralPath $requiredPath -PathType Leaf)) {
         throw "Required packaged file is missing: $requiredPath"
@@ -138,7 +150,7 @@ foreach ($requiredPath in @($executablePath, (Join-Path $PackageDirectory 'porta
 }
 
 foreach ($name in @($updaterName, 'MovieSift.Updater.dll', 'MovieSift.Updater.deps.json', 'MovieSift.Updater.runtimeconfig.json')) {
-    if (-not (Test-Path -LiteralPath (Join-Path $PackageDirectory $name) -PathType Leaf)) {
+    if (-not (Test-Path -LiteralPath (Join-Path $payloadDirectory $name) -PathType Leaf)) {
         throw "Required update helper file is missing: $name"
     }
 }
@@ -214,6 +226,10 @@ foreach ($mediaFixture in @($FixturePath, $Mp4FixturePath) | Where-Object { $_ }
     }
 
     Write-Output "Full packaged $containerExtension workflow passed; original SHA256 $originalHash."
+}
+
+if (Test-Path -LiteralPath (Join-Path $payloadDirectory 'data')) {
+    throw 'Packaged workflows must keep all portable working data beside the root launcher, not inside app.'
 }
 
 Write-Output "Packaged application checks passed: $PackageDirectory"

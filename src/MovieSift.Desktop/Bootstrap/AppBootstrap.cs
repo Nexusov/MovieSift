@@ -30,7 +30,8 @@ internal static class AppBootstrap
     public static Window CreateMainWindow(bool canInstallUpdates)
     {
         var localization = new LocalizationService();
-        var dataDirectory = Path.Combine(AppContext.BaseDirectory, "data");
+        var applicationRoot = PortableLayout.ApplicationRootFromBaseDirectory(AppContext.BaseDirectory);
+        var dataDirectory = Path.Combine(applicationRoot, "data");
         var dataWritable = CanWriteData(dataDirectory);
         var loggerConfiguration = new LoggerConfiguration().MinimumLevel.Information();
 
@@ -67,7 +68,7 @@ internal static class AppBootstrap
         var http = new HttpClient(new HttpClientHandler { AllowAutoRedirect = false }) { Timeout = Timeout.InfiniteTimeSpan };
         var previousInstallFailed = Environment.GetEnvironmentVariable("MOVIESIFT_UPDATE_FAILED") == "1";
         Environment.SetEnvironmentVariable("MOVIESIFT_UPDATE_FAILED", null);
-        var updates = new UpdatesViewModel(new GitHubUpdateService(http, AppContext.BaseDirectory, currentVersion,
+        var updates = new UpdatesViewModel(new GitHubUpdateService(http, applicationRoot, currentVersion,
             runtime, canInstallUpdates), new PortableUpdatePreferencesStore(dataDirectory), localization, currentVersion, logger, previousInstallFailed);
         var translations = new GitHubTranslationPackStore(http, dataDirectory, LocalizationService.EnglishMessages);
         window.DataContext = new MainViewModel(new(settings, outputs, localization, dataWritable, logger, batchViewModel, appearance, updates, translations));

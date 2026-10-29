@@ -14,13 +14,14 @@ import zipfile
 
 HASH_PATTERN = re.compile(r"[a-f0-9]{64}")
 REVISION_PATTERN = re.compile(r"[a-f0-9]{40}")
-COPY_PREFIXES = ("licenses/", "tools/licenses/")
+COPY_PREFIXES = ("licenses/", "tools/licenses/", "app/licenses/", "app/tools/licenses/")
 COPY_RECORDS = frozenset({
     "LICENSE", "THIRD_PARTY_NOTICES.md", "SHA256SUMS", "build-provenance.json",
     "tool-provenance.json", "ffmpeg-provenance.json", "mkv-source-provenance.json",
     "tools/file-provenance.json",
 })
 REQUIRED_RECORDS = COPY_RECORDS - {"mkv-source-provenance.json"}
+COPY_RECORDS = COPY_RECORDS | frozenset("app/" + name for name in COPY_RECORDS if name != "SHA256SUMS")
 PENDING_MARKER = "licenses/APPLICATION-LICENSE-PENDING.txt"
 COPYRIGHT = "Copyright (c) 2026 Nexusov"
 
@@ -89,10 +90,13 @@ def load_inputs(repository, archive_path, inventory_path):
             raise ValueError("Duplicate or invalid inventory material record")
         records[name] = row
 
-    if PENDING_MARKER in records:
+    if PENDING_MARKER in records or "app/" + PENDING_MARKER in records:
         raise ValueError("Obsolete application-license pending marker is present")
 
-    if not REQUIRED_RECORDS.issubset(records):
+    payload_prefix = "app/" if "app/MovieSift.dll" in records else ""
+    root_records = {"LICENSE", "SHA256SUMS", "build-provenance.json"}
+    required_materials = root_records | {payload_prefix + name for name in REQUIRED_RECORDS - root_records}
+    if not required_materials.issubset(records):
         raise ValueError("A required source/notice/provenance record is absent")
     license_bytes = git_output(repository, "show", revision + ":LICENSE")
 
