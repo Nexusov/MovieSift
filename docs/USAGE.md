@@ -2,7 +2,7 @@
 
 See the [README](../README.md) for downloads and startup.
 
-**Version note:** this guide describes **1.1.0**. Version **1.0.0** creates copies in a selected output folder; it has neither source replacement nor an updater. Install **1.1.0** manually in a separate directory as described below.
+**Version note:** this guide describes **1.2.0**. Version **1.0.0** has no updater. Version **1.1.0** has an updater but requires the old flat package layout. Install **1.2.0** manually in a separate directory once, using the migration instructions below; do not mix files from these versions.
 
 ## Choose what to keep
 
@@ -75,15 +75,19 @@ On Windows, the application uses an integrated caption with minimize, maximize/r
 
 ### Install updates
 
-MovieSift checks GitHub for newer stable releases after startup. **Close** dismisses the notification; **Update available** remains in the header and **Appearance → Updates**. That panel also offers manual checks and an option to disable startup checks. Network errors do not block media use.
+MovieSift checks GitHub for newer stable releases after startup. The permanent **Updates** header button opens its own panel, separate from Appearance, with the installed version, check result, **Check now** and the startup-check preference. A newer available version is shown beside the button. Closing an offer keeps that indicator available. Manual checks work even when startup checks are disabled; network errors do not block media use.
 
-Only **Install and restart** downloads and installs. Finish processing, resolve recovery notices and allow settings saves to complete first. Settings and the unfinished list are retained; track choices and Review must be recreated after restart.
+Only **Download and update** downloads and installs, then restarts MovieSift. Download progress and cancellation remain visible. Finish processing, resolve recovery notices and allow settings saves to complete first. Settings and the unfinished list are retained; track choices and Review must be recreated after restart. There is no automatic download or installation on startup.
 
 Installation requires a local writable portable folder and its bundled updater. Unsupported locations or permissions require manual migration. Windows updates preserve current access rules as a fixed snapshot; later parent-folder permission changes do not propagate automatically.
 
 The old application remains in the adjacent `.moviesift-update-…/previous` folder. Remove it after checking the new version. If a switch is interrupted, consult `UPDATE-RESULT.txt` in the same update folder. Never replace files beneath a running application.
 
 ### Upgrade manually
+
+The 1.2 portable root has one launcher (`MovieSift.exe` on Windows, `MovieSift` on Linux), `app/`, `data/`, and small license/provenance/checksum records. Internal assemblies, runtime, updater, tools, notices and documentation belong under `app/`. Keep that entire directory alongside the launcher; do not move individual DLLs or start the internal updater yourself. The layout does not depend on Windows Hidden attributes or runtime extraction into temporary directories.
+
+The new updater understands this layout and legacy flat packages, but the immutable 1.1 updater does not understand nested packages. Consequently, 1.0/1.1 → 1.2 requires the manual steps below. The old updater rejects an incompatible archive before switching the current installation; this is not a successful upgrade. Existing release archives are not replaced.
 
 1. Finish or explicitly discard pending work, then close the old copy.
 2. Extract the new release into a separate writable directory. Keep all bundled files together.

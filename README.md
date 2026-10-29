@@ -10,7 +10,7 @@ Choose tracks for a single movie or a whole series in one workspace. Available f
 
 ## Get started
 
-These controls describe **1.1.0**. Version **1.0.0** uses Keep checkboxes; its archives are unchanged.
+These controls describe **1.2.0**. Earlier release archives remain unchanged. Upgrade from 1.0/1.1 by extracting 1.2 into a separate directory; their updater cannot install the new package layout.
 
 1. Download and extract the archive for your platform.
 2. Run `MovieSift.exe` on Windows or `./MovieSift` on Linux.
@@ -18,6 +18,8 @@ These controls describe **1.1.0**. Version **1.0.0** uses Keep checkboxes; its a
 4. Review the changes and start processing.
 
 The runtime and media tools are included. Linux requires the [listed system libraries](docs/SUPPORTED_FORMATS.md#platform-and-native-requirements).
+
+The root contains one application launcher; DLLs, bundled tools and documentation live under `app`, while portable settings stay in `data`. Keep the complete folder together. **Updates** is always available in the header, independently of Appearance, with a newer-version indicator alongside it. Startup checks are on by default; downloading/installing still requires an explicit action.
 
 ## Features
 
