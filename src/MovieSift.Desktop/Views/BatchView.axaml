@@ -99,11 +99,11 @@
                   </ListBox.Styles>
                   <ListBox.ItemTemplate>
                     <DataTemplate x:DataType="viewModels:BatchItemViewModel">
-                      <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8" Margin="3,6" ToolTip.Tip="{Binding SourcePath}">
+                      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8" Margin="3,6" ToolTip.Tip="{Binding SourcePath}">
                         <CheckBox x:Name="FileInclusionCheckBox" IsChecked="{Binding Included, Mode=TwoWay}" IsEnabled="{Binding CanChangeInclusion}" VerticalAlignment="Top" AutomationProperties.Name="{Binding InclusionAccessibleName}" />
                         <StackPanel Grid.Column="1" Spacing="4">
-                          <Button x:Name="FileDetailsNameButton" Classes="fileName" Click="OnFileDetails" Padding="0" MinHeight="0"
-                                  HorizontalContentAlignment="Left" HorizontalAlignment="Stretch"
+                          <Button x:Name="FileDetailsNameButton" Classes="fileName" Click="OnFileDetails" Padding="0" MinHeight="32" Margin="0,0,40,0"
+                                  HorizontalContentAlignment="Left" VerticalContentAlignment="Top" HorizontalAlignment="Stretch"
                                   AutomationProperties.Name="{Binding SourcePath}" AutomationProperties.HelpText="{Binding Localization[WorkspaceDetails]}"
                                   ToolTip.Tip="{Binding SourcePath}">
                             <TextBlock Text="{Binding FileName}" FontWeight="SemiBold" TextWrapping="Wrap" />
@@ -113,7 +113,7 @@
                           <TextBlock appearance:SoftMotion.ResultKey="{Binding PublishedPath}" Text="{Binding PublishedPath}" IsVisible="{Binding HasPublishedPath}" TextWrapping="Wrap" MaxLines="2" />
                           <TextBlock x:Name="BatchFileSizeDifferenceText" Text="{Binding SizeDifferenceText}" IsVisible="{Binding HasSizeDifference}" TextWrapping="Wrap" />
                         </StackPanel>
-                        <Button x:Name="RemoveQueueItemButton" Grid.Column="2" Classes="iconClose danger" VerticalAlignment="Top"
+                        <Button x:Name="RemoveQueueItemButton" Grid.Column="1" Classes="iconClose queueRemove" VerticalAlignment="Top" HorizontalAlignment="Right"
                                 Command="{Binding $parent[views:BatchView].((viewModels:BatchViewModel)DataContext).RemoveItemCommand}"
                                 CommandParameter="{Binding}" AutomationProperties.Name="{Binding Localization[BatchRemove]}"
                                 ToolTip.Tip="{Binding Localization[BatchRemove]}">

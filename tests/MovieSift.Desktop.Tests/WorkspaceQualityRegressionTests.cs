@@ -1,7 +1,9 @@
 using System.Collections.Immutable;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -16,6 +18,80 @@ namespace MovieSift.Desktop.Tests;
 /// <summary>Protects direct queue actions, cosmetic track tabs and explicit remembered output choices.</summary>
 public sealed class WorkspaceQualityRegressionTests
 {
+    /// <summary>Protects the compact corner action from long titles, short-title metadata and list scrollbars.</summary>
+    [AvaloniaTheory]
+    [InlineData("en", 240, false)]
+    [InlineData("ru", 240, false)]
+    [InlineData("en", 320, false)]
+    [InlineData("ru", 320, false)]
+    [InlineData("en", 400, false)]
+    [InlineData("ru", 400, false)]
+    [InlineData("en", 240, true)]
+    [InlineData("ru", 240, true)]
+    public async Task CompactQueueCornerReservesTheTitleAndMetadata(string language, int width, bool shortName)
+    {
+        const double minimumTargetSize = 32;
+        const double boundsTolerance = 1;
+        var fixture = SoftWorkspaceRenderTests.CreateLongNameFixture();
+        await fixture.LoadAsync();
+        await fixture.Main.ChangeLanguageCommand.ExecuteAsync(language);
+        var view = new BatchView { DataContext = fixture.Batch };
+        var window = new Window { Content = view, Width = 1100, Height = 800 };
+        window.Show();
+
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            view.FindControl<Grid>("WorkspaceColumns")!.ColumnDefinitions = new($"{width},*");
+            window.UpdateLayout();
+            var first = fixture.Batch.Items[0];
+            var second = fixture.Batch.Items[1];
+            fixture.Batch.SelectedItem = second;
+            var list = view.FindControl<ListBox>("BatchFileList")!;
+            var remove = Assert.Single(list.GetVisualDescendants().OfType<Button>(), button =>
+                button.Name == "RemoveQueueItemButton" && ReferenceEquals(button.DataContext, first));
+            var name = Assert.Single(list.GetVisualDescendants().OfType<Button>(), button =>
+                button.Name == "FileDetailsNameButton" && ReferenceEquals(button.DataContext, first));
+
+            if (shortName)
+            {
+                Assert.IsType<TextBlock>(name.Content).Text = "Episode.mkv";
+            }
+
+            window.UpdateLayout();
+            remove.BringIntoView();
+            Dispatcher.UIThread.RunJobs();
+            window.UpdateLayout();
+            using var renderedFrame = window.CaptureRenderedFrame();
+            var nameBounds = new Rect(name.TranslatePoint(default, window)!.Value, name.Bounds.Size);
+            var removeBounds = new Rect(remove.TranslatePoint(default, window)!.Value, remove.Bounds.Size);
+            Assert.Equal(minimumTargetSize, remove.Bounds.Width);
+            Assert.Equal(minimumTargetSize, remove.Bounds.Height);
+            Assert.True(nameBounds.Right < removeBounds.Left);
+            Assert.InRange(removeBounds.Top - nameBounds.Top, -boundsTolerance, boundsTolerance);
+            var content = Assert.IsType<StackPanel>(name.Parent);
+            var metadata = content.Children.OfType<TextBlock>().First();
+            var metadataBounds = new Rect(metadata.TranslatePoint(default, window)!.Value, metadata.Bounds.Size);
+            Assert.True(metadataBounds.Top >= removeBounds.Bottom);
+            var listBounds = new Rect(list.TranslatePoint(default, window)!.Value, list.Bounds.Size);
+            Assert.True(removeBounds.Right <= listBounds.Right);
+            var hit = window.InputHitTest(removeBounds.Center);
+            Assert.True(ReferenceEquals(hit, remove) || hit is Visual visual && visual.GetVisualAncestors().Contains(remove),
+                $"Remove bounds={removeBounds}; list={listBounds}; hit={hit}");
+            Assert.Same(first, remove.CommandParameter);
+            Assert.True(remove.Command!.CanExecute(remove.CommandParameter));
+            remove.Command.Execute(remove.CommandParameter);
+            Assert.DoesNotContain(first, fixture.Batch.Items);
+            Assert.Same(second, Assert.Single(fixture.Batch.Items));
+            Assert.Same(second, fixture.Batch.SelectedItem);
+            Assert.Empty(fixture.Backend.RemuxRequests);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
     /// <summary>Removing the targeted row cannot remove the currently selected different source.</summary>
     [AvaloniaFact]
     public async Task QueueRowRemoveTargetsItsOwnItemAndNewQueueActuallyConfirms()

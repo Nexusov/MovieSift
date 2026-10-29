@@ -217,6 +217,33 @@
   <Style Selector="Button.danger Path.closeGlyph">
     <Setter Property="Stroke" Value="{DynamicResource MovieSiftErrorBrush}" />
   </Style>
+  <Style Selector="Button.queueRemove">
+    <Setter Property="Width" Value="32" />
+    <Setter Property="Height" Value="32" />
+    <Setter Property="MinWidth" Value="32" />
+    <Setter Property="MinHeight" Value="32" />
+    <Setter Property="Padding" Value="6" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+  <Style Selector="Button.queueRemove Path.closeGlyph">
+    <Setter Property="Width" Value="14" />
+    <Setter Property="Height" Value="14" />
+    <Setter Property="Stroke" Value="{DynamicResource MovieSiftMutedBrush}" />
+  </Style>
+  <Style Selector="Button.queueRemove:pointerover Path.closeGlyph, Button.queueRemove:focus-visible Path.closeGlyph">
+    <Setter Property="Stroke" Value="{DynamicResource MovieSiftErrorBrush}" />
+  </Style>
+  <Style Selector="Button.queueRemove:focus-visible">
+    <Setter Property="BorderThickness" Value="2" />
+    <Setter Property="BorderBrush" Value="{DynamicResource MovieSiftFocusBrush}" />
+  </Style>
+  <Style Selector="Button.queueRemove:pointerover /template/ ContentPresenter#PART_ContentPresenter, Button.queueRemove:pressed /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource MovieSiftSecondaryBrush}" />
+  </Style>
+  <Style Selector="Button.queueRemove:disabled Path.closeGlyph">
+    <Setter Property="Opacity" Value="0.45" />
+  </Style>
   <Style Selector="TabControl.trackCategories">
     <Setter Property="Padding" Value="0,10,0,0" />
     <Setter Property="Background" Value="Transparent" />
