@@ -32,19 +32,28 @@ if ($sdkLocation.Count -ne 1 -or $sdkLocation[0] -notmatch $sdkPattern) {
 }
 
 $modelPath = Join-Path $Matches[1] "$sdkVersion/Microsoft.NET.HostModel.dll"
+$dotnetRoot = [IO.Path]::GetFullPath((Join-Path $Matches[1] '..'))
 Add-Type -Path $modelPath
 $assets = Get-Content -LiteralPath $AssetsFile -Raw | ConvertFrom-Json
 $templateName = if ($RuntimeIdentifier -eq 'win-x64') { 'apphost.exe' } else { 'apphost' }
-$templates = @($assets.packageFolders.PSObject.Properties.Name | ForEach-Object {
+$packageTemplates = @($assets.packageFolders.PSObject.Properties.Name | ForEach-Object {
     $candidate = Join-Path $_ "microsoft.netcore.app.host.$RuntimeIdentifier/$RuntimeVersion/runtimes/$RuntimeIdentifier/native/$templateName"
 
     if (Test-Path -LiteralPath $candidate -PathType Leaf) {
         $candidate
     }
 })
+$sdkTemplate = Join-Path $dotnetRoot "packs/Microsoft.NETCore.App.Host.$RuntimeIdentifier/$RuntimeVersion/runtimes/$RuntimeIdentifier/native/$templateName"
+$templates = @(@($sdkTemplate) + $packageTemplates | Where-Object { Test-Path -LiteralPath $_ -PathType Leaf } | Sort-Object -Unique)
 
-if ($templates.Count -ne 1) {
-    throw 'Expected exactly one pinned native apphost template.'
+if (-not $templates.Count) {
+    throw 'The pinned native apphost template is absent from both SDK packs and restored packages.'
+}
+
+$templateHashes = @($templates | ForEach-Object { (Get-FileHash -LiteralPath $_ -Algorithm SHA256).Hash } | Sort-Object -Unique)
+
+if ($templateHashes.Count -ne 1) {
+    throw 'Conflicting pinned native apphost templates were found; no template was selected.'
 }
 
 $executableName = if ($RuntimeIdentifier -eq 'win-x64') { 'MovieSift.exe' } else { 'MovieSift' }
