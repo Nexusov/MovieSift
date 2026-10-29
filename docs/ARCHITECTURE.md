@@ -81,6 +81,8 @@ Executables are absolute, application-relative paths. Commands use `ProcessStart
 
 Cancellation terminates and awaits the owned worker, including inspection/verification processes. If termination cannot be confirmed, its candidate remains protected from deletion. Probe/startup operations have time bounds; valid large remuxes are not cut off by a small fixed timeout. Closing the UI awaits safe shutdown or exposes the unresolved decision.
 
+On Linux, cancellation captures descendants from the owned worker's procfs task/children records before the existing tree-kill request. PID, parent and birth identities are checked; captured descendants must disappear, change birth identity, or enter a non-writing Z/X state before cleanup. Observation is bounded to 256 descendants, 4,096 tasks, 16 KiB per record and the existing 15-second termination budget. Unreadable or incomplete ownership evidence preserves the candidate instead of treating pipe EOF or parent exit as proof that descendants stopped. This observer sends no additional signals.
+
 ## Job ownership and publication
 
 `JobCoordinator` is the single owner of the plan, process, candidate, verification, warning decision, publication fact and cleanup result:

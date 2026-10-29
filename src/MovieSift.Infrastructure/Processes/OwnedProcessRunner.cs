@@ -9,6 +9,7 @@ internal sealed class OwnedProcessRunner
     private const int ReadBufferCharacters = 4096;
     private const int MaximumProtocolLineCharacters = 4096;
     private static readonly TimeSpan TerminationTimeout = TimeSpan.FromSeconds(15);
+    private static readonly TimeSpan TerminationObservationInterval = TimeSpan.FromMilliseconds(25);
 
     /// <summary>Runs an absolute executable without a shell and continuously drains both streams.</summary>
     public async Task<ProcessResult> RunAsync(ProcessRequest request)
@@ -125,21 +126,53 @@ internal sealed class OwnedProcessRunner
     /// <summary>Terminates the owned worker tree and waits independently of the caller cancellation.</summary>
     private static async Task TerminateAsync(Process process)
     {
+        using var terminationSource = new CancellationTokenSource(TerminationTimeout);
+        LinuxProcessTreeObservation? descendants = null;
+        Exception? observationFailure = null;
         try
         {
+            if (OperatingSystem.IsLinux())
+            {
+                try
+                {
+                    descendants = LinuxProcessTreeObservation.Capture(process, terminationSource.Token);
+                }
+                catch (Exception exception) when (exception is ProcessTerminationException or IOException or UnauthorizedAccessException
+                    or InvalidOperationException or System.ComponentModel.Win32Exception or ArgumentException or OperationCanceledException)
+                {
+                    // Observation uncertainty must not prevent the existing owned-tree termination attempt.
+                    observationFailure = exception;
+                }
+            }
 
-            if (!process.HasExited)
+            if (!process.WaitForExit(TimeSpan.Zero))
             {
                 process.Kill(entireProcessTree: true);
             }
 
-            using var terminationSource = new CancellationTokenSource(TerminationTimeout);
-            await process.WaitForExitAsync(terminationSource.Token).ConfigureAwait(false);
+            while (!process.WaitForExit(TimeSpan.Zero))
+            {
+                await Task.Delay(TerminationObservationInterval, terminationSource.Token).ConfigureAwait(false);
+            }
+
+            if (observationFailure is not null)
+            {
+                throw new ProcessTerminationException("Owned descendant termination could not be established.", observationFailure);
+            }
+
+            if (descendants is not null)
+            {
+                await descendants.WaitAsync(terminationSource.Token).ConfigureAwait(false);
+            }
         }
         catch (Exception exception) when (exception is InvalidOperationException or System.ComponentModel.Win32Exception
-            or OperationCanceledException or AggregateException)
+            or OperationCanceledException or AggregateException or IOException or UnauthorizedAccessException or ArgumentException)
         {
             throw new ProcessTerminationException("The media worker may still be writing its candidate.", exception);
+        }
+        finally
+        {
+            descendants?.Dispose();
         }
     }
 
