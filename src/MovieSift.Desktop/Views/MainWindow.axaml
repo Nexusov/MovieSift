@@ -3,6 +3,7 @@
         xmlns:appearance="using:MovieSift.Desktop.Appearance"
         xmlns:viewModels="using:MovieSift.Desktop.ViewModels"
         xmlns:views="using:MovieSift.Desktop.Views"
+        xmlns:converters="using:Avalonia.Data.Converters"
         x:Class="MovieSift.Desktop.Views.MainWindow"
         x:DataType="viewModels:MainViewModel"
         Title="MovieSift" Icon="avares://MovieSift/Assets/moviesift.ico" Width="1040" Height="800" MinWidth="640" MinHeight="480">
@@ -88,10 +89,18 @@
       <views:QueueRecoveryView DataContext="{Binding Batch.Recovery}" />
     </Border>
     <Grid>
-      <Border IsHitTestVisible="{Binding !IsPreferencesOpen}">
+      <Border IsHitTestVisible="{Binding !#PreferencesBackdrop.IsVisible}">
         <views:BatchView x:Name="Workspace" DataContext="{Binding Batch}" />
       </Border>
-      <Border x:Name="PreferencesBackdrop" Background="Transparent" IsVisible="{Binding IsPreferencesOpen}" PointerPressed="OnPreferencesBackdropPressed" />
+      <Border x:Name="PreferencesBackdrop" Background="Transparent" PointerPressed="OnPreferencesBackdropPressed">
+        <Border.IsVisible>
+          <MultiBinding Converter="{x:Static converters:BoolConverters.Or}">
+            <Binding Path="IsVisible" ElementName="AppearancePanel" />
+            <Binding Path="IsVisible" ElementName="LanguagePanel" />
+            <Binding Path="IsVisible" ElementName="UpdatesPanel" />
+          </MultiBinding>
+        </Border.IsVisible>
+      </Border>
       <Border x:Name="AppearancePanel" Classes="panel" appearance:SoftMotion.Visible="{Binding IsAppearanceOpen}" IsHitTestVisible="{Binding IsAppearanceOpen}" KeyboardNavigation.TabNavigation="Cycle" HorizontalAlignment="Right" Width="460" MaxWidth="600" Margin="0,0,0,6" BoxShadow="{StaticResource MovieSiftPanelShadow}">
         <DockPanel>
           <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,10">

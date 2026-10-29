@@ -56,6 +56,13 @@ public sealed partial class BatchView : UserControl
     /// <summary>Moves focus to inert review text so queued Space/Enter cannot activate Run.</summary>
     private void OnWorkspaceChanged(object? sender, PropertyChangedEventArgs eventArguments)
     {
+        var rulesClosed = eventArguments.PropertyName == nameof(BatchViewModel.IsRulesOpen) && observedWorkspace?.IsRulesOpen == false;
+
+        if (rulesClosed && RulesPanel.IsKeyboardFocusWithin)
+        {
+            TopLevel.GetTopLevel(this)?.FocusManager?.Focus(null);
+        }
+
         var reviewTransition = eventArguments.PropertyName is nameof(BatchViewModel.IsReviewOpen) or nameof(BatchViewModel.IsReviewPending);
 
         if (reviewTransition && observedWorkspace?.IsReviewOpen == true)
@@ -119,8 +126,8 @@ public sealed partial class BatchView : UserControl
         var availableHeight = WorkspaceColumns.Bounds.Height;
         var expandedShelfHeight = Math.Min(availableHeight * NarrowExpandedShelfFraction,
             Math.Max(0, availableHeight - NarrowMinimumTrackHeight));
-        FileSidebar.MaxHeight = FileSidebar.IsExpanded
-            ? expandedShelfHeight : double.PositiveInfinity;
+        // Closing content remains visible during its fade and must keep the same finite layout budget.
+        FileSidebar.MaxHeight = expandedShelfHeight;
     }
 
     /// <summary>Opens deliberately activated row details while inclusion and filename controls retain their own actions.</summary>

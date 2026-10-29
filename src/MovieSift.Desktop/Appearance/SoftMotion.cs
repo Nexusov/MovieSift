@@ -67,14 +67,20 @@ public sealed class SoftMotion : AvaloniaObject
     {
         var state = States.GetOrCreateValue(control);
         var revision = ++state.VisibilityRevision;
+        var initialOpacity = control.IsVisible ? control.Opacity : 0d;
         state.Cancellation?.Cancel();
 
         if (visible)
         {
             control.IsVisible = true;
-            Animate(control, true);
+            control.Opacity = 1d;
+            Animate(control, true, initialOpacity);
             return;
         }
+
+        // RunAsync releases its animation priority before the awaiting continuation runs.
+        // Keep the underlying value at the final opacity so that gap cannot reveal a closing panel again.
+        control.Opacity = 0d;
 
         if (AppearanceMotionPolicy.Reduced || TopLevel.GetTopLevel(control) is null)
         {
@@ -92,9 +98,11 @@ public sealed class SoftMotion : AvaloniaObject
             }
         };
         AppearanceMotionPolicy.Changed += reduce;
+        EventHandler<VisualTreeAttachmentEventArgs> detached = (_, _) => cancellation.Cancel();
+        control.DetachedFromVisualTree += detached;
         var animation = new Animation { Duration = AppearanceMotionPolicy.DisclosureDuration, Easing = new CubicEaseOut() };
         var start = new KeyFrame { Cue = new Cue(0) };
-        start.Setters.Add(new Setter(Visual.OpacityProperty, 1d));
+        start.Setters.Add(new Setter(Visual.OpacityProperty, initialOpacity));
         var end = new KeyFrame { Cue = new Cue(1) };
         end.Setters.Add(new Setter(Visual.OpacityProperty, 0d));
         animation.Children.Add(start);
@@ -111,6 +119,7 @@ public sealed class SoftMotion : AvaloniaObject
         finally
         {
             AppearanceMotionPolicy.Changed -= reduce;
+            control.DetachedFromVisualTree -= detached;
 
             if (ReferenceEquals(state.Cancellation, cancellation))
             {
@@ -134,7 +143,7 @@ public sealed class SoftMotion : AvaloniaObject
     public static void SetResultKey(Control control, string? value) => control.SetValue(ResultKeyProperty, value);
 
     /// <summary>Starts a finite visual animation that carries no workflow authority.</summary>
-    private static async void Animate(Control control, bool panel)
+    private static async void Animate(Control control, bool panel, double initialOpacity = 0d)
     {
         var state = States.GetOrCreateValue(control);
         state.Cancellation?.Cancel();
@@ -155,9 +164,11 @@ public sealed class SoftMotion : AvaloniaObject
             }
         };
         AppearanceMotionPolicy.Changed += reduce;
+        EventHandler<VisualTreeAttachmentEventArgs> detached = (_, _) => cancellation.Cancel();
+        control.DetachedFromVisualTree += detached;
         var animation = new Animation { Duration = panel ? AppearanceMotionPolicy.DisclosureDuration : ResultDuration, Easing = new CubicEaseOut() };
         var start = new KeyFrame { Cue = new Cue(0) };
-        start.Setters.Add(new Setter(Visual.OpacityProperty, 0d));
+        start.Setters.Add(new Setter(Visual.OpacityProperty, initialOpacity));
         var end = new KeyFrame { Cue = new Cue(1) };
         end.Setters.Add(new Setter(Visual.OpacityProperty, 1d));
 
@@ -181,6 +192,7 @@ public sealed class SoftMotion : AvaloniaObject
         finally
         {
             AppearanceMotionPolicy.Changed -= reduce;
+            control.DetachedFromVisualTree -= detached;
 
             if (ReferenceEquals(state.Cancellation, cancellation))
             {

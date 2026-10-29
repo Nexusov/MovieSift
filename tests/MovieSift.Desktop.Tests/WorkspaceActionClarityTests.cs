@@ -189,7 +189,7 @@ public sealed class WorkspaceActionClarityTests
             var review = view.FindControl<BatchReviewView>("StructuredReview")!;
             var rules = view.FindControl<Border>("RulesPanel")!;
             Assert.True(SoftMotion.GetEnter(review));
-            Assert.True(SoftMotion.GetEnter(rules));
+            Assert.False(SoftMotion.GetVisible(rules));
             Assert.False(review.IsVisible);
             Assert.False(rules.IsVisible);
             await fixture.Batch.ReviewCommand.ExecuteAsync(null);
@@ -207,6 +207,9 @@ public sealed class WorkspaceActionClarityTests
             Dispatcher.UIThread.RunJobs();
             Assert.True(rules.IsVisible);
             fixture.Batch.IsRulesOpen = false;
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(SoftMotion.GetVisible(rules));
+            AppearanceMotionPolicy.Configure(MovieSift.Application.Appearance.AppearanceMotion.Reduced);
             Dispatcher.UIThread.RunJobs();
             Assert.False(rules.IsVisible);
             fixture.Batch.IsRulesOpen = true;

@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using MovieSift.Application.Updates;
 using MovieSift.Desktop.Appearance;
 using MovieSift.Desktop.ViewModels;
@@ -36,9 +37,31 @@ public sealed partial class MainWindow : Window
         LanguagePanel.PropertyChanged += OnLanguagePanelChanged;
         UpdatesPanel.PropertyChanged += OnUpdatesPanelChanged;
         AddHandler(KeyDownEvent, OnAppearanceKeyDown, RoutingStrategies.Tunnel);
+        AddHandler(PointerPressedEvent, OnEditorBackgroundPressed, RoutingStrategies.Tunnel);
         Opened += OnOpened;
         Closing += OnClosing;
         Closed += OnClosed;
+    }
+
+    /// <summary>Ends text editing on an outside primary press without consuming the target control's normal action.</summary>
+    private void OnEditorBackgroundPressed(object? sender, PointerPressedEventArgs eventArguments)
+    {
+        var focusedEditor = FocusManager?.GetFocusedElement() as TextBox;
+        var primaryPress = eventArguments.GetCurrentPoint(this).Properties.IsLeftButtonPressed;
+
+        if (focusedEditor is null || !primaryPress || eventArguments.Source is not Visual source)
+        {
+            return;
+        }
+
+        var insideEditor = ReferenceEquals(source, focusedEditor) || source.GetVisualAncestors().Contains(focusedEditor);
+
+        if (insideEditor)
+        {
+            return;
+        }
+
+        FocusManager?.Focus(null);
     }
 
     /// <summary>Connects logical panel opening to focus independently of an outgoing visibility animation.</summary>
@@ -95,7 +118,21 @@ public sealed partial class MainWindow : Window
 
         var target = viewModel.IsAppearanceOpen ? CloseAppearanceButton : viewModel.IsLanguageOpen ? CloseLanguageButton
             : viewModel.IsUpdatesOpen ? CloseUpdatesButton : null;
-        target?.Focus();
+
+        if (target is not null)
+        {
+            target.Focus();
+            return;
+        }
+
+        var focused = FocusManager?.GetFocusedElement() as Visual;
+        var insideOutgoingPanel = focused?.GetVisualAncestors().Any(ancestor =>
+            ReferenceEquals(ancestor, AppearancePanel) || ReferenceEquals(ancestor, LanguagePanel) || ReferenceEquals(ancestor, UpdatesPanel)) == true;
+
+        if (insideOutgoingPanel)
+        {
+            FocusManager?.Focus(null);
+        }
     }
 
     /// <summary>Uses only non-button header space for native Windows caption gestures.</summary>

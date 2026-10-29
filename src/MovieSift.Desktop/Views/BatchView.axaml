@@ -7,7 +7,7 @@
              x:Class="MovieSift.Desktop.Views.BatchView"
              x:DataType="viewModels:BatchViewModel">
   <Grid>
-  <DockPanel LastChildFill="True" IsVisible="{Binding IsEditingSurfaceVisible}">
+  <DockPanel LastChildFill="True" IsVisible="{Binding IsEditingSurfaceVisible}" IsHitTestVisible="{Binding !#RulesPanel.IsVisible}">
     <!-- Destination, cancellation and Review remain outside the scrolling preparation panels. -->
     <StackPanel x:Name="BatchRunControls" DockPanel.Dock="Bottom" Spacing="6" Margin="0,10,0,0">
       <Border Classes="panel" Padding="12">
@@ -224,7 +224,7 @@
       </Grid>
     </Grid>
   </DockPanel>
-  <Border x:Name="RulesPanel" Classes="panel" appearance:SoftMotion.Enter="True" IsVisible="{Binding IsRulesOpen}">
+  <Border x:Name="RulesPanel" Classes="panel" appearance:SoftMotion.Visible="{Binding IsRulesOpen}" IsHitTestVisible="{Binding IsRulesOpen}">
     <DockPanel>
       <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" ColumnSpacing="12" Margin="0,0,0,12">
         <TextBlock Classes="heading" Text="{Binding Localization[WorkspaceRules]}" VerticalAlignment="Center" />
