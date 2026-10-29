@@ -31,6 +31,7 @@ public sealed partial class MainWindow : Window
         AppearanceMotionPolicy.Track(this);
         AppearancePanel.PropertyChanged += OnAppearancePanelChanged;
         LanguagePanel.PropertyChanged += OnLanguagePanelChanged;
+        UpdatesPanel.PropertyChanged += OnUpdatesPanelChanged;
         AddHandler(KeyDownEvent, OnAppearanceKeyDown, RoutingStrategies.Tunnel);
         Opened += OnOpened;
         Closing += OnClosing;
@@ -103,6 +104,28 @@ public sealed partial class MainWindow : Window
         });
     }
 
+    /// <summary>Uses fresh visibility to move focus into updates and back to its permanent entry.</summary>
+    private void OnUpdatesPanelChanged(object? sender, AvaloniaPropertyChangedEventArgs eventArguments)
+    {
+        if (eventArguments.Property != IsVisibleProperty)
+        {
+            return;
+        }
+
+        var isOpen = UpdatesPanel.IsVisible;
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (!IsVisible || UpdatesPanel.IsVisible != isOpen)
+            {
+                return;
+            }
+
+            var target = isOpen ? CloseUpdatesButton : DataContext is MainViewModel { HasPendingMediaDecision: true }
+                ? AppearanceFocusTarget(false) : AvailableUpdateButton;
+            target.Focus();
+        });
+    }
+
     /// <summary>Escape closes only cosmetic UI; media cancellation and warning decisions remain explicit actions.</summary>
     private void OnAppearanceKeyDown(object? sender, KeyEventArgs eventArguments)
     {
@@ -115,6 +138,7 @@ public sealed partial class MainWindow : Window
 
         ((MainViewModel)DataContext!).IsAppearanceOpen = false;
         ((MainViewModel)DataContext!).IsLanguageOpen = false;
+        ((MainViewModel)DataContext!).IsUpdatesOpen = false;
         eventArguments.Handled = true;
     }
 
@@ -237,6 +261,7 @@ public sealed partial class MainWindow : Window
             eventArguments.Cancel = true;
             ((MainViewModel)DataContext!).IsAppearanceOpen = false;
             ((MainViewModel)DataContext!).IsLanguageOpen = false;
+            ((MainViewModel)DataContext!).IsUpdatesOpen = false;
             return;
         }
 

@@ -410,7 +410,7 @@
     "UpdatesAvailableVersion": "MovieSift {0} 已可用",
     "UpdatesCheckOnStartup": "启动时检查更新",
     "UpdatesCheckNow": "检查更新",
-    "UpdatesInstall": "安装并重启",
+    "UpdatesInstall": "下载并更新",
     "UpdatesInstallNotice": "MovieSift 将下载更新、安全关闭并重启。您的设置和已保存列表会保留。",
     "UpdatesNotChecked": "尚未检查更新。",
     "UpdatesChecking": "正在检查 GitHub 上的新版本…",

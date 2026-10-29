@@ -172,7 +172,7 @@ public sealed class UpdatePresentationTests
 
     /// <summary>The real shell keeps a visible entry point after dismissal and does not create duplicate dialogs.</summary>
     [AvaloniaFact]
-    public async Task ShellBadgeReopensOneDismissedNotificationWithoutDownloading()
+    public async Task ShellBadgeOpensIndependentPanelAfterNotificationDismissal()
     {
         var fixture = new UpdateFixture();
         var window = new MainWindow { DataContext = fixture.Main };
@@ -195,7 +195,9 @@ public sealed class UpdatePresentationTests
             Assert.True(badge.Focus());
             Press(window, PhysicalKey.Space);
             Dispatcher.UIThread.RunJobs();
-            Assert.Single(window.OwnedWindows.OfType<UpdateWindow>()).Close();
+            Assert.True(fixture.Main.IsUpdatesOpen);
+            Assert.True(window.FindControl<Border>("UpdatesPanel")!.IsVisible);
+            Assert.Empty(window.OwnedWindows);
             Assert.Equal(1, fixture.Service.CheckCount);
             Assert.Equal(0, fixture.Service.StageCount);
         }
@@ -206,6 +208,59 @@ public sealed class UpdatePresentationTests
                 child.Close();
             }
 
+            await fixture.Main.ShutdownAsync();
+            window.Close();
+        }
+    }
+
+    /// <summary>A permanent entry exposes manual checks even when automatic checks are disabled and no update is known.</summary>
+    [AvaloniaFact]
+    public async Task UpdatesPanelRemainsReachableWithoutAnAvailableRelease()
+    {
+        var fixture = new UpdateFixture();
+        fixture.Preferences.Load = () => Task.FromResult(false);
+        fixture.Service.Check = _ => Task.FromResult<UpdateRelease?>(null);
+        var window = new MainWindow { DataContext = fixture.Main, Width = 640, Height = 480 };
+        window.Show();
+
+        try
+        {
+            await Await(fixture.Updates.InitializeAsync());
+            Dispatcher.UIThread.RunJobs();
+            var trigger = window.FindControl<Button>("AvailableUpdateButton")!;
+            Assert.True(trigger.IsEffectivelyVisible);
+            Assert.True(trigger.IsEnabled);
+            Assert.False(fixture.Main.ShowUpdateSummary);
+            Assert.Equal(0, fixture.Service.CheckCount);
+            Assert.True(trigger.Focus());
+            Press(window, PhysicalKey.Space);
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(fixture.Main.IsUpdatesOpen);
+            Assert.False(fixture.Main.IsAppearanceOpen);
+            var panel = window.FindControl<Border>("UpdatesPanel")!;
+            Assert.True(panel.IsEffectivelyVisible);
+            var check = Assert.Single(panel.GetVisualDescendants().OfType<Button>(), button => ReferenceEquals(button.Command, fixture.Updates.CheckCommand));
+            Assert.True(check.IsEffectivelyVisible);
+            Assert.True(check.IsEnabled);
+            await fixture.Updates.CheckCommand.ExecuteAsync(null);
+            Assert.Equal(1, fixture.Service.CheckCount);
+            Assert.False(fixture.Updates.HasUpdate);
+            Assert.False(fixture.Updates.CheckOnStartup);
+            fixture.Main.ToggleAppearanceCommand.Execute(null);
+            Assert.False(fixture.Main.IsUpdatesOpen);
+            fixture.Main.ToggleUpdatesCommand.Execute(null);
+            Assert.False(fixture.Main.IsAppearanceOpen);
+            await fixture.Main.ChangeLanguageCommand.ExecuteAsync("ru");
+            Assert.True(fixture.Main.IsUpdatesOpen);
+            Assert.Equal(fixture.Localization["UpdatesHeading"], fixture.Main.UpdateActionText);
+            Press(window, PhysicalKey.Escape);
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(fixture.Main.IsUpdatesOpen);
+            Assert.Equal(0, fixture.Service.StageCount);
+            Assert.Empty(fixture.Backend.RemuxRequests);
+        }
+        finally
+        {
             await fixture.Main.ShutdownAsync();
             window.Close();
         }

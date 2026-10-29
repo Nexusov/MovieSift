@@ -410,7 +410,7 @@
     "UpdatesAvailableVersion": "MovieSift {0} kullanılabilir",
     "UpdatesCheckOnStartup": "Başlangıçta güncellemeleri denetle",
     "UpdatesCheckNow": "Güncellemeleri denetle",
-    "UpdatesInstall": "Yükle ve yeniden başlat",
+    "UpdatesInstall": "İndir ve güncelle",
     "UpdatesInstallNotice": "MovieSift güncellemeyi indirecek, güvenli biçimde kapanacak ve yeniden başlayacak. Ayarlarınız ve kayıtlı listeniz korunacak.",
     "UpdatesNotChecked": "Güncellemeler henüz denetlenmedi.",
     "UpdatesChecking": "GitHub üzerinde yeni sürüm denetleniyor…",

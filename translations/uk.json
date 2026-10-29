@@ -410,7 +410,7 @@
     "UpdatesAvailableVersion": "Доступна MovieSift {0}",
     "UpdatesCheckOnStartup": "Перевіряти оновлення під час запуску",
     "UpdatesCheckNow": "Перевірити оновлення",
-    "UpdatesInstall": "Встановити й перезапустити",
+    "UpdatesInstall": "Завантажити й оновити",
     "UpdatesInstallNotice": "MovieSift завантажить оновлення, безпечно закриється й перезапуститься. Налаштування та збережений список залишаться.",
     "UpdatesNotChecked": "Оновлення ще не перевірялися.",
     "UpdatesChecking": "Пошук нової версії на GitHub…",
