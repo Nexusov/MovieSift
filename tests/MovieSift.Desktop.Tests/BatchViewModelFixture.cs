@@ -39,14 +39,14 @@ internal sealed class BatchViewModelFixture
 
     /// <summary>Shares one job coordinator for every file in the unified workspace.</summary>
     public BatchViewModelFixture(IRulePresetStore? presetStore = null, IQueueListStore? queueStore = null, bool initializeQueue = true,
-        ITranslationPackStore? translationPacks = null, IOutputPreferencesStore? outputPreferences = null)
+        ITranslationPackStore? translationPacks = null, IOutputPreferencesStore? outputPreferences = null, ILogger? logger = null)
     {
         Dialogs = new(Backend.Inspections.Keys.ToArray());
         Discovery = new(Backend.Inspections.Values.Select(inspection => inspection.Source).ToImmutableArray());
         SourceAccess = new(Backend);
         var jobs = new JobCoordinator(Backend, SourceAccess, Outputs);
         Coordinator = new(Session, new InspectionService(Backend, SourceAccess), jobs, SourceAccess);
-        var logger = new LoggerConfiguration().CreateLogger();
+        logger ??= new LoggerConfiguration().CreateLogger();
         Batch = new(new(Session, Coordinator, Discovery, Dialogs, Localization, true, logger, new(presetStore ?? PresetStore), queueStore ?? QueueStore, outputPreferences));
         Appearance = new(new(new WorkspaceAppearanceStore(), Localization, new AppearanceApplier(Avalonia.Application.Current)));
         Main = new(new(Settings, Outputs, Localization, true, logger, Batch, Appearance, TranslationPacks: translationPacks));
@@ -167,6 +167,7 @@ internal sealed class BatchUiBackend : IMediaBackend
     public List<RemuxRequest> RemuxRequests { get; } = [];
     public Func<InspectRequest, Task>? OnInspect { get; set; }
     public Func<RemuxRequest, Task>? OnRemux { get; set; }
+    public VerificationOutcome Verification { get; set; } = new(true, "simulated batch verification");
 
     /// <summary>Creates two ordinary inputs whose numeric identities and track order cannot be copied blindly.</summary>
     public BatchUiBackend()
@@ -219,7 +220,7 @@ internal sealed class BatchUiBackend : IMediaBackend
     public Task<VerificationOutcome> VerifyAsync(VerifyRequest request)
     {
         request.CancellationToken.ThrowIfCancellationRequested();
-        return Task.FromResult(new VerificationOutcome(true, "simulated batch verification"));
+        return Task.FromResult(Verification);
     }
 
     /// <summary>Creates immutable distinguishable track metadata without imposing row-based identity.</summary>

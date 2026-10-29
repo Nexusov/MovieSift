@@ -104,4 +104,4 @@ Keep the old directory for unresolved work. Do not transfer unresolved `data/own
 
 ## Compatibility and help
 
-See [supported formats](SUPPORTED_FORMATS.md) for media and system requirements. Problem reports should include the version, operating system, steps and displayed error. Remove personal filenames and paths from shared logs.
+See [supported formats](SUPPORTED_FORMATS.md) for media and system requirements. Problem reports should include the version, operating system, steps and displayed error. Expand the file diagnostics for the precise failure. Returned inspection, review and processing failures are also recorded under portable `data/logs`; successful remux alone does not imply successful verification or publication. Remove personal filenames and paths from shared logs.

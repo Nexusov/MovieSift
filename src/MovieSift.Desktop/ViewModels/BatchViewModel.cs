@@ -9,6 +9,7 @@ using MovieSift.Application.Inspection;
 using MovieSift.Application.Jobs;
 using MovieSift.Core.Failures;
 using MovieSift.Core.Planning;
+using Serilog.Events;
 
 namespace MovieSift.Desktop.ViewModels;
 
@@ -569,6 +570,7 @@ public sealed partial class BatchViewModel : ObservableObject
         }
 
         var completion = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var previousSnapshot = services.Session.Snapshot;
         activeOperation = completion.Task;
         activeCancellation = new();
         operationRevision++;
@@ -599,6 +601,7 @@ public sealed partial class BatchViewModel : ObservableObject
         }
         finally
         {
+            LogOperationFailures(previousSnapshot);
             InspectionActivity.End();
             activeCancellation.Dispose();
             activeCancellation = null;
@@ -606,6 +609,69 @@ public sealed partial class BatchViewModel : ObservableObject
             IsProgressIndeterminate = false;
             Synchronize();
             completion.TrySetResult();
+        }
+    }
+
+    /// <summary>Records returned failures once at the operation boundary without replacing their authoritative outcomes.</summary>
+    private void LogOperationFailures(BatchSnapshot previous)
+    {
+        try
+        {
+            var current = services.Session.Snapshot;
+            var reported = new HashSet<(Guid? ItemId, Failure? Failure)>();
+
+            foreach (var item in current.Items)
+            {
+                var former = previous.Items.FirstOrDefault(candidate => candidate.Id == item.Id);
+                var changedOutcome = item.Failure != former?.Failure || item.Result != former?.Result;
+
+                if (!changedOutcome)
+                {
+                    continue;
+                }
+
+                var itemFailure = item.Failure ?? item.Result?.Failure;
+
+                var diagnosticOutcome = itemFailure is not null || item.Result is { CleanupIssues.IsDefaultOrEmpty: false }
+                    || item.Result?.Phase == JobPhase.AwaitingWarningReview;
+
+                if (diagnosticOutcome)
+                {
+                    Report(itemFailure, item.Id, item.Result?.Phase.ToString() ?? item.State.ToString(), item.Result);
+                }
+            }
+
+            foreach (var issue in reviewFailures)
+            {
+                Report(issue.Failure, issue.ItemId, "Reviewing", null);
+            }
+
+            var operationFailure = failure ?? (current.Failure != previous.Failure ? current.Failure : null);
+
+            if (operationFailure is not null && !reported.Any(entry => entry.Failure == operationFailure))
+            {
+                Report(operationFailure, null, current.Phase.ToString(), null);
+            }
+
+            /// <summary>Uses structured diagnostics while preserving distinct file-local failures.</summary>
+            void Report(Failure? outcome, Guid? itemId, string stage, JobResult? result)
+            {
+                if (!reported.Add((itemId, outcome)))
+                {
+                    return;
+                }
+
+                var level = outcome?.Code == ErrorCode.Cancelled ? LogEventLevel.Information : LogEventLevel.Warning;
+                services.Log.Write(level,
+                    "Batch operation outcome: stage={Stage}, item={ItemId}, code={Code}, reason={Reason}, detail={Detail}; tool exit={ToolExitCode}, disposition={ToolDisposition}, diagnostics={ToolDiagnostics}; verification={VerificationDetails}; cleanup={@CleanupIssues}",
+                    stage, itemId, outcome?.Code, outcome?.Reason, outcome?.Detail, result?.Tool?.ExitCode,
+                    result?.Tool?.EffectiveDisposition, result?.Tool?.Diagnostics, result?.Verification?.Details,
+                    result is { CleanupIssues.IsDefault: false } ? result.CleanupIssues : []);
+            }
+        }
+        catch (Exception)
+        {
+            // Diagnostic sinks must never replace the actual media/ownership failure or prevent operation completion.
         }
     }
 

@@ -2,6 +2,8 @@
 
 This document describes the current source tree. MovieSift is a desktop application that remuxes local MKV and supported MP4 files through bundled workers. It keeps encoded streams rather than re-encoding them. The [format reference](SUPPORTED_FORMATS.md) defines the preservation contract; [CONTRIBUTING](../CONTRIBUTING.md) covers builds and tests.
 
+Expected inspection, Review and job failures are logged at the desktop operation-completion boundary with the authoritative failure detail, raw worker result, verification detail and cleanup issues. Logging cannot change the job outcome or prevent command completion. Media-specific verification diagnostics identify differing property names without dumping encoded codec data.
+
 ## Project boundaries
 
 | Project | Responsibility | Dependencies |
