@@ -19,7 +19,7 @@ MKV_BUILD_JSON_BYTES = 1024 * 1024
 MKV_BUILD_MAX_FILES = 4096
 MKV_BUILD_MAX_PAYLOAD_BYTES = 128 * 1024 * 1024
 MKV_BUILD_MATERIAL_PREFIX = "licenses/mkv-source-build/"
-MKV_BUILD_WORKERS = frozenset({"mkvmerge.exe", "mkvextract.exe"})
+MKV_BUILD_WORKERS = frozenset({"mkvmerge.exe", "mkvextract.exe", "mkvpropedit.exe"})
 MKV_SOURCE_NOTICE_PACKAGES = frozenset({
     "mingw-w64-ucrt-x86_64-gmp", "mingw-w64-ucrt-x86_64-icu", "mingw-w64-ucrt-x86_64-libvorbis",
 })
@@ -124,7 +124,7 @@ def mkv_source_build_evidence(directory, records, lock_path, recipe_path, standa
         raise ValueError("MKV source-build receipt contains an invalid file record")
 
     if len(workers) != len(MKV_BUILD_WORKERS) or {row.get("path") for row in workers} != MKV_BUILD_WORKERS:
-        raise ValueError("MKV source-build receipt requires exactly the two intended workers")
+        raise ValueError("MKV source-build receipt requires exactly the three intended workers")
 
     all_rows = workers + dependencies + materials
 
@@ -583,12 +583,12 @@ def classify(records, origins, components, tool_lock, profile):
             if name.endswith(".tar.xz"):
                 record["category"] = "included-source-archive"
 
-            if name in ("tools/mkvmerge.exe", "tools/mkvextract.exe", "tools/app-root/usr/bin/mkvmerge", "tools/app-root/usr/bin/mkvextract"):
+            if name in ("tools/mkvmerge.exe", "tools/mkvextract.exe", "tools/mkvpropedit.exe", "tools/app-root/usr/bin/mkvmerge", "tools/app-root/usr/bin/mkvextract", "tools/app-root/usr/bin/mkvpropedit"):
                 record["category"] = "bundled-executable"
                 record["component"] = f"MKVToolNix/{tool_lock['version']}"
                 record["staticComponentStatus"] = "See nativeComponentEvidence and unresolved build/source findings"
 
-            if name in ("tools/mkvmerge", "tools/mkvextract", "tools/provenance.json"):
+            if name in ("tools/mkvmerge", "tools/mkvextract", "tools/mkvpropedit", "tools/provenance.json"):
                 record.update(category="generated-build-material", origin="build/acquire-tools.ps1 and build/tools.lock.json")
             continue
 

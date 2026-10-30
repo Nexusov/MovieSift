@@ -38,7 +38,7 @@ Acquisition requires network access and disk space. Its destination must be abse
 | FFmpeg/zlib source and recipe | [ffmpeg.lock.json](build/ffmpeg.lock.json) |
 | Windows worker/source validation | [distribution-inventory.py](build/distribution-inventory.py) |
 
-The application uses the bundled matching tools. A separately installed executable or two copied workers without their materials do not satisfy acquisition.
+The application uses the bundled matching tools. A separately installed executable or copied workers without their materials do not satisfy acquisition. The MKVToolNix set contains `mkvmerge`, `mkvextract` and `mkvpropedit`, all pinned to 102.0.
 
 ### Windows media setup
 
@@ -104,7 +104,7 @@ pwsh ./build/acquire-tools.ps1 -RuntimeIdentifier linux-x64 -Destination ./tools
 
 Use a whitespace-free repository/cache path for native compilation. MKVToolNix is extracted from the pinned AppImage at build time without FUSE. FFmpeg/ffprobe use the pinned source recipe and static zlib, or a verified `ffmpeg-source-linux-x64-<identity>` cache.
 
-Production MKV workers live under `tools/app-root/usr/bin`; their native library environment is set by the application. The `tools/mkvmerge` and `tools/mkvextract` wrappers serve build/fixture tooling only. FFmpeg/ffprobe live directly under `tools` on both platforms.
+Production MKV workers live under `tools/app-root/usr/bin`; their native library environment is set by the application. The `tools/mkvmerge`, `tools/mkvextract` and `tools/mkvpropedit` wrappers serve build/fixture tooling only. FFmpeg/ffprobe live directly under `tools` on both platforms.
 
 ## Fixtures and real media tests
 
@@ -159,15 +159,15 @@ Copy tools once per output directory/tool version; later launches need only the 
 Build on the target OS so native workers and executable permissions can be checked. The Windows commands reuse the variables set during acquisition:
 
 ```powershell
-pwsh ./build/package.ps1 -RuntimeIdentifier win-x64 -WindowsMkvBuildDirectory $mkvBuildDirectory -ToolCacheDirectory $toolCacheDirectory -FixturePath ./artifacts/fixtures/ordinary.mkv -Mp4FixturePath ./artifacts/fixtures/mp4/ordinary.mp4
-pwsh ./build/verify-package.ps1 -ArchivePath ./artifacts/MovieSift-win-x64.zip -FixturePath ./artifacts/fixtures/ordinary.mkv -Mp4FixturePath ./artifacts/fixtures/mp4/ordinary.mp4
+pwsh ./build/package.ps1 -RuntimeIdentifier win-x64 -WindowsMkvBuildDirectory $mkvBuildDirectory -ToolCacheDirectory $toolCacheDirectory -FixturePath ./artifacts/fixtures/ordinary.mkv -Mp4FixturePath ./artifacts/fixtures/mp4/ordinary.mp4 -DtsFixturePath ./artifacts/fixtures/dts-derived-properties-overlap.mkv
+pwsh ./build/verify-package.ps1 -ArchivePath ./artifacts/MovieSift-win-x64.zip -FixturePath ./artifacts/fixtures/ordinary.mkv -Mp4FixturePath ./artifacts/fixtures/mp4/ordinary.mp4 -DtsFixturePath ./artifacts/fixtures/dts-derived-properties-overlap.mkv
 ```
 
 On Linux:
 
 ```powershell
-pwsh ./build/package.ps1 -RuntimeIdentifier linux-x64 -FixturePath ./artifacts/fixtures/ordinary.mkv -Mp4FixturePath ./artifacts/fixtures/mp4/ordinary.mp4
-pwsh ./build/verify-package.ps1 -ArchivePath ./artifacts/MovieSift-linux-x64.tar.gz -FixturePath ./artifacts/fixtures/ordinary.mkv -Mp4FixturePath ./artifacts/fixtures/mp4/ordinary.mp4
+pwsh ./build/package.ps1 -RuntimeIdentifier linux-x64 -FixturePath ./artifacts/fixtures/ordinary.mkv -Mp4FixturePath ./artifacts/fixtures/mp4/ordinary.mp4 -DtsFixturePath ./artifacts/fixtures/dts-derived-properties-overlap.mkv
+pwsh ./build/verify-package.ps1 -ArchivePath ./artifacts/MovieSift-linux-x64.tar.gz -FixturePath ./artifacts/fixtures/ordinary.mkv -Mp4FixturePath ./artifacts/fixtures/mp4/ordinary.mp4 -DtsFixturePath ./artifacts/fixtures/dts-derived-properties-overlap.mkv
 ```
 
 Packaging includes the complete self-contained runtime, app/helper and tool closure, notices, provenance and checksums. The pinned SDK HostWriter binds the root native apphost to `app/MovieSift.dll`; no separate launcher project/compiler or single-file extraction is introduced. `app/` contains the runtime/tool payload, while `data/`, license/provenance copies and the complete manifest remain beside the root launcher. Packaging verifies this layout, the shipped runtime, license inventory and actual MKV/MP4 workflows. Use `-Overwrite` only when replacing an existing generated archive. Staging and relocation directories remain under `artifacts`.
@@ -192,7 +192,7 @@ Run only the command for the package being prepared. The bundle binds exact appl
 With Docker available on a Linux development host:
 
 ```bash
-bash ./build/verify-clean-linux.sh ./artifacts/MovieSift-linux-x64.tar.gz ./artifacts/fixtures/ordinary.mkv ./artifacts/fixtures/mp4/ordinary.mp4
+bash ./build/verify-clean-linux.sh ./artifacts/MovieSift-linux-x64.tar.gz ./artifacts/fixtures/ordinary.mkv ./artifacts/fixtures/mp4/ordinary.mp4 ./artifacts/fixtures/dts-derived-properties-overlap.mkv
 ```
 
 The [pinned Ubuntu image](build/portable-smoke.Dockerfile) includes native OS libraries, but no separately installed SDK or media tools. The check runs unprivileged and without networking, with an ASCII parent locale to exercise Unicode handling at the worker boundary. Evidence is retained beneath `artifacts/clean Linux Кириллица.*/evidence`. Docker is not an application dependency.

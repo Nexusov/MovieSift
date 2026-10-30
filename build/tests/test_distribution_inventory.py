@@ -307,6 +307,7 @@ class DistributionInventoryTests(unittest.TestCase):
                                                        "sourceArchiveSha256": package["sourceNotices"]["sourceArchiveSha256"], "members": notice_members}
         self.json(prefix + "dependency-packages.json", [package_evidence])
         imports = {"mkvmerge.exe": ["Qt6Core.dll", "KERNEL32.dll"], "mkvextract.exe": ["Qt6Core.dll", "KERNEL32.dll"],
+                   "mkvpropedit.exe": ["Qt6Core.dll", "KERNEL32.dll"],
                    "Qt6Core.dll": ["KERNEL32.dll"]}
         for name, names in imports.items():
             self.write("tools/" + name, self.pe_payload(names))
@@ -624,7 +625,7 @@ class DistributionInventoryTests(unittest.TestCase):
     def test_source_built_mkv_changed_worker_or_material_is_rejected(self):
         """A freshly manifested package must still match its exact compiled worker/material receipt."""
         self.prepare_mkv_source_build()
-        for name in ("tools/mkvmerge.exe", "tools/licenses/mkv-source-build/config.h"):
+        for name in ("tools/mkvmerge.exe", "tools/mkvpropedit.exe", "tools/licenses/mkv-source-build/config.h"):
             with self.subTest(name=name):
                 original = (self.root / name).read_bytes()
                 self.write(name, b"substituted content")
@@ -633,6 +634,27 @@ class DistributionInventoryTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "does not match the actual worker/material"):
                     self.generate()
                 self.write(name, original)
+
+    def test_source_built_mkv_requires_the_header_editor_worker(self):
+        """A two-worker receipt cannot satisfy the native header-projection runtime contract."""
+        self.prepare_mkv_source_build()
+        self.mkv_receipt["workers"] = [row for row in self.mkv_receipt["workers"] if row["path"] != "mkvpropedit.exe"]
+        (self.root / "tools/mkvpropedit.exe").unlink()
+        self.write_mkv_receipt()
+        with self.assertRaisesRegex(ValueError, "exactly the three intended workers"):
+            self.generate()
+
+    def test_source_built_mkv_header_editor_imports_require_the_same_complete_closure(self):
+        """A receipted editor cannot load an undeclared developer-machine library."""
+        self.prepare_mkv_source_build()
+        self.write("tools/mkvpropedit.exe", self.pe_payload(["Qt6Core.dll", "editor-unshipped.dll"]))
+        row = next(row for row in self.mkv_receipt["workers"] if row["path"] == "mkvpropedit.exe")
+        row.update(size=(self.root / "tools/mkvpropedit.exe").stat().st_size,
+                   sha256=INVENTORY.file_hash(self.root / "tools/mkvpropedit.exe"))
+        next(row for row in self.mkv_receipt["dllImports"] if row["path"] == "mkvpropedit.exe")["imports"] = ["Qt6Core.dll", "editor-unshipped.dll"]
+        self.write_mkv_receipt()
+        with self.assertRaisesRegex(ValueError, "Undeclared MKV.*editor-unshipped"):
+            self.generate()
 
     def test_source_built_mkv_missing_dependency_source_is_rejected(self):
         """A notice or approximate archive cannot stand in for the pinned DLL owner's complete source."""

@@ -210,7 +210,7 @@ def extract_source_notice_members(archive_bytes, policy):
 
 
 def collect(directory, cache, prefix, pacman, lock_path, recipe):
-    """Bind the CLI pair, recursive DLLs and source/recipe/notices to the exact executed build."""
+    """Bind all three CLI workers, recursive DLLs and source/recipe/notices to the exact executed build."""
     lock = json.loads(lock_path.read_text(encoding="utf-8"))
     packages = {item["name"]: item for item in lock["packages"]}
     material_root = directory / "licenses/mkv-source-build"
@@ -218,7 +218,7 @@ def collect(directory, cache, prefix, pacman, lock_path, recipe):
     specification = importlib.util.spec_from_file_location("mkv_pe_imports", module_path)
     module = importlib.util.module_from_spec(specification)
     specification.loader.exec_module(module)
-    workers = [directory / name for name in ("mkvmerge.exe", "mkvextract.exe")]
+    workers = [directory / name for name in ("mkvmerge.exe", "mkvextract.exe", "mkvpropedit.exe")]
     dll_index = {path.name.casefold(): path for path in (prefix / "bin").glob("*.dll")}
     pending = workers.copy()
     imported = []

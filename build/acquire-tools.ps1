@@ -151,6 +151,7 @@ if ($RuntimeIdentifier -eq 'win-x64') {
         $distributionDirectory = Join-Path $stageDirectory 'mkvtoolnix'
         Copy-Item -LiteralPath (Join-Path $distributionDirectory 'mkvmerge.exe') -Destination $destinationPath
         Copy-Item -LiteralPath (Join-Path $distributionDirectory 'mkvextract.exe') -Destination $destinationPath
+        Copy-Item -LiteralPath (Join-Path $distributionDirectory 'mkvpropedit.exe') -Destination $destinationPath
         Copy-Item -LiteralPath (Join-Path $distributionDirectory 'doc') -Destination $licenseDirectory -Recurse
         & python (Join-Path $PSScriptRoot 'select-tool-payload.py') --runtime-identifier $RuntimeIdentifier --source $distributionDirectory --destination $destinationPath
 
@@ -160,6 +161,7 @@ if ($RuntimeIdentifier -eq 'win-x64') {
     }
     $mergeExecutable = Join-Path $destinationPath 'mkvmerge.exe'
     $extractExecutable = Join-Path $destinationPath 'mkvextract.exe'
+    $editExecutable = Join-Path $destinationPath 'mkvpropedit.exe'
 }
 
 if ($RuntimeIdentifier -eq 'linux-x64') {
@@ -195,6 +197,7 @@ if ($RuntimeIdentifier -eq 'linux-x64') {
     New-Item -ItemType Directory -Path $binaryDirectory -Force | Out-Null
     Copy-Item -LiteralPath (Join-Path $extractedDirectory 'usr/bin/mkvmerge') -Destination $binaryDirectory
     Copy-Item -LiteralPath (Join-Path $extractedDirectory 'usr/bin/mkvextract') -Destination $binaryDirectory
+    Copy-Item -LiteralPath (Join-Path $extractedDirectory 'usr/bin/mkvpropedit') -Destination $binaryDirectory
     # Select only the unchanged, hash-verified CLI closure; every omitted upstream file is receipted.
     & python (Join-Path $PSScriptRoot 'select-tool-payload.py') --runtime-identifier $RuntimeIdentifier --source $extractedDirectory --destination $destinationPath
 
@@ -202,7 +205,7 @@ if ($RuntimeIdentifier -eq 'linux-x64') {
         throw 'The pinned Linux CLI library selection did not match the upstream payload.'
     }
 
-    foreach ($toolName in @('mkvmerge', 'mkvextract')) {
+    foreach ($toolName in @('mkvmerge', 'mkvextract', 'mkvpropedit')) {
         $wrapper = @'
 #!/bin/sh
 set -eu
@@ -222,6 +225,7 @@ exec "$application_root/usr/bin/TOOL_NAME" "$@"
 
     $mergeExecutable = Join-Path $destinationPath 'mkvmerge'
     $extractExecutable = Join-Path $destinationPath 'mkvextract'
+    $editExecutable = Join-Path $destinationPath 'mkvpropedit'
 }
 
 $mergeVersion = & $mergeExecutable --version
@@ -234,6 +238,12 @@ $extractVersion = & $extractExecutable --version
 
 if ($LASTEXITCODE -or !$extractVersion.StartsWith("mkvextract v$($toolLock.version) ")) {
     throw "The acquired mkvextract failed its actual version check: $extractVersion"
+}
+
+$editVersion = & $editExecutable --version
+
+if ($LASTEXITCODE -or !$editVersion.StartsWith("mkvpropedit v$($toolLock.version) ")) {
+    throw "The acquired mkvpropedit failed its actual version check: $editVersion"
 }
 
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'tools.lock.json') -Destination (Join-Path $destinationPath 'provenance.json')
@@ -358,7 +368,7 @@ $fileProvenance = @(Get-ChildItem -LiteralPath $destinationPath -File -Recurse -
         $originArchiveHash = $sourceHash
     }
 
-    $isWindowsPayload = $RuntimeIdentifier -eq 'win-x64' -and -not $sourceBuiltWindows -and ($relativePath -in @('mkvmerge.exe', 'mkvextract.exe') -or $relativePath.StartsWith('licenses/doc/'))
+    $isWindowsPayload = $RuntimeIdentifier -eq 'win-x64' -and -not $sourceBuiltWindows -and ($relativePath -in @('mkvmerge.exe', 'mkvextract.exe', 'mkvpropedit.exe') -or $relativePath.StartsWith('licenses/doc/'))
 
     if ($isWindowsPayload) {
         $origin = 'unchanged member of the pinned upstream binary ZIP'
@@ -382,7 +392,7 @@ $fileProvenance = @(Get-ChildItem -LiteralPath $destinationPath -File -Recurse -
         $originArchiveHash = ''
         $originMember = ''
 
-        if ($relativePath -cin @('mkvmerge.exe', 'mkvextract.exe')) {
+        if ($relativePath -cin @('mkvmerge.exe', 'mkvextract.exe', 'mkvpropedit.exe')) {
             $originArchive = $toolLock.source.url
             $originArchiveHash = $sourceHash
         }

@@ -92,6 +92,10 @@ CODEC_ID = 0x86
 DEFAULT_DURATION_ID = 0x23E383
 BIT_DEPTH_ID = 0x6264
 CRC_ID = 0xBF
+CLUSTER_ID = 0x1F43B675
+SIMPLE_BLOCK_ID = 0xA3
+ORIGINAL_DTS_TRACK_NUMBER = 3
+OVERLAP_SHIFT_MILLISECONDS = 32
 
 
 def _elements(request):
@@ -172,7 +176,46 @@ def create_fixture(request):
     raw = destination / "original-derived-properties.dts"
     raw.write_bytes(b"".join(frames) * FRAME_REPETITIONS)
     outputs = [_mux_fixture((merge, raw, destination, laced)) for laced in (False, True)]
+    _create_overlapping_lace_fixture(outputs[1])
     return outputs[0]
+
+
+def _create_overlapping_lace_fixture(source):
+    """Shift one original lace anchor without changing any media bytes, modeling overlapping codec-derived frame times."""
+    payload = bytearray(source.read_bytes())
+    blocks = 0
+    changed = False
+    for identifier, _, content, end in _elements((payload, 0, len(payload))):
+        if identifier != SEGMENT_ID:
+            continue
+        for child, _, child_content, child_end in _elements((payload, content, end)):
+            if child != CLUSTER_ID:
+                continue
+            for element, element_start, value, limit in _elements((payload, child_content, child_end)):
+                if element == CRC_ID:
+                    _void((payload, element_start, limit))
+                if element != SIMPLE_BLOCK_ID or payload[value] != 0x80 | ORIGINAL_DTS_TRACK_NUMBER:
+                    continue
+                blocks += 1
+                if blocks != 2:
+                    continue
+                if payload[value + 3] & 6 != 4 or payload[value + 4] < 1:
+                    raise ValueError("The original overlap fixture requires a fixed DTS lace")
+                relative = int.from_bytes(payload[value + 1:value + 3], "big", signed=True)
+                shifted = relative - OVERLAP_SHIFT_MILLISECONDS
+                if relative < OVERLAP_SHIFT_MILLISECONDS:
+                    raise ValueError("The original second DTS lace must remain after the first block anchor")
+                payload[value + 1:value + 3] = shifted.to_bytes(2, "big", signed=True)
+                changed = True
+    if not changed:
+        raise ValueError("The original overlap fixture did not contain a second DTS SimpleBlock")
+    output = source.with_name("dts-derived-properties-overlap.mkv")
+    output.write_bytes(payload)
+    provenance = json.loads(source.with_suffix(".provenance.json").read_text(encoding="utf-8"))
+    provenance.update({"frameTimestamps": "Second DTS fixed-lace anchor shifted earlier by 32 ms; block anchors remain ordered while codec-derived frames overlap",
+                       "overlapTransformation": "Only the second original DTS SimpleBlock signed relative timestamp changes; affected cluster CRC removed; encoded payloads unchanged",
+                       "fixtureSha256": hashlib.sha256(payload).hexdigest(), "fixtureBytes": len(payload)})
+    output.with_suffix(".provenance.json").write_text(json.dumps(provenance, indent=2) + "\n", encoding="utf-8")
 
 
 def _mux_fixture(request):
@@ -180,7 +223,8 @@ def _mux_fixture(request):
     merge, raw, destination, laced = request
     output = destination / ("dts-derived-properties-laced.mkv" if laced else "dts-derived-properties.mkv")
     lacing_arguments = [] if laced else ["--disable-lacing"]
-    command = [str(merge), "--deterministic", "MovieSift-derived-DTS-v1", "--disable-track-statistics-tags", *lacing_arguments, "-o", str(output), str(destination / "red.ivf"),
+    command = [str(merge), "--deterministic", "MovieSift-derived-DTS-v1", "--disable-track-statistics-tags", *lacing_arguments,
+               "--track-order", "0:0,2:0,1:0", "-o", str(output), str(destination / "red.ivf"),
                "--language", "0:eng", "--track-name", "0:Original DTS sine tones", str(raw),
                "--language", "0:rus", str(destination / "high.wav")]
     completed = subprocess.run(command, capture_output=True, text=True, encoding="utf-8", check=False)
@@ -190,6 +234,7 @@ def _mux_fixture(request):
     provenance = {"origin": "Original MovieSift VP8 keyframes, sine-tone DTS and PCM; no user media",
                   "encoding": DTS_ENCODING_PROVENANCE, "repetitions": FRAME_REPETITIONS,
                   "rawDtsBytes": raw.stat().st_size, "rawDtsSha256": hashlib.sha256(raw.read_bytes()).hexdigest(),
+                  "trackOrder": "VP8, PCM, DTS; the portable workflow removes the first audio and must retain legacy DTS",
                   "frameTimestamps": "Preserved Matroska laces; codec-derived duration defines intra-lace frame timestamps" if laced else
                       "Lacing disabled so every original DTS frame has its own explicit timestamp after duration omission",
                   "omittedOptionalElements": removed,

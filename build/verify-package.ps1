@@ -5,7 +5,8 @@ param(
     [Parameter(Mandatory, ParameterSetName = 'Archive')]
     [string] $ArchivePath,
     [string] $FixturePath,
-    [string] $Mp4FixturePath
+    [string] $Mp4FixturePath,
+    [string] $DtsFixturePath
 )
 
 $ErrorActionPreference = 'Stop'
@@ -200,7 +201,7 @@ if ($PSCmdlet.ParameterSetName -eq 'Archive') {
 
 Invoke-PackagedApplication -Options @{ Executable = $executablePath; Arguments = @('--verify-tools') }
 
-foreach ($mediaFixture in @($FixturePath, $Mp4FixturePath) | Where-Object { $_ }) {
+foreach ($mediaFixture in @($FixturePath, $Mp4FixturePath, $DtsFixturePath) | Where-Object { $_ }) {
     $mediaFixture = [IO.Path]::GetFullPath($mediaFixture)
     $containerExtension = [IO.Path]::GetExtension($mediaFixture).ToLowerInvariant()
 
