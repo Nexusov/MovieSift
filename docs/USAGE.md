@@ -2,7 +2,7 @@
 
 See the [README](../README.md) for downloads and startup.
 
-**Version note:** this guide describes the **1.2.1 review build**. Version **1.0.0** has no updater. Version **1.1.0** requires the old flat package layout. Install the 1.2 layout manually in a separate directory once, using the migration instructions below; do not mix files from these versions.
+**Upgrading from older versions:** version **1.0.0** has no updater and version **1.1.0** requires the old flat package layout. Install the current portable layout manually in a separate directory once, using the migration instructions below; do not mix files from these versions.
 
 ## Choose what to keep
 
