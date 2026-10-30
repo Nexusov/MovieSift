@@ -1,6 +1,6 @@
-# MovieSift 1.2.1 review build
+# MovieSift 1.2.1
 
-This is a review build, not a newly published stable release. Existing release archives remain unchanged.
+Portable MKV/MP4 track removal with a more consistent workspace and safer handling of legacy DTS timing. Existing release archives remain unchanged.
 
 - One sticky Theme heading, rounded vector Close/Update controls, stable scrollbar gutters and padded shared choice cards.
 - Effective custom HEX colors with swatches, bottom-aligned Reset, smooth interruptible panels/disclosures and reduced-motion support.
@@ -13,4 +13,4 @@ This is a review build, not a newly published stable release. Existing release a
 - Expected inspection, review and processing failures now write their precise worker/verification/cleanup diagnostics to portable logs instead of leaving only the aggregate paused message.
 - The slow owner-provided MKV was inspected through the production path. Structural header I/O dominated the observed 471-second cold-HDD run. Bounded positional prefixes reduce requested bytes while preserving all existing structure checks. Warmed old/new controls do not establish a cold-storage speed guarantee; see [measured evidence](verification/inspection-performance.md).
 
-The media preservation contract, dependency/tool pins, source checks, owned cancellation and no-overwrite publication remain unchanged. Automated results and source/package identities belong in the review PR and local handoff receipt. No new native desktop, Windows 11/Ubuntu Desktop, W13–W15 or scaling acceptance is claimed. Translation coverage and placeholder checks are mechanical checks, not native-speaker certification.
+The media preservation contract, dependency/tool pins, source checks, owned cancellation and no-overwrite publication remain unchanged. Automated results and exact source/package identities are recorded on the release page. No new native desktop, Windows 11/Ubuntu Desktop, W13–W15 or scaling acceptance is claimed. Translation coverage and placeholder checks are mechanical checks, not native-speaker certification.

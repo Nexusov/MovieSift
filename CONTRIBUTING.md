@@ -58,7 +58,7 @@ python ./build/distribution-inventory.py --validate-windows-mkv-build $mkvBuildD
 $env:MOVIESIFT_WINDOWS_MKV_BUILD_DIRECTORY = $mkvBuildDirectory
 ```
 
-The two executables and `build-receipt.json` must be directly inside that directory. Validation checks worker/DLL hashes and the complete matching source/build materials. Stop on failure; changing receipts does not make an old build compatible. Artifacts expire after three days. If none matches, ask a maintainer to run the source-build workflow.
+The three executables and `build-receipt.json` must be directly inside that directory. Validation checks worker/DLL hashes and the complete matching source/build materials. Stop on failure; changing receipts does not make an old build compatible. Artifacts expire after three days. If none matches, ask a maintainer to run the source-build workflow.
 
 #### 2. Prepare FFmpeg's build prerequisites
 
