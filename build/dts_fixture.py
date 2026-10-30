@@ -3,6 +3,7 @@
 import base64
 import hashlib
 import json
+from decimal import Decimal
 from pathlib import Path
 import subprocess
 import sys
@@ -94,8 +95,10 @@ BIT_DEPTH_ID = 0x6264
 CRC_ID = 0xBF
 CLUSTER_ID = 0x1F43B675
 SIMPLE_BLOCK_ID = 0xA3
+CLUSTER_TIMESTAMP_ID = 0xE7
 ORIGINAL_DTS_TRACK_NUMBER = 3
 OVERLAP_SHIFT_MILLISECONDS = 32
+SOURCE_TIMESTAMP_SCALE_NANOSECONDS = 1_000_000
 
 
 def _elements(request):
@@ -214,6 +217,7 @@ def _create_overlapping_lace_fixture(source):
     provenance = json.loads(source.with_suffix(".provenance.json").read_text(encoding="utf-8"))
     provenance.update({"frameTimestamps": "Second DTS fixed-lace anchor shifted earlier by 32 ms; block anchors remain ordered while codec-derived frames overlap",
                        "overlapTransformation": "Only the second original DTS SimpleBlock signed relative timestamp changes; affected cluster CRC removed; encoded payloads unchanged",
+                       "sourceDtsFramePresentationMilliseconds": _original_frame_timestamps(payload),
                        "fixtureSha256": hashlib.sha256(payload).hexdigest(), "fixtureBytes": len(payload)})
     output.with_suffix(".provenance.json").write_text(json.dumps(provenance, indent=2) + "\n", encoding="utf-8")
 
@@ -224,6 +228,7 @@ def _mux_fixture(request):
     output = destination / ("dts-derived-properties-laced.mkv" if laced else "dts-derived-properties.mkv")
     lacing_arguments = [] if laced else ["--disable-lacing"]
     command = [str(merge), "--deterministic", "MovieSift-derived-DTS-v1", "--disable-track-statistics-tags", *lacing_arguments,
+               "--timestamp-scale", str(SOURCE_TIMESTAMP_SCALE_NANOSECONDS),
                "--track-order", "0:0,2:0,1:0", "-o", str(output), str(destination / "red.ivf"),
                "--language", "0:eng", "--track-name", "0:Original DTS sine tones", str(raw),
                "--language", "0:rus", str(destination / "high.wav")]
@@ -235,10 +240,41 @@ def _mux_fixture(request):
                   "encoding": DTS_ENCODING_PROVENANCE, "repetitions": FRAME_REPETITIONS,
                   "rawDtsBytes": raw.stat().st_size, "rawDtsSha256": hashlib.sha256(raw.read_bytes()).hexdigest(),
                   "trackOrder": "VP8, PCM, DTS; the portable workflow removes the first audio and must retain legacy DTS",
+                  "sourceTimestampScaleNanoseconds": SOURCE_TIMESTAMP_SCALE_NANOSECONDS,
                   "frameTimestamps": "Preserved Matroska laces; codec-derived duration defines intra-lace frame timestamps" if laced else
                       "Lacing disabled so every original DTS frame has its own explicit timestamp after duration omission",
                   "omittedOptionalElements": removed,
+                  "sourceDtsFramePresentationMilliseconds": _original_frame_timestamps(output.read_bytes()),
                   "headerTransformation": "Equal-length EBML Void substitution; affected CRCs removed; payload and offsets unchanged",
                   "fixtureSha256": hashlib.sha256(output.read_bytes()).hexdigest(), "fixtureBytes": output.stat().st_size}
     output.with_suffix(".provenance.json").write_text(json.dumps(provenance, indent=2) + "\n", encoding="utf-8")
     return output
+
+
+def _original_frame_timestamps(payload):
+    """Record an independent clock guide from original block anchors and the original encoder's 512 samples at 48 kHz."""
+    timestamps = []
+    duration_milliseconds = Decimal(512) * Decimal(1000) / Decimal(48000)
+    for identifier, _, content, end in _elements((payload, 0, len(payload))):
+        if identifier != SEGMENT_ID:
+            continue
+        for child, _, child_content, child_end in _elements((payload, content, end)):
+            if child != CLUSTER_ID:
+                continue
+            cluster_timestamp = None
+            for element, _, value, limit in _elements((payload, child_content, child_end)):
+                if element == CLUSTER_TIMESTAMP_ID:
+                    cluster_timestamp = int.from_bytes(payload[value:limit], "big")
+                if element != SIMPLE_BLOCK_ID or payload[value] != 0x80 | ORIGINAL_DTS_TRACK_NUMBER:
+                    continue
+                if cluster_timestamp is None:
+                    raise ValueError("The original fixture DTS block needs its explicit cluster anchor")
+                lacing = payload[value + 3] & 6
+                if lacing not in (0, 4):
+                    raise ValueError("Only known original fixed/no-lace fixtures have a clock guide")
+                count = payload[value + 4] + 1 if lacing == 4 else 1
+                anchor = cluster_timestamp + int.from_bytes(payload[value + 1:value + 3], "big", signed=True)
+                timestamps.extend(format(Decimal(anchor) + frame * duration_milliseconds, "f") for frame in range(count))
+    if len(timestamps) != len(DTS_FRAMES_BASE64) * FRAME_REPETITIONS:
+        raise ValueError("The original DTS clock guide must account for every original frame")
+    return timestamps

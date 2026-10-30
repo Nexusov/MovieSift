@@ -11,6 +11,7 @@ internal static class DtsLacedTimestampEvidence
     private const int MaximumFrames = 10_000_000;
     private const int MaximumHeaderReadBytes = 128 * 1024 * 1024;
     private const int MaximumDepth = 4;
+    private const int MaximumPendingFrames = 4096;
     private const int HeaderBytes = 16;
     private const decimal NanosecondsPerMillisecond = 1_000_000;
     private const decimal NanosecondsPerSecond = 1_000_000_000;
@@ -25,7 +26,15 @@ internal static class DtsLacedTimestampEvidence
     private const ulong Block = 0xa1;
 
     /// <summary>Writes a fresh owned scratch reference; false leaves it unusable and the caller retains ordinary scratch cleanup responsibility.</summary>
-    internal static async Task<bool> WriteReferenceAsync(DtsLacedTimestampRequest request)
+    internal static Task<bool> WriteReferenceAsync(DtsLacedTimestampRequest request) => TraverseAsync(new(request.SourcePath,
+        request.TrackNumber, request.ExpectedHeader, request.CancellationToken, request.ExtractedTimestampPath, request.ReferencePath));
+
+    /// <summary>Validates every target core frame and block anchor before materializing a duration in an owned input copy.</summary>
+    internal static Task<bool> ValidateProfileAsync(DtsProfileValidation request) => TraverseAsync(new(request.SourcePath,
+        request.TrackNumber, request.ExpectedHeader, request.CancellationToken));
+
+    /// <summary>Shares one bounded traversal between read-only profile validation and an independently corroborated timestamp reference.</summary>
+    private static async Task<bool> TraverseAsync(TraversalRequest request)
     {
         request.CancellationToken.ThrowIfCancellationRequested();
 
@@ -36,17 +45,23 @@ internal static class DtsLacedTimestampEvidence
 
         try
         {
-            await using var source = FileSourceAccess.OpenRegularReadStream(request.SourcePath, FileOptions.RandomAccess);
-            using var extracted = File.OpenText(request.ExtractedTimestampPath);
+            await using var source = FileSourceAccess.OpenRegularReadStream(request.SourcePath, FileOptions.SequentialScan);
+            using var extracted = request.ExtractedTimestampPath is null ? null : File.OpenText(request.ExtractedTimestampPath);
 
-            if (await extracted.ReadLineAsync(request.CancellationToken).ConfigureAwait(false) != "# timestamp format v2")
+            if (extracted is not null && await extracted.ReadLineAsync(request.CancellationToken).ConfigureAwait(false) != "# timestamp format v2")
             {
                 return false;
             }
 
-            await using var referenceStream = new FileStream(request.ReferencePath, FileMode.CreateNew, FileAccess.Write, FileShare.None);
-            await using var reference = new StreamWriter(referenceStream);
-            await reference.WriteLineAsync("# timestamp format v2").ConfigureAwait(false);
+            await using var referenceStream = request.ReferencePath is null ? null :
+                new FileStream(request.ReferencePath, FileMode.CreateNew, FileAccess.Write, FileShare.None);
+            await using var reference = referenceStream is null ? null : new StreamWriter(referenceStream);
+
+            if (reference is not null)
+            {
+                await reference.WriteLineAsync("# timestamp format v2").ConfigureAwait(false);
+            }
+
             var elements = 0;
             var readBytes = 0;
             var frames = 0;
@@ -54,24 +69,37 @@ internal static class DtsLacedTimestampEvidence
             var sawScale = false;
             var sawLace = false;
             decimal? lastRawTimestamp = null;
-            decimal? lastDerivedTimestamp = null;
+            decimal? previousBlockTimestamp = null;
+            decimal? lastWrittenTimestamp = null;
+            var pending = new PriorityQueue<decimal, decimal>();
             var frameDuration = request.ExpectedHeader.SamplesPerFrame * NanosecondsPerSecond / request.ExpectedHeader.SamplingFrequency;
             await VisitAsync(0, source.Length, 0, null, 0).ConfigureAwait(false);
 
-            if (!sawLace || lastRawTimestamp is null || lastDerivedTimestamp is null)
+            if (lastRawTimestamp is null)
+            {
+                return false;
+            }
+
+            if (reference is null)
+            {
+                return true;
+            }
+
+            if (!sawLace)
             {
                 return false;
             }
 
             await RequireRawTimestampAsync(lastRawTimestamp.Value).ConfigureAwait(false);
 
-            if (await extracted.ReadLineAsync(request.CancellationToken).ConfigureAwait(false) is not null)
+            if (extracted is null || await extracted.ReadLineAsync(request.CancellationToken).ConfigureAwait(false) is not null)
             {
                 return false;
             }
 
-            // The extractor has no source duration for the synthetic final boundary. Preserve that uncertainty explicitly.
-            await WriteTimestampAsync(lastDerivedTimestamp.Value).ConfigureAwait(false);
+            await FlushBeforeAsync(decimal.MaxValue).ConfigureAwait(false);
+            // Match pinned timestamps_v2 presentation sorting, while keeping its unknown terminal separate from real frames.
+            await WriteTimestampAsync(lastWrittenTimestamp!.Value).ConfigureAwait(false);
             await reference.FlushAsync(request.CancellationToken).ConfigureAwait(false);
             return true;
 
@@ -218,6 +246,14 @@ internal static class DtsLacedTimestampEvidence
 
                 var rawTime = ((decimal)clusterTime.Value + relative) * scale;
 
+                if (previousBlockTimestamp is { } previous && rawTime < previous)
+                {
+                    throw new UnprovenLayoutException();
+                }
+
+                previousBlockTimestamp = rawTime;
+                await FlushBeforeAsync(rawTime).ConfigureAwait(false);
+
                 for (var frame = 0; frame < count; frame++)
                 {
 
@@ -241,15 +277,26 @@ internal static class DtsLacedTimestampEvidence
 
                     await RequireRawTimestampAsync(rawTime).ConfigureAwait(false);
                     var derived = rawTime + frame * frameDuration;
-                    await WriteTimestampAsync(derived).ConfigureAwait(false);
+
+                    if (pending.Count >= MaximumPendingFrames)
+                    {
+                        throw new UnprovenLayoutException();
+                    }
+
+                    pending.Enqueue(derived, derived);
                     lastRawTimestamp = rawTime;
-                    lastDerivedTimestamp = derived;
                 }
             }
 
             /// <summary>Requires every original extractor line to agree with its actual block anchor, including all duplicated lace entries.</summary>
             async Task RequireRawTimestampAsync(decimal nanoseconds)
             {
+
+                if (extracted is null)
+                {
+                    return;
+                }
+
                 var line = await extracted.ReadLineAsync(request.CancellationToken).ConfigureAwait(false);
                 var valid = decimal.TryParse(line, NumberStyles.Float, CultureInfo.InvariantCulture, out var milliseconds);
 
@@ -260,8 +307,28 @@ internal static class DtsLacedTimestampEvidence
             }
 
             /// <summary>Writes one rationally derived timestamp with the extractor's nanosecond display precision.</summary>
-            Task WriteTimestampAsync(decimal nanoseconds) => reference.WriteLineAsync((nanoseconds / NanosecondsPerMillisecond)
-                .ToString("0.######", CultureInfo.InvariantCulture));
+            async Task WriteTimestampAsync(decimal nanoseconds)
+            {
+
+                if (reference is null)
+                {
+                    return;
+                }
+
+                await reference.WriteLineAsync((nanoseconds / NanosecondsPerMillisecond)
+                    .ToString("0.######", CultureInfo.InvariantCulture)).ConfigureAwait(false);
+                lastWrittenTimestamp = nanoseconds;
+            }
+
+            /// <summary>Future blocks cannot precede their monotone anchors, so only a bounded overlap window needs sorting.</summary>
+            async Task FlushBeforeAsync(decimal boundary)
+            {
+                while (pending.TryPeek(out var timestamp, out _) && timestamp <= boundary)
+                {
+                    pending.Dequeue();
+                    await WriteTimestampAsync(timestamp).ConfigureAwait(false);
+                }
+            }
 
             /// <summary>Reads no more than a bounded metadata/prefix budget, independently of source length.</summary>
             async Task<byte[]> ReadAsync(long offset, int length)
@@ -357,7 +424,11 @@ internal static class DtsLacedTimestampEvidence
     }
 
     private sealed class UnprovenLayoutException : Exception;
+    private sealed record TraversalRequest(string SourcePath, ulong TrackNumber, DtsCoreFrameHeader ExpectedHeader,
+        CancellationToken CancellationToken, string? ExtractedTimestampPath = null, string? ReferencePath = null);
 }
 
 internal sealed record DtsLacedTimestampRequest(string SourcePath, ulong TrackNumber, DtsCoreFrameHeader ExpectedHeader,
     string ExtractedTimestampPath, string ReferencePath, CancellationToken CancellationToken);
+internal sealed record DtsProfileValidation(string SourcePath, ulong TrackNumber, DtsCoreFrameHeader ExpectedHeader,
+    CancellationToken CancellationToken);

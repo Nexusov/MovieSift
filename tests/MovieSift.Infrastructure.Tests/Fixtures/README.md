@@ -31,7 +31,9 @@ Use `build/generate-ffmpeg-fixture.py` with an explicitly provided matching enco
 
 `build/generate-fixtures.py` also creates original VP8/DTS/PCM fixtures through `build/dts_fixture.py`. Two embedded original DTS core frames contain six synthetic sine tones; their encoder command, development tool/archive hashes and frame hashes are recorded in the helper. CI needs only Python and pinned MKVToolNix, not an additional encoder. Generated provenance records the exact repeated stream and container hashes.
 
-The fixtures replace optional DTS `DefaultDuration` and `BitDepth` elements and affected CRCs with equal-length EBML Void; encoded payloads and offsets remain unchanged. One fixture disables lacing, preserving explicit frame times. The other keeps fixed lacing and exercises codec-derived times inside each real source block. Copy and replacement cases compare retained video/DTS bytes, metadata, source hashes and owned cleanup; a shifted-candidate negative control must still fail. No user media is included.
+The fixtures replace optional DTS `DefaultDuration` and `BitDepth` elements and affected CRCs with equal-length EBML Void; encoded payloads and offsets remain unchanged. They cover explicit frame times, fixed lacing, and a fixed lace whose second block anchor is shifted earlier by 32 ms, producing overlapping codec-derived frame times. PCM precedes DTS so the ordinary packaged workflow removes PCM and retains legacy DTS. Generated provenance includes an independent frame-clock guide from the original block anchors and the original encoder's 512 samples at 48 kHz.
+
+Copy and replacement cases exercise journal-owned input preparation with the pinned `mkvpropedit`, then native passthrough with finer container ticks. Output gains only the proven missing duration; missing bit depth remains missing. Tests compare retained video/DTS bytes, presentation timestamps with the unchanged 1 ms bound, metadata, source hashes and owned cleanup; a shifted-candidate negative control must still fail. No user media is included.
 
 ## Generated MP4 fixtures
 

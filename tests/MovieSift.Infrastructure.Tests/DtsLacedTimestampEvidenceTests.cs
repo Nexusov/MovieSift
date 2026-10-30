@@ -93,6 +93,42 @@ public sealed class DtsLacedTimestampEvidenceTests
             request with { SourcePath = Path.Combine(workspace.Path, "absent.mkv"), CancellationToken = cancelled.Token }));
     }
 
+    /// <summary>Presentation sorting preserves overlapping physical lace anchors rather than accepting a changed timeline.</summary>
+    [Fact]
+    public async Task SortsOnlyTheProvenOverlapWindow()
+    {
+        using var workspace = new TestWorkspace();
+        var blocks = Simple(0, 4, Frame(), Frame()).Concat(Simple(5, 4, Frame(), Frame())).ToArray();
+        var request = await PrepareAsync(workspace, Segment(Cluster(0, blocks)), "0\n0\n5\n5\n5\n");
+        Assert.True(await DtsLacedTimestampEvidence.WriteReferenceAsync(request));
+        Assert.Equal(["# timestamp format v2", "0", "5", "10.666667", "15.666667", "15.666667"],
+            await File.ReadAllLinesAsync(request.ReferencePath, TestContext.Current.CancellationToken));
+    }
+
+    /// <summary>The preparation gate can validate an unlaced profile without creating evidence files or changing source bytes.</summary>
+    [Fact]
+    public async Task ValidatesProfileWithoutRequiringLacesOrWritingFiles()
+    {
+        using var workspace = new TestWorkspace();
+        var source = Segment(Cluster(0, Simple(0, 0, Frame())));
+        var request = await PrepareAsync(workspace, source, "0\n0\n");
+        Assert.True(await DtsLacedTimestampEvidence.ValidateProfileAsync(new(request.SourcePath, 7, Header, request.CancellationToken)));
+        Assert.Equal(source, await File.ReadAllBytesAsync(request.SourcePath, request.CancellationToken));
+        Assert.False(File.Exists(request.ReferencePath));
+    }
+
+    /// <summary>A pathological overlap window is rejected with a finite pending-frame budget in preparation and verification.</summary>
+    [Fact]
+    public async Task RejectsUnboundedPendingOverlap()
+    {
+        using var workspace = new TestWorkspace();
+        var lace = Simple(0, 4, Enumerable.Range(0, 8).Select(_ => Frame()).ToArray());
+        var blocks = Enumerable.Range(0, 600).SelectMany(_ => lace).ToArray();
+        var request = await PrepareAsync(workspace, Segment(Cluster(0, blocks)), string.Concat(Enumerable.Repeat("0\n", 4801)));
+        Assert.False(await DtsLacedTimestampEvidence.ValidateProfileAsync(new(request.SourcePath, 7, Header, request.CancellationToken)));
+        Assert.False(await DtsLacedTimestampEvidence.WriteReferenceAsync(request));
+    }
+
     /// <summary>Writes only task-owned controlled metadata/prefix bytes and the extractor's separate terminal line.</summary>
     private static async Task<DtsLacedTimestampRequest> PrepareAsync(TestWorkspace workspace, byte[] source, string raw)
     {

@@ -2,12 +2,19 @@ using MovieSift.Application;
 using MovieSift.Application.Ports;
 using MovieSift.Core.Failures;
 using MovieSift.Core.Media;
+using MovieSift.Core.Planning;
 
 namespace MovieSift.Infrastructure.MediaTools;
 
 /// <summary>Selects an explicit adapter for inspection and the approved, frozen adapter for execution.</summary>
 public sealed class ContainerMediaBackend(IMediaBackend matroska, IMediaBackend mp4) : IMediaBackend
 {
+    /// <summary>Uses the approved format's preparation requirements without choosing another adapter.</summary>
+    public MediaWorkRequirements GetWorkRequirements(RemuxPlan plan) => Select(plan.Inspection.Container).GetWorkRequirements(plan);
+
+    /// <summary>Prepares the reserved source projection through the frozen backend.</summary>
+    public Task PrepareInputAsync(PrepareInputRequest request) => Select(request.Plan.Inspection.Container).PrepareInputAsync(request);
+
     /// <summary>Uses a candidate suffix only for routing; each adapter validates the real container independently.</summary>
     public Task<MediaInspection> InspectAsync(InspectRequest request)
     {

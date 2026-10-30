@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Security.Cryptography;
+using System.Text.Json;
 using MovieSift.Application.Inspection;
 using MovieSift.Application.Jobs;
 using MovieSift.Application.Ports;
@@ -13,16 +14,18 @@ using Xunit;
 
 namespace MovieSift.Infrastructure.Tests;
 
-/// <summary>Checks payload-proven DTS header derivation through actual copy and replacement jobs.</summary>
-public sealed class DtsDerivedPropertiesIntegrationTests
+/// <summary>Checks native Matroska passthrough for legacy DTS through actual copy and replacement jobs.</summary>
+public sealed class LegacyDtsPassthroughIntegrationTests
 {
-    /// <summary>Legacy missing DTS headers are admitted only while all retained payloads and explicit output safety survive.</summary>
+    /// <summary>Owned native duration projection preserves original frame clocks and payloads without inventing bit-depth metadata.</summary>
     [MediaTheory]
     [InlineData("dts-derived-properties.mkv", OutputMode.Copy)]
     [InlineData("dts-derived-properties.mkv", OutputMode.ReplaceSource)]
     [InlineData("dts-derived-properties-laced.mkv", OutputMode.Copy)]
     [InlineData("dts-derived-properties-laced.mkv", OutputMode.ReplaceSource)]
-    public async Task MissingDtsHeadersAreDerivedWithoutChangingRetainedPayloads(string fixtureName, OutputMode outputMode)
+    [InlineData("dts-derived-properties-overlap.mkv", OutputMode.Copy)]
+    [InlineData("dts-derived-properties-overlap.mkv", OutputMode.ReplaceSource)]
+    public async Task LegacyDtsHeadersAndTimestampsArePreservedWithoutChangingRetainedPayloads(string fixtureName, OutputMode outputMode)
     {
         using var workspace = new TestWorkspace();
         var fixture = Path.Combine(MediaTestEnvironment.FixtureDirectory, fixtureName);
@@ -73,7 +76,7 @@ public sealed class DtsDerivedPropertiesIntegrationTests
             Assert.Equal(retained.Select(track => track.Uid), output.Tracks.Select(track => track.Uid));
             var outputDts = Assert.Single(output.Tracks, track => track.Properties.GetValueOrDefault("codec_id") == "A_DTS");
             Assert.Equal("10666667", outputDts.Properties["default_duration"]);
-            Assert.Equal("16", outputDts.Properties["audio_bits_per_sample"]);
+            Assert.False(outputDts.Properties.ContainsKey("audio_bits_per_sample"));
             Assert.Equal(dts.Title, outputDts.Title);
             Assert.Equal(dts.Language, outputDts.Language);
             Assert.Equal(dts.IsDefault, outputDts.IsDefault);
@@ -85,6 +88,15 @@ public sealed class DtsDerivedPropertiesIntegrationTests
                 var actual = Assert.Single(output.Tracks, candidate => candidate.Uid == track.Uid);
                 await MediaPayloadEvidence.AssertIdenticalAsync(new(fixture, track.Id, destination, actual.Id,
                     workspace.Path, $"dts-retained-{track.Id}"));
+
+                if (track.Id == dts.Id)
+                {
+                    await AssertOriginalDtsClockAsync(new(fixture, destination, actual.Id, workspace.Path));
+                    continue;
+                }
+
+                await MediaPayloadEvidence.AssertIdenticalAsync(new(fixture, track.Id, destination, actual.Id,
+                    workspace.Path, $"dts-timestamps-{track.Id}", "timestamps_v2"));
             }
 
             Assert.Equal(originalHash, await HashAsync(fixture));
@@ -105,7 +117,37 @@ public sealed class DtsDerivedPropertiesIntegrationTests
         }
     }
 
-    /// <summary>Derived intra-lace times never authorize changing an actual encoded block timestamp.</summary>
+    /// <summary>Checks every presentation timestamp against the fixture generator's independent original block/sample clock.</summary>
+    private static async Task AssertOriginalDtsClockAsync(DtsClockExpectation request)
+    {
+        const int maximumDiagnostics = 32768;
+        const decimal permittedRoundingMilliseconds = 1;
+        var provenancePath = Path.ChangeExtension(request.FixturePath, ".provenance.json");
+        using var provenance = JsonDocument.Parse(await File.ReadAllTextAsync(provenancePath, TestContext.Current.CancellationToken));
+        var expected = provenance.RootElement.GetProperty("sourceDtsFramePresentationMilliseconds").EnumerateArray()
+            .Select(value => decimal.Parse(value.GetString()!, CultureInfo.InvariantCulture)).Order().ToArray();
+        var tools = MkvToolPaths.FromDirectory(MediaTestEnvironment.ToolDirectory);
+        var environment = tools.NativeLibraryDirectory is { } nativeLibraryDirectory
+            ? new Dictionary<string, string> { ["LD_LIBRARY_PATH"] = nativeLibraryDirectory } : null;
+        var evidence = Path.Combine(request.Directory, "independent-dts-clock.txt");
+        var extraction = await new OwnedProcessRunner().RunAsync(new(tools.MkvExtract,
+            [request.OutputPath, "timestamps_v2", $"{request.OutputTrackId.ToString(CultureInfo.InvariantCulture)}:{evidence}"],
+            maximumDiagnostics, TimeSpan.FromMinutes(2), null, TestContext.Current.CancellationToken, environment));
+        Assert.Equal(0, extraction.ExitCode);
+        var lines = await File.ReadAllLinesAsync(evidence, TestContext.Current.CancellationToken);
+        Assert.Equal("# timestamp format v2", lines[0]);
+        var actual = lines.Skip(1).Select(value => decimal.Parse(value, CultureInfo.InvariantCulture)).ToArray();
+        Assert.NotEmpty(expected);
+        Assert.Equal(expected.Length + 1, actual.Length); // mkvextract adds one synthetic end boundary after actual frames.
+
+        for (var frame = 0; frame < expected.Length; frame++)
+        {
+            Assert.True(Math.Abs(expected[frame] - actual[frame]) <= permittedRoundingMilliseconds,
+                $"Original DTS frame {frame}: expected {expected[frame]} ms, actual {actual[frame]} ms.");
+        }
+    }
+
+    /// <summary>Native passthrough never authorizes changing an actual encoded block timestamp.</summary>
     [MediaFact]
     public async Task ShiftedDtsBlockTimestampsFailVerificationDespiteIdenticalPayloads()
     {
@@ -149,4 +191,6 @@ public sealed class DtsDerivedPropertiesIntegrationTests
         await using var stream = File.OpenRead(path);
         return Convert.ToHexString(await SHA256.HashDataAsync(stream));
     }
+
+    private sealed record DtsClockExpectation(string FixturePath, string OutputPath, int OutputTrackId, string Directory);
 }

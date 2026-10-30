@@ -6,6 +6,7 @@ using MovieSift.Application.Inspection;
 using MovieSift.Application.Ports;
 using MovieSift.Core.Failures;
 using MovieSift.Core.Media;
+using MovieSift.Core.Planning;
 using MovieSift.Infrastructure.Files;
 using MovieSift.Infrastructure.Processes;
 
@@ -26,9 +27,25 @@ public sealed class MkvBackend(MkvBackendOptions options) : IMediaBackend
     {
         "uid", "number", "num_index_entries", "minimum_timestamp", "language_ietf",
         "default_track", "forced_track", "enabled_track", "language", "track_name", "_source_writing_application",
-        DtsDerivedPropertiesPolicy.EvidenceKey,
+        DtsDefaultDurationPolicy.EvidenceKey,
     };
     private readonly OwnedProcessRunner processRunner = new();
+
+    /// <summary>Requests a journal-owned input copy only when retained DTS lacks a source duration.</summary>
+    public MediaWorkRequirements GetWorkRequirements(RemuxPlan plan)
+    {
+        ValidatePlanBackend(plan.Inspection);
+        return new(MkvDtsInputProjection.RequiresProjection(plan));
+    }
+
+    /// <summary>Materializes only codec-proven missing duration headers in an independently owned input copy.</summary>
+    public async Task PrepareInputAsync(PrepareInputRequest request)
+    {
+        ValidatePlanBackend(request.Plan.Inspection);
+        await ValidateToolsAsync(request.CancellationToken).ConfigureAwait(false);
+        var preparation = new MkvDtsInputProjection(new(options.SourceAccess, options.Tools.MkvPropEdit, RunAsync));
+        await preparation.PrepareAsync(request).ConfigureAwait(false);
+    }
 
     /// <summary>Inspects the detected container, required properties, and supported chapter/tag structures.</summary>
     public async Task<MediaInspection> InspectAsync(InspectRequest request)
@@ -72,6 +89,24 @@ public sealed class MkvBackend(MkvBackendOptions options) : IMediaBackend
     {
         ValidatePlanBackend(request.Plan.Inspection);
         await ValidateToolsAsync(request.CancellationToken).ConfigureAwait(false);
+        var requiresProjection = MkvDtsInputProjection.RequiresProjection(request.Plan);
+
+        if (requiresProjection != (request.InputProjection is not null))
+        {
+            throw Failure(new BackendFailure(ErrorCode.OwnershipInvalid, "The approved DTS plan requires its reserved input projection."));
+        }
+
+        if (request.InputProjection is { } projection)
+        {
+
+            if (projection.OriginalSource != request.Plan.Inspection.Source)
+            {
+                throw Failure(new BackendFailure(ErrorCode.OwnershipInvalid, "The input projection belongs to a different source revision."));
+            }
+
+            OwnedInputProjectionAccess.Validate(projection);
+        }
+
         var result = await RunAsync(new ProcessRequest(options.Tools.MkvMerge, MkvArguments.BuildRemux(request),
             MaximumDiagnosticsCharacters, null,
             line => ReportProgress(new ProgressLine(line, request.Progress)), request.CancellationToken,
@@ -148,9 +183,22 @@ public sealed class MkvBackend(MkvBackendOptions options) : IMediaBackend
             {
                 var sourceTrack = request.Plan.RetainedTracks[trackIndex];
                 var outputTrack = candidate.Tracks[trackIndex];
-                var sourceTimestamps = await DtsTimestampReferenceAsync(new(
-                    sourceInspection.Source.FullPath, sourceScratch, sourceTrack, outputTrack,
-                    request.CancellationToken)).ConfigureAwait(false);
+                var sourceTimestamps = TimestampPath(new TrackPath(sourceScratch, sourceTrack.Id));
+                var provenDuration = DtsDefaultDurationPolicy.PermitsAddition(new(sourceTrack, outputTrack));
+
+                if (provenDuration && DtsDefaultDurationPolicy.TryReadHeader(sourceTrack, out var header))
+                {
+                    var referencePath = Path.Combine(sourceScratch, $"dts-{sourceTrack.Id.ToString(CultureInfo.InvariantCulture)}.reference.txt");
+                    var number = ulong.Parse(sourceTrack.Properties["number"], CultureInfo.InvariantCulture);
+                    var reconstructed = await DtsLacedTimestampEvidence.WriteReferenceAsync(new(sourceInspection.Source.FullPath,
+                        number, header, sourceTimestamps, referencePath, request.CancellationToken)).ConfigureAwait(false);
+
+                    if (reconstructed)
+                    {
+                        sourceTimestamps = referencePath;
+                    }
+                }
+
                 var timestampsMatch = await MkvTimestampComparison.EquivalentAsync(new TrackTimestampComparison(
                     sourceTimestamps,
                     TimestampPath(new TrackPath(outputScratch, outputTrack.Id)), sourceTrack, outputTrack,
@@ -181,13 +229,14 @@ public sealed class MkvBackend(MkvBackendOptions options) : IMediaBackend
         }
     }
 
-    /// <summary>Checks both executables against the same pinned distribution before using a plan.</summary>
+    /// <summary>Checks all Matroska executables against the same pinned distribution before using a plan.</summary>
     public async Task ValidateToolsAsync(CancellationToken cancellationToken = default)
     {
         var tools = new[]
         {
             new ToolVersionRequest(options.Tools.MkvMerge, "mkvmerge"),
             new ToolVersionRequest(options.Tools.MkvExtract, "mkvextract"),
+            new ToolVersionRequest(options.Tools.MkvPropEdit, "mkvpropedit"),
         };
 
         foreach (var tool in tools)
@@ -231,7 +280,7 @@ public sealed class MkvBackend(MkvBackendOptions options) : IMediaBackend
         var structureStarted = Stopwatch.GetTimestamp();
         await MkvSegmentInfoReader.ValidateAsync(new(request.Source.FullPath, request.CancellationToken)).ConfigureAwait(false);
         ReportInspectionTiming("structure", structureStarted);
-        return await DtsDerivedPropertiesPolicy.AnnotateAsync(inspection, request.CancellationToken).ConfigureAwait(false);
+        return await DtsDefaultDurationPolicy.AnnotateAsync(inspection, request.CancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>Records bounded stage timings without paths or media metadata to diagnose large-file latency honestly.</summary>
@@ -289,33 +338,6 @@ public sealed class MkvBackend(MkvBackendOptions options) : IMediaBackend
         return new ExtractedMetadata(chapters, tags);
     }
 
-    /// <summary>Resolves only proven missing DTS lace durations; unsupported evidence retains the strict extracted reference.</summary>
-    private static async Task<string> DtsTimestampReferenceAsync(DtsTimestampReference request)
-    {
-        var extracted = TimestampPath(new TrackPath(request.Directory, request.SourceTrack.Id));
-        var provenDuration = DtsDerivedPropertiesPolicy.PermitsAddition(
-            new(request.SourceTrack, request.CandidateTrack), DtsDerivedPropertiesPolicy.DurationProperty);
-
-        if (!provenDuration || !ulong.TryParse(request.SourceTrack.Properties.GetValueOrDefault("number"),
-            NumberStyles.None, CultureInfo.InvariantCulture, out var number))
-        {
-            return extracted;
-        }
-
-        var evidence = await DtsCoreHeaderEvidence.ReadAsync(new(request.SourcePath,
-            new HashSet<ulong> { number }, request.CancellationToken)).ConfigureAwait(false);
-
-        if (!evidence.TryGetValue(number, out var header))
-        {
-            return extracted;
-        }
-
-        var reference = Path.Combine(request.Directory, $"track-{request.SourceTrack.Id.ToString(CultureInfo.InvariantCulture)}.dts-reference.txt");
-        var written = await DtsLacedTimestampEvidence.WriteReferenceAsync(new(request.SourcePath, number, header,
-            extracted, reference, request.CancellationToken)).ConfigureAwait(false);
-        return written ? reference : extracted;
-    }
-
     /// <summary>Extracts frame timestamps using local backend IDs and application-owned filenames.</summary>
     private async Task ExtractTimestampsAsync(TimestampExtraction request)
     {
@@ -370,12 +392,9 @@ public sealed class MkvBackend(MkvBackendOptions options) : IMediaBackend
                 actualProperties.Remove(AacDefaultDurationPolicy.PropertyName);
             }
 
-            foreach (var property in new[] { DtsDerivedPropertiesPolicy.DurationProperty, DtsDerivedPropertiesPolicy.BitDepthProperty })
+            if (DtsDefaultDurationPolicy.PermitsAddition(new TrackSemanticComparison(expected, actual)))
             {
-                if (DtsDerivedPropertiesPolicy.PermitsAddition(new(expected, actual), property))
-                {
-                    actualProperties.Remove(property);
-                }
+                actualProperties.Remove(DtsDefaultDurationPolicy.PropertyName);
             }
 
             var propertiesMatch = expectedProperties.Count == actualProperties.Count
@@ -520,8 +539,6 @@ public sealed class MkvBackend(MkvBackendOptions options) : IMediaBackend
     private sealed record MetadataExtraction(MediaInspection Inspection, string Directory, CancellationToken CancellationToken);
     private sealed record ExtractedMetadata(XDocument? Chapters, XDocument? Tags);
     private sealed record TimestampExtraction(string SourcePath, IReadOnlyList<MediaTrack> Tracks, string Directory, CancellationToken CancellationToken);
-    private sealed record DtsTimestampReference(string SourcePath, string Directory, MediaTrack SourceTrack,
-        MediaTrack CandidateTrack, CancellationToken CancellationToken);
     private sealed record TrackComparison(IReadOnlyList<MediaTrack> Expected, IReadOnlyList<MediaTrack> Actual);
     private sealed record AttachmentComparison(IReadOnlyList<Attachment> Expected, IReadOnlyList<Attachment> Actual);
     private sealed record TrackLanguageComparison(MediaTrack Expected, MediaTrack Actual);
