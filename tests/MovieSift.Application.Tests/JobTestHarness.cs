@@ -23,6 +23,12 @@ internal sealed class JobTestHarness : IMediaBackend, ISourceAccess, IOutputStor
     public int PublishCalls { get; private set; }
     public int CleanupCalls { get; private set; }
     public int ReserveCalls { get; private set; }
+    public int PrepareInputCalls { get; private set; }
+    public bool RequiresInputProjection { get; set; }
+    public bool OmitInputProjection { get; set; }
+    public Func<PrepareInputRequest, Task>? OnPrepareInput { get; set; }
+    public OwnedInputProjection? PreparedInput { get; private set; }
+    public OwnedInputProjection? RemuxInput { get; private set; }
     public int RevisionCalls { get; private set; }
     public long AvailableFreeSpace { get; set; } = long.MaxValue;
     public int ExitCode { get; set; }
@@ -50,6 +56,7 @@ internal sealed class JobTestHarness : IMediaBackend, ISourceAccess, IOutputStor
     public Task<ToolOutcome> RemuxAsync(RemuxRequest request)
     {
         RemuxCalls++;
+        RemuxInput = request.InputProjection;
         OnRemux?.Invoke();
 
         if (TerminationFails)
@@ -105,7 +112,26 @@ internal sealed class JobTestHarness : IMediaBackend, ISourceAccess, IOutputStor
     public Task<OwnedOutput> ReserveAsync(ReserveOutputRequest request)
     {
         ReserveCalls++;
-        return Task.FromResult(new OwnedOutput(request.Plan.Id, "owned", "candidate.mkv", "output.mkv", "token"));
+        var projection = request.RequiresInputProjection && !OmitInputProjection
+            ? new OwnedInputProjection(new("input-projection.mkv", "owned-input", 0, 200), request.Plan.Inspection.Source) : null;
+        return Task.FromResult(new OwnedOutput(request.Plan.Id, "owned", "candidate.mkv", "output.mkv", "token", InputProjection: projection));
+    }
+
+    /// <summary>Returns explicit preparation requirements without creating any media state.</summary>
+    public MediaWorkRequirements GetWorkRequirements(RemuxPlan plan) => new(RequiresInputProjection);
+
+    /// <summary>Exposes a deterministic preparation boundary before any remux request.</summary>
+    public async Task PrepareInputAsync(PrepareInputRequest request)
+    {
+        PrepareInputCalls++;
+        PreparedInput = request.InputProjection;
+
+        if (OnPrepareInput is not null)
+        {
+            await OnPrepareInput(request);
+        }
+
+        request.CancellationToken.ThrowIfCancellationRequested();
     }
 
     /// <summary>Accepts only this harness's candidate ownership.</summary>

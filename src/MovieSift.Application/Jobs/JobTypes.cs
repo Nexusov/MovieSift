@@ -8,7 +8,7 @@ namespace MovieSift.Application.Jobs;
 public enum JobPhase
 {
     Validating, Remuxing, Verifying, AwaitingWarningReview, Publishing,
-    Completed, NoChange, Failed, Cancelled
+    Completed, NoChange, Failed, Cancelled, PreparingInput
 }
 
 public sealed record JobRequest(RemuxPlan Plan, IProgress<JobProgress>? Progress = null, CancellationToken CancellationToken = default);

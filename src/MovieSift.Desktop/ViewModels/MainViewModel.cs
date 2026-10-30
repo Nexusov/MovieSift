@@ -157,6 +157,7 @@ public sealed partial class MainViewModel : ObservableObject
             services.Log.Warning(exception, "Portable ownership records could not be read");
         }
 
+        await Batch.InitializePreferencesAsync();
         await Batch.Presets.InitializeAsync();
         await Batch.Recovery.InitializeAsync();
 
@@ -369,7 +370,10 @@ public sealed partial class MainViewModel : ObservableObject
         var paths = entry.Output is { } output
             ? Localization.Format(new("InterruptedPaths", [output.CandidatePath, output.DestinationPath]))
             : entry.Issue ?? string.Empty;
-        return $"{Localization[state]}{Environment.NewLine}{paths}";
+        var inputCopy = entry.Output?.InputProjection is { } projection
+            ? Environment.NewLine + Localization.Format(new("InterruptedInputProjectionPath", [projection.CreatedFile.FullPath]))
+            : string.Empty;
+        return $"{Localization[state]}{Environment.NewLine}{paths}{inputCopy}";
     }));
 
     /// <summary>Shares only shell availability and persistence status with the sole media workspace.</summary>

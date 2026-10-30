@@ -7,7 +7,7 @@
              x:Class="MovieSift.Desktop.Views.BatchView"
              x:DataType="viewModels:BatchViewModel">
   <Grid>
-  <DockPanel LastChildFill="True" IsVisible="{Binding IsEditingSurfaceVisible}">
+  <DockPanel LastChildFill="True" IsVisible="{Binding IsEditingSurfaceVisible}" IsHitTestVisible="{Binding !#RulesPanel.IsVisible}">
     <!-- Destination, cancellation and Review remain outside the scrolling preparation panels. -->
     <StackPanel x:Name="BatchRunControls" DockPanel.Dock="Bottom" Spacing="6" Margin="0,10,0,0">
       <Border Classes="panel" Padding="12">
@@ -61,14 +61,22 @@
         <Button x:Name="AddBatchFilesButton" Content="{Binding Localization[BatchAddFiles]}" Command="{Binding AddFilesCommand}" Margin="0,0,8,6" />
         <Button x:Name="AddBatchFolderButton" Content="{Binding Localization[BatchAddFolder]}" Command="{Binding AddFolderCommand}" Margin="0,0,8,6" />
         <Button x:Name="OpenRulesButton" Content="{Binding Localization[WorkspaceRules]}" Click="OnOpenRules" IsEnabled="{Binding CanEdit}" Margin="0,0,8,6" />
-        <Button x:Name="WorkspaceOptions" Content="⋯" AutomationProperties.Name="{Binding Localization[WorkspaceOptions]}" Margin="0,0,0,6">
+        <Button x:Name="NewBatchButton" Click="OnNewQueue" IsEnabled="{Binding CanEdit}" AutomationProperties.Name="{Binding Localization[BatchNew]}"
+                ToolTip.Tip="{Binding Localization[BatchNewHelp]}" IsVisible="{Binding ShowNewQueue}" Margin="0,0,8,6">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Path Width="16" Height="16" Stretch="Uniform" Stroke="{DynamicResource MovieSiftTextBrush}" StrokeThickness="1.6"
+                  StrokeLineCap="Round" StrokeJoin="Round" Data="M14,3 H5 V21 H19 V8 L14,3 V8 H19 M8,14 H16 M12,10 V18" />
+            <TextBlock x:Name="NewQueueLabel" Text="{Binding Localization[BatchNew]}" />
+          </StackPanel>
+        </Button>
+        <Button x:Name="WorkspaceOptions" AutomationProperties.Name="{Binding Localization[WorkspaceOptions]}" Margin="0,0,0,6">
+          <Button.Content><PathIcon Width="18" Height="18" Data="M4,10 A2,2 0 1 1 4,14 A2,2 0 1 1 4,10 M12,10 A2,2 0 1 1 12,14 A2,2 0 1 1 12,10 M20,10 A2,2 0 1 1 20,14 A2,2 0 1 1 20,10" /></Button.Content>
           <Button.Flyout>
             <Flyout>
               <StackPanel Spacing="10" MaxWidth="300">
                 <CheckBox x:Name="IncludeSubfoldersCheckBox" IsChecked="{Binding IncludeSubfolders, Mode=TwoWay}" IsEnabled="{Binding CanEdit}" Content="{Binding Localization[BatchIncludeSubfolders]}" />
                 <TextBlock Text="{Binding Localization[BatchFolderScopeHelp]}" Classes="muted" TextWrapping="Wrap" />
                 <Button Content="{Binding Localization[OutputUseSourceFolders]}" Command="{Binding UseSourceFoldersCommand}" IsVisible="{Binding HasCustomOutputFolder}" />
-                <Button x:Name="NewBatchButton" Click="OnNewQueue" Content="{Binding Localization[BatchNew]}" Command="{Binding NewBatchCommand}" IsVisible="{Binding ShowNewQueue}" />
               </StackPanel>
             </Flyout>
           </Button.Flyout>
@@ -77,7 +85,8 @@
       <Grid Grid.Row="1">
         <!-- One native collection remains alive when the responsive layout changes. -->
         <Grid x:Name="WorkspaceColumns" ColumnDefinitions="330,*" ColumnSpacing="12" IsVisible="{Binding HasItems}" ClipToBounds="True">
-          <Expander x:Name="FileSidebar" IsExpanded="True" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True">
+          <!-- The file panel owns its inset; duplicated Expander padding would consume the narrow file viewport. -->
+          <Expander x:Name="FileSidebar" Padding="0" IsExpanded="True" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True">
             <Expander.Header>
               <TextBlock x:Name="FileCountSummary" Text="{Binding SummaryText}" TextWrapping="Wrap" FontWeight="SemiBold" />
             </Expander.Header>
@@ -93,8 +102,8 @@
                       <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8" Margin="3,6" ToolTip.Tip="{Binding SourcePath}">
                         <CheckBox x:Name="FileInclusionCheckBox" IsChecked="{Binding Included, Mode=TwoWay}" IsEnabled="{Binding CanChangeInclusion}" VerticalAlignment="Top" AutomationProperties.Name="{Binding InclusionAccessibleName}" />
                         <StackPanel Grid.Column="1" Spacing="4">
-                          <Button x:Name="FileDetailsNameButton" Classes="fileName" Click="OnFileDetails" Padding="0" MinHeight="0"
-                                  HorizontalContentAlignment="Left" HorizontalAlignment="Stretch"
+                          <Button x:Name="FileDetailsNameButton" Classes="fileName" Click="OnFileDetails" Padding="0" MinHeight="32" Margin="0,0,40,0"
+                                  HorizontalContentAlignment="Left" VerticalContentAlignment="Top" HorizontalAlignment="Stretch"
                                   AutomationProperties.Name="{Binding SourcePath}" AutomationProperties.HelpText="{Binding Localization[WorkspaceDetails]}"
                                   ToolTip.Tip="{Binding SourcePath}">
                             <TextBlock Text="{Binding FileName}" FontWeight="SemiBold" TextWrapping="Wrap" />
@@ -104,6 +113,12 @@
                           <TextBlock appearance:SoftMotion.ResultKey="{Binding PublishedPath}" Text="{Binding PublishedPath}" IsVisible="{Binding HasPublishedPath}" TextWrapping="Wrap" MaxLines="2" />
                           <TextBlock x:Name="BatchFileSizeDifferenceText" Text="{Binding SizeDifferenceText}" IsVisible="{Binding HasSizeDifference}" TextWrapping="Wrap" />
                         </StackPanel>
+                        <Button x:Name="RemoveQueueItemButton" Grid.Column="1" Classes="iconClose queueRemove" VerticalAlignment="Top" HorizontalAlignment="Right"
+                                Command="{Binding $parent[views:BatchView].((viewModels:BatchViewModel)DataContext).RemoveItemCommand}"
+                                CommandParameter="{Binding}" AutomationProperties.Name="{Binding Localization[BatchRemove]}"
+                                ToolTip.Tip="{Binding Localization[BatchRemove]}">
+                          <Path Classes="closeGlyph" />
+                        </Button>
                       </Grid>
                     </DataTemplate>
                   </ListBox.ItemTemplate>
@@ -139,7 +154,10 @@
                       </StackPanel>
                     </RadioButton>
                   </Grid>
-
+                  <CheckBox x:Name="RememberOutputChoice" IsChecked="{Binding OutputPreferences.RememberChoice, Mode=TwoWay}"
+                            IsEnabled="{Binding CanRememberOutputChoice}" Content="{Binding Localization[OutputRememberChoice]}" />
+                  <TextBlock Text="{Binding OutputPreferences.ErrorText}" IsVisible="{Binding OutputPreferences.HasError}"
+                             Classes="warning" TextWrapping="Wrap" />
                 </StackPanel>
               </Border>
               <ContentControl x:Name="SingleFileEditor" Content="{Binding SingleFileItem}" IsVisible="{Binding IsSingleFile}" HorizontalContentAlignment="Stretch">
@@ -154,7 +172,6 @@
                 <StackPanel Spacing="8">
                   <WrapPanel>
                     <Button Content="{Binding Localization[BatchInspectSelected]}" Command="{Binding InspectSelectedCommand}" Margin="0,0,8,4" />
-                    <Button Content="{Binding Localization[BatchRemove]}" Command="{Binding RemoveSelectedCommand}" Margin="0,0,0,4" />
                   </WrapPanel>
                   <ContentControl Content="{Binding SelectedItem}" HorizontalContentAlignment="Stretch">
                     <ContentControl.ContentTemplate>
@@ -175,7 +192,7 @@
         </Grid>
         <Border x:Name="EmptyDropTarget" Classes="panel dropTarget" IsVisible="{Binding IsEmpty}" DragDrop.AllowDrop="True" Padding="16">
           <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8" MaxWidth="420">
-            <TextBlock Text="＋" FontSize="28" HorizontalAlignment="Center" Foreground="{DynamicResource MovieSiftAccentBrush}" />
+            <Path Width="28" Height="28" Stretch="Uniform" Stroke="{DynamicResource MovieSiftAccentBrush}" StrokeThickness="1.6" Data="M12,3 V21 M3,12 H21" HorizontalAlignment="Center" />
             <TextBlock Text="{Binding Localization[WorkspaceEmptyTitle]}" Classes="heading" TextWrapping="Wrap" TextAlignment="Center" />
             <TextBlock Text="{Binding Localization[WorkspaceEmptyHelp]}" Classes="muted" TextWrapping="Wrap" TextAlignment="Center" />
           </StackPanel>
@@ -207,11 +224,13 @@
       </Grid>
     </Grid>
   </DockPanel>
-  <Border x:Name="RulesPanel" Classes="panel" appearance:SoftMotion.Enter="True" IsVisible="{Binding IsRulesOpen}">
+  <Border x:Name="RulesPanel" Classes="panel" appearance:SoftMotion.Visible="{Binding IsRulesOpen}" IsHitTestVisible="{Binding IsRulesOpen}">
     <DockPanel>
       <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" ColumnSpacing="12" Margin="0,0,0,12">
         <TextBlock Classes="heading" Text="{Binding Localization[WorkspaceRules]}" VerticalAlignment="Center" />
-        <Button Grid.Column="1" Content="{Binding Localization[WorkspaceClose]}" Click="OnCloseRules" />
+        <Button Grid.Column="1" Classes="iconClose" Click="OnCloseRules" AutomationProperties.Name="{Binding Localization[WorkspaceClose]}">
+          <Path Classes="closeGlyph" />
+        </Button>
       </Grid>
       <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
         <StackPanel Spacing="16">

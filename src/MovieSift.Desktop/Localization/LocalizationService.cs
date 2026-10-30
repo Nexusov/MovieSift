@@ -24,7 +24,15 @@ public sealed class LocalizationService : ObservableObject
         .Cast<DictionaryEntry>().ToDictionary(entry => (string)entry.Key, entry => (string)entry.Value!, StringComparer.Ordinal);
 
     /// <summary>Registers an already validated immutable pack without changing the active language.</summary>
-    public void InstallPack(TranslationPack pack) => downloaded[pack.Locale] = pack.Messages;
+    public void InstallPack(TranslationPack pack)
+    {
+        downloaded[pack.Locale] = pack.Messages;
+
+        if (Language == pack.Locale)
+        {
+            OnPropertyChanged(string.Empty);
+        }
+    }
 
     /// <summary>Selects an explicit supported language and otherwise uses English.</summary>
     public void SetLanguage(string? language)

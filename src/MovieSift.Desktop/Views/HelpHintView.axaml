@@ -2,11 +2,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="MovieSift.Desktop.Views.HelpHintView"
              x:Name="HintRoot">
-  <Button x:Name="HintButton" Classes="helpHint" Content="?" Width="24" Height="24" MinWidth="24" MinHeight="24"
+  <Button x:Name="HintButton" Classes="helpHint" Width="24" Height="24" MinWidth="24" MinHeight="24"
           Padding="0" FontSize="12" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
           AutomationProperties.Name="{Binding #HintRoot.Label}" AutomationProperties.HelpText="{Binding #HintRoot.Text}"
           ToolTip.ShowDelay="0" ToolTip.Placement="Bottom"
           PointerEntered="OnHintPointerEntered" GotFocus="OnHintFocused" LostFocus="OnHintBlurred">
+    <Path Width="16" Height="16" Stretch="Uniform" Stroke="{DynamicResource MovieSiftTextBrush}" StrokeThickness="1.6"
+          StrokeLineCap="Round" Data="M12,2 A10,10 0 1 0 12,22 A10,10 0 1 0 12,2 M9,8 C9,4 17,4 16,9 C15.5,11 12,11 12,14 M12,17 V17.1" />
     <ToolTip.Tip>
       <TextBlock Text="{Binding #HintRoot.Text}" MaxWidth="320" TextWrapping="Wrap" />
     </ToolTip.Tip>

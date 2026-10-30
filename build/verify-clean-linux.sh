@@ -6,12 +6,14 @@ repository_directory="$(cd -- "$script_directory/.." && pwd)"
 archive_path="$(realpath "$1")"
 fixture_path="$(realpath "$2")"
 mp4_fixture_path="$(realpath "$3")"
+dts_fixture_path="$(realpath "$4")"
 check_directory="$(mktemp -d "$repository_directory/artifacts/clean Linux Кириллица.XXXXXXXX")"
 
 mkdir -p "$check_directory/app Кириллица" "$check_directory/input Кириллица" "$check_directory/output Кириллица" "$check_directory/evidence"
 tar -xzf "$archive_path" -C "$check_directory/app Кириллица"
 cp -- "$fixture_path" "$check_directory/input Кириллица/--source with spaces; &.mkv"
 cp -- "$mp4_fixture_path" "$check_directory/input Кириллица/--source with spaces; &.mp4"
+cp -- "$dts_fixture_path" "$check_directory/input Кириллица/--legacy DTS source with spaces; &.mkv"
 
 docker build --platform linux/amd64 --file "$script_directory/portable-smoke.Dockerfile" --tag moviesift-portable-smoke "$script_directory"
 docker run --rm --platform linux/amd64 --network none --read-only \

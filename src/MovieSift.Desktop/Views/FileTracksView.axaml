@@ -8,10 +8,8 @@
     <Style Selector="Border.trackCard.excluded"><Setter Property="Background" Value="{DynamicResource MovieSiftSecondaryBrush}" /></Style>
     <Style Selector="Border.trackCard.excluded StackPanel.trackMetadata TextBlock"><Setter Property="Foreground" Value="{DynamicResource MovieSiftMutedBrush}" /></Style>
   </UserControl.Styles>
-  <StackPanel Spacing="8">
-    <ItemsControl x:Name="FileTrackList" ItemsSource="{Binding Tracks}" IsEnabled="{Binding CanEditPlan}">
-      <ItemsControl.ItemTemplate>
-        <DataTemplate x:DataType="viewModels:TrackViewModel">
+  <UserControl.Resources>
+        <DataTemplate x:Key="FileTrackTemplate" x:DataType="viewModels:TrackViewModel">
           <Border Classes="card trackCard" Classes.excluded="{Binding IsExcluded}" Padding="10" Margin="0,3">
             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
               <StackPanel Classes="trackMetadata" Spacing="3">
@@ -24,6 +22,7 @@
                 </WrapPanel>
                 <TextBlock Text="{Binding TitleText}" TextWrapping="Wrap" />
                 <TextBlock Text="{Binding FlagsText}" TextWrapping="Wrap" />
+                <TextBlock Text="{Binding SizeText}" Classes="muted" ToolTip.Tip="{Binding Localization[TrackSizeHelp]}" />
                 <WrapPanel IsVisible="{Binding IsAudio}">
                   <TextBlock Text="{Binding Localization[Channels]}" Margin="0,0,4,0" />
                   <TextBlock Text="{Binding ChannelsText}" />
@@ -38,8 +37,19 @@
             </Grid>
           </Border>
         </DataTemplate>
-      </ItemsControl.ItemTemplate>
-    </ItemsControl>
+  </UserControl.Resources>
+  <StackPanel Spacing="8">
+    <Expander x:Name="FileVideoSection" Header="{Binding VideoSummaryText}" IsVisible="{Binding ShowVideoSection}" IsExpanded="False" HorizontalContentAlignment="Stretch">
+      <ItemsControl x:Name="FileVideoTracks" ItemsSource="{Binding VideoTracks}" ItemTemplate="{StaticResource FileTrackTemplate}" />
+    </Expander>
+    <TabControl x:Name="FileTrackCategories" Classes="trackCategories" SelectedIndex="{Binding SelectedTrackTab, Mode=TwoWay}">
+      <TabItem Header="{Binding Localization[Audio]}">
+        <ItemsControl x:Name="FileTrackList" ItemsSource="{Binding AudioTracks}" IsEnabled="{Binding CanEditPlan}" ItemTemplate="{StaticResource FileTrackTemplate}" />
+      </TabItem>
+      <TabItem Header="{Binding Localization[Subtitles]}">
+        <ItemsControl x:Name="FileSubtitleTracks" ItemsSource="{Binding SubtitleTracks}" IsEnabled="{Binding CanEditPlan}" ItemTemplate="{StaticResource FileTrackTemplate}" />
+      </TabItem>
+    </TabControl>
     <CheckBox x:Name="FileZeroAudioConfirmation" IsChecked="{Binding ZeroAudioConfirmed, Mode=TwoWay}" IsVisible="{Binding NeedsZeroAudioConfirmation}" IsEnabled="{Binding CanEditPlan}">
       <TextBlock Text="{Binding Localization[ConfirmSilent]}" TextWrapping="Wrap" />
     </CheckBox>

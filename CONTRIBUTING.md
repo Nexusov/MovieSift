@@ -26,7 +26,7 @@ Use `dotnet format --no-restore` when needed, inspect its diff, then repeat the 
 
 These commands do not provision media tools. Optional local C# media tests skip when tools/fixtures are absent; those skips are not media coverage. The [verification workflow](.github/workflows/verify.yml) sets `MOVIESIFT_REQUIRE_MEDIA_TOOLS=1` and fails when mandatory provisioning is missing.
 
-For interface-resource changes, update all 11 downloadable packs and run `python translations/validate-packs.py --write-catalog`, `python translations/validate-packs.py` and `python -m unittest discover -s translations -p "test_*.py"`. CI requires complete keys, exact format placeholders and the current byte/hash catalog. See [translation maintenance](translations/README.md); complete coverage does not replace native-speaker review.
+For interface-resource changes, update all 14 downloadable packs and run `python lang/validate-packs.py --write-catalog`, `python lang/validate-packs.py` and `python -m unittest discover -s lang -p "test_*.py"`. CI requires complete keys, exact format placeholders and the current byte/hash catalog. See [translation maintenance](lang/README.md); complete coverage does not replace native-speaker review.
 
 ## Media tool acquisition
 
@@ -38,7 +38,7 @@ Acquisition requires network access and disk space. Its destination must be abse
 | FFmpeg/zlib source and recipe | [ffmpeg.lock.json](build/ffmpeg.lock.json) |
 | Windows worker/source validation | [distribution-inventory.py](build/distribution-inventory.py) |
 
-The application uses the bundled matching tools. A separately installed executable or two copied workers without their materials do not satisfy acquisition.
+The application uses the bundled matching tools. A separately installed executable or copied workers without their materials do not satisfy acquisition. The MKVToolNix set contains `mkvmerge`, `mkvextract` and `mkvpropedit`, all pinned to 102.0.
 
 ### Windows media setup
 
@@ -58,7 +58,7 @@ python ./build/distribution-inventory.py --validate-windows-mkv-build $mkvBuildD
 $env:MOVIESIFT_WINDOWS_MKV_BUILD_DIRECTORY = $mkvBuildDirectory
 ```
 
-The two executables and `build-receipt.json` must be directly inside that directory. Validation checks worker/DLL hashes and the complete matching source/build materials. Stop on failure; changing receipts does not make an old build compatible. Artifacts expire after three days. If none matches, ask a maintainer to run the source-build workflow.
+The three executables and `build-receipt.json` must be directly inside that directory. Validation checks worker/DLL hashes and the complete matching source/build materials. Stop on failure; changing receipts does not make an old build compatible. Artifacts expire after three days. If none matches, ask a maintainer to run the source-build workflow.
 
 #### 2. Prepare FFmpeg's build prerequisites
 
@@ -104,7 +104,7 @@ pwsh ./build/acquire-tools.ps1 -RuntimeIdentifier linux-x64 -Destination ./tools
 
 Use a whitespace-free repository/cache path for native compilation. MKVToolNix is extracted from the pinned AppImage at build time without FUSE. FFmpeg/ffprobe use the pinned source recipe and static zlib, or a verified `ffmpeg-source-linux-x64-<identity>` cache.
 
-Production MKV workers live under `tools/app-root/usr/bin`; their native library environment is set by the application. The `tools/mkvmerge` and `tools/mkvextract` wrappers serve build/fixture tooling only. FFmpeg/ffprobe live directly under `tools` on both platforms.
+Production MKV workers live under `tools/app-root/usr/bin`; their native library environment is set by the application. The `tools/mkvmerge`, `tools/mkvextract` and `tools/mkvpropedit` wrappers serve build/fixture tooling only. FFmpeg/ffprobe live directly under `tools` on both platforms.
 
 ## Fixtures and real media tests
 
@@ -159,15 +159,15 @@ Copy tools once per output directory/tool version; later launches need only the 
 Build on the target OS so native workers and executable permissions can be checked. The Windows commands reuse the variables set during acquisition:
 
 ```powershell
-pwsh ./build/package.ps1 -RuntimeIdentifier win-x64 -WindowsMkvBuildDirectory $mkvBuildDirectory -ToolCacheDirectory $toolCacheDirectory -FixturePath ./artifacts/fixtures/ordinary.mkv -Mp4FixturePath ./artifacts/fixtures/mp4/ordinary.mp4
-pwsh ./build/verify-package.ps1 -ArchivePath ./artifacts/MovieSift-win-x64.zip -FixturePath ./artifacts/fixtures/ordinary.mkv -Mp4FixturePath ./artifacts/fixtures/mp4/ordinary.mp4
+pwsh ./build/package.ps1 -RuntimeIdentifier win-x64 -WindowsMkvBuildDirectory $mkvBuildDirectory -ToolCacheDirectory $toolCacheDirectory -FixturePath ./artifacts/fixtures/ordinary.mkv -Mp4FixturePath ./artifacts/fixtures/mp4/ordinary.mp4 -DtsFixturePath ./artifacts/fixtures/dts-derived-properties-overlap.mkv
+pwsh ./build/verify-package.ps1 -ArchivePath ./artifacts/MovieSift-win-x64.zip -FixturePath ./artifacts/fixtures/ordinary.mkv -Mp4FixturePath ./artifacts/fixtures/mp4/ordinary.mp4 -DtsFixturePath ./artifacts/fixtures/dts-derived-properties-overlap.mkv
 ```
 
 On Linux:
 
 ```powershell
-pwsh ./build/package.ps1 -RuntimeIdentifier linux-x64 -FixturePath ./artifacts/fixtures/ordinary.mkv -Mp4FixturePath ./artifacts/fixtures/mp4/ordinary.mp4
-pwsh ./build/verify-package.ps1 -ArchivePath ./artifacts/MovieSift-linux-x64.tar.gz -FixturePath ./artifacts/fixtures/ordinary.mkv -Mp4FixturePath ./artifacts/fixtures/mp4/ordinary.mp4
+pwsh ./build/package.ps1 -RuntimeIdentifier linux-x64 -FixturePath ./artifacts/fixtures/ordinary.mkv -Mp4FixturePath ./artifacts/fixtures/mp4/ordinary.mp4 -DtsFixturePath ./artifacts/fixtures/dts-derived-properties-overlap.mkv
+pwsh ./build/verify-package.ps1 -ArchivePath ./artifacts/MovieSift-linux-x64.tar.gz -FixturePath ./artifacts/fixtures/ordinary.mkv -Mp4FixturePath ./artifacts/fixtures/mp4/ordinary.mp4 -DtsFixturePath ./artifacts/fixtures/dts-derived-properties-overlap.mkv
 ```
 
 Packaging includes the complete self-contained runtime, app/helper and tool closure, notices, provenance and checksums. The pinned SDK HostWriter binds the root native apphost to `app/MovieSift.dll`; no separate launcher project/compiler or single-file extraction is introduced. `app/` contains the runtime/tool payload, while `data/`, license/provenance copies and the complete manifest remain beside the root launcher. Packaging verifies this layout, the shipped runtime, license inventory and actual MKV/MP4 workflows. Use `-Overwrite` only when replacing an existing generated archive. Staging and relocation directories remain under `artifacts`.
@@ -192,7 +192,7 @@ Run only the command for the package being prepared. The bundle binds exact appl
 With Docker available on a Linux development host:
 
 ```bash
-bash ./build/verify-clean-linux.sh ./artifacts/MovieSift-linux-x64.tar.gz ./artifacts/fixtures/ordinary.mkv ./artifacts/fixtures/mp4/ordinary.mp4
+bash ./build/verify-clean-linux.sh ./artifacts/MovieSift-linux-x64.tar.gz ./artifacts/fixtures/ordinary.mkv ./artifacts/fixtures/mp4/ordinary.mp4 ./artifacts/fixtures/dts-derived-properties-overlap.mkv
 ```
 
 The [pinned Ubuntu image](build/portable-smoke.Dockerfile) includes native OS libraries, but no separately installed SDK or media tools. The check runs unprivileged and without networking, with an ASCII parent locale to exercise Unicode handling at the worker boundary. Evidence is retained beneath `artifacts/clean Linux Кириллица.*/evidence`. Docker is not an application dependency.
@@ -204,6 +204,8 @@ Native file dialogs, keyboard focus, OS scaling and window closure during work s
 Keep pull requests focused on a concrete behavior or defect. Include reproduction steps, what changed, checks actually run and material limitations. For media support changes, update the preservation matrix and relevant real-media tests.
 
 Project conventions:
+
+Desktop changes must follow the shared [UI standards](docs/UI_STANDARDS.md). Extend existing semantic styles and controls; preserve finite scroll viewports, stable rows and cosmetic/workflow separation. Add regression coverage for a demonstrated layout or lifecycle failure instead of introducing per-screen workarounds.
 
 - Keep code, documentation and commit messages in English; align English/Russian UI resource keys and formatting arguments.
 - Respect the [project boundaries](docs/ARCHITECTURE.md#project-boundaries). Use explicit constructor injection, nullable reference types and immutable workflow snapshots.

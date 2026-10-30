@@ -22,6 +22,7 @@ public sealed class BatchItemViewModel : ObservableObject
     private bool zeroAudioConfirmed;
     private Failure? planningFailure;
     private bool applyingSnapshot;
+    private int selectedTrackTab;
 
     /// <summary>Creates an editor for a stable item ID without loading global preferences.</summary>
     public BatchItemViewModel(BatchItemViewModelOptions options)
@@ -44,6 +45,12 @@ public sealed class BatchItemViewModel : ObservableObject
     public bool HasFolderOrigin => item.FolderOrigin is not null;
     public LocalizationService Localization => options.Localization;
     public ObservableCollection<TrackViewModel> Tracks { get; } = [];
+    public ObservableCollection<TrackViewModel> VideoTracks { get; } = [];
+    public ObservableCollection<TrackViewModel> AudioTracks { get; } = [];
+    public ObservableCollection<TrackViewModel> SubtitleTracks { get; } = [];
+    public bool ShowVideoSection => VideoTracks.Count > 1;
+    public string VideoSummaryText => $"{Localization["Video"]} · {VideoTracks.Count} — {Localization["AlwaysKept"]}";
+    public int SelectedTrackTab { get => selectedTrackTab; set => SetProperty(ref selectedTrackTab, value); }
     public BatchItem Snapshot => item;
     public RemuxPlan? ApprovedPlan => item.ApprovedPlan;
     public bool HasTracks => displayedInspection is not null;
@@ -201,10 +208,21 @@ public sealed class BatchItemViewModel : ObservableObject
             zeroAudioConfirmed = false;
             planningFailure = null;
             Tracks.Clear();
+            VideoTracks.Clear();
+            AudioTracks.Clear();
+            SubtitleTracks.Clear();
 
             foreach (var track in inspection.Tracks)
             {
-                Tracks.Add(new(new(track, Localization, OnTrackSelectionChanged, () => CanEditPlan && Included)));
+                var row = new TrackViewModel(new(track, Localization, OnTrackSelectionChanged, () => CanEditPlan && Included));
+                Tracks.Add(row);
+                var category = track.Kind switch
+                {
+                    TrackKind.Video => VideoTracks,
+                    TrackKind.Audio => AudioTracks,
+                    _ => SubtitleTracks
+                };
+                category.Add(row);
             }
         }
 
@@ -212,6 +230,9 @@ public sealed class BatchItemViewModel : ObservableObject
         {
             displayedInspection = null;
             Tracks.Clear();
+            VideoTracks.Clear();
+            AudioTracks.Clear();
+            SubtitleTracks.Clear();
             zeroAudioConfirmed = false;
             planningFailure = null;
         }

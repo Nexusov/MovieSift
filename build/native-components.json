@@ -297,7 +297,8 @@
       "kind": "tool-library-observation",
       "paths": [
         "tools/app-root/usr/bin/mkvextract",
-        "tools/app-root/usr/bin/mkvmerge"
+        "tools/app-root/usr/bin/mkvmerge",
+        "tools/app-root/usr/bin/mkvpropedit"
       ],
       "missing": [
         "Exact source package/revision including distribution patches for this binary build.",
@@ -2173,7 +2174,7 @@
   "unresolved": [
     {
       "component": "Windows MKVToolNix source delivery",
-      "evidence": "The same-version source-built CLI pair replaces the historical staticQt6.10.2/MXE workers. Actual DLL bytes match pinned UCRT64 packages; binary BUILDINFO recipe hashes bind their complete source/patch packages. QtCore6.12/GMP GPL2 alternatives, exact primary notices and configuration/compiler/build scripts are collected in mkvSourceBuildEvidence.",
+      "evidence": "The same-version source-built CLI workers replace the historical staticQt6.10.2/MXE workers. Actual DLL bytes match pinned UCRT64 packages; binary BUILDINFO recipe hashes bind their complete source/patch packages. QtCore6.12/GMP GPL2 alternatives, exact primary notices and configuration/compiler/build scripts are collected in mkvSourceBuildEvidence.",
       "missing": "Actually deliver the collected applicable covered-source/build materials and notices alongside the matching public binaries. The old official binary closure remains unproven historical research, not a shipped replacement dependency.",
       "primaryLocationChecked": "build/mkv-source.lock.json, build/build-mkv-windows.sh and actual worker/dependency/material receipts; primary package sources at https://repo.msys2.org/mingw/sources/",
       "nextAction": "Retain the source-built closure and provide its bound materials through the eventual release's compliant source-delivery arrangement. A private bundle or expiring CI review artifact is not that public delivery."

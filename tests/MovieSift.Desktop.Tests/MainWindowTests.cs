@@ -22,7 +22,7 @@ public sealed class MainWindowTests
         window.Show();
         await fixture.LoadAsync();
         await fixture.Workspace.ReviewCommand.ExecuteAsync(null);
-        Assert.Equal("Resulting default audio: retained track IDs 1 keep their existing default flags.", fixture.Item.PlanDefaultAudioText);
+        Assert.Equal("Resulting default audio: retained track IDs 1 keep their existing default flags", fixture.Item.PlanDefaultAudioText);
         fixture.Item.Tracks[1].Keep = false;
         Assert.False(fixture.Item.HasPlan);
         Assert.Empty(fixture.Item.PlanDefaultAudioText);
@@ -36,9 +36,9 @@ public sealed class MainWindowTests
         fixture.Item.Tracks[2].Keep = false;
         fixture.Item.ZeroAudioConfirmed = true;
         await fixture.Workspace.ReviewCommand.ExecuteAsync(null);
-        Assert.Equal("В результате не останется аудиодорожек.", fixture.Item.PlanDefaultAudioText);
+        Assert.Equal("В результате не останется аудиодорожек", fixture.Item.PlanDefaultAudioText);
         await viewModel.ChangeLanguageCommand.ExecuteAsync("en");
-        Assert.Equal("Resulting audio: no audio tracks will remain.", fixture.Item.PlanDefaultAudioText);
+        Assert.Equal("Resulting audio: no audio tracks will remain", fixture.Item.PlanDefaultAudioText);
         fixture.Item.Tracks[1].Keep = true;
         await fixture.Workspace.ReviewCommand.ExecuteAsync(null);
         Assert.Contains("retained track IDs 1 keep their existing default flags", fixture.Item.PlanDefaultAudioText);

@@ -17,6 +17,7 @@ public sealed partial class OwnedOutputStore : IOutputStore
     private const int LegacyMatroskaRecordVersion = 1;
     private const int LegacyContainerRecordVersion = 2;
     private const int RecordVersion = 3;
+    private const int ProjectionRecordVersion = 4;
     private const int OwnershipTokenBytes = 32;
     private const int OwnershipTokenCharacters = OwnershipTokenBytes * 2;
     private const string CandidateStem = "candidate";
@@ -92,6 +93,15 @@ public sealed partial class OwnedOutputStore : IOutputStore
 
             reservationBoundary?.Invoke(ReservationBoundary.MarkerWritten, output);
             request.CancellationToken.ThrowIfCancellationRequested();
+
+            if (request.RequiresInputProjection)
+            {
+                output = output with { InputProjection = await ReserveProjectionAsync(request, partial) };
+                ValidateOutput(output);
+                reservationBoundary?.Invoke(ReservationBoundary.ProjectionCreated, output);
+                request.CancellationToken.ThrowIfCancellationRequested();
+            }
+
             partial.Journal = await WriteRecordAsync(new(output, ReservedStage), request.CancellationToken, overwrite: false);
             reservationBoundary?.Invoke(ReservationBoundary.JournalPublished, output);
             request.CancellationToken.ThrowIfCancellationRequested();
@@ -127,6 +137,16 @@ public sealed partial class OwnedOutputStore : IOutputStore
         }
 
         var issues = ImmutableArray.CreateBuilder<CleanupIssue>();
+
+        try
+        {
+            RemovePartialProjection(partial);
+        }
+        catch (Exception exception)
+        {
+            issues.Add(new(partial.ProjectionPath!, exception.Message));
+            return issues.ToImmutable();
+        }
 
         try
         {
@@ -262,7 +282,7 @@ public sealed partial class OwnedOutputStore : IOutputStore
             var ownsCurrentProcess = record.OwnerProcessId == currentProcess.Id &&
                 record.OwnerStartedUtcTicks == currentProcess.StartTime.ToUniversalTime().Ticks;
             var unsafeInterruptedCleanup = !ownsCurrentProcess &&
-                (IsOriginalProcessAlive(record) || File.Exists(request.Output.CandidatePath));
+                (IsOriginalProcessAlive(record) || File.Exists(request.Output.CandidatePath) || ProjectionExists(request.Output));
 
             if (unsafeInterruptedCleanup)
             {
@@ -289,6 +309,7 @@ public sealed partial class OwnedOutputStore : IOutputStore
 
             if (ownsCurrentProcess)
             {
+                RemoveProjection(request.Output);
                 File.Delete(request.Output.CandidatePath);
             }
 
@@ -322,7 +343,7 @@ public sealed partial class OwnedOutputStore : IOutputStore
             {
                 var record = await ReadRecordAsync(path);
                 await ValidateEvidenceAsync(record);
-                var canClean = !IsOriginalProcessAlive(record) && !File.Exists(record.Output.CandidatePath) &&
+                var canClean = !IsOriginalProcessAlive(record) && !File.Exists(record.Output.CandidatePath) && !ProjectionExists(record.Output) &&
                     (record.Output.OutputMode == OutputMode.Copy || record.Stage == PublishedStage);
                 results.Add(new(record.Output, record.Stage, canClean));
             }
@@ -382,7 +403,7 @@ public sealed partial class OwnedOutputStore : IOutputStore
 
         var validOwnerIdentity = record.OwnerProcessId > 0 && record.OwnerStartedUtcTicks > 0 &&
             record.OwnerStartedUtcTicks <= DateTime.MaxValue.Ticks;
-        var validVersion = record.Version is LegacyMatroskaRecordVersion or LegacyContainerRecordVersion or RecordVersion;
+        var validVersion = record.Version is LegacyMatroskaRecordVersion or LegacyContainerRecordVersion or RecordVersion or ProjectionRecordVersion;
         var validHeader = validVersion && validOwnerIdentity;
 
         if (!validHeader)
@@ -394,17 +415,18 @@ public sealed partial class OwnedOutputStore : IOutputStore
         {
             ReservedStage => ReservedStage,
             PublishingStage => PublishingStage,
-            PublishedStage when record.Version == RecordVersion => PublishedStage,
+            PublishedStage when record.Version is RecordVersion or ProjectionRecordVersion => PublishedStage,
             _ => throw InvalidOwnership("The ownership record has an invalid stage.")
         };
         var output = ValidateOutput(record.Output);
-        var invalidLegacyMode = record.Version != RecordVersion &&
+        var invalidLegacyMode = record.Version < RecordVersion &&
             (output.OutputMode != OutputMode.Copy || output.ExpectedSource is not null || record.VerifiedCandidate is not null);
+        var invalidProjectionVersion = (record.Version == ProjectionRecordVersion) != (output.InputProjection is not null);
         var invalidPublication = stage == PublishedStage && output.OutputMode != OutputMode.ReplaceSource ||
             output.OutputMode == OutputMode.ReplaceSource && stage != ReservedStage &&
             !IsValidCandidateRevision(output, record.VerifiedCandidate);
 
-        if (invalidLegacyMode || invalidPublication)
+        if (invalidLegacyMode || invalidPublication || invalidProjectionVersion)
         {
             throw InvalidOwnership("The publication evidence does not match the ownership record version or mode.");
         }
@@ -426,7 +448,7 @@ public sealed partial class OwnedOutputStore : IOutputStore
     }
 
     /// <summary>Requires a complete operation identity and an exact canonical adjacent candidate layout.</summary>
-    private static OwnedOutput ValidateOutput(OwnedOutput? output)
+    private OwnedOutput ValidateOutput(OwnedOutput? output)
     {
         if (output is null)
         {
@@ -472,6 +494,7 @@ public sealed partial class OwnedOutputStore : IOutputStore
             throw InvalidOwnership("The temporary layout does not match its record.");
         }
 
+        ValidateProjectionDescription(output);
         return output;
     }
 
@@ -510,6 +533,11 @@ public sealed partial class OwnedOutputStore : IOutputStore
         {
             PathSafety.RejectReparsePoints(output.CandidatePath);
         }
+
+        if (ProjectionExists(output))
+        {
+            OwnedInputProjectionAccess.Validate(output.InputProjection!);
+        }
     }
 
     /// <summary>Requires the exact complete marker identity and token for normal and pre-handoff ownership checks.</summary>
@@ -546,7 +574,8 @@ public sealed partial class OwnedOutputStore : IOutputStore
     private Task<SourceRevision> WriteRecordAsync(RecordWriteRequest request, CancellationToken cancellationToken = default, bool overwrite = true)
     {
         using var process = Process.GetCurrentProcess();
-        var record = new OwnershipRecord(RecordVersion, request.Output, request.Stage, process.Id, process.StartTime.ToUniversalTime().Ticks,
+        var version = request.Output.InputProjection is null ? RecordVersion : ProjectionRecordVersion;
+        var record = new OwnershipRecord(version, request.Output, request.Stage, process.Id, process.StartTime.ToUniversalTime().Ticks,
             request.Output.Container, request.VerifiedCandidate);
         return BoundedJson.WriteAsync(new JsonWriteRequest<OwnershipRecord>(RecordPath(request.Output.JobId), record, cancellationToken, overwrite));
     }

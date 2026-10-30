@@ -2,6 +2,8 @@
 
 This document describes the current source tree. MovieSift is a desktop application that remuxes local MKV and supported MP4 files through bundled workers. It keeps encoded streams rather than re-encoding them. The [format reference](SUPPORTED_FORMATS.md) defines the preservation contract; [CONTRIBUTING](../CONTRIBUTING.md) covers builds and tests.
 
+Expected inspection, Review and job failures are logged at the desktop operation-completion boundary with the authoritative failure detail, raw worker result, verification detail and cleanup issues. Logging cannot change the job outcome or prevent command completion. Media-specific verification diagnostics identify differing property names without dumping encoded codec data.
+
 ## Project boundaries
 
 | Project | Responsibility | Dependencies |
@@ -24,7 +26,7 @@ A sole queue entry uses the shared file-local track editor directly. Multiple en
 
 The common list is the **union** of included inspections. `TrackGroupingPolicy` groups exact canonical language, title, codec/channels, forced status and semantic roles; unknown/conflicting metadata stays separate. Duplicates and per-file exceptions remain visible. Default/enabled flags are displayed separately.
 
-Exclude/Restore buttons are a presentation of the existing Keep choices, not a second selection model. Excluded cards remain in their source/group order with semantic muted colors; their restore controls remain readable. Video is locked. Mixed-group exclusion targets editable members only.
+Remove/Restore buttons are a presentation of the existing Keep choices, not a second selection model. Removed cards remain in their source/group order with semantic muted colors; their restore controls remain readable. Video is locked. Mixed-group removal targets editable members only.
 
 The projection references authoritative session choices. Group, member and remove-all-subtitles edits validate the whole request before applying it atomically. Actual edits invalidate affected plans and Review; no-op edits preserve them. Completed results stay locked.
 
@@ -121,6 +123,7 @@ Application-controlled state and bounded logs live in `data` beside the executab
 | `settings.json` | UI language |
 | `translations/<locale>.json` | Validated downloaded UI text; no media or workflow authority |
 | `appearance.json` | Independent appearance preferences |
+| `output-preferences.json` | Explicitly remembered Copy/Replace default; no approval or source paths |
 | `rule-presets.json` | Named rule configurations |
 | `queue-list.json` | Unfinished listing intent |
 | `updates.json` | Startup update-check preference |
@@ -132,15 +135,15 @@ Unavailable ownership storage disables media writes. An isolated language or app
 
 ### Interface translations and window presentation
 
-The language chooser and appearance panel are separate, mutually exclusive cosmetic views. `LanguageSettingsViewModel` owns explicit download/cancel/retry intent; `LocalizationService` publishes a complete immutable dictionary only after validation and preserves full locale identifiers. Existing shell preference writes and shutdown remain authoritative. A translation request counts as an active shell operation so close cancels and drains it before disposing HTTP resources. It owns no media worker, approval or queue revision.
+The language chooser and theme panel are separate, mutually exclusive cosmetic views. `LanguageSettingsViewModel` owns explicit download/cancel/retry intent; `LocalizationService` publishes a complete immutable dictionary only after validation and preserves full locale identifiers. Existing shell preference writes and shutdown remain authoritative. A translation request counts as an active shell operation so close cancels and drains it before disposing HTTP resources. It owns no media worker, approval or queue revision.
 
-`ITranslationPackStore` is a narrow Application port. `GitHubTranslationPackStore` resolves the small official `git/ref/heads/main` response, then reads catalog and pack from that one immutable commit. Fixed locale filenames, exact SHA256/length, complete English key coverage and composite-format placeholders are checked before caching. Responses are bounded (8 KiB reference, 64 KiB catalog, 256 KiB pack), depth-limited and subject to a 30-second deadline. Redirects and unsupported locales are rejected. Cache access uses regular-file/reparse checks, interprocess exclusion and owned temporary replacement. Invalid files remain untouched until an explicitly requested, fully validated replacement succeeds. Startup reads only local cache and falls back to English with a visible notice.
+`ITranslationPackStore` is a narrow Application port. `GitHubTranslationPackStore` resolves the small official `git/ref/heads/main` response, then reads catalog and pack from that one immutable commit. Only a resource-contract mismatch or absent supported locale permits a fallback to the exact official source commit embedded in the build; no arbitrary URI, hash or schema failure authorizes fallback. Fixed locale filenames, exact SHA256/length, complete English key coverage and composite-format placeholders are checked before caching. Responses are bounded (8 KiB reference, 64 KiB catalog, 256 KiB pack), depth-limited and subject to one 30-second deadline. Redirects and unsupported locales are rejected. Cache access uses regular-file/reparse checks, interprocess exclusion and owned temporary replacement. Startup first restores compatible local data, then performs bounded synchronization for the new build. Invalid files remain untouched when a fully validated replacement cannot be obtained.
 
-English is built in; `package.ps1` removes only the original application's Russian satellite from portable output. All 11 downloadable source packs and their exact-byte catalog live under [translations](../translations/README.md); translated binaries or executable resources are never downloaded. A complete key set is a compatibility check, not a native-speaker quality certification or independently signed authenticity proof. A new incompatible English resource contract requires corresponding repository packs; old cached incompatible data is rejected visibly.
+English is built in; `package.ps1` removes only the original application's Russian satellite from portable output. All 14 downloadable source packs and their exact-byte catalog live under [lang](../lang/README.md); translated binaries or executable resources are never downloaded. This repository directory is separate from the portable `data/translations` cache. A complete key set is a compatibility check, not a native-speaker quality certification or independently signed authenticity proof. A new incompatible English resource contract requires corresponding repository packs; old cached incompatible data is rejected visibly. First-launch background synchronization refreshes only already installed locales, validates all responses from one immutable snapshot before any cache writes, and records successful completion per build. It shares the existing bounded/cancellable language lifecycle; failed refresh retains compatible offline data.
 
-The Desktop project embeds the original film/scissors SVG, PNG and multi-resolution Windows ICO. Windows uses an integrated client caption over a resizable border; Linux keeps native decorations. Caption Close calls the existing `Window.Close()` lifecycle, and localization/appearance affect presentation only. Headless caption/layout tests are not native Windows resizing, snap or scaling acceptance.
+The Desktop project embeds the original film/scissors SVG, PNG and multi-resolution Windows ICO. Windows uses an undecorated resizable window and integrated client caption; Linux keeps native decorations. Caption Close calls the existing `Window.Close()` lifecycle, and localization/appearance affect presentation only. Headless caption/layout tests are not native Windows resizing, snap or scaling acceptance. Shared UI rules and finite motion/scrolling contracts are maintained in [UI standards](UI_STANDARDS.md).
 
-Ownership schema 3 binds output mode and replacement source/candidate revisions; legacy schemas 1/2 allow only Copy and their original layouts. Restart validates the record, paths, marker, stage and process identity. Corrupt records authorize no action; a saved PID cannot authorize termination, nor a matching filename prove publication.
+Ownership schema 3 binds output mode and replacement source/candidate revisions; legacy schemas 1/2 allow only Copy and their original layouts. Schema 4 is used only when the same job also owns an app-local input projection. It binds the reserved file identity and original revision; size/mtime may change while that owned file is copied and edited. Restart validates the record, paths, marker, stage and process identity. Corrupt records authorize no action; a saved PID cannot authorize termination, nor a matching filename prove publication.
 
 A remaining candidate is unresolved after restart because parent death does not prove worker exit. Cleanup is offered only when validated ownership/stage and process/file evidence allow it; replacement cleanup additionally requires its confirmed published record. Restart never automatically publishes, retries or resumes bytes.
 
@@ -168,7 +171,7 @@ Portable layout version 2 uses the pinned SDK's native apphost at the root, embe
 
 Startup can asynchronously check the public stable GitHub release. Disabled checks, network failure or invalid responses do not block media use. A newer compatible release opens a dismissible offer; downloading and installing require an explicit action.
 
-Updates has a permanent dedicated header entry and panel, independent of language and appearance. A newer version is indicated beside it. Manual checks remain available after startup opt-out; the existing update ViewModel owns all checks, progress, cancellation and safe installation. The supplied circular-arrow silhouette is tinted with semantic foreground resources rather than maintaining theme-specific raster variants.
+Updates has a permanent dedicated header entry and panel, independent of language and theme. A newer version is indicated beside it. Manual checks remain available after startup opt-out; the existing update ViewModel owns all checks, progress, cancellation and safe installation. Update, caption, close and disclosure icons use rounded vector strokes and semantic foreground resources rather than text glyphs or theme-specific raster variants.
 
 Staging validates archive size/hash, bounded extraction paths, the complete package manifest, runtime and assembly version from the declared layout. Linux internal file aliases become verified regular files; external links and special entries are rejected. The current bundled helper/runtime is copied from the payload directory to adjacent storage and checked before launch. New-layout data migration still copies root `data/`, never an inferred `app/data/`.
 

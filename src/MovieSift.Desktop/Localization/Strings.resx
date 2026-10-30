@@ -2,14 +2,14 @@
 <root>
   <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
   <resheader name="version"><value>2.0</value></resheader>
-  <data name="AppSubtitle" xml:space="preserve"><value>Keep the tracks you need.</value></data>
+  <data name="AppSubtitle" xml:space="preserve"><value>Keep the tracks you need</value></data>
   <data name="Language" xml:space="preserve"><value>Language / Язык</value></data>
   <data name="OpenFile" xml:space="preserve"><value>Open MKV / MP4…</value></data>
   <data name="ChooseOutput" xml:space="preserve"><value>Choose output folder…</value></data>
   <data name="Source" xml:space="preserve"><value>Source file</value></data>
   <data name="Output" xml:space="preserve"><value>Output file</value></data>
-  <data name="NoSource" xml:space="preserve"><value>Select one local MKV or MP4 to inspect its real tracks.</value></data>
-  <data name="NoOutput" xml:space="preserve"><value>Choose a separate output folder.</value></data>
+  <data name="NoSource" xml:space="preserve"><value>Select one local MKV or MP4 to inspect its real tracks</value></data>
+  <data name="NoOutput" xml:space="preserve"><value>Choose a separate output folder</value></data>
   <data name="Tracks" xml:space="preserve"><value>Tracks</value></data>
   <data name="Keep" xml:space="preserve"><value>Keep</value></data>
   <data name="TrackId" xml:space="preserve"><value>Tool ID</value></data>
@@ -39,115 +39,116 @@
   <data name="Run" xml:space="preserve"><value>Create separate output</value></data>
   <data name="Cancel" xml:space="preserve"><value>Cancel</value></data>
   <data name="Plan" xml:space="preserve"><value>Approved plan review</value></data>
-  <data name="PlanInstructions" xml:space="preserve"><value>Review the selected tracks and output path, then create a new file in the same container. Changing a selection or destination invalidates this review.</value></data>
-  <data name="ConfirmSilent" xml:space="preserve"><value>I confirm removal of every audio track (silent output).</value></data>
-  <data name="OriginalNotice" xml:space="preserve"><value>The original is preserved and still occupies disk space. Only a new file is created.</value></data>
-  <data name="VerificationNotice" xml:space="preserve"><value>Every output receives structural and metadata verification. This does not prove every encoded packet is intact.</value></data>
+  <data name="PlanInstructions" xml:space="preserve"><value>Review the selected tracks and output path, then create a new file in the same container. Changing a selection or destination invalidates this review</value></data>
+  <data name="ConfirmSilent" xml:space="preserve"><value>I confirm removal of every audio track (silent output)</value></data>
+  <data name="OriginalNotice" xml:space="preserve"><value>The original is preserved and still occupies disk space. Only a new file is created</value></data>
+  <data name="VerificationNotice" xml:space="preserve"><value>Every output receives structural and metadata verification. This does not prove every encoded packet is intact</value></data>
   <data name="Idle" xml:space="preserve"><value>Ready</value></data>
   <data name="Inspecting" xml:space="preserve"><value>Inspecting the source…</value></data>
-  <data name="InspectionReady" xml:space="preserve"><value>Tracks loaded. Select audio and subtitles to keep.</value></data>
-  <data name="PlanReady" xml:space="preserve"><value>Plan is ready for execution.</value></data>
-  <data name="PlanInvalidated" xml:space="preserve"><value>The plan changed. Review it again before processing.</value></data>
-  <data name="NoChange" xml:space="preserve"><value>No track changes. Processing is not needed.</value></data>
+  <data name="InspectionReady" xml:space="preserve"><value>Tracks loaded. Select audio and subtitles to keep</value></data>
+  <data name="PlanReady" xml:space="preserve"><value>Plan is ready for execution</value></data>
+  <data name="PlanInvalidated" xml:space="preserve"><value>The plan changed. Review it again before processing</value></data>
+  <data name="NoChange" xml:space="preserve"><value>No track changes. Processing is not needed</value></data>
   <data name="Checking" xml:space="preserve"><value>Checking source and destination…</value></data>
   <data name="Remuxing" xml:space="preserve"><value>Copying retained streams…</value></data>
+  <data name="PreparingInput" xml:space="preserve"><value>Preparing a temporary input copy…</value></data>
   <data name="Verifying" xml:space="preserve"><value>Verifying the candidate…</value></data>
   <data name="Publishing" xml:space="preserve"><value>Saving the verified result…</value></data>
   <data name="Published" xml:space="preserve"><value>New file created: {0}</value></data>
-  <data name="Cancelled" xml:space="preserve"><value>Operation cancelled.</value></data>
-  <data name="Failed" xml:space="preserve"><value>Operation failed.</value></data>
-  <data name="WarningReview" xml:space="preserve"><value>The tool reported warnings. Verified output is awaiting your review.</value></data>
+  <data name="Cancelled" xml:space="preserve"><value>Operation cancelled</value></data>
+  <data name="Failed" xml:space="preserve"><value>Operation failed</value></data>
+  <data name="WarningReview" xml:space="preserve"><value>The tool reported warnings. Verified output is awaiting your review</value></data>
   <data name="PublishWarnings" xml:space="preserve"><value>Publish with warnings</value></data>
   <data name="Discard" xml:space="preserve"><value>Discard output</value></data>
-  <data name="Discarded" xml:space="preserve"><value>The temporary output was discarded.</value></data>
+  <data name="Discarded" xml:space="preserve"><value>The temporary output was discarded</value></data>
   <data name="Diagnostics" xml:space="preserve"><value>Technical diagnostics (original language)</value></data>
   <data name="Error" xml:space="preserve"><value>Error: {0}</value></data>
   <data name="Details" xml:space="preserve"><value>Details</value></data>
-  <data name="PersistenceFailure" xml:space="preserve"><value>Portable data is unavailable. In non-persistent mode, settings cannot be saved and media writes are disabled. Move the application to a writable folder to enable processing.</value></data>
+  <data name="PersistenceFailure" xml:space="preserve"><value>Portable data is unavailable. In non-persistent mode, settings cannot be saved and media writes are disabled. Move the application to a writable folder to enable processing</value></data>
   <data name="ChooseData" xml:space="preserve"><value>Choose writable data folder…</value></data>
-  <data name="Interrupted" xml:space="preserve"><value>Interrupted temporary work requires review. Nothing will be published automatically.</value></data>
+  <data name="Interrupted" xml:space="preserve"><value>Interrupted temporary work requires review. Nothing will be published automatically</value></data>
   <data name="CleanInterrupted" xml:space="preserve"><value>Clean owned temporary files</value></data>
   <data name="CleanupIssue" xml:space="preserve"><value>Temporary cleanup needs attention: {0}</value></data>
   <data name="CloseDuringWork" xml:space="preserve"><value>Stopping the active operation safely before closing…</value></data>
-  <data name="TracksSummary" xml:space="preserve"><value>Keep {0} tracks; remove {1}.</value></data>
-  <data name="SizeDifference" xml:space="preserve"><value>Result is {0:N0} bytes smaller.</value></data>
+  <data name="TracksSummary" xml:space="preserve"><value>Keep {0} tracks; remove {1}</value></data>
+  <data name="SizeDifference" xml:space="preserve"><value>Result is {0:N0} bytes smaller</value></data>
   <data name="Backend" xml:space="preserve"><value>Media backend</value></data>
   <data name="DevelopmentTools" xml:space="preserve"><value>Development tool override</value></data>
   <data name="FileDialogTitle" xml:space="preserve"><value>Select an MKV or MP4 file</value></data>
   <data name="OutputDialogTitle" xml:space="preserve"><value>Choose a folder for the new file</value></data>
   <data name="DataDialogTitle" xml:space="preserve"><value>Choose a writable portable data folder</value></data>
-  <data name="SelectionWarning" xml:space="preserve"><value>Removing a default audio track does not assign a new default. Player choices may differ.</value></data>
-  <data name="LanguageTagNotice" xml:space="preserve"><value>Language tags are metadata and do not prove which language is spoken.</value></data>
-  <data name="NoAudioConfirmation" xml:space="preserve"><value>Confirm the silent-output decision before reviewing this plan.</value></data>
+  <data name="SelectionWarning" xml:space="preserve"><value>Removing a default audio track does not assign a new default. Player choices may differ</value></data>
+  <data name="LanguageTagNotice" xml:space="preserve"><value>Language tags are metadata and do not prove which language is spoken</value></data>
+  <data name="NoAudioConfirmation" xml:space="preserve"><value>Confirm the silent-output decision before reviewing this plan</value></data>
   <data name="Unsupported" xml:space="preserve"><value>The source contains a detected unsupported feature: {0}</value></data>
-  <data name="DestinationRequired" xml:space="preserve"><value>Choose an output folder before reviewing the plan.</value></data>
-  <data name="SourceRequired" xml:space="preserve"><value>Open an MKV or MP4 file first.</value></data>
-  <data name="CleanupHeading" xml:space="preserve"><value>Temporary cleanup is incomplete. Review the technical diagnostics below; any published output is retained.</value></data>
-  <data name="ErrorInvalidSource" xml:space="preserve"><value>Select a supported local regular MKV or MP4 file.</value></data>
-  <data name="ErrorUnsupportedContainer" xml:space="preserve"><value>The detected container is not supported in this phase.</value></data>
-  <data name="ErrorUnsupportedFeature" xml:space="preserve"><value>A detected media feature cannot be preserved safely.</value></data>
-  <data name="ErrorToolUnavailable" xml:space="preserve"><value>The bundled media tools are missing or cannot run. Re-extract the complete portable archive.</value></data>
-  <data name="ErrorToolVersionMismatch" xml:space="preserve"><value>The media tool versions do not match the pinned supported distribution.</value></data>
-  <data name="ErrorInvalidToolOutput" xml:space="preserve"><value>The media tool returned malformed, incomplete, or excessive structured data.</value></data>
-  <data name="ErrorToolFailed" xml:space="preserve"><value>The media tool failed. Review its original diagnostics below.</value></data>
-  <data name="ErrorSourceChanged" xml:space="preserve"><value>The source changed after inspection. Open and review it again.</value></data>
-  <data name="ErrorInvalidSelection" xml:space="preserve"><value>The selection is invalid. Every video track must be kept.</value></data>
-  <data name="ErrorZeroAudioConfirmationRequired" xml:space="preserve"><value>Confirm creation of a silent output before reviewing the plan.</value></data>
-  <data name="ErrorInvalidDestination" xml:space="preserve"><value>The output location is invalid or not writable. Check the output mode and file location.</value></data>
-  <data name="ErrorDestinationExists" xml:space="preserve"><value>The destination already exists. Choose another output filename.</value></data>
-  <data name="ErrorInsufficientSpace" xml:space="preserve"><value>There may be insufficient space for a complete new output alongside the original.</value></data>
-  <data name="ErrorPersistenceUnavailable" xml:space="preserve"><value>Portable ownership records cannot be stored safely. Media writes are disabled.</value></data>
-  <data name="ErrorVerificationFailed" xml:space="preserve"><value>The required verification failed. This candidate cannot be published.</value></data>
-  <data name="ErrorPublicationFailed" xml:space="preserve"><value>The verified candidate could not be published. The original is preserved.</value></data>
-  <data name="ErrorPublicationUncertain" xml:space="preserve"><value>Publication could not be confirmed. Inspect the destination; do not assume success.</value></data>
-  <data name="ErrorOwnershipInvalid" xml:space="preserve"><value>Temporary file ownership could not be verified. Automatic deletion is refused.</value></data>
-  <data name="ErrorProcessTerminationFailed" xml:space="preserve"><value>Worker termination could not be confirmed. The candidate is retained for safety.</value></data>
-  <data name="ErrorBusy" xml:space="preserve"><value>Another operation is still active.</value></data>
-  <data name="ErrorStalePlan" xml:space="preserve"><value>The approved plan is stale. Inspect and review the source again.</value></data>
-  <data name="ErrorCancelled" xml:space="preserve"><value>The operation was cancelled.</value></data>
-  <data name="ErrorIoFailure" xml:space="preserve"><value>A local file operation failed. Review the details below.</value></data>
+  <data name="DestinationRequired" xml:space="preserve"><value>Choose an output folder before reviewing the plan</value></data>
+  <data name="SourceRequired" xml:space="preserve"><value>Open an MKV or MP4 file first</value></data>
+  <data name="CleanupHeading" xml:space="preserve"><value>Temporary cleanup is incomplete. Review the technical diagnostics below; any published output is retained</value></data>
+  <data name="ErrorInvalidSource" xml:space="preserve"><value>Select a supported local regular MKV or MP4 file</value></data>
+  <data name="ErrorUnsupportedContainer" xml:space="preserve"><value>The detected container is not supported in this phase</value></data>
+  <data name="ErrorUnsupportedFeature" xml:space="preserve"><value>A detected media feature cannot be preserved safely</value></data>
+  <data name="ErrorToolUnavailable" xml:space="preserve"><value>The bundled media tools are missing or cannot run. Re-extract the complete portable archive</value></data>
+  <data name="ErrorToolVersionMismatch" xml:space="preserve"><value>The media tool versions do not match the pinned supported distribution</value></data>
+  <data name="ErrorInvalidToolOutput" xml:space="preserve"><value>The media tool returned malformed, incomplete, or excessive structured data</value></data>
+  <data name="ErrorToolFailed" xml:space="preserve"><value>The media tool failed. Review its original diagnostics below</value></data>
+  <data name="ErrorSourceChanged" xml:space="preserve"><value>The source changed after inspection. Open and review it again</value></data>
+  <data name="ErrorInvalidSelection" xml:space="preserve"><value>The selection is invalid. Every video track must be kept</value></data>
+  <data name="ErrorZeroAudioConfirmationRequired" xml:space="preserve"><value>Confirm creation of a silent output before reviewing the plan</value></data>
+  <data name="ErrorInvalidDestination" xml:space="preserve"><value>The output location is invalid or not writable. Check the output mode and file location</value></data>
+  <data name="ErrorDestinationExists" xml:space="preserve"><value>The destination already exists. Choose another output filename</value></data>
+  <data name="ErrorInsufficientSpace" xml:space="preserve"><value>There may be insufficient space for a complete new output alongside the original</value></data>
+  <data name="ErrorPersistenceUnavailable" xml:space="preserve"><value>Portable ownership records cannot be stored safely. Media writes are disabled</value></data>
+  <data name="ErrorVerificationFailed" xml:space="preserve"><value>The required verification failed. This candidate cannot be published</value></data>
+  <data name="ErrorPublicationFailed" xml:space="preserve"><value>The verified candidate could not be published. The original is preserved</value></data>
+  <data name="ErrorPublicationUncertain" xml:space="preserve"><value>Publication could not be confirmed. Inspect the destination; do not assume success</value></data>
+  <data name="ErrorOwnershipInvalid" xml:space="preserve"><value>Temporary file ownership could not be verified. Automatic deletion is refused</value></data>
+  <data name="ErrorProcessTerminationFailed" xml:space="preserve"><value>Worker termination could not be confirmed. The candidate is retained for safety</value></data>
+  <data name="ErrorBusy" xml:space="preserve"><value>Another operation is still active</value></data>
+  <data name="ErrorStalePlan" xml:space="preserve"><value>The approved plan is stale. Inspect and review the source again</value></data>
+  <data name="ErrorCancelled" xml:space="preserve"><value>The operation was cancelled</value></data>
+  <data name="ErrorIoFailure" xml:space="preserve"><value>A local file operation failed. Review the details below</value></data>
   <data name="Remove" xml:space="preserve"><value>Remove</value></data>
-  <data name="InterruptedCleanable" xml:space="preserve"><value>Ownership validated; the empty temporary directory can be cleaned.</value></data>
-  <data name="InterruptedUnresolved" xml:space="preserve"><value>Automatic cleanup is unavailable. Review ownership and worker state before manual cleanup. Start a fresh operation from the source; this candidate cannot be published after restart.</value></data>
-  <data name="CloseUnconfirmedNotice" xml:space="preserve"><value>The worker's termination is unconfirmed. Keep this window open to review diagnostics, or explicitly close the application while retaining its temporary files.</value></data>
+  <data name="InterruptedCleanable" xml:space="preserve"><value>Ownership validated; the empty temporary directory can be cleaned</value></data>
+  <data name="InterruptedUnresolved" xml:space="preserve"><value>Automatic cleanup is unavailable. Review ownership and worker state before manual cleanup. Start a fresh operation from the source; this candidate cannot be published after restart</value></data>
+  <data name="CloseUnconfirmedNotice" xml:space="preserve"><value>The worker's termination is unconfirmed. Keep this window open to review diagnostics, or explicitly close the application while retaining its temporary files</value></data>
   <data name="CloseDespiteUncertainty" xml:space="preserve"><value>Close application; retain temporary files</value></data>
   <data name="Finishing" xml:space="preserve"><value>Completing the operation…</value></data>
-  <data name="DiscardCleanupIncomplete" xml:space="preserve"><value>Discard was requested, but temporary cleanup is incomplete. Review the cleanup details.</value></data>
+  <data name="DiscardCleanupIncomplete" xml:space="preserve"><value>Discard was requested, but temporary cleanup is incomplete. Review the cleanup details</value></data>
   <data name="PublishedWithWarnings" xml:space="preserve"><value>New file published with warnings after explicit approval: {0}</value></data>
-  <data name="SizeIncrease" xml:space="preserve"><value>Result is {0:N0} bytes larger.</value></data>
+  <data name="SizeIncrease" xml:space="preserve"><value>Result is {0:N0} bytes larger</value></data>
   <data name="Yes" xml:space="preserve"><value>yes</value></data>
   <data name="No" xml:space="preserve"><value>no</value></data>
-  <data name="MediaFeatures" xml:space="preserve"><value>Attachments: {0}. Chapters: {1}. User tags: {2}.</value></data>
-  <data name="PreservationSummary" xml:space="preserve"><value>Keep every video track and supported attachment, ordinary chapters and supported user tags. Retained stream order and effective flags are preserved.</value></data>
+  <data name="MediaFeatures" xml:space="preserve"><value>Attachments: {0}. Chapters: {1}. User tags: {2}</value></data>
+  <data name="PreservationSummary" xml:space="preserve"><value>Keep every video track and supported attachment, ordinary chapters and supported user tags. Retained stream order and effective flags are preserved</value></data>
   <data name="InterruptedPaths" xml:space="preserve"><value>Temporary candidate: {0}&#10;Planned output (publication unconfirmed): {1}</value></data>
-  <data name="ErrorReasonLinkedSegments" xml:space="preserve"><value>Linked Matroska segments are unsupported. Choose a standalone MKV without segment links.</value></data>
-  <data name="ErrorReasonTrackType" xml:space="preserve"><value>The file contains an unsupported track type. Only video, audio and subtitle tracks can be processed.</value></data>
-  <data name="ErrorReasonHdrMetadata" xml:space="preserve"><value>Detected advanced HDR or Dolby Vision metadata is outside the supported preservation contract.</value></data>
-  <data name="ErrorReasonChapterReferences" xml:space="preserve"><value>Chapter references cannot be preserved safely for this source or selection. Keep the referenced tracks or choose a source without these references.</value></data>
-  <data name="ErrorReasonOrderedChapters" xml:space="preserve"><value>Ordered chapters are unsupported. Choose a file with ordinary, self-contained chapters.</value></data>
-  <data name="ErrorReasonTagTargets" xml:space="preserve"><value>User tags target unsupported container elements. This file cannot be processed safely.</value></data>
-  <data name="ErrorReasonDanglingTrackTags" xml:space="preserve"><value>User tags contain unresolved track references. This file cannot be processed safely.</value></data>
-  <data name="ErrorReasonRedirectedPath" xml:space="preserve"><value>A symbolic link, junction or reparse point was detected. Choose direct local file and directory paths.</value></data>
-  <data name="ErrorReasonNetworkPath" xml:space="preserve"><value>Network paths are unsupported in this workflow. Choose a local source and destination.</value></data>
-  <data name="ErrorReasonRegularFileRequired" xml:space="preserve"><value>Select an ordinary local file. Directories and special files are unsupported.</value></data>
-  <data name="PlanDefaultAudioRetained" xml:space="preserve"><value>Resulting default audio: retained track IDs {0} keep their existing default flags.</value></data>
-  <data name="PlanNoDefaultAudio" xml:space="preserve"><value>Resulting default audio: none of the retained audio tracks has the default flag. No new default is assigned.</value></data>
-  <data name="PlanNoAudio" xml:space="preserve"><value>Resulting audio: no audio tracks will remain.</value></data>
-  <data name="CloseWarningReview" xml:space="preserve"><value>This output has not been published. Stay in warning review, or discard the temporary output and close after cleanup finishes. A cleanup failure keeps the window open.</value></data>
+  <data name="ErrorReasonLinkedSegments" xml:space="preserve"><value>Linked Matroska segments are unsupported. Choose a standalone MKV without segment links</value></data>
+  <data name="ErrorReasonTrackType" xml:space="preserve"><value>The file contains an unsupported track type. Only video, audio and subtitle tracks can be processed</value></data>
+  <data name="ErrorReasonHdrMetadata" xml:space="preserve"><value>Detected advanced HDR or Dolby Vision metadata is outside the supported preservation contract</value></data>
+  <data name="ErrorReasonChapterReferences" xml:space="preserve"><value>Chapter references cannot be preserved safely for this source or selection. Keep the referenced tracks or choose a source without these references</value></data>
+  <data name="ErrorReasonOrderedChapters" xml:space="preserve"><value>Ordered chapters are unsupported. Choose a file with ordinary, self-contained chapters</value></data>
+  <data name="ErrorReasonTagTargets" xml:space="preserve"><value>User tags target unsupported container elements. This file cannot be processed safely</value></data>
+  <data name="ErrorReasonDanglingTrackTags" xml:space="preserve"><value>User tags contain unresolved track references. This file cannot be processed safely</value></data>
+  <data name="ErrorReasonRedirectedPath" xml:space="preserve"><value>A symbolic link, junction or reparse point was detected. Choose direct local file and directory paths</value></data>
+  <data name="ErrorReasonNetworkPath" xml:space="preserve"><value>Network paths are unsupported in this workflow. Choose a local source and destination</value></data>
+  <data name="ErrorReasonRegularFileRequired" xml:space="preserve"><value>Select an ordinary local file. Directories and special files are unsupported</value></data>
+  <data name="PlanDefaultAudioRetained" xml:space="preserve"><value>Resulting default audio: retained track IDs {0} keep their existing default flags</value></data>
+  <data name="PlanNoDefaultAudio" xml:space="preserve"><value>Resulting default audio: none of the retained audio tracks has the default flag. No new default is assigned</value></data>
+  <data name="PlanNoAudio" xml:space="preserve"><value>Resulting audio: no audio tracks will remain</value></data>
+  <data name="CloseWarningReview" xml:space="preserve"><value>This output has not been published. Stay in warning review, or discard the temporary output and close after cleanup finishes. A cleanup failure keeps the window open</value></data>
   <data name="RemainInWarningReview" xml:space="preserve"><value>Stay in review</value></data>
   <data name="DiscardWarningsAndClose" xml:space="preserve"><value>Discard output and close</value></data>
-  <data name="InterruptedInvalidRecord" xml:space="preserve"><value>An ownership record is invalid or incomplete and needs manual review. Automatic cleanup and deletion are disabled for this entry.</value></data>
-  <data name="ErrorReasonSegmentStructure" xml:space="preserve"><value>The Segment Info cannot be inspected within the supported bounds. Choose a standalone MKV with finite element sizes; streaming clusters and multiple segments are unsupported.</value></data>
-  <data name="BatchInstructions" xml:space="preserve"><value>Add one or more MKV/MP4 files or a folder. Choose tracks across included files, choose destinations, then Review the individual plans before running.</value></data>
-  <data name="BatchLimits" xml:space="preserve"><value>Limits: {0} files per queue; {1} examined entries across the whole folder scan. Exceeding a limit rejects the addition in full.</value></data>
+  <data name="InterruptedInvalidRecord" xml:space="preserve"><value>An ownership record is invalid or incomplete and needs manual review. Automatic cleanup and deletion are disabled for this entry</value></data>
+  <data name="ErrorReasonSegmentStructure" xml:space="preserve"><value>The Segment Info cannot be inspected within the supported bounds. Choose a standalone MKV with finite element sizes; streaming clusters and multiple segments are unsupported</value></data>
+  <data name="BatchInstructions" xml:space="preserve"><value>Add one or more MKV/MP4 files or a folder. Choose tracks across included files, choose destinations, then Review the individual plans before running</value></data>
+  <data name="BatchLimits" xml:space="preserve"><value>Limits: {0} files per queue; {1} examined entries across the whole folder scan. Exceeding a limit rejects the addition in full</value></data>
   <data name="BatchAddFiles" xml:space="preserve"><value>Add files…</value></data>
   <data name="BatchAddFolder" xml:space="preserve"><value>Add a folder…</value></data>
   <data name="BatchFilesDialogTitle" xml:space="preserve"><value>Select one or more MKV/MP4 files</value></data>
   <data name="BatchFolderDialogTitle" xml:space="preserve"><value>Choose one folder with MKV/MP4 files</value></data>
   <data name="BatchFiles" xml:space="preserve"><value>Input files</value></data>
-  <data name="BatchInclusionHint" xml:space="preserve"><value>Included files are reviewed together. Correct or explicitly exclude unresolved files.</value></data>
+  <data name="BatchInclusionHint" xml:space="preserve"><value>Included files are reviewed together. Correct or explicitly exclude unresolved files</value></data>
   <data name="BatchInclude" xml:space="preserve"><value>Include file</value></data>
-  <data name="BatchSummary" xml:space="preserve"><value>{0} files · {1} included · {2} finished</value></data>
+  <data name="BatchSummary" xml:space="preserve"><value>Files: {0} · Included: {1} · Finished: {2}</value></data>
   <data name="BatchRemove" xml:space="preserve"><value>Remove from list</value></data>
   <data name="BatchInspectPending" xml:space="preserve"><value>Inspect pending files</value></data>
   <data name="BatchInspectSelected" xml:space="preserve"><value>Reinspect file</value></data>
@@ -156,20 +157,20 @@
   <data name="BatchExcluded" xml:space="preserve"><value>Explicitly excluded files (will not run)</value></data>
   <data name="BatchStart" xml:space="preserve"><value>Start / resume reviewed items</value></data>
   <data name="BatchNew" xml:space="preserve"><value>New queue</value></data>
-  <data name="BatchNewConfirmation" xml:space="preserve"><value>Start a new batch? The current list and plans will be cleared. Files already created remain on disk.</value></data>
+  <data name="BatchNewConfirmation" xml:space="preserve"><value>Start a new batch? The current list and plans will be cleared. Files already created remain on disk</value></data>
   <data name="BatchNewConfirm" xml:space="preserve"><value>Clear list and start new batch</value></data>
   <data name="BatchKeepCurrent" xml:space="preserve"><value>Keep current batch</value></data>
   <data name="BatchPauseAfterCurrent" xml:space="preserve"><value>Pause after current file</value></data>
   <data name="BatchCancel" xml:space="preserve"><value>Cancel batch</value></data>
-  <data name="BatchExplicitResume" xml:space="preserve"><value>Resolving this warning does not start the next file. Review the remaining batch and explicitly start it.</value></data>
-  <data name="BatchQueuePolicy" xml:space="preserve"><value>Unfinished source/destination listings are saved locally for explicit Restore or Discard after restart. Restored files require fresh inspection, selections, approvals and Review. No automatic retry or byte-offset resume. Published outputs remain intact. Failures, warnings, cancellation and cleanup problems pause the queue; rules require Preview and Apply.</value></data>
-  <data name="BatchPreparing" xml:space="preserve"><value>Choose tracks, then review changes.</value></data>
+  <data name="BatchExplicitResume" xml:space="preserve"><value>Resolving this warning does not start the next file. Review the remaining batch and explicitly start it</value></data>
+  <data name="BatchQueuePolicy" xml:space="preserve"><value>Unfinished source/destination listings are saved locally for explicit Restore or Discard after restart. Restored files require fresh inspection, selections, approvals and Review. No automatic retry or byte-offset resume. Published outputs remain intact. Failures, warnings, cancellation and cleanup problems pause the queue; rules require Preview and Apply</value></data>
+  <data name="BatchPreparing" xml:space="preserve"><value>Choose tracks, then review changes</value></data>
   <data name="BatchInspecting" xml:space="preserve"><value>Inspecting each file independently…</value></data>
   <data name="BatchReviewing" xml:space="preserve"><value>Checking changes and destinations…</value></data>
-  <data name="BatchReady" xml:space="preserve"><value>Changes reviewed. Ready to process.</value></data>
+  <data name="BatchReady" xml:space="preserve"><value>Changes reviewed. Ready to process</value></data>
   <data name="BatchRunning" xml:space="preserve"><value>Processing approved files sequentially…</value></data>
-  <data name="BatchPaused" xml:space="preserve"><value>Batch paused. Published outputs remain intact.</value></data>
-  <data name="BatchCompleted" xml:space="preserve"><value>All reviewed items finished.</value></data>
+  <data name="BatchPaused" xml:space="preserve"><value>Batch paused. Published outputs remain intact</value></data>
+  <data name="BatchCompleted" xml:space="preserve"><value>All reviewed items finished</value></data>
   <data name="BatchItemPendingInspection" xml:space="preserve"><value>Pending inspection</value></data>
   <data name="BatchItemInspecting" xml:space="preserve"><value>Inspecting…</value></data>
   <data name="BatchItemNeedsReview" xml:space="preserve"><value>Ready to choose tracks</value></data>
@@ -182,19 +183,19 @@
   <data name="BatchItemNoChange" xml:space="preserve"><value>Unchanged</value></data>
   <data name="BatchItemFailed" xml:space="preserve"><value>Failed; review required</value></data>
   <data name="BatchItemCancelled" xml:space="preserve"><value>Cancelled; later items were not started</value></data>
-  <data name="BatchPauseRequestedPending" xml:space="preserve"><value>Pause requested. The active file will finish safely before dispatch stops.</value></data>
-  <data name="BatchPauseRequested" xml:space="preserve"><value>Paused at a safe boundary. Review remaining plans to resume explicitly.</value></data>
-  <data name="BatchPauseWarningReview" xml:space="preserve"><value>Resolve the current warning candidate first. Remaining files will not start automatically.</value></data>
-  <data name="BatchPauseItemFailed" xml:space="preserve"><value>A file failed. Correct or exclude it, then review the remaining changes.</value></data>
-  <data name="BatchPauseCancelled" xml:space="preserve"><value>Cancellation stopped further dispatch. Resolve any cancelled item and review remaining work explicitly.</value></data>
-  <data name="BatchPauseCleanupRequired" xml:space="preserve"><value>Owned cleanup is incomplete. Further execution is blocked; review diagnostics. Published outputs are retained.</value></data>
-  <data name="BatchPauseUnsafeOwnership" xml:space="preserve"><value>Worker termination or publication could not be confirmed. Further execution is blocked and ownership evidence is retained.</value></data>
-  <data name="BatchCleanupCloseNotice" xml:space="preserve"><value>Owned cleanup remains unresolved. Review diagnostics before closing. Remaining evidence is retained; this in-memory queue will not be restored.</value></data>
-  <data name="ErrorReasonBatchFileLimit" xml:space="preserve"><value>Too many file entries. Reduce the selection or folder contents; no partial addition was accepted.</value></data>
-  <data name="ErrorReasonBatchEntryLimit" xml:space="preserve"><value>The folder contains too many entries to scan within the displayed limit. Use a smaller folder; no partial addition was accepted.</value></data>
-  <data name="ErrorReasonInvalidBatchInput" xml:space="preserve"><value>Choose several local MKV/MP4 files or exactly one local folder, without directory links.</value></data>
+  <data name="BatchPauseRequestedPending" xml:space="preserve"><value>Pause requested. The active file will finish safely before dispatch stops</value></data>
+  <data name="BatchPauseRequested" xml:space="preserve"><value>Paused at a safe boundary. Review remaining plans to resume explicitly</value></data>
+  <data name="BatchPauseWarningReview" xml:space="preserve"><value>Resolve the current warning candidate first. Remaining files will not start automatically</value></data>
+  <data name="BatchPauseItemFailed" xml:space="preserve"><value>A file failed. Correct or exclude it, then review the remaining changes</value></data>
+  <data name="BatchPauseCancelled" xml:space="preserve"><value>Cancellation stopped further dispatch. Resolve any cancelled item and review remaining work explicitly</value></data>
+  <data name="BatchPauseCleanupRequired" xml:space="preserve"><value>Owned cleanup is incomplete. Further execution is blocked; review diagnostics. Published outputs are retained</value></data>
+  <data name="BatchPauseUnsafeOwnership" xml:space="preserve"><value>Worker termination or publication could not be confirmed. Further execution is blocked and ownership evidence is retained</value></data>
+  <data name="BatchCleanupCloseNotice" xml:space="preserve"><value>Owned cleanup remains unresolved. Review diagnostics before closing. Remaining evidence is retained; this in-memory queue will not be restored</value></data>
+  <data name="ErrorReasonBatchFileLimit" xml:space="preserve"><value>Too many file entries. Reduce the selection or folder contents; no partial addition was accepted</value></data>
+  <data name="ErrorReasonBatchEntryLimit" xml:space="preserve"><value>The folder contains too many entries to scan within the displayed limit. Use a smaller folder; no partial addition was accepted</value></data>
+  <data name="ErrorReasonInvalidBatchInput" xml:space="preserve"><value>Choose several local MKV/MP4 files or exactly one local folder, without directory links</value></data>
   <data name="RuleHeading" xml:space="preserve"><value>Batch language and title rules</value></data>
-  <data name="RuleHint" xml:space="preserve"><value>Unchecked categories leave current choices unchanged. Enable a category to keep every matching track independently in each file. Preview first; nothing changes until you apply.</value></data>
+  <data name="RuleHint" xml:space="preserve"><value>Unchecked categories leave current choices unchanged. Enable a category to keep every matching track independently in each file. Preview first; nothing changes until you apply</value></data>
   <data name="RuleAudio" xml:space="preserve"><value>Keep all audio matching these language codes</value></data>
   <data name="RuleSubtitles" xml:space="preserve"><value>Keep all subtitles matching these language codes</value></data>
   <data name="RuleAudioCodes" xml:space="preserve"><value>Audio language codes (comma separated)</value></data>
@@ -203,104 +204,104 @@
   <data name="RuleSubtitleTitleFilter" xml:space="preserve"><value>Also require subtitle title to contain text</value></data>
   <data name="RuleSubtitleTitleContains" xml:space="preserve"><value>Subtitle title contains (literal text)</value></data>
   <data name="RuleForcedSubtitlesOnly" xml:space="preserve"><value>Keep only forced subtitles</value></data>
-  <data name="RuleForcedSubtitleHelp" xml:space="preserve"><value>Uses the inspected track's forced flag in addition to language and optional title. Selects whole tracks; subtitle text and individual events are not inspected.</value></data>
-  <data name="RuleTitleHelp" xml:space="preserve"><value>Optional title text is combined with the language rule. It matches the actual track title, ignoring case and trimming surrounding search whitespace. Punctuation is literal; blank titles do not match. No regular expressions or wildcards.</value></data>
+  <data name="RuleForcedSubtitleHelp" xml:space="preserve"><value>Uses the inspected track's forced flag in addition to language and optional title. Selects whole tracks; subtitle text and individual events are not inspected</value></data>
+  <data name="RuleTitleHelp" xml:space="preserve"><value>Optional title text is combined with the language rule. It matches the actual track title, ignoring case and trimming surrounding search whitespace. Punctuation is literal; blank titles do not match. No regular expressions or wildcards</value></data>
   <data name="RuleSubtitleCodes" xml:space="preserve"><value>Subtitle language codes (comma separated)</value></data>
-  <data name="RuleTagHelp" xml:space="preserve"><value>Comma-separated codes, e.g. en, ger, ru-RU, sr-Latn. Tags match exactly: ru does not match ru-RU. Supported tags have an ISO language plus optional script/region. Language metadata is not proof of the language spoken.</value></data>
+  <data name="RuleTagHelp" xml:space="preserve"><value>Comma-separated codes, e.g. en, ger, ru-RU, sr-Latn. Tags match exactly: ru does not match ru-RU. Supported tags have an ISO language plus optional script/region. Language metadata is not proof of the language spoken</value></data>
   <data name="RulePreview" xml:space="preserve"><value>Preview language choices</value></data>
   <data name="RuleApply" xml:space="preserve"><value>Apply proposed choices</value></data>
   <data name="RuleDismiss" xml:space="preserve"><value>Dismiss preview</value></data>
-  <data name="RulePreviewSummary" xml:space="preserve"><value>Entries shown: {0}; would change: {1}; manual review: {2}. Nothing has been applied.</value></data>
-  <data name="RuleAppliedSummary" xml:space="preserve"><value>Files changed: {0}. Files requiring manual review and left unchanged: {1}. Approve changed plans, then explicitly Review and Start.</value></data>
-  <data name="RulePreviewStale" xml:space="preserve"><value>The batch changed. Create a fresh language preview before applying.</value></data>
-  <data name="RuleFileChanged" xml:space="preserve"><value>Proposed choices — not yet applied.</value></data>
-  <data name="RuleFileApplied" xml:space="preserve"><value>Choices applied. Review this file and explicitly approve its plan.</value></data>
-  <data name="RuleFileUnchanged" xml:space="preserve"><value>Current choices already satisfy the rules; approvals remain unchanged.</value></data>
-  <data name="RuleFileManualReview" xml:space="preserve"><value>Manual review required. All current choices for this file remain unchanged.</value></data>
-  <data name="RuleFileExcluded" xml:space="preserve"><value>Excluded entry — rules do not change it.</value></data>
-  <data name="RuleFileCompleted" xml:space="preserve"><value>Completed file — rules do not change it or its published output.</value></data>
-  <data name="RuleFileNoChange" xml:space="preserve"><value>Finished no-change item — rules do not change it.</value></data>
-  <data name="RuleFilePendingInspection" xml:space="preserve"><value>Inspect this entry before using language rules. No proposal or automatic exclusion.</value></data>
-  <data name="RuleFileFailed" xml:space="preserve"><value>Inspect and review this failed entry manually. Rules do not change it.</value></data>
-  <data name="RuleFileCancelled" xml:space="preserve"><value>Inspect and review this cancelled entry manually. Rules do not change it.</value></data>
+  <data name="RulePreviewSummary" xml:space="preserve"><value>Entries shown: {0}; would change: {1}; manual review: {2}. Nothing has been applied</value></data>
+  <data name="RuleAppliedSummary" xml:space="preserve"><value>Files changed: {0}. Files requiring manual review and left unchanged: {1}. Approve changed plans, then explicitly Review and Start</value></data>
+  <data name="RulePreviewStale" xml:space="preserve"><value>The batch changed. Create a fresh language preview before applying</value></data>
+  <data name="RuleFileChanged" xml:space="preserve"><value>Proposed choices — not yet applied</value></data>
+  <data name="RuleFileApplied" xml:space="preserve"><value>Choices applied. Review this file and explicitly approve its plan</value></data>
+  <data name="RuleFileUnchanged" xml:space="preserve"><value>Current choices already satisfy the rules; approvals remain unchanged</value></data>
+  <data name="RuleFileManualReview" xml:space="preserve"><value>Manual review required. All current choices for this file remain unchanged</value></data>
+  <data name="RuleFileExcluded" xml:space="preserve"><value>Excluded entry — rules do not change it</value></data>
+  <data name="RuleFileCompleted" xml:space="preserve"><value>Completed file — rules do not change it or its published output</value></data>
+  <data name="RuleFileNoChange" xml:space="preserve"><value>Finished no-change item — rules do not change it</value></data>
+  <data name="RuleFilePendingInspection" xml:space="preserve"><value>Inspect this entry before using language rules. No proposal or automatic exclusion</value></data>
+  <data name="RuleFileFailed" xml:space="preserve"><value>Inspect and review this failed entry manually. Rules do not change it</value></data>
+  <data name="RuleFileCancelled" xml:space="preserve"><value>Inspect and review this cancelled entry manually. Rules do not change it</value></data>
   <data name="RuleCurrentChoices" xml:space="preserve"><value>Current choices (unchanged)</value></data>
   <data name="RuleProposedChoices" xml:space="preserve"><value>Per-file track choices</value></data>
-  <data name="RuleNoSubtitleMatches" xml:space="preserve"><value>No subtitle track matches this rule. This proposal keeps no subtitles.</value></data>
+  <data name="RuleNoSubtitleMatches" xml:space="preserve"><value>No subtitle track matches this rule. This proposal keeps no subtitles</value></data>
   <data name="RuleLegacyLanguage" xml:space="preserve"><value>Legacy language</value></data>
-  <data name="RuleIssueEmptyLanguageSelection" xml:space="preserve"><value>Select at least one language code for the enabled rule.</value></data>
-  <data name="RuleIssueEmptyTitleFilter" xml:space="preserve"><value>Enter non-blank title text or disable the title filter. This file is unchanged.</value></data>
-  <data name="RuleIssueInvalidRuleLanguage" xml:space="preserve"><value>The rule contains an unknown or unsupported language tag. Correct the codes and preview again.</value></data>
-  <data name="RuleIssueUnknownLanguage" xml:space="preserve"><value>Unknown or undetermined language metadata requires manual review.</value></data>
-  <data name="RuleIssueMalformedLanguage" xml:space="preserve"><value>Malformed or unsupported language metadata requires manual review.</value></data>
-  <data name="RuleIssueConflictingLanguage" xml:space="preserve"><value>Legacy and IETF language fields conflict. Review this file manually.</value></data>
-  <data name="RuleIssueNoAudioMatches" xml:space="preserve"><value>No audio track matches this rule. This file is unchanged; choose audio manually. Removing all audio still requires per-file confirmation.</value></data>
-  <data name="RuleIssueInvalidCurrentSelection" xml:space="preserve"><value>The current track selection requires manual correction.</value></data>
+  <data name="RuleIssueEmptyLanguageSelection" xml:space="preserve"><value>Select at least one language code for the enabled rule</value></data>
+  <data name="RuleIssueEmptyTitleFilter" xml:space="preserve"><value>Enter non-blank title text or disable the title filter. This file is unchanged</value></data>
+  <data name="RuleIssueInvalidRuleLanguage" xml:space="preserve"><value>The rule contains an unknown or unsupported language tag. Correct the codes and preview again</value></data>
+  <data name="RuleIssueUnknownLanguage" xml:space="preserve"><value>Unknown or undetermined language metadata requires manual review</value></data>
+  <data name="RuleIssueMalformedLanguage" xml:space="preserve"><value>Malformed or unsupported language metadata requires manual review</value></data>
+  <data name="RuleIssueConflictingLanguage" xml:space="preserve"><value>Legacy and IETF language fields conflict. Review this file manually</value></data>
+  <data name="RuleIssueNoAudioMatches" xml:space="preserve"><value>No audio track matches this rule. This file is unchanged; choose audio manually. Removing all audio still requires per-file confirmation</value></data>
+  <data name="RuleIssueInvalidCurrentSelection" xml:space="preserve"><value>The current track selection requires manual correction</value></data>
   <data name="PresetHeading" xml:space="preserve"><value>Named rule presets</value></data>
-  <data name="PresetHint" xml:space="preserve"><value>Selection alone does not load a preset. Load restores only rule settings; Preview, Apply and plan approval remain explicit.</value></data>
+  <data name="PresetHint" xml:space="preserve"><value>Selection alone does not load a preset. Load restores only rule settings; Preview, Apply and plan approval remain explicit</value></data>
   <data name="PresetChoose" xml:space="preserve"><value>Saved rule preset</value></data>
   <data name="PresetName" xml:space="preserve"><value>Name for Save as new or Rename</value></data>
-  <data name="PresetNameHelp" xml:space="preserve"><value>1–80 characters; surrounding spaces are trimmed. Names must be unique, ignoring case.</value></data>
+  <data name="PresetNameHelp" xml:space="preserve"><value>1–80 characters; surrounding spaces are trimmed. Names must be unique, ignoring case</value></data>
   <data name="PresetSaveNew" xml:space="preserve"><value>Save as new</value></data>
   <data name="PresetLoad" xml:space="preserve"><value>Load</value></data>
   <data name="PresetRename" xml:space="preserve"><value>Rename</value></data>
   <data name="PresetDelete" xml:space="preserve"><value>Delete preset…</value></data>
   <data name="PresetRefresh" xml:space="preserve"><value>Reload catalog</value></data>
-  <data name="PresetDeleteConfirmation" xml:space="preserve"><value>Delete preset “{0}”? Current rule settings and existing files will remain unchanged.</value></data>
+  <data name="PresetDeleteConfirmation" xml:space="preserve"><value>Delete preset “{0}”? Current rule settings and existing files will remain unchanged</value></data>
   <data name="PresetDeleteConfirm" xml:space="preserve"><value>Delete preset</value></data>
   <data name="PresetDeleteDecline" xml:space="preserve"><value>Keep preset</value></data>
   <data name="PresetWorking" xml:space="preserve"><value>Reading or saving presets…</value></data>
-  <data name="PresetSaved" xml:space="preserve"><value>Saved as a new preset. Current rules and plans are unchanged.</value></data>
-  <data name="PresetRenamed" xml:space="preserve"><value>Preset renamed. Current rules and plans are unchanged.</value></data>
-  <data name="PresetDeleted" xml:space="preserve"><value>Preset deleted. Loaded rule values remain in the editor.</value></data>
-  <data name="PresetLoaded" xml:space="preserve"><value>Rule settings loaded. Create a fresh Preview before applying choices.</value></data>
-  <data name="PresetAlreadyLoaded" xml:space="preserve"><value>These rule settings are already in the editor. The current Preview is preserved.</value></data>
-  <data name="PresetLoadStale" xml:space="preserve"><value>The editor, selection or batch changed while loading. No rule settings were replaced; load again if needed.</value></data>
-  <data name="PresetCommittedCleanupIssue" xml:space="preserve"><value>The catalog was saved, but temporary-file cleanup reported a problem. See details.</value></data>
-  <data name="PresetErrorBusy" xml:space="preserve"><value>Another application instance is using the preset catalog. Try again after it finishes.</value></data>
-  <data name="PresetErrorInvalidName" xml:space="preserve"><value>Enter a name with 1–80 characters and no control characters.</value></data>
-  <data name="PresetErrorDuplicateName" xml:space="preserve"><value>A preset with this name already exists. Choose another name.</value></data>
-  <data name="PresetErrorInvalidConfiguration" xml:space="preserve"><value>Correct the active rule configuration before saving this preset.</value></data>
-  <data name="PresetErrorInvalidCatalog" xml:space="preserve"><value>The preset catalog is invalid and was preserved. Correct the file, then reload the catalog. Manual rules remain available.</value></data>
-  <data name="PresetErrorUnsupportedVersion" xml:space="preserve"><value>This catalog version is unsupported and was preserved. Use a compatible application; manual rules remain available.</value></data>
-  <data name="PresetErrorLimitExceeded" xml:space="preserve"><value>The preset catalog or configuration exceeds a documented limit. Reduce its size or number of entries.</value></data>
-  <data name="PresetErrorNotFound" xml:space="preserve"><value>The selected preset no longer exists. Reload the catalog.</value></data>
-  <data name="PresetErrorPersistenceUnavailable" xml:space="preserve"><value>The preset catalog could not be safely read or saved. See details, resolve the problem and reload; manual rules remain available.</value></data>
-  <data name="PresetErrorCancelled" xml:space="preserve"><value>The preset operation was cancelled.</value></data>
-  <data name="PresetIssueEmptyLanguageSelection" xml:space="preserve"><value>Enter at least one language code for the active category.</value></data>
-  <data name="PresetIssueEmptyTitleFilter" xml:space="preserve"><value>Enter non-blank title text or disable the title filter.</value></data>
-  <data name="PresetIssueInvalidRuleLanguage" xml:space="preserve"><value>Correct the unknown or unsupported rule language code.</value></data>
-  <data name="PresetCleanupIssue" xml:space="preserve"><value>Preset temporary-file cleanup reported a problem. See details.</value></data>
+  <data name="PresetSaved" xml:space="preserve"><value>Saved as a new preset. Current rules and plans are unchanged</value></data>
+  <data name="PresetRenamed" xml:space="preserve"><value>Preset renamed. Current rules and plans are unchanged</value></data>
+  <data name="PresetDeleted" xml:space="preserve"><value>Preset deleted. Loaded rule values remain in the editor</value></data>
+  <data name="PresetLoaded" xml:space="preserve"><value>Rule settings loaded. Create a fresh Preview before applying choices</value></data>
+  <data name="PresetAlreadyLoaded" xml:space="preserve"><value>These rule settings are already in the editor. The current Preview is preserved</value></data>
+  <data name="PresetLoadStale" xml:space="preserve"><value>The editor, selection or batch changed while loading. No rule settings were replaced; load again if needed</value></data>
+  <data name="PresetCommittedCleanupIssue" xml:space="preserve"><value>The catalog was saved, but temporary-file cleanup reported a problem. See details</value></data>
+  <data name="PresetErrorBusy" xml:space="preserve"><value>Another application instance is using the preset catalog. Try again after it finishes</value></data>
+  <data name="PresetErrorInvalidName" xml:space="preserve"><value>Enter a name with 1–80 characters and no control characters</value></data>
+  <data name="PresetErrorDuplicateName" xml:space="preserve"><value>A preset with this name already exists. Choose another name</value></data>
+  <data name="PresetErrorInvalidConfiguration" xml:space="preserve"><value>Correct the active rule configuration before saving this preset</value></data>
+  <data name="PresetErrorInvalidCatalog" xml:space="preserve"><value>The preset catalog is invalid and was preserved. Correct the file, then reload the catalog. Manual rules remain available</value></data>
+  <data name="PresetErrorUnsupportedVersion" xml:space="preserve"><value>This catalog version is unsupported and was preserved. Use a compatible application; manual rules remain available</value></data>
+  <data name="PresetErrorLimitExceeded" xml:space="preserve"><value>The preset catalog or configuration exceeds a documented limit. Reduce its size or number of entries</value></data>
+  <data name="PresetErrorNotFound" xml:space="preserve"><value>The selected preset no longer exists. Reload the catalog</value></data>
+  <data name="PresetErrorPersistenceUnavailable" xml:space="preserve"><value>The preset catalog could not be safely read or saved. See details, resolve the problem and reload; manual rules remain available</value></data>
+  <data name="PresetErrorCancelled" xml:space="preserve"><value>The preset operation was cancelled</value></data>
+  <data name="PresetIssueEmptyLanguageSelection" xml:space="preserve"><value>Enter at least one language code for the active category</value></data>
+  <data name="PresetIssueEmptyTitleFilter" xml:space="preserve"><value>Enter non-blank title text or disable the title filter</value></data>
+  <data name="PresetIssueInvalidRuleLanguage" xml:space="preserve"><value>Correct the unknown or unsupported rule language code</value></data>
+  <data name="PresetCleanupIssue" xml:space="preserve"><value>Preset temporary-file cleanup reported a problem. See details</value></data>
   <data name="BatchIncludeSubfolders" xml:space="preserve"><value>Include subfolders</value></data>
-  <data name="BatchFolderScopeHelp" xml:space="preserve"><value>Include MKV/MP4 files from subfolders when adding a folder. Copies can stay beside their originals or preserve the relative folders under a separate output folder. Known application working folders are excluded.</value></data>
-  <data name="ErrorReasonRecursiveOutputRequired" xml:space="preserve"><value>Choose an existing output folder before adding a folder with subfolders.</value></data>
-  <data name="ErrorReasonRecursiveRootConflict" xml:space="preserve"><value>The output folder cannot equal or contain the selected source folder. Choose a separate output root or a child that can be excluded.</value></data>
-  <data name="ErrorReasonBatchDepthLimit" xml:space="preserve"><value>The folder tree exceeds the supported depth of 32 subfolders. Nothing was added.</value></data>
-  <data name="QueueRecoveryHelp" xml:space="preserve"><value>Restore only the unfinished file list. Inspect every source again, approve each plan and review before starting. Discard removes only the saved list; media and interruption records stay untouched. Reload requires an empty current batch.</value></data>
+  <data name="BatchFolderScopeHelp" xml:space="preserve"><value>Include MKV/MP4 files from subfolders when adding a folder. Copies can stay beside their originals or preserve the relative folders under a separate output folder. Known application working folders are excluded</value></data>
+  <data name="ErrorReasonRecursiveOutputRequired" xml:space="preserve"><value>Choose an existing output folder before adding a folder with subfolders</value></data>
+  <data name="ErrorReasonRecursiveRootConflict" xml:space="preserve"><value>The output folder cannot equal or contain the selected source folder. Choose a separate output root or a child that can be excluded</value></data>
+  <data name="ErrorReasonBatchDepthLimit" xml:space="preserve"><value>The folder tree exceeds the supported depth of 32 subfolders. Nothing was added</value></data>
+  <data name="QueueRecoveryHelp" xml:space="preserve"><value>Restore only the unfinished file list. Inspect every source again, approve each plan and review before starting. Discard removes only the saved list; media and interruption records stay untouched. Reload requires an empty current batch</value></data>
   <data name="QueueRestore" xml:space="preserve"><value>Restore saved list</value></data>
   <data name="QueueDiscard" xml:space="preserve"><value>Discard saved list</value></data>
   <data name="QueueReload" xml:space="preserve"><value>Reload saved list</value></data>
   <data name="QueueLoading" xml:space="preserve"><value>Reading saved queue list…</value></data>
-  <data name="QueueRecoveryAvailable" xml:space="preserve"><value>An unfinished queue list is available. Restore or discard it explicitly.</value></data>
+  <data name="QueueRecoveryAvailable" xml:space="preserve"><value>An unfinished queue list is available. Restore or discard it explicitly</value></data>
   <data name="QueueSaving" xml:space="preserve"><value>Saving the unfinished queue list…</value></data>
-  <data name="QueueCheckpointReady" xml:space="preserve"><value>Queue-list recovery is ready. Published outputs are not queued again.</value></data>
-  <data name="QueueNotSaved" xml:space="preserve"><value>Queue-list persistence has a problem. Manual work remains available; restart recovery is not confirmed.</value></data>
-  <data name="QueueCurrentListInvalid" xml:space="preserve"><value>The current destination or source draft cannot be saved. Correct it; the previous saved list is preserved.</value></data>
-  <data name="QueueCleanupIssue" xml:space="preserve"><value>The queue-list operation has a temporary-file cleanup issue. Check technical details.</value></data>
+  <data name="QueueCheckpointReady" xml:space="preserve"><value>Queue-list recovery is ready. Published outputs are not queued again</value></data>
+  <data name="QueueNotSaved" xml:space="preserve"><value>Queue-list persistence has a problem. Manual work remains available; restart recovery is not confirmed</value></data>
+  <data name="QueueCurrentListInvalid" xml:space="preserve"><value>The current destination or source draft cannot be saved. Correct it; the previous saved list is preserved</value></data>
+  <data name="QueueCleanupIssue" xml:space="preserve"><value>The queue-list operation has a temporary-file cleanup issue. Check technical details</value></data>
   <data name="QueueDestinationNeeded" xml:space="preserve"><value>Choose a destination before approval</value></data>
   <data name="QueueExcluded" xml:space="preserve"><value>excluded</value></data>
-  <data name="QueueErrorBusy" xml:space="preserve"><value>Another application instance is changing the saved list. No list was overwritten. Reload when the current batch is empty.</value></data>
-  <data name="QueueErrorConflict" xml:space="preserve"><value>The saved list changed in another instance. It was not overwritten. Reload when the current batch is empty.</value></data>
-  <data name="QueueErrorInvalidRecord" xml:space="preserve"><value>The saved queue list is invalid and remains unchanged. Correct the file explicitly, then reload. Manual work is available.</value></data>
-  <data name="QueueErrorUnsupportedVersion" xml:space="preserve"><value>This queue-list version is unsupported. The file is preserved; use a compatible application or correct it explicitly.</value></data>
-  <data name="QueueErrorLimitExceeded" xml:space="preserve"><value>The queue list exceeds its storage bounds. The previous file is preserved; reduce the list or path lengths.</value></data>
-  <data name="QueueErrorPersistenceUnavailable" xml:space="preserve"><value>The queue list could not be stored or read. Existing data is preserved; restart recovery is not confirmed.</value></data>
-  <data name="QueueErrorCancelled" xml:space="preserve"><value>Queue-list storage was cancelled. Restart recovery is not confirmed.</value></data>
+  <data name="QueueErrorBusy" xml:space="preserve"><value>Another application instance is changing the saved list. No list was overwritten. Reload when the current batch is empty</value></data>
+  <data name="QueueErrorConflict" xml:space="preserve"><value>The saved list changed in another instance. It was not overwritten. Reload when the current batch is empty</value></data>
+  <data name="QueueErrorInvalidRecord" xml:space="preserve"><value>The saved queue list is invalid and remains unchanged. Correct the file explicitly, then reload. Manual work is available</value></data>
+  <data name="QueueErrorUnsupportedVersion" xml:space="preserve"><value>This queue-list version is unsupported. The file is preserved; use a compatible application or correct it explicitly</value></data>
+  <data name="QueueErrorLimitExceeded" xml:space="preserve"><value>The queue list exceeds its storage bounds. The previous file is preserved; reduce the list or path lengths</value></data>
+  <data name="QueueErrorPersistenceUnavailable" xml:space="preserve"><value>The queue list could not be stored or read. Existing data is preserved; restart recovery is not confirmed</value></data>
+  <data name="QueueErrorCancelled" xml:space="preserve"><value>Queue-list storage was cancelled. Restart recovery is not confirmed</value></data>
   <data name="AggregateHeading" xml:space="preserve"><value>Tracks to keep</value></data>
-  <data name="AggregateNotice" xml:space="preserve"><value>Groups use track metadata, not content identity. Expand a group for individual files and original flags. Highlighting a file does not change this scope.</value></data>
-  <data name="AggregateScope" xml:space="preserve"><value>{0} included files; {1} unresolved inspections.</value></data>
-  <data name="AggregateUnresolved" xml:space="preserve"><value>This track list is incomplete. Inspect, correct or explicitly exclude unresolved files before Review.</value></data>
+  <data name="AggregateNotice" xml:space="preserve"><value>Groups use track metadata, not content identity. Expand a group for individual files and original flags. Highlighting a file does not change this scope</value></data>
+  <data name="AggregateScope" xml:space="preserve"><value>{0} included files; {1} unresolved inspections</value></data>
+  <data name="AggregateUnresolved" xml:space="preserve"><value>This track list is incomplete. Inspect, correct or explicitly exclude unresolved files before Review</value></data>
   <data name="AggregateMembers" xml:space="preserve"><value>Files and individual tracks</value></data>
-  <data name="AggregateCoverage" xml:space="preserve"><value>{0} of {1} files; {2} occurrences</value></data>
+  <data name="AggregateCoverage" xml:space="preserve"><value>Files: {0}/{1} · Tracks: {2}</value></data>
   <data name="AggregateChannels" xml:space="preserve"><value>Channels: {0}</value></data>
   <data name="AggregateAllKept" xml:space="preserve"><value>Will be kept</value></data>
   <data name="AggregateAllRemoved" xml:space="preserve"><value>Will be removed</value></data>
@@ -311,14 +312,14 @@
   <data name="AggregateSilentFiles" xml:space="preserve"><value>Confirm each file that will have no audio</value></data>
   <data name="AggregateFlags" xml:space="preserve"><value>Forced: {0}; default: {1}; enabled: {2}</value></data>
   <data name="Varies" xml:space="preserve"><value>varies</value></data>
-  <data name="SizeEqual" xml:space="preserve"><value>Result has the same size as the source.</value></data>
-  <data name="WorkspaceSettings" xml:space="preserve"><value>Appearance</value></data>
+  <data name="SizeEqual" xml:space="preserve"><value>Result has the same size as the source</value></data>
+  <data name="WorkspaceSettings" xml:space="preserve"><value>Theme</value></data>
   <data name="WorkspaceClose" xml:space="preserve"><value>Close</value></data>
   <data name="WorkspaceBack" xml:space="preserve"><value>Back to selection</value></data>
   <data name="WorkspaceRules" xml:space="preserve"><value>Rules &amp; presets</value></data>
   <data name="WorkspaceDetails" xml:space="preserve"><value>File details and choices</value></data>
-  <data name="WorkspaceEmptyTitle" xml:space="preserve"><value>Choose the tracks to keep.</value></data>
-  <data name="WorkspaceEmptyHelp" xml:space="preserve"><value>Drop local MKV or MP4 files here, or use Add files and Add folder above. Folder options stay explicit.</value></data>
+  <data name="WorkspaceEmptyTitle" xml:space="preserve"><value>Choose the tracks to keep</value></data>
+  <data name="WorkspaceEmptyHelp" xml:space="preserve"><value>Drop local MKV or MP4 files here, or use Add files and Add folder above. Folder options stay explicit</value></data>
   <data name="WorkspaceReview" xml:space="preserve"><value>Review changes</value></data>
   <data name="WorkspaceWillRemove" xml:space="preserve"><value>Will be removed</value></data>
   <data name="WorkspaceWillKeep" xml:space="preserve"><value>Will be kept</value></data>
@@ -326,13 +327,13 @@
   <data name="ReviewSummary" xml:space="preserve"><value>{0} · {1}</value></data>
   <data name="RunContinue" xml:space="preserve"><value>Continue processing</value></data>
   <data name="RunNoChanges" xml:space="preserve"><value>Finish without changes</value></data>
-  <data name="ReviewNextInspect" xml:space="preserve"><value>Inspect this source again, then review changes.</value></data>
-  <data name="ReviewNextConfirmAudio" xml:space="preserve"><value>Confirm removing all audio from this file, then review again.</value></data>
-  <data name="ReviewNextDestination" xml:space="preserve"><value>Check the output mode and file location, then review again.</value></data>
-  <data name="ReviewNextSelection" xml:space="preserve"><value>Check this file’s selection, then review again.</value></data>
-  <data name="ReviewNoRemovedTracks" xml:space="preserve"><value>No tracks will be removed.</value></data>
-  <data name="ReviewNoRetainedTracks" xml:space="preserve"><value>Fresh inspection and review required.</value></data>
-  <data name="RecursiveOutputGuide" xml:space="preserve"><value>Choose an output folder before including subfolders.</value></data>
+  <data name="ReviewNextInspect" xml:space="preserve"><value>Inspect this source again, then review changes</value></data>
+  <data name="ReviewNextConfirmAudio" xml:space="preserve"><value>Confirm removing all audio from this file, then review again</value></data>
+  <data name="ReviewNextDestination" xml:space="preserve"><value>Check the output mode and file location, then review again</value></data>
+  <data name="ReviewNextSelection" xml:space="preserve"><value>Check this file’s selection, then review again</value></data>
+  <data name="ReviewNoRemovedTracks" xml:space="preserve"><value>No tracks will be removed</value></data>
+  <data name="ReviewNoRetainedTracks" xml:space="preserve"><value>Fresh inspection and review required</value></data>
+  <data name="RecursiveOutputGuide" xml:space="preserve"><value>Choose an output folder before including subfolders</value></data>
   <data name="ReviewChangedOne" xml:space="preserve"><value>{0} file will change</value></data>
   <data name="ReviewUnchangedOne" xml:space="preserve"><value>{0} file unchanged</value></data>
   <data name="RunCopiesOne" xml:space="preserve"><value>Create {0} copy</value></data>
@@ -346,8 +347,8 @@
   <data name="ReviewUnchangedOther" xml:space="preserve"><value>{0} files unchanged</value></data>
   <data name="RunCopiesOther" xml:space="preserve"><value>Create {0} copies</value></data>
   <data name="AppearanceTitle" xml:space="preserve"><value>Appearance</value></data>
-  <data name="AppearanceHelp" xml:space="preserve"><value>Customize this application without changing files or reviewed plans.</value></data>
-  <data name="AppearanceTheme" xml:space="preserve"><value>Theme</value></data>
+  <data name="AppearanceHelp" xml:space="preserve"><value>Customize this application without changing files or reviewed plans</value></data>
+  <data name="AppearanceTheme" xml:space="preserve"><value>Color scheme</value></data>
   <data name="AppearanceSystem" xml:space="preserve"><value>System</value></data>
   <data name="AppearanceLight" xml:space="preserve"><value>Light</value></data>
   <data name="AppearanceDark" xml:space="preserve"><value>Dark</value></data>
@@ -358,7 +359,7 @@
   <data name="AppearanceRose" xml:space="preserve"><value>Rose</value></data>
   <data name="AppearanceAmber" xml:space="preserve"><value>Amber</value></data>
   <data name="AppearanceCustomColors" xml:space="preserve"><value>Custom colors</value></data>
-  <data name="AppearanceCustomHelp" xml:space="preserve"><value>Use #RRGGBB. Empty fields use built-in values. Text needs 4.5:1 contrast and essential borders 3:1.</value></data>
+  <data name="AppearanceCustomHelp" xml:space="preserve"><value>Use #RRGGBB. Empty fields use built-in values. Text needs 4.5:1 contrast and essential borders 3:1</value></data>
   <data name="AppearancePage" xml:space="preserve"><value>Page</value></data>
   <data name="AppearanceSurface" xml:space="preserve"><value>Surface</value></data>
   <data name="AppearancePrimaryText" xml:space="preserve"><value>Primary text</value></data>
@@ -367,38 +368,38 @@
   <data name="AppearanceMotion" xml:space="preserve"><value>Motion</value></data>
   <data name="AppearanceReduced" xml:space="preserve"><value>Reduced</value></data>
   <data name="AppearanceFullMotion" xml:space="preserve"><value>Full</value></data>
-  <data name="AppearanceReset" xml:space="preserve"><value>Reset appearance</value></data>
-  <data name="AppearanceInvalidHex" xml:space="preserve"><value>Enter opaque colors as #RRGGBB. The last usable appearance is retained.</value></data>
-  <data name="AppearanceInvalidContrast" xml:space="preserve"><value>These colors do not meet the text/border contrast targets. The last usable appearance is retained.</value></data>
-  <data name="AppearanceCatalogError" xml:space="preserve"><value>Appearance settings could not be read safely. Manual appearance remains available for this session; use Reset to replace the invalid appearance file.</value></data>
-  <data name="AppearanceSessionOnly" xml:space="preserve"><value>Appearance is applied for this session but could not be saved.</value></data>
-  <data name="AppearanceMotionSystemAvailable" xml:space="preserve"><value>System follows the Windows client-area animation preference.</value></data>
-  <data name="AppearanceMotionSystemFallback" xml:space="preserve"><value>System motion preference is unavailable here. System uses reduced motion; you can choose Full explicitly.</value></data>
-  <data name="WorkspaceOriginalShort" xml:space="preserve"><value>Original files stay unchanged.</value></data>
+  <data name="AppearanceReset" xml:space="preserve"><value>Reset theme</value></data>
+  <data name="AppearanceInvalidHex" xml:space="preserve"><value>Enter opaque colors as #RRGGBB. The last usable appearance is retained</value></data>
+  <data name="AppearanceInvalidContrast" xml:space="preserve"><value>These colors do not meet the text/border contrast targets. The last usable appearance is retained</value></data>
+  <data name="AppearanceCatalogError" xml:space="preserve"><value>Appearance settings could not be read safely. Manual appearance remains available for this session; use Reset to replace the invalid appearance file</value></data>
+  <data name="AppearanceSessionOnly" xml:space="preserve"><value>Appearance is applied for this session but could not be saved</value></data>
+  <data name="AppearanceMotionSystemAvailable" xml:space="preserve"><value>System follows the Windows client-area animation preference</value></data>
+  <data name="AppearanceMotionSystemFallback" xml:space="preserve"><value>System motion preference is unavailable here. System uses reduced motion; you can choose Full explicitly</value></data>
+  <data name="WorkspaceOriginalShort" xml:space="preserve"><value>Original files stay unchanged</value></data>
   <data name="WorkspaceOptions" xml:space="preserve"><value>Folder options and queue</value></data>
-  <data name="AppearancePendingDecision" xml:space="preserve"><value>A media review or cleanup decision is still pending. Close settings to return to it.</value></data>
-  <data name="ReviewValidating" xml:space="preserve"><value>Checking source files and destinations… No media processing has started.</value></data>
-  <data name="ReviewCancelled" xml:space="preserve"><value>Review cancelled. Review again before processing the remaining files.</value></data>
-  <data name="ReviewNeedsAttention" xml:space="preserve"><value>Some changes need attention before processing.</value></data>
-  <data name="ReviewRequired" xml:space="preserve"><value>Review the current choices before processing.</value></data>
+  <data name="AppearancePendingDecision" xml:space="preserve"><value>A media review or cleanup decision is still pending. Close settings to return to it</value></data>
+  <data name="ReviewValidating" xml:space="preserve"><value>Checking source files and destinations… No media processing has started</value></data>
+  <data name="ReviewCancelled" xml:space="preserve"><value>Review cancelled. Review again before processing the remaining files</value></data>
+  <data name="ReviewNeedsAttention" xml:space="preserve"><value>Some changes need attention before processing</value></data>
+  <data name="ReviewRequired" xml:space="preserve"><value>Review the current choices before processing</value></data>
   <data name="ReviewCheckAgain" xml:space="preserve"><value>Check again</value></data>
-  <data name="ReviewNoCopy" xml:space="preserve"><value>No track changes. This file will stay unchanged.</value></data>
+  <data name="ReviewNoCopy" xml:space="preserve"><value>No track changes. This file will stay unchanged</value></data>
   <data name="ReviewSourceTracks" xml:space="preserve"><value>Source tracks (inspection)</value></data>
-  <data name="LanguagePreferenceFailure" xml:space="preserve"><value>The language preference could not be saved or restored. Your current language works for this session; media processing is still available when its storage is healthy.</value></data>
+  <data name="LanguagePreferenceFailure" xml:space="preserve"><value>The language preference could not be saved or restored. Your current language works for this session; media processing is still available when its storage is healthy</value></data>
   <data name="IncludeFileAccessible" xml:space="preserve"><value>Include file in selection: {0}</value></data>
-  <data name="AggregateSelectionHelp" xml:space="preserve"><value>Excluded tracks stay in the source and are omitted only from the result. Use Restore to include them again. Review changes before processing.</value></data>
+  <data name="AggregateSelectionHelp" xml:space="preserve"><value>Removed tracks are omitted from the result. Use Restore to include them again, then Review changes</value></data>
   <data name="AggregateSectionSummary" xml:space="preserve"><value>{0} · Groups: {1} · Tracks: {2}</value></data>
-  <data name="RemoveAllSubtitles" xml:space="preserve"><value>Exclude all subtitles</value></data>
+  <data name="RemoveAllSubtitles" xml:space="preserve"><value>Remove all subtitles</value></data>
   <data name="AggregateMemberKeep" xml:space="preserve"><value>Keep {0} track {1} in {2}: {3}</value></data>
   <data name="OutputModeLabel" xml:space="preserve"><value>Output</value></data>
   <data name="OutputCopyMode" xml:space="preserve"><value>Create trimmed copies</value></data>
   <data name="OutputReplaceMode" xml:space="preserve"><value>Replace original files</value></data>
-  <data name="OutputCopyBesideHelp" xml:space="preserve"><value>Copies beside originals.</value></data>
-  <data name="OutputReplaceHelp" xml:space="preserve"><value>Verified results will replace the original files.</value></data>
-  <data name="OutputMixedHelp" xml:space="preserve"><value>Recovered files have different output modes. Choose one mode before Review.</value></data>
+  <data name="OutputCopyBesideHelp" xml:space="preserve"><value>Copies beside originals</value></data>
+  <data name="OutputReplaceHelp" xml:space="preserve"><value>Verified results will replace the original files</value></data>
+  <data name="OutputMixedHelp" xml:space="preserve"><value>Recovered files have different output modes. Choose one mode before Review</value></data>
   <data name="OutputUseSourceFolders" xml:space="preserve"><value>Save beside originals</value></data>
-  <data name="OutputWillCopy" xml:space="preserve"><value>Create a new copy.</value></data>
-  <data name="OutputWillReplace" xml:space="preserve"><value>Replace this original file.</value></data>
+  <data name="OutputWillCopy" xml:space="preserve"><value>Create a new copy</value></data>
+  <data name="OutputWillReplace" xml:space="preserve"><value>Replace this original file</value></data>
   <data name="RunReplacementsOne" xml:space="preserve"><value>Replace {0} original</value></data>
   <data name="RunReplacementsFew" xml:space="preserve"><value>Replace {0} originals</value></data>
   <data name="RunReplacementsMany" xml:space="preserve"><value>Replace {0} originals</value></data>
@@ -411,44 +412,44 @@
   <data name="UpdatesCheckOnStartup" xml:space="preserve"><value>Check for updates at startup</value></data>
   <data name="UpdatesCheckNow" xml:space="preserve"><value>Check for updates</value></data>
   <data name="UpdatesInstall" xml:space="preserve"><value>Download and update</value></data>
-  <data name="UpdatesInstallNotice" xml:space="preserve"><value>MovieSift will download the update, close safely and restart. Your settings and saved list will be kept.</value></data>
-  <data name="UpdatesNotChecked" xml:space="preserve"><value>Updates have not been checked yet.</value></data>
+  <data name="UpdatesInstallNotice" xml:space="preserve"><value>MovieSift will download the update, close safely and restart. Your settings and saved list will be kept</value></data>
+  <data name="UpdatesNotChecked" xml:space="preserve"><value>Updates have not been checked yet</value></data>
   <data name="UpdatesChecking" xml:space="preserve"><value>Checking GitHub for a new release…</value></data>
-  <data name="UpdatesReady" xml:space="preserve"><value>Ready to download and install.</value></data>
-  <data name="UpdatesCurrent" xml:space="preserve"><value>You have the latest stable version.</value></data>
-  <data name="UpdatesCheckFailed" xml:space="preserve"><value>Could not check for updates. You can keep working and try again later.</value></data>
+  <data name="UpdatesReady" xml:space="preserve"><value>Ready to download and install</value></data>
+  <data name="UpdatesCurrent" xml:space="preserve"><value>You have the latest stable version</value></data>
+  <data name="UpdatesCheckFailed" xml:space="preserve"><value>Could not check for updates. You can keep working and try again later</value></data>
   <data name="UpdatesDownloading" xml:space="preserve"><value>Downloading and checking the update…</value></data>
   <data name="UpdatesRestarting" xml:space="preserve"><value>Restarting to install the update…</value></data>
-  <data name="UpdatesCancelled" xml:space="preserve"><value>Update cancelled. Your installation is unchanged.</value></data>
-  <data name="UpdatesFinishWork" xml:space="preserve"><value>Finish processing and resolve any recovery notices before installing.</value></data>
-  <data name="UpdatesPreferenceFailed" xml:space="preserve"><value>The update preference could not be saved. Your choice applies to this session.</value></data>
-  <data name="UpdatesAlreadyInstalling" xml:space="preserve"><value>MovieSift is being updated. Try opening it again after installation finishes.</value></data>
-  <data name="UpdateErrorNetwork" xml:space="preserve"><value>The download failed. Check your connection and try again.</value></data>
-  <data name="UpdateErrorInvalidRelease" xml:space="preserve"><value>This release does not contain a verified update for your platform.</value></data>
-  <data name="UpdateErrorInvalidPackage" xml:space="preserve"><value>The update package is invalid. Your installation was not changed.</value></data>
-  <data name="UpdateErrorIntegrity" xml:space="preserve"><value>The update checksum does not match. Installation was stopped.</value></data>
-  <data name="UpdateErrorUnsupportedInstallation" xml:space="preserve"><value>This location cannot be updated automatically. Download the new release from github.com/Nexusov/MovieSift/releases and extract it into a writable folder.</value></data>
-  <data name="UpdateErrorBusy" xml:space="preserve"><value>Another application instance or unfinished work prevents installation. Close other instances and try again.</value></data>
-  <data name="UpdateErrorStorage" xml:space="preserve"><value>The update could not be saved. Check free space and folder permissions, then retry.</value></data>
-  <data name="UpdateErrorInstaller" xml:space="preserve"><value>The update could not start. Your current version and recovery files were kept.</value></data>
+  <data name="UpdatesCancelled" xml:space="preserve"><value>Update cancelled. Your installation is unchanged</value></data>
+  <data name="UpdatesFinishWork" xml:space="preserve"><value>Finish processing and resolve any recovery notices before installing</value></data>
+  <data name="UpdatesPreferenceFailed" xml:space="preserve"><value>The update preference could not be saved. Your choice applies to this session</value></data>
+  <data name="UpdatesAlreadyInstalling" xml:space="preserve"><value>MovieSift is being updated. Try opening it again after installation finishes</value></data>
+  <data name="UpdateErrorNetwork" xml:space="preserve"><value>The download failed. Check your connection and try again</value></data>
+  <data name="UpdateErrorInvalidRelease" xml:space="preserve"><value>This release does not contain a verified update for your platform</value></data>
+  <data name="UpdateErrorInvalidPackage" xml:space="preserve"><value>The update package is invalid. Your installation was not changed</value></data>
+  <data name="UpdateErrorIntegrity" xml:space="preserve"><value>The update checksum does not match. Installation was stopped</value></data>
+  <data name="UpdateErrorUnsupportedInstallation" xml:space="preserve"><value>This location cannot be updated automatically. Download the new release from github.com/Nexusov/MovieSift/releases and extract it into a writable folder</value></data>
+  <data name="UpdateErrorBusy" xml:space="preserve"><value>Another application instance or unfinished work prevents installation. Close other instances and try again</value></data>
+  <data name="UpdateErrorStorage" xml:space="preserve"><value>The update could not be saved. Check free space and folder permissions, then retry</value></data>
+  <data name="UpdateErrorInstaller" xml:space="preserve"><value>The update could not start. Your current version and recovery files were kept</value></data>
   <data name="UpdatesCleanupFailed" xml:space="preserve"><value>Some temporary update files could not be removed. They are kept at: {0}</value></data>
-  <data name="ErrorReasonReplacementPermissions" xml:space="preserve"><value>The original file's permissions cannot be preserved safely. Create a copy instead.</value></data>
-  <data name="UpdatesPreviousFailure" xml:space="preserve"><value>The update did not complete. Your previous version has been kept. You can retry from Updates in settings.</value></data>
+  <data name="ErrorReasonReplacementPermissions" xml:space="preserve"><value>The original file's permissions cannot be preserved safely. Create a copy instead</value></data>
+  <data name="UpdatesPreviousFailure" xml:space="preserve"><value>The update did not complete. Your previous version has been kept. You can retry from Updates in settings</value></data>
   <data name="LanguageTitle" xml:space="preserve"><value>Interface language</value></data>
-  <data name="LanguageHelp" xml:space="preserve"><value>Download once. Use offline afterward.</value></data>
+  <data name="LanguageHelp" xml:space="preserve"><value>Download once. Use offline afterward</value></data>
   <data name="LanguageSearch" xml:space="preserve"><value>Search languages…</value></data>
   <data name="LanguageCurrent" xml:space="preserve"><value>Current</value></data>
-  <data name="LanguageIncluded" xml:space="preserve"><value>Included</value></data>
-  <data name="LanguageDownloaded" xml:space="preserve"><value>Downloaded</value></data>
+  <data name="LanguageIncluded" xml:space="preserve"><value>Installed</value></data>
+  <data name="LanguageDownloaded" xml:space="preserve"><value>Installed</value></data>
   <data name="LanguageDownload" xml:space="preserve"><value>Download</value></data>
   <data name="LanguageDownloading" xml:space="preserve"><value>Downloading {0}…</value></data>
   <data name="LanguageCancel" xml:space="preserve"><value>Cancel download</value></data>
   <data name="LanguageRetry" xml:space="preserve"><value>Retry</value></data>
-  <data name="LanguageStorage" xml:space="preserve"><value>Only English is included. Other languages download from the MovieSift repository when selected.</value></data>
-  <data name="LanguageFailure" xml:space="preserve"><value>Could not load the translation. The current language has not changed.</value></data>
-  <data name="LanguageInvalidPack" xml:space="preserve"><value>The translation is damaged or incompatible with this version. The current language has not changed.</value></data>
-  <data name="LanguageCacheMissing" xml:space="preserve"><value>The saved language is not available locally. English is active; choose the language to download it.</value></data>
-  <data name="LanguageNoMatches" xml:space="preserve"><value>No languages found.</value></data>
+  <data name="LanguageStorage" xml:space="preserve"><value>Only English is included. Other languages download from the MovieSift repository when selected</value></data>
+  <data name="LanguageFailure" xml:space="preserve"><value>Could not load the translation. The current language has not changed</value></data>
+  <data name="LanguageInvalidPack" xml:space="preserve"><value>The translation is damaged or incompatible with this version. The current language has not changed</value></data>
+  <data name="LanguageCacheMissing" xml:space="preserve"><value>The saved language is not available locally. English is active; choose the language to download it</value></data>
+  <data name="LanguageNoMatches" xml:space="preserve"><value>No languages found</value></data>
   <data name="LanguageClose" xml:space="preserve"><value>Close language chooser</value></data>
   <data name="WindowMinimize" xml:space="preserve"><value>Minimize</value></data>
   <data name="WindowMaximize" xml:space="preserve"><value>Maximize</value></data>
@@ -460,16 +461,28 @@
   <data name="InspectionStageReadingMetadata" xml:space="preserve"><value>Reading chapters and tags…</value></data>
   <data name="InspectionStageRecheckingSource" xml:space="preserve"><value>Rechecking that the source is unchanged…</value></data>
   <data name="InspectionElapsed" xml:space="preserve"><value>Elapsed: {0}</value></data>
-  <data name="InspectionRemainingUnknown" xml:space="preserve"><value>Remaining time cannot be estimated for this inspection.</value></data>
-  <data name="InspectionSlowNotice" xml:space="preserve"><value>Inspection is still in progress. Some checks may scan the file; you can cancel without changing the source.</value></data>
-  <data name="TrackExclude" xml:space="preserve"><value>Exclude</value></data>
+  <data name="InspectionRemainingUnknown" xml:space="preserve"><value>Remaining time cannot be estimated for this inspection</value></data>
+  <data name="InspectionSlowNotice" xml:space="preserve"><value>Inspection is still in progress. Some checks may scan the file; you can cancel without changing the source</value></data>
+  <data name="TrackExclude" xml:space="preserve"><value>Remove</value></data>
   <data name="TrackRestore" xml:space="preserve"><value>Restore</value></data>
-  <data name="TrackExcluded" xml:space="preserve"><value>Excluded from output</value></data>
-  <data name="TrackExcludeGroupHelp" xml:space="preserve"><value>Exclude the editable retained tracks in this group. Already excluded tracks stay excluded.</value></data>
-  <data name="TrackRestoreGroupHelp" xml:space="preserve"><value>Restore the editable excluded tracks in this group.</value></data>
+  <data name="TrackExcluded" xml:space="preserve"><value>Removed from output</value></data>
+  <data name="TrackExcludeGroupHelp" xml:space="preserve"><value>Remove the editable retained tracks in this group. Already removed tracks remain removed</value></data>
+  <data name="TrackRestoreGroupHelp" xml:space="preserve"><value>Restore the editable removed tracks in this group</value></data>
   <data name="ReviewKeptSummary" xml:space="preserve"><value>Kept: {0} video · {1} audio · {2} subtitles</value></data>
   <data name="ReviewRetainedDetails" xml:space="preserve"><value>Retained track details</value></data>
   <data name="ReviewDefaultAudioHelp" xml:space="preserve"><value>Default audio</value></data>
   <data name="OutputChoiceHeading" xml:space="preserve"><value>How should results be saved?</value></data>
-  <data name="OutputReplaceSpaceHelp" xml:space="preserve"><value>Replacement still needs temporary disk space until verification finishes.</value></data>
+  <data name="OutputReplaceSpaceHelp" xml:space="preserve"><value>Replacement still needs temporary disk space until verification finishes</value></data>
+  <data name="LanguageSyncFailed" xml:space="preserve"><value>Installed translations could not be refreshed. Compatible saved translations remain available offline</value></data>
+  <data name="LanguageSynchronizing" xml:space="preserve"><value>Checking installed translations…</value></data>
+  <data name="InspectionStageCheckingStructure" xml:space="preserve"><value>Checking container structure…</value></data>
+  <data name="OutputRememberChoice" xml:space="preserve"><value>Remember this choice</value></data>
+  <data name="OutputPreferenceFailed" xml:space="preserve"><value>This choice could not be saved. It applies only to this session</value></data>
+  <data name="PresetEmpty" xml:space="preserve"><value>No saved presets</value></data>
+  <data name="TrackSizeReported" xml:space="preserve"><value>Reported payload: {0}</value></data>
+  <data name="TrackSizeEstimated" xml:space="preserve"><value>Estimated payload: ≈ {0}</value></data>
+  <data name="TrackSizeUnavailable" xml:space="preserve"><value>Size unavailable</value></data>
+  <data name="BatchNewHelp" xml:space="preserve"><value>Start an empty list. Files already created stay on disk</value></data>
+  <data name="TrackSizeHelp" xml:space="preserve"><value>Container-reported or bitrate-based sizes may be approximate. Exact sizes require reading every payload</value></data>
+  <data name="InterruptedInputProjectionPath" xml:space="preserve"><value>Temporary input copy: {0}</value></data>
 </root>

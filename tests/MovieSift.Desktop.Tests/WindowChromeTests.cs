@@ -19,7 +19,7 @@ public sealed class WindowChromeTests
         window.Show();
         var caption = window.FindControl<WindowChrome>("Caption")!;
         Assert.Equal(OperatingSystem.IsWindows(), caption.IsVisible);
-        Assert.Equal(OperatingSystem.IsWindows() ? WindowDecorations.BorderOnly : WindowDecorations.Full, window.WindowDecorations);
+        Assert.Equal(OperatingSystem.IsWindows() ? WindowDecorations.None : WindowDecorations.Full, window.WindowDecorations);
         Assert.True(window.CanResize);
         Assert.NotNull(window.Icon);
         window.Close();

@@ -7,6 +7,7 @@ namespace MovieSift.Infrastructure.MediaTools;
 /// <summary>Builds explicit retention arguments for one Matroska input without shell interpretation.</summary>
 internal static class MkvArguments
 {
+    private const long ProjectedTimestampScaleNanoseconds = 100_000;
     private static readonly (string Property, string Option)[] AdditionalFlags =
     [
         ("flag_hearing_impaired", "--hearing-impaired-flag"),
@@ -28,6 +29,19 @@ internal static class MkvArguments
             "--output", request.CandidatePath,
             "--track-order", string.Join(',', retainedTracks.Select(track => $"0:{track.Id.ToString(CultureInfo.InvariantCulture)}")),
         };
+
+        if (retainedTracks.Any(track => track.Kind == TrackKind.Audio && track.Properties.GetValueOrDefault("codec_id") == "A_DTS"))
+        {
+            // Keep Matroska packets instead of invoking the DTS packetizer's continuous sample-clock reconstruction.
+            arguments.AddRange(["--engage", "force_passthrough_packetizer"]);
+        }
+
+        if (request.InputProjection is not null)
+        {
+            // Finer representation avoids double-rounding at re-laced frame boundaries; no timestamps are normalized.
+            arguments.AddRange(["--timestamp-scale", ProjectedTimestampScaleNanoseconds.ToString(CultureInfo.InvariantCulture)]);
+        }
+
         AddRetention(new RetentionRequest(arguments, retainedTracks, TrackKind.Video, "--video-tracks", "--no-video"));
         AddRetention(new RetentionRequest(arguments, retainedTracks, TrackKind.Audio, "--audio-tracks", "--no-audio"));
         AddRetention(new RetentionRequest(arguments, retainedTracks, TrackKind.Subtitles, "--subtitle-tracks", "--no-subtitles"));
@@ -58,7 +72,7 @@ internal static class MkvArguments
             }
         }
 
-        arguments.Add(request.Plan.Inspection.Source.FullPath);
+        arguments.Add(request.InputProjection?.CreatedFile.FullPath ?? request.Plan.Inspection.Source.FullPath);
         return arguments;
     }
 

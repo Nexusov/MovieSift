@@ -45,7 +45,8 @@ public sealed partial class RulePresetsViewModel : ObservableObject
     public bool IsBusy => isBusy;
     public bool HasError => failure is not null || !cleanupIssues.IsEmpty;
     public bool HasDeleteConfirmation => deletionId is not null;
-    public bool CanSelect => CanRead;
+    public bool HasPresets => Presets.Count != 0;
+    public bool CanSelect => CanRead && HasPresets;
     public bool CanRead => !IsBusy && !HasDeleteConfirmation && options.CanEdit();
     public bool CanWrite => CanRead && catalogAvailable && options.CanWrite();
     public bool CanLoad => CanRead && catalogAvailable && SelectedPreset is not null;

@@ -2,21 +2,25 @@
 
 See the [README](../README.md) for downloads and startup.
 
-**Version note:** this guide describes **1.2.0**. Version **1.0.0** has no updater. Version **1.1.0** has an updater but requires the old flat package layout. Install **1.2.0** manually in a separate directory once, using the migration instructions below; do not mix files from these versions.
+**Upgrading from older versions:** version **1.0.0** has no updater and version **1.1.0** requires the old flat package layout. Install the current portable layout manually in a separate directory once, using the migration instructions below; do not mix files from these versions.
 
 ## Choose what to keep
 
-Add local files or a folder. **Audio** and **Subtitles** show tracks from every included file, including tracks found in only one episode. All tracks initially stay in the result. Use **Exclude** (×) for an unwanted track. Its card stays in the same position, becomes muted, and offers **Restore**. Video is always kept and has no exclusion action.
+Add local files or a folder. **Audio** and **Subtitles** show tracks from every included file, including tracks found in only one episode. All tracks initially stay in the result. Use **Remove** (×) for an unwanted track. Its card stays in the same position, becomes muted, and offers **Restore**. Video is always kept and has no exclusion action.
 
-With one file, its actual tracks are shown directly; **Details** contains file information and destination editing without a second track list. With multiple files, exclude a group to change its editable tracks together, or expand it for per-file exceptions. A mixed group excludes its remaining editable tracks; Restore includes its editable tracks again. Completed results are unaffected. Grouping uses metadata, not spoken content. Excluding a file removes it from these actions without deleting it.
+With one file, its actual tracks are shown directly. Audio and Subtitles have separate tabs; switching tabs does not change choices or Review. Video stays required and can be inspected separately. **Details** contains file information and destination editing without a second track list. With multiple files, remove a group to change its editable tracks together, or expand it for per-file exceptions. Restore reverses an editable track choice. Completed results are unaffected. Grouping uses metadata, not spoken content. The queue-row cross removes that unfinished file from the list without deleting its media.
 
-**Exclude all subtitles** clears subtitle selections for included, editable files. Their muted cards remain available for Restore before Review. Audio, video, attachments and completed results are unaffected.
+Track sizes are labelled reported (container statistics) or estimated (bitrate and duration). Missing or unreliable statistics show size unavailable. They are not measured savings or preservation evidence; no extra full payload scan is performed solely to calculate these labels.
+
+**Remove all subtitles** clears subtitle selections for included, editable files. Their muted cards remain available for Restore before Review. Audio, video, attachments and completed results are unaffected.
 
 During inspection, the workspace shows the current backend stage and elapsed time for the active file. Remaining time is explicitly unavailable because the tools do not report a reliable fraction of inspection completed. A slow-check notice appears after 30 seconds; it is not a timeout prediction. Cancel remains available.
 
 ## Choose the result
 
 Choose either visible output card above **Review changes**. The folder chooser appears for Copy; Replace explains the temporary space needed. Changing mode invalidates affected plans and requires fresh Review.
+
+**Remember this choice** saves only the selected Copy/Replace default in this portable copy. New and restored files still need fresh inspection and explicit Review; remembered replacement is not reusable approval. With remembering off, a new queue defaults to Copy. A save failure is shown as a session-only preference.
 
 | Output mode | Result |
 | --- | --- |
@@ -61,13 +65,15 @@ An unreadable list is left untouched. Back it up before correcting it externally
 
 Interrupted-operation records are separate. Keep the old application directory and reported working files until recovery is resolved. Do not rename working directories or edit journal paths. See [recovery details](ARCHITECTURE.md#unfinished-queue-list-recovery).
 
-## Appearance and language
+## Theme and language
 
-Use the translation-icon button for **Interface language** and **Appearance** for themes, custom colors and reduced motion. Escape closes the current cosmetic panel and returns focus to its button. Neither action changes track selections, plans or media metadata. A preference that cannot be saved may still apply for the current session; MovieSift reports the problem without interrupting media work.
+Use the translation-icon button for **Interface language** and **Theme** for colors and reduced motion. The panel has one sticky heading and an icon Close button; outside click and Escape also close it. Colors show their effective HEX values and swatches. Reset stays at the panel bottom while long settings scroll separately. Neither panel changes track selections, plans or media metadata. A preference that cannot be saved may still apply for the current session; MovieSift reports the problem without interrupting media work.
 
-Portable packages include English only. The language chooser offers English, Russian, German, Spanish, French, Brazilian Portuguese, Ukrainian, Polish, Turkish, Japanese, Korean and Simplified Chinese. Selecting another language explicitly downloads its complete translation from the MovieSift GitHub repository, with progress and cancellation. The current language stays active until validation completes. Network, compatibility and cache errors remain visible; **Retry** downloads a replacement without deleting the previous cache first.
+Portable packages include English only. The language chooser offers English plus Russian, German, Spanish, French, Brazilian Portuguese, Ukrainian, Polish, Turkish, Japanese, Korean, Simplified Chinese, Swedish, Danish and Czech. Selecting an uninstalled language explicitly downloads its complete translation from the MovieSift GitHub repository, with progress and cancellation. Switching a compatible installed language needs no download bar. The current language stays active until validation completes. Network, compatibility and cache errors remain visible; **Retry** downloads a replacement without deleting the previous cache first.
 
-Downloaded packs are stored in `data/translations` and work offline after restart. Startup never downloads a translation automatically. If a saved language is unavailable or invalid, the application stays usable in English and explains how to download it. Preset names, source paths, track titles and backend diagnostics remain original. Translation packs are data, not executable extensions. New source-tree functionality requires a corresponding newly built application; the already published 1.0.0 archives are unchanged.
+Downloaded packs are stored in `data/translations` and work offline after restart. On the first launch of a new build, installed packs are checked/refreshed in the background against one immutable official catalog snapshot, with a shared 30-second limit. It does not install additional languages. Valid offline translations remain usable if refresh fails; incompatible old files remain on disk while the UI falls back to English. A successful refresh updates the active dictionary without changing language or media choices. Preset names, source paths, track titles and backend diagnostics remain original. Translation packs are data, not executable extensions. Complete key coverage does not constitute native-speaker review.
+
+Repository translation sources now live in `lang`. The released 1.2.0 downloader uses the previous repository path and cannot install new languages after that move; update MovieSift first. Existing cached packs remain on disk and the updater is independent of the translation endpoint. New builds can use their own immutable source snapshot when the current catalog has an incompatible text contract.
 
 On Windows, the application uses an integrated caption with minimize, maximize/restore and close buttons. Drag the header or double-click it to maximize/restore. Resizing remains available. Close retains the existing warning decisions and safe asynchronous shutdown. Linux retains the desktop's native decorations. Both platforms use the film/scissors application icon; no minimize-to-tray behavior is introduced.
 
@@ -75,9 +81,9 @@ On Windows, the application uses an integrated caption with minimize, maximize/r
 
 ### Install updates
 
-MovieSift checks GitHub for newer stable releases after startup. The permanent **Updates** header button opens its own panel, separate from Appearance, with the installed version, check result, **Check now** and the startup-check preference. A newer available version is shown beside the button. Closing an offer keeps that indicator available. Manual checks work even when startup checks are disabled; network errors do not block media use.
+MovieSift checks GitHub for newer stable releases after startup. The permanent **Updates** header button opens its own panel, separate from Theme, with the installed version, check result, **Check now** and the startup-check preference. A newer available version is shown beside the button. Closing an offer keeps that indicator available. Manual checks work even when startup checks are disabled; network errors do not block media use.
 
-Only **Download and update** downloads and installs, then restarts MovieSift. Download progress and cancellation remain visible. Finish processing, resolve recovery notices and allow settings saves to complete first. Settings and the unfinished list are retained; track choices and Review must be recreated after restart. There is no automatic download or installation on startup.
+Only **Download and update** downloads and installs, then restarts MovieSift. Download progress and cancellation remain visible. Finish processing, resolve recovery notices and allow settings saves to complete first. Portable settings, custom colors, rule presets, downloaded translations and the unfinished list are retained; track choices and Review must be recreated after restart. Installed translations are checked against the new build's text contract on startup as described above. There is no automatic download or installation on startup.
 
 Installation requires a local writable portable folder and its bundled updater. Unsupported locations or permissions require manual migration. Windows updates preserve current access rules as a fixed snapshot; later parent-folder permission changes do not propagate automatically.
 
@@ -91,11 +97,11 @@ The new updater understands this layout and legacy flat packages, but the immuta
 
 1. Finish or explicitly discard pending work, then close the old copy.
 2. Extract the new release into a separate writable directory. Keep all bundled files together.
-3. To retain preferences, copy `data/settings.json`, `data/appearance.json`, `data/updates.json` and `data/rule-presets.json` if present. Check access permissions when migrating data.
+3. To retain preferences, copy `data/settings.json`, `data/appearance.json`, `data/updates.json`, `data/output-preferences.json`, `data/rule-presets.json` and the `data/translations` directory if present. Check access permissions when migrating data.
 4. Optionally copy `data/queue-list.json`; Restore still requires fresh inspection and Review.
 
 Keep the old directory for unresolved work. Do not transfer unresolved `data/ownership` records or mix media tools from different releases.
 
 ## Compatibility and help
 
-See [supported formats](SUPPORTED_FORMATS.md) for media and system requirements. Problem reports should include the version, operating system, steps and displayed error. Remove personal filenames and paths from shared logs.
+See [supported formats](SUPPORTED_FORMATS.md) for media and system requirements. Problem reports should include the version, operating system, steps and displayed error. Expand the file diagnostics for the precise failure. Returned inspection, review and processing failures are also recorded under portable `data/logs`; successful remux alone does not imply successful verification or publication. Remove personal filenames and paths from shared logs.

@@ -39,6 +39,30 @@ public sealed class MkvTimestampComparisonTests
             sourceTrack with { Kind = TrackKind.Video }, withDuration with { Kind = TrackKind.Video })));
     }
 
+    /// <summary>A proven DTS end gains only its intrinsic duration; real-frame retiming and unknown evidence still fail.</summary>
+    [Theory]
+    [InlineData("0|10.666667|21.333334|21.333334", "0|10.7|21.3|31.966667", true)]
+    [InlineData("0|10.666667|21.333334|21.333334", "0|10.7|23.3|33.966667", false)]
+    [InlineData("0|10.666667|21.333334|21.333334", "0|10.7|21.3|85.3", false)]
+    [InlineData("0|10.666667|21.333334|30", "0|10.7|21.3|31.966667", false)]
+    public async Task ProvenDtsDurationDoesNotRelaxRealFrameChecks(string sourceValues, string candidateValues, bool equivalent)
+    {
+        var properties = ImmutableDictionary<string, string>.Empty.Add("codec_id", "A_DTS")
+            .Add("audio_sampling_frequency", "48000").Add(DtsDefaultDurationPolicy.EvidenceKey, "48000:512:16:6:2048");
+        var source = new MediaTrack(6, 7, TrackKind.Audio, "DTS", "eng", null, "Original", 6, false, false, true, properties);
+        var candidate = source with { Properties = properties.Add("default_duration", "10666667") };
+        var request = new TimestampCase(sourceValues, candidateValues, source, candidate);
+        Assert.Equal(equivalent, await CompareAsync(request));
+
+        if (equivalent)
+        {
+            Assert.False(await CompareAsync(request with
+            {
+                SourceTrack = source with { Properties = properties.Remove(DtsDefaultDurationPolicy.EvidenceKey) }
+            }));
+        }
+    }
+
     /// <summary>Creates trusted timestamp output files and invokes the production streaming comparator.</summary>
     private static async Task<bool> CompareAsync(TimestampCase request)
     {

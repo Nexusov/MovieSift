@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "version": "102.0",
-  "purpose": "Exact omissions from fixed upstream distributions for the two CLI-only workers. No source or library rewriting. Runtime dependency and packaged-workflow gates remain required.",
+  "purpose": "Exact omissions from fixed upstream distributions for the three CLI-only workers. No source or library rewriting. Runtime dependency and packaged-workflow gates remain required.",
   "linux-x64": {
     "artifactSha256": "c66345b30d6d5fd640ea982ab5e202a99b9f541a20e42aa19edd90f3ddd5dc9b",
     "sourceDirectory": "usr/lib",
@@ -639,7 +639,7 @@
         "sha256": "de59cad24a9a462036a7b622e479f1d26c778c30f2c6357588b102f222c0dbae"
       }
     ],
-    "reason": "Both CLI transitive ELF dependencies, pinned source startup paths and representative strace-backed identification/remux/extraction use these22 retained libraries. The83 omitted files comprise unused GUI/media/platform dependencies and unused static archives."
+    "reason": "Existing mkvmerge/mkvextract ELF, source-startup and strace-backed evidence identifies these22 unchanged libraries. Mandatory all-three-worker ELF inspection and packaged legacy-DTS workflows must also resolve mkvpropedit's closure; an additional dependency fails those gates. The83 omitted files comprise unused GUI/media/platform dependencies and unused static archives."
   },
   "win-x64": {
     "artifactSha256": "c02e918900f6d945d9307b426237e456378b79a200589ac6928de39064409a44",

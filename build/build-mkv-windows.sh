@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build the pinned CLI pair in an ephemeral Windows UCRT64 environment.
+# Build the pinned CLI workers in an ephemeral Windows UCRT64 environment.
 set -euo pipefail
 
 if [[ "${GITHUB_ACTIONS:-}" != true || "${RUNNER_OS:-}" != Windows ]]; then
@@ -59,9 +59,10 @@ if ! grep -q '^#define HAVE_FLAC_FORMAT_H 1' config.h; then
 fi
 
 # Explicit aliases avoid the GUI, development utilities, installer and default icon batch.
-rake -j2 V=1 apps:mkvmerge apps:mkvextract 2>&1 | tee "$material_directory/build-output.txt"
-cp src/mkvmerge.exe src/mkvextract.exe "$destination/"
+rake -j2 V=1 apps:mkvmerge apps:mkvextract apps:mkvpropedit 2>&1 | tee "$material_directory/build-output.txt"
+cp src/mkvmerge.exe src/mkvextract.exe src/mkvpropedit.exe "$destination/"
 cp config.h build-config config.log "$material_directory/"
 
 "$destination/mkvmerge.exe" --version
 "$destination/mkvextract.exe" --version
+"$destination/mkvpropedit.exe" --version

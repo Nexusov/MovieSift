@@ -36,6 +36,20 @@ An absent AAC `DefaultDuration` may be added only when unchanged codec configura
 
 The extractor appends a synthetic boundary after actual frame timestamps. If the source boundary duplicates its last frame timestamp, that boundary alone may gain the proven duration above, within the same 1 ms tolerance. Actual frames remain checked. This does not permit HE-AAC, 960-sample frames, changed configuration or changes to a known duration; some ordinary AAC files therefore fail verification.
 
+### Legacy DTS preparation and timing
+
+The ordinary DTS packetizer can infer missing headers and reconstruct a continuous sample clock, changing explicitly anchored overlapping laces. Retained DTS therefore uses MKVToolNix's native Matroska passthrough packetizer. When a retained DTS track lacks `DefaultDuration`, the job first reserves a separate app-local input copy under its existing ownership journal. Only that copy is edited with the matching pinned `mkvpropedit`; the original remains read-only, including in Replace mode.
+
+Only a missing `DefaultDuration` may be added, after independent source/candidate core-header evidence. Its value must equal the rounded samples-per-frame/rate in integer nanoseconds. Missing `BitDepth` remains missing; existing duration, precision and other properties remain strict. No audio is decoded or re-encoded.
+
+The inspection reader examines at most **4,096 elements**, **256 KiB** of headers/prefixes and the first **64 MiB** of file offsets, supporting ordinary Matroska lacing. Unrecognized first blocks/encodings or exhausted bounds provide no exception authority. It does not decode audio or claim full payload equality.
+
+Before copying, a bounded read-only pass validates every affected source core frame and its SimpleBlock layout. Supported frames are un-laced or fixed-laced ordinary 16-bit big/little-endian DTS core, with consistent sample rate, samples per frame, channels and frame size. Valid per-frame PCM precision may vary. Unsupported layouts, inconsistent frames or exhausted bounds fail preparation without starting remux. The pass is bounded to **10,000,000 elements/frames**, **128 MiB** of read headers/prefixes and four nesting levels.
+
+For a missing default, the pinned extractor repeats a SimpleBlock anchor for every laced frame. Verification independently reconstructs those intra-lace offsets from the proven frame duration and corroborates every original extractor line, block anchor, signed offset, frame length and count. Its sorted streaming reference is bounded to **4,096** pending frames; unsupported references retain the strict original comparison. Every candidate frame/count remains checked with the existing **1 ms** tolerance. Only the duplicated unknown terminal boundary may gain the proven intrinsic duration, as for AAC.
+
+Projected-input remux uses a **100,000 ns** timestamp scale to avoid double rounding when the backend re-laces frames; it does not normalize timestamps or fill source gaps. Known durations, other metadata and known terminal boundaries remain strict. The native header editor and remux share the existing owned-process cancellation/reaping and cleanup lifecycle. Preparation needs an additional source-sized allocation plus **16 MiB** growth headroom on the portable data volume; if candidate and projection share a volume, both allocations are counted. The UI reports a separate preparation stage. Restart does not authorize deleting an unresolved projection that may still be in use.
+
 ### Unsupported MKV structures
 
 Inspection rejects:
@@ -83,7 +97,7 @@ The track list is the union of all included, successfully inspected files. Track
 
 Groups match kind, exact canonical language, title trimmed at its edges, codec, audio channels, forced status and semantic roles. Titles are case-sensitive here. Regional/script language distinctions remain; unknown/conflicting language tracks stay separate. Default/enabled differences remain individual metadata, unchanged by selection.
 
-Duplicate tracks remain distinct occurrences. Group actions affect only their represented tracks; per-file exceptions produce a mixed checkbox state. New or reinspected tracks start kept. Excluded files and completed results are not edited. Grouping does not establish content equivalence or spoken language.
+Duplicate tracks remain distinct occurrences. Group actions affect only their represented tracks; per-file exceptions produce a mixed selection state. New or reinspected tracks start kept. Excluded files and completed results are not edited. Grouping does not establish content equivalence or spoken language.
 
 ## Input discovery scope
 

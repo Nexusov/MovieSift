@@ -10,6 +10,12 @@ public sealed record SourceRevision(string FullPath, string FileIdentity, long L
 
 public sealed record BackendIdentity(string Name, string Version, int IdentificationFormatVersion);
 
+/// <summary>Distinguishes unverified container statistics from bitrate-based presentation estimates.</summary>
+public enum TrackPayloadSizeKind { Reported, Estimated }
+
+/// <summary>Describes track bytes for display only, never preservation or publication authority.</summary>
+public sealed record TrackPayloadSize(long Bytes, TrackPayloadSizeKind Kind);
+
 public sealed record MediaTrack(
     int Id,
     ulong? Uid,
@@ -23,7 +29,8 @@ public sealed record MediaTrack(
     bool IsForced,
     bool IsEnabled,
     ImmutableDictionary<string, string> Properties,
-    ImmutableArray<TrackDisposition> Dispositions = default);
+    ImmutableArray<TrackDisposition> Dispositions = default,
+    TrackPayloadSize? PayloadSize = null);
 
 public sealed record Attachment(int Id, ulong Uid, string Name, string ContentType, long Size, string Description = "");
 

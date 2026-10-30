@@ -16,6 +16,73 @@ namespace MovieSift.Desktop.Tests;
 /// <summary>Exercises the direct one-row presentation without creating another selection or plan authority.</summary>
 public sealed class SingleFileWorkspaceTests
 {
+    /// <summary>Single-video files omit the informational section without changing retention or approved plans.</summary>
+    [AvaloniaTheory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task VideoSectionIsVisibleOnlyForMultipleFileLocalVideos(bool multipleVideos)
+    {
+        const int additionalVideoId = 42;
+        const ulong additionalVideoUid = 4242;
+        var fixture = SingleFileFixture();
+        var source = fixture.Dialogs.Sources[0];
+        var inspection = fixture.Backend.Inspections[source];
+
+        if (multipleVideos)
+        {
+            var video = inspection.Tracks.Single(track => track.Kind == TrackKind.Video);
+            fixture.Backend.Inspections[source] = inspection with
+            {
+                Tracks = inspection.Tracks.Add(video with { Id = additionalVideoId, Uid = additionalVideoUid })
+            };
+        }
+
+        await fixture.LoadAsync();
+        var item = Assert.Single(fixture.Batch.Items);
+        item.Tracks.First(track => track.Track.Kind == TrackKind.Audio).Keep = false;
+        await fixture.Batch.ReviewCommand.ExecuteAsync(null);
+        var approval = Assert.IsType<MovieSift.Core.Planning.RemuxPlan>(item.ApprovedPlan);
+        Assert.Equal(item.VideoTracks.Select(track => track.Track.Id),
+            approval.RetainedTracks.Where(track => track.Kind == TrackKind.Video).Select(track => track.Id));
+        var snapshot = fixture.Batch.Snapshot;
+        var selections = item.Tracks.Select(track => track.Keep).ToArray();
+        var view = new FileTracksView { DataContext = item };
+        var window = new Window { Content = view };
+        window.Show();
+
+        try
+        {
+            foreach (var language in new[] { "en", "ru", "en" })
+            {
+                await fixture.Main.ChangeLanguageCommand.ExecuteAsync(language);
+                Dispatcher.UIThread.RunJobs();
+                Assert.Equal(multipleVideos, view.FindControl<Expander>("FileVideoSection")!.IsVisible);
+                Assert.Equal(selections, item.Tracks.Select(track => track.Keep));
+                Assert.All(item.VideoTracks, track =>
+                {
+                    Assert.True(track.Keep);
+                    Assert.False(track.ToggleSelectionCommand.CanExecute(null));
+                });
+                Assert.Same(approval, item.ApprovedPlan);
+                Assert.Same(snapshot, fixture.Batch.Snapshot);
+            }
+
+            fixture.Batch.CloseReviewCommand.Execute(null);
+            fixture.Batch.SelectedItem = item;
+            fixture.Backend.Inspections[source] = inspection;
+            await fixture.Batch.InspectSelectedCommand.ExecuteAsync(null);
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(view.FindControl<Expander>("FileVideoSection")!.IsVisible);
+            Assert.Single(item.VideoTracks);
+            Assert.True(item.VideoTracks[0].Keep);
+            Assert.Empty(fixture.Backend.RemuxRequests);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
     /// <summary>The direct editor retains the existing reversible remove-all-subtitles action and its selection authority.</summary>
     [AvaloniaFact]
     public async Task SingleFileRemoveAllSubtitlesPreservesAudioVideoAndCanBeReversed()
@@ -88,11 +155,19 @@ public sealed class SingleFileWorkspaceTests
             Assert.True(view.FindControl<ContentControl>("SingleFileEditor")!.IsEffectivelyVisible);
             Assert.False(view.FindControl<AggregateTracksView>("AggregateEditor")!.IsEffectivelyVisible);
             var editor = Assert.Single(view.GetVisualDescendants().OfType<SingleFileTracksView>(), control => control.IsEffectivelyVisible);
-            var cards = editor.GetVisualDescendants().OfType<Border>().Where(control => control.Classes.Contains("trackCard")).ToArray();
-            Assert.Equal([0, 1, 2, 3], cards.Select(control => ((TrackViewModel)control.DataContext!).Track.Id));
-            var video = Assert.Single(cards, control => ((TrackViewModel)control.DataContext!).Track.Kind == TrackKind.Video);
-            Assert.False(((TrackViewModel)video.DataContext!).ToggleSelectionCommand.CanExecute(null));
-            Assert.DoesNotContain(video.GetVisualDescendants().OfType<TrackSelectionActionView>(), control => control.IsEffectivelyVisible);
+            var trackView = Assert.Single(editor.GetVisualDescendants().OfType<FileTracksView>());
+            Assert.False(trackView.FindControl<Expander>("FileVideoSection")!.IsVisible);
+            Dispatcher.UIThread.RunJobs();
+            var cards = editor.GetVisualDescendants().OfType<Border>().Where(control => control.Classes.Contains("trackCard") && control.IsEffectivelyVisible).ToArray();
+            Assert.Equal([1, 2], cards.Select(control => ((TrackViewModel)control.DataContext!).Track.Id));
+            var video = Assert.Single(item.VideoTracks);
+            Assert.True(video.Keep);
+            Assert.False(video.ToggleSelectionCommand.CanExecute(null));
+            trackView.FindControl<TabControl>("FileTrackCategories")!.SelectedIndex = 1;
+            Dispatcher.UIThread.RunJobs();
+            var subtitleCards = editor.GetVisualDescendants().OfType<Border>().Where(control => control.Classes.Contains("trackCard") && control.IsEffectivelyVisible).ToArray();
+            Assert.Equal([3], subtitleCards.Select(control => ((TrackViewModel)control.DataContext!).Track.Id));
+            trackView.FindControl<TabControl>("FileTrackCategories")!.SelectedIndex = 0;
             item.Tracks[0].Keep = false;
             Assert.True(item.Tracks[0].Keep);
             item.Tracks.Single(track => track.Track.Id == 1).Keep = false;

@@ -16,6 +16,7 @@ public sealed class AppearanceViewModel : ObservableObject
     private static readonly TimeSpan SaveDebounce = TimeSpan.FromMilliseconds(250);
     private readonly AppearanceViewModelOptions options;
     private AppearanceSettings current = AppearanceSettings.Default;
+    private AppearancePaletteResult currentPalettes = AppearancePalettePolicy.Resolve(AppearanceSettings.Default);
     private AppearanceSettings? pending;
     private Task loading = Task.CompletedTask;
     private Task saving = Task.CompletedTask;
@@ -51,7 +52,7 @@ public sealed class AppearanceViewModel : ObservableObject
 
             Refresh();
         };
-        options.Applier.Apply(current, AppearancePalettePolicy.Resolve(current));
+        options.Applier.Apply(current, currentPalettes);
     }
 
     public LocalizationService Localization => options.Localization;
@@ -104,16 +105,33 @@ public sealed class AppearanceViewModel : ObservableObject
         get => AppearancePalettePolicy.TryColor(accentHex, out var color) ? color : Color.Parse(current.AccentHex);
         set => AccentHex = AppearancePalettePolicy.ToHex(value);
     }
-    public string LightPage { get => lightPage; set => Edit(ref lightPage, value); }
-    public string LightSurface { get => lightSurface; set => Edit(ref lightSurface, value); }
-    public string LightText { get => lightText; set => Edit(ref lightText, value); }
-    public string LightMuted { get => lightMuted; set => Edit(ref lightMuted, value); }
-    public string LightBorder { get => lightBorder; set => Edit(ref lightBorder, value); }
-    public string DarkPage { get => darkPage; set => Edit(ref darkPage, value); }
-    public string DarkSurface { get => darkSurface; set => Edit(ref darkSurface, value); }
-    public string DarkText { get => darkText; set => Edit(ref darkText, value); }
-    public string DarkMuted { get => darkMuted; set => Edit(ref darkMuted, value); }
-    public string DarkBorder { get => darkBorder; set => Edit(ref darkBorder, value); }
+    public string LightPage { get => EffectiveHex(lightPage, currentPalettes.Light!.Window); set => Edit(ref lightPage, value); }
+    public string LightSurface { get => EffectiveHex(lightSurface, currentPalettes.Light!.Panel); set => Edit(ref lightSurface, value); }
+    public string LightText { get => EffectiveHex(lightText, currentPalettes.Light!.Text); set => Edit(ref lightText, value); }
+    public string LightMuted { get => EffectiveHex(lightMuted, currentPalettes.Light!.Muted); set => Edit(ref lightMuted, value); }
+    public string LightBorder { get => EffectiveHex(lightBorder, currentPalettes.Light!.Border); set => Edit(ref lightBorder, value); }
+    public string DarkPage { get => EffectiveHex(darkPage, currentPalettes.Dark!.Window); set => Edit(ref darkPage, value); }
+    public string DarkSurface { get => EffectiveHex(darkSurface, currentPalettes.Dark!.Panel); set => Edit(ref darkSurface, value); }
+    public string DarkText { get => EffectiveHex(darkText, currentPalettes.Dark!.Text); set => Edit(ref darkText, value); }
+    public string DarkMuted { get => EffectiveHex(darkMuted, currentPalettes.Dark!.Muted); set => Edit(ref darkMuted, value); }
+    public string DarkBorder { get => EffectiveHex(darkBorder, currentPalettes.Dark!.Border); set => Edit(ref darkBorder, value); }
+
+    public IBrush LightPageBrush => PreviewBrush(LightPage);
+    public IBrush LightSurfaceBrush => PreviewBrush(LightSurface);
+    public IBrush LightTextBrush => PreviewBrush(LightText);
+    public IBrush LightMutedBrush => PreviewBrush(LightMuted);
+    public IBrush LightBorderBrush => PreviewBrush(LightBorder);
+    public IBrush DarkPageBrush => PreviewBrush(DarkPage);
+    public IBrush DarkSurfaceBrush => PreviewBrush(DarkSurface);
+    public IBrush DarkTextBrush => PreviewBrush(DarkText);
+    public IBrush DarkMutedBrush => PreviewBrush(DarkMuted);
+    public IBrush DarkBorderBrush => PreviewBrush(DarkBorder);
+
+    /// <summary>Displays the active fallback without materializing default overrides in portable storage.</summary>
+    private static string EffectiveHex(string text, Color fallback) => string.IsNullOrWhiteSpace(text) ? AppearancePalettePolicy.ToHex(fallback) : text;
+
+    /// <summary>Reflects valid field colors while an invalid intermediate HEX remains visibly editable.</summary>
+    private static IBrush PreviewBrush(string text) => AppearancePalettePolicy.TryColor(text, out var color) ? new SolidColorBrush(color) : Brushes.Transparent;
 
     /// <summary>Reads once and rejects delayed startup completion after a newer user edit.</summary>
     public Task InitializeAsync()
@@ -161,6 +179,7 @@ public sealed class AppearanceViewModel : ObservableObject
         if (palette.IsValid)
         {
             current = proposed;
+            currentPalettes = palette;
             options.Applier.Apply(current, palette);
             pending = current;
             StartSaving();
@@ -337,6 +356,7 @@ public sealed class AppearanceViewModel : ObservableObject
     private void Accept(AppearanceSettings settings, AppearancePaletteResult palettes)
     {
         current = settings;
+        currentPalettes = palettes;
         accentHex = settings.AccentHex;
         themeIndex = (int)settings.Theme;
         motionIndex = (int)settings.Motion;

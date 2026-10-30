@@ -11,7 +11,21 @@
       <Setter Property="Padding" Value="0" />
       <Setter Property="CornerRadius" Value="0" />
       <Setter Property="BorderThickness" Value="0" />
-      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Background" Value="{DynamicResource MovieSiftTransparentSelectionBrush}" />
+      <Setter Property="RenderTransform" Value="none" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border x:Name="CaptionSurface" Background="{TemplateBinding Background}">
+            <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Border>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="Button.caption:pointerover /template/ Border#CaptionSurface">
+      <Setter Property="Background" Value="{DynamicResource MovieSiftSelectionBrush}" />
+    </Style>
+    <Style Selector="Button.caption:pressed /template/ Border#CaptionSurface">
+      <Setter Property="Background" Value="{DynamicResource MovieSiftSecondaryBrush}" />
     </Style>
   </UserControl.Styles>
     <StackPanel Orientation="Horizontal" Height="32">
@@ -25,7 +39,7 @@
       </Button>
       <Button x:Name="CloseWindowButton" Classes="caption" Click="OnClose"
               AutomationProperties.Name="{Binding Localization[WindowClose]}" ToolTip.Tip="{Binding Localization[WindowClose]}">
-        <PathIcon Width="12" Height="12" Data="M 0,1 L 1,0 L 6,5 L 11,0 L 12,1 L 7,6 L 12,11 L 11,12 L 6,7 L 1,12 L 0,11 L 5,6 Z" />
+        <Path Classes="closeGlyph" Width="12" Height="12" />
       </Button>
     </StackPanel>
 </UserControl>

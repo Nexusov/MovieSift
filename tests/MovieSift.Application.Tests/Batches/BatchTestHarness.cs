@@ -33,6 +33,8 @@ internal sealed class BatchTestHarness : IMediaBackend, ISourceAccess, IOutputSt
     public Failure? RemuxFailure { get; set; }
     public Failure? PublicationFailure { get; set; }
     public Func<RemuxRequest, Task>? OnRemux { get; set; }
+    public bool RequiresInputProjection { get; set; }
+    public Func<PrepareInputRequest, Task>? OnPrepareInput { get; set; }
     public Func<InspectRequest, Task>? OnInspect { get; set; }
     public Func<VerifyRequest, Task>? OnVerify { get; set; }
     public Func<OutputRequest, Task>? OnCleanup { get; set; }
@@ -197,10 +199,26 @@ internal sealed class BatchTestHarness : IMediaBackend, ISourceAccess, IOutputSt
     public Task<OwnedOutput> ReserveAsync(ReserveOutputRequest request)
     {
         var directory = Path.Combine(Path.GetTempPath(), "MovieSift batch fake owned", request.Plan.Id.ToString("N"));
-        var output = new OwnedOutput(request.Plan.Id, directory, Path.Combine(directory, "candidate.mkv"), request.Plan.DestinationPath, "token");
+        var projection = request.RequiresInputProjection
+            ? new OwnedInputProjection(new(Path.Combine(directory, "input-projection.mkv"), "owned-input", 0, 200), request.Plan.Inspection.Source) : null;
+        var output = new OwnedOutput(request.Plan.Id, directory, Path.Combine(directory, "candidate.mkv"), request.Plan.DestinationPath, "token", InputProjection: projection);
         Reservations.Add(output);
         Revisions[output.CandidatePath] = new(output.CandidatePath, request.Plan.Id.ToString(), 80, 300);
         return Task.FromResult(output);
+    }
+
+    /// <summary>Opts controlled batches into the existing preparation boundary.</summary>
+    public MediaWorkRequirements GetWorkRequirements(RemuxPlan plan) => new(RequiresInputProjection);
+
+    /// <summary>Waits at the preparation gate without simulating a second worker owner.</summary>
+    public async Task PrepareInputAsync(PrepareInputRequest request)
+    {
+        if (OnPrepareInput is not null)
+        {
+            await OnPrepareInput(request);
+        }
+
+        request.CancellationToken.ThrowIfCancellationRequested();
     }
 
     /// <summary>Accepts only test-owned candidate reservations.</summary>

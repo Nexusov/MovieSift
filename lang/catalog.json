@@ -1,0 +1,89 @@
+{
+  "version": 1,
+  "packs": [
+    {
+      "locale": "ru",
+      "file": "ru.json",
+      "sha256": "4142a68080ccd0f62264bba8861a1578c4fa6a2e04036bab49ae0f9254431508",
+      "bytes": 60514
+    },
+    {
+      "locale": "de",
+      "file": "de.json",
+      "sha256": "054974ba37273b797ee8a9a47f4eac614ca14c0140f24257d451c3d2c2b02fe8",
+      "bytes": 44157
+    },
+    {
+      "locale": "es",
+      "file": "es.json",
+      "sha256": "016e16b0f60f04d59ad774196bfca155daf5b7f7b5c6c091987955cb33eb85fa",
+      "bytes": 38497
+    },
+    {
+      "locale": "fr",
+      "file": "fr.json",
+      "sha256": "8101cb41788274a9a8e1ce2752466242ef1e8c1503bb32d7ba8d3018692d8a0c",
+      "bytes": 40242
+    },
+    {
+      "locale": "pt-BR",
+      "file": "pt-BR.json",
+      "sha256": "470ffc54ab577679bb02a4c43004593272f5ef623ec107ea3e9d6b85cb598c51",
+      "bytes": 38433
+    },
+    {
+      "locale": "uk",
+      "file": "uk.json",
+      "sha256": "920b83bf9694a397ac202e0a63f9a993970de4fec6838e39b0cf039277e2f9ca",
+      "bytes": 56433
+    },
+    {
+      "locale": "pl",
+      "file": "pl.json",
+      "sha256": "b9c2b8af6ae838a1e2bdc0ad5b0408d58fe79a98c985e01f14c725ff5d97caea",
+      "bytes": 43207
+    },
+    {
+      "locale": "tr",
+      "file": "tr.json",
+      "sha256": "a1c1b147c3a5a369f1b9a56f9bf31a1319c2619ba7455952461dde774972d27a",
+      "bytes": 42494
+    },
+    {
+      "locale": "ja",
+      "file": "ja.json",
+      "sha256": "808fea5e06750a71baacb90dd4d074bc53fa8689f2c783e3ae69dcf5d8486fae",
+      "bytes": 46615
+    },
+    {
+      "locale": "ko",
+      "file": "ko.json",
+      "sha256": "800fd85628624fdc37421ae113e6a252e1ad031f807c3c9df24c428d85a9c305",
+      "bytes": 46352
+    },
+    {
+      "locale": "zh-Hans",
+      "file": "zh-Hans.json",
+      "sha256": "93c4720cbc173994ccddfc8a6e44047b79af9b938a1bb95169aa665bc8cf464e",
+      "bytes": 35458
+    },
+    {
+      "locale": "sv",
+      "file": "sv.json",
+      "sha256": "361c7535baafc65c4841589fccacbfefa050a3b83fdd0da886091f885794879e",
+      "bytes": 40507
+    },
+    {
+      "locale": "da",
+      "file": "da.json",
+      "sha256": "d2e8ab62cfa1a3931406a4e4ee6aafa9b82cc6012e871d2a328c668043d7a20b",
+      "bytes": 42206
+    },
+    {
+      "locale": "cs",
+      "file": "cs.json",
+      "sha256": "c67be62900ce831b5ce932cc19ad1046c2fa7cbeb078c853867396a0b12cf313",
+      "bytes": 41678
+    }
+  ]
+}

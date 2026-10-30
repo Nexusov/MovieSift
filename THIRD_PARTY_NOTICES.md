@@ -24,7 +24,7 @@ The collector preserves package license/notice files and `.nuspec` metadata. Com
 
 ## MKVToolNix artifacts
 
-`build/tools.lock.json` pins MKVToolNix 102.0 and its complete source. Windows uses a same-version source build; Linux uses the CLI executables and 22 required libraries from the pinned official AppImage. `build/tool-payload.lock.json` records selected and omitted files; changed or unaccounted files fail acquisition. Both platforms include complete MKVToolNix source under `tools/licenses/corresponding-source` and upstream notices under `tools/licenses/source-notices`. MovieSift invokes `mkvmerge` and `mkvextract`.
+`build/tools.lock.json` pins MKVToolNix 102.0 and its complete source. Windows uses a same-version source build; Linux uses the CLI executables and the verified library closure from the pinned official AppImage. `build/tool-payload.lock.json` records selected and omitted libraries; changed or unaccounted files fail acquisition. Both platforms include complete MKVToolNix source under `tools/licenses/corresponding-source` and upstream notices under `tools/licenses/source-notices`. MovieSift invokes `mkvmerge`, `mkvextract` and `mkvpropedit`; the header editor operates only on an owned input copy for supported legacy DTS timing preparation, never on the original.
 
 MKVToolNix includes separately licensed libEBML/libMatroska/librmff (LGPL), avilib (GPL), JSON and pugixml (MIT), utf8-cpp (Boost), fmt, Qt and artwork. The actual `lib/fmt/LICENSE` is MIT-style with an optional compiled-object exception. These texts, vendor LGPL notices and upstream build recipes are retained with the source materials.
 

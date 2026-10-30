@@ -49,10 +49,24 @@ public sealed class JobCoordinator(IMediaBackend backend, ISourceAccess sourceAc
                 await sourceAccess.PrepareDestinationAsync(destinationRequest);
                 await sourceAccess.ValidateDestinationAsync(destinationRequest);
             }
-            output = await outputStore.ReserveAsync(new(request.Plan, request.CancellationToken));
+            var requirements = backend.GetWorkRequirements(request.Plan);
+            output = await outputStore.ReserveAsync(new(request.Plan, request.CancellationToken, requirements.RequiresInputProjection));
+
+            if (requirements.RequiresInputProjection)
+            {
+                var projection = output.InputProjection ?? throw new OperationFailureException(
+                    new(ErrorCode.OwnershipInvalid, "The required input projection was not reserved."));
+                result = result with { Phase = JobPhase.PreparingInput };
+                request.Progress?.Report(new(JobPhase.PreparingInput));
+                await backend.PrepareInputAsync(new(request.Plan, projection,
+                    new InlineProgress(request.Progress, JobPhase.PreparingInput), request.CancellationToken));
+                await ValidatePlanAsync(new(request.Plan, request.CancellationToken));
+                await outputStore.ValidateOwnershipAsync(new(output, request.CancellationToken));
+            }
+
             request.Progress?.Report(new(JobPhase.Remuxing));
             var progress = new InlineProgress(request.Progress);
-            var tool = await backend.RemuxAsync(new(request.Plan, output.CandidatePath, progress, request.CancellationToken));
+            var tool = await backend.RemuxAsync(new(request.Plan, output.CandidatePath, progress, request.CancellationToken, output.InputProjection));
             result = result with { Phase = JobPhase.Remuxing, Tool = tool };
 
             if (tool.EffectiveDisposition is not (ToolDisposition.Success or ToolDisposition.WarningReview))
@@ -278,9 +292,9 @@ public sealed class JobCoordinator(IMediaBackend backend, ISourceAccess sourceAc
         !(mode == OutputMode.ReplaceSource && failure?.Code == ErrorCode.PublicationUncertain);
 
     /// <summary>Reports backend progress without capturing an accidental synchronization context.</summary>
-    private sealed class InlineProgress(IProgress<JobProgress>? progress) : IProgress<double>
+    private sealed class InlineProgress(IProgress<JobProgress>? progress, JobPhase phase = JobPhase.Remuxing) : IProgress<double>
     {
         /// <summary>Forwards measured remux progress to the caller.</summary>
-        public void Report(double value) => progress?.Report(new(JobPhase.Remuxing, value));
+        public void Report(double value) => progress?.Report(new(phase, value));
     }
 }

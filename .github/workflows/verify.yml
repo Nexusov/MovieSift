@@ -89,16 +89,16 @@ jobs:
         run: |
           python -m unittest discover -s build/tests -v
           if ($LASTEXITCODE -ne 0) { throw 'Distribution evidence regression checks failed.' }
-          python translations/validate-packs.py
+          python lang/validate-packs.py
           if ($LASTEXITCODE -ne 0) { throw 'Translation catalog verification failed.' }
-          python -m unittest discover -s translations -p 'test_*.py' -v
+          python -m unittest discover -s lang -p 'test_*.py' -v
           if ($LASTEXITCODE -ne 0) { throw 'Translation validation regression checks failed.' }
       - name: Unit, headless UI and required real-backend tests
         run: dotnet test --configuration Release --no-build --no-restore --logger trx --results-directory ./TestResults
       - name: Build self-contained archive and run packaged workflow
-        run: ./build/package.ps1 -RuntimeIdentifier '${{ matrix.runtime }}' -FixturePath '${{ github.workspace }}/artifacts/fixtures/ordinary.mkv' -Mp4FixturePath '${{ github.workspace }}/artifacts/fixtures/mp4/ordinary.mp4'
+        run: ./build/package.ps1 -RuntimeIdentifier '${{ matrix.runtime }}' -FixturePath '${{ github.workspace }}/artifacts/fixtures/ordinary.mkv' -Mp4FixturePath '${{ github.workspace }}/artifacts/fixtures/mp4/ordinary.mp4' -DtsFixturePath '${{ github.workspace }}/artifacts/fixtures/dts-derived-properties-overlap.mkv'
       - name: Relocate archive and run the actual application workflow
-        run: ./build/verify-package.ps1 -ArchivePath './artifacts/${{ matrix.archive }}' -FixturePath '${{ github.workspace }}/artifacts/fixtures/ordinary.mkv' -Mp4FixturePath '${{ github.workspace }}/artifacts/fixtures/mp4/ordinary.mp4'
+        run: ./build/verify-package.ps1 -ArchivePath './artifacts/${{ matrix.archive }}' -FixturePath '${{ github.workspace }}/artifacts/fixtures/ordinary.mkv' -Mp4FixturePath '${{ github.workspace }}/artifacts/fixtures/mp4/ordinary.mp4' -DtsFixturePath '${{ github.workspace }}/artifacts/fixtures/dts-derived-properties-overlap.mkv'
       - name: Prepare matching review source and build materials
         run: |
           python ./build/prepare-review-materials.py --repository . --archive './artifacts/${{ matrix.archive }}' --inventory './artifacts/distribution-reports/${{ matrix.runtime }}/distribution-${{ matrix.runtime }}.json' --output './artifacts/review-materials-${{ matrix.runtime }}'
@@ -107,7 +107,7 @@ jobs:
       - name: Verify Linux CLI archive without installed SDK or media tools
         if: runner.os == 'Linux'
         shell: bash
-        run: bash ./build/verify-clean-linux.sh ./artifacts/MovieSift-linux-x64.tar.gz ./artifacts/fixtures/ordinary.mkv ./artifacts/fixtures/mp4/ordinary.mp4
+        run: bash ./build/verify-clean-linux.sh ./artifacts/MovieSift-linux-x64.tar.gz ./artifacts/fixtures/ordinary.mkv ./artifacts/fixtures/mp4/ordinary.mp4 ./artifacts/fixtures/dts-derived-properties-overlap.mkv
       - name: Validate and stage the explicitly requested candidate set
         id: candidates
         if: ${{ success() && github.event_name == 'workflow_dispatch' && inputs.retain_candidates == true }}

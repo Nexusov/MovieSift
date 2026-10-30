@@ -16,4 +16,5 @@ public sealed record BatchViewModelServices(
     bool DataWritable,
     ILogger Log,
     RulePresetService Presets,
-    IQueueListStore QueueLists);
+    IQueueListStore QueueLists,
+    IOutputPreferencesStore? OutputPreferences = null);

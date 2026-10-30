@@ -8,7 +8,8 @@
     <StackPanel Spacing="8">
       <TextBlock Text="{Binding Localization[PresetHeading]}" FontWeight="SemiBold" />
       <TextBlock Text="{Binding Localization[PresetHint]}" TextWrapping="Wrap" />
-      <ComboBox x:Name="RulePresetList" ItemsSource="{Binding Presets}" SelectedItem="{Binding SelectedPreset, Mode=TwoWay}"
+      <TextBlock x:Name="EmptyPresetNotice" Text="{Binding Localization[PresetEmpty]}" IsVisible="{Binding !HasPresets}" Classes="muted" />
+      <ComboBox x:Name="RulePresetList" ItemsSource="{Binding Presets}" SelectedItem="{Binding SelectedPreset, Mode=TwoWay}" IsVisible="{Binding HasPresets}"
                 IsEnabled="{Binding CanSelect}" HorizontalAlignment="Stretch" MaxDropDownHeight="240"
                 AutomationProperties.Name="{Binding Localization[PresetChoose]}">
         <ComboBox.ItemTemplate>

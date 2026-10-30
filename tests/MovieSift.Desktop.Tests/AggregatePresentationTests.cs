@@ -28,6 +28,7 @@ public sealed class AggregatePresentationTests
         await fixture.LoadAsync();
         var ordinary = Assert.Single(fixture.Batch.AggregateTracks.Groups, group => group.Snapshot.Key.Title == subtitle.Title && !group.Snapshot.Key.IsForced);
         var forced = Assert.Single(fixture.Batch.AggregateTracks.Groups, group => group.Snapshot.Key.Title == subtitle.Title && group.Snapshot.Key.IsForced);
+        fixture.Batch.AggregateTracks.SelectedTrackTab = 1;
         var view = new AggregateTracksView { DataContext = fixture.Batch.AggregateTracks };
         var window = new Window { Content = view };
         window.Show();

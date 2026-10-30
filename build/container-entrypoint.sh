@@ -6,7 +6,7 @@ if (( $(id -u) == 0 )); then
     exit 1
 fi
 
-for unavailable_tool in dotnet mkvmerge mkvextract ffmpeg ffprobe; do
+for unavailable_tool in dotnet mkvmerge mkvextract mkvpropedit ffmpeg ffprobe; do
     if command -v "$unavailable_tool" >/dev/null 2>&1; then
         printf '%s\n' "Unexpected installed development/media tool: $unavailable_tool" >&2
         exit 1
@@ -26,9 +26,9 @@ cp /usr/local/share/moviesift-smoke/environment.txt "$evidence/container-environ
 
 cd /tmp
 "$application" --verify-tools
-for container_extension in mkv mp4; do
-    source="/check/input Кириллица/--source with spaces; &.$container_extension"
-    destination="/check/output Кириллица/result with spaces; &.$container_extension"
+for fixture_name in '--source with spaces; &.mkv' '--source with spaces; &.mp4' '--legacy DTS source with spaces; &.mkv'; do
+    source="/check/input Кириллица/$fixture_name"
+    destination="/check/output Кириллица/result $fixture_name"
     original_hash="$(sha256sum "$source" | cut -d ' ' -f 1)"
     "$application" --verify-portable "$source" "$destination"
 
@@ -47,4 +47,4 @@ for container_extension in mkv mp4; do
     printf 'Published output: %s\nUnchanged source SHA256: %s\n' "$destination" "$final_hash" >> "$evidence/container-environment.txt"
 done
 
-printf '%s\n' 'Portable MKV and MP4 CLI workflows passed without installed .NET/media tools, without network, and without root.'
+printf '%s\n' 'Portable MKV, legacy DTS and MP4 CLI workflows passed without installed .NET/media tools, without network, and without root.'

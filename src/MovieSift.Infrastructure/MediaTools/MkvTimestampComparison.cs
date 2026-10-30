@@ -10,7 +10,7 @@ internal static class MkvTimestampComparison
     private const double TimestampToleranceMilliseconds = 1;
     private const double NanosecondsPerMillisecond = 1_000_000;
 
-    /// <summary>Retains frame-count and timestamp checks while recognizing only a proven unknown AAC end boundary.</summary>
+    /// <summary>Retains frame-count and timestamp checks while recognizing only a proven unknown codec end boundary.</summary>
     internal static async Task<bool> EquivalentAsync(TrackTimestampComparison request)
     {
         using var sourceReader = File.OpenText(request.SourcePath);
@@ -57,7 +57,7 @@ internal static class MkvTimestampComparison
                 }
 
                 return WithinTimestampTolerance(new TimestampValues(sourceValue, candidateValue))
-                    || IsUnknownAacEnd(new EndBoundary(request, sourceValue, candidateValue,
+                    || IsUnknownCodecEnd(new EndBoundary(request, sourceValue, candidateValue,
                         lastSourceFrame!.Value, lastCandidateFrame!.Value));
             }
 
@@ -73,15 +73,17 @@ internal static class MkvTimestampComparison
         }
     }
 
-    /// <summary>Recognizes the pinned extractor's unknown-duration sentinel only for a proven AAC header addition.</summary>
-    private static bool IsUnknownAacEnd(EndBoundary request)
+    /// <summary>Recognizes the extractor's final unknown-duration sentinel only after independently proven AAC or DTS header addition.</summary>
+    private static bool IsUnknownCodecEnd(EndBoundary request)
     {
         // Pinned102 src/extract/tracks.cpp close_timestamp_files writes one end boundary after all frames.
         // An absent SimpleBlock duration yields an exact duplicate of the last frame timestamp.
         var unknownSourceEnd = request.SourceEnd == request.LastSourceFrame;
 
-        if (!unknownSourceEnd || !AacDefaultDurationPolicy.PermitsAddition(
-            new TrackSemanticComparison(request.Comparison.SourceTrack, request.Comparison.CandidateTrack)))
+        var comparison = new TrackSemanticComparison(request.Comparison.SourceTrack, request.Comparison.CandidateTrack);
+        var provenAddition = AacDefaultDurationPolicy.PermitsAddition(comparison) || DtsDefaultDurationPolicy.PermitsAddition(comparison);
+
+        if (!unknownSourceEnd || !provenAddition)
         {
             return false;
         }

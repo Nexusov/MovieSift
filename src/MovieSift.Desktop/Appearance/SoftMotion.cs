@@ -12,15 +12,16 @@ namespace MovieSift.Desktop.Appearance;
 public sealed class SoftMotion : AvaloniaObject
 {
     private const double PanelOffset = 8;
-    private static readonly TimeSpan PanelDuration = TimeSpan.FromMilliseconds(240);
     private static readonly TimeSpan ResultDuration = TimeSpan.FromMilliseconds(220);
     private static readonly ConditionalWeakTable<Control, MotionState> States = new();
+    public static readonly AttachedProperty<bool> VisibleProperty = AvaloniaProperty.RegisterAttached<SoftMotion, Control, bool>("Visible", true);
     public static readonly AttachedProperty<bool> EnterProperty = AvaloniaProperty.RegisterAttached<SoftMotion, Control, bool>("Enter");
     public static readonly AttachedProperty<string?> ResultKeyProperty = AvaloniaProperty.RegisterAttached<SoftMotion, Control, string?>("ResultKey");
 
     /// <summary>Connects declarative view markers to visibility and immutable publication presentation.</summary>
     static SoftMotion()
     {
+        VisibleProperty.Changed.AddClassHandler<Control>((control, arguments) => ChangeVisibility(control, arguments.NewValue is true));
         EnterProperty.Changed.AddClassHandler<Control>((control, arguments) =>
         {
             if (arguments.NewValue is not true)
@@ -56,6 +57,82 @@ public sealed class SoftMotion : AvaloniaObject
         });
     }
 
+    /// <summary>Reads the intended cosmetic visibility independently of an outgoing frame.</summary>
+    public static bool GetVisible(Control control) => control.GetValue(VisibleProperty);
+    /// <summary>Requests an interruptible cosmetic transition without deferring application state.</summary>
+    public static void SetVisible(Control control, bool value) => control.SetValue(VisibleProperty, value);
+
+    /// <summary>Fades outgoing panels before hiding them; a new request always wins.</summary>
+    private static async void ChangeVisibility(Control control, bool visible)
+    {
+        var state = States.GetOrCreateValue(control);
+        var revision = ++state.VisibilityRevision;
+        var initialOpacity = control.IsVisible ? control.Opacity : 0d;
+        state.Cancellation?.Cancel();
+
+        if (visible)
+        {
+            control.IsVisible = true;
+            control.Opacity = 1d;
+            Animate(control, true, initialOpacity);
+            return;
+        }
+
+        // RunAsync releases its animation priority before the awaiting continuation runs.
+        // Keep the underlying value at the final opacity so that gap cannot reveal a closing panel again.
+        control.Opacity = 0d;
+
+        if (AppearanceMotionPolicy.Reduced || TopLevel.GetTopLevel(control) is null)
+        {
+            control.IsVisible = false;
+            return;
+        }
+
+        using var cancellation = new CancellationTokenSource();
+        state.Cancellation = cancellation;
+        EventHandler reduce = (_, _) =>
+        {
+            if (AppearanceMotionPolicy.Reduced)
+            {
+                cancellation.Cancel();
+            }
+        };
+        AppearanceMotionPolicy.Changed += reduce;
+        EventHandler<VisualTreeAttachmentEventArgs> detached = (_, _) => cancellation.Cancel();
+        control.DetachedFromVisualTree += detached;
+        var animation = new Animation { Duration = AppearanceMotionPolicy.DisclosureDuration, Easing = new CubicEaseOut() };
+        var start = new KeyFrame { Cue = new Cue(0) };
+        start.Setters.Add(new Setter(Visual.OpacityProperty, initialOpacity));
+        var end = new KeyFrame { Cue = new Cue(1) };
+        end.Setters.Add(new Setter(Visual.OpacityProperty, 0d));
+        animation.Children.Add(start);
+        animation.Children.Add(end);
+
+        try
+        {
+            await animation.RunAsync(control, cancellation.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            // A subsequent open or close supersedes only the outgoing presentation.
+        }
+        finally
+        {
+            AppearanceMotionPolicy.Changed -= reduce;
+            control.DetachedFromVisualTree -= detached;
+
+            if (ReferenceEquals(state.Cancellation, cancellation))
+            {
+                state.Cancellation = null;
+            }
+
+            if (revision == state.VisibilityRevision && !GetVisible(control))
+            {
+                control.IsVisible = false;
+            }
+        }
+    }
+
     /// <summary>Reads the declarative finite-panel entry marker.</summary>
     public static bool GetEnter(Control control) => control.GetValue(EnterProperty);
     /// <summary>Marks a panel for visibility-based cosmetic entry.</summary>
@@ -66,7 +143,7 @@ public sealed class SoftMotion : AvaloniaObject
     public static void SetResultKey(Control control, string? value) => control.SetValue(ResultKeyProperty, value);
 
     /// <summary>Starts a finite visual animation that carries no workflow authority.</summary>
-    private static async void Animate(Control control, bool panel)
+    private static async void Animate(Control control, bool panel, double initialOpacity = 0d)
     {
         var state = States.GetOrCreateValue(control);
         state.Cancellation?.Cancel();
@@ -87,9 +164,11 @@ public sealed class SoftMotion : AvaloniaObject
             }
         };
         AppearanceMotionPolicy.Changed += reduce;
-        var animation = new Animation { Duration = panel ? PanelDuration : ResultDuration, Easing = new CubicEaseOut() };
+        EventHandler<VisualTreeAttachmentEventArgs> detached = (_, _) => cancellation.Cancel();
+        control.DetachedFromVisualTree += detached;
+        var animation = new Animation { Duration = panel ? AppearanceMotionPolicy.DisclosureDuration : ResultDuration, Easing = new CubicEaseOut() };
         var start = new KeyFrame { Cue = new Cue(0) };
-        start.Setters.Add(new Setter(Visual.OpacityProperty, 0d));
+        start.Setters.Add(new Setter(Visual.OpacityProperty, initialOpacity));
         var end = new KeyFrame { Cue = new Cue(1) };
         end.Setters.Add(new Setter(Visual.OpacityProperty, 1d));
 
@@ -113,6 +192,7 @@ public sealed class SoftMotion : AvaloniaObject
         finally
         {
             AppearanceMotionPolicy.Changed -= reduce;
+            control.DetachedFromVisualTree -= detached;
 
             if (ReferenceEquals(state.Cancellation, cancellation))
             {
@@ -126,5 +206,6 @@ public sealed class SoftMotion : AvaloniaObject
     {
         public CancellationTokenSource? Cancellation { get; set; }
         public string? ResultKey { get; set; }
+        public long VisibilityRevision { get; set; }
     }
 }

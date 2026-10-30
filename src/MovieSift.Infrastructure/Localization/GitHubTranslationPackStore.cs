@@ -11,7 +11,7 @@ namespace MovieSift.Infrastructure.Localization;
 
 /// <summary>Fetches data-only translation packs from one immutable official repository snapshot and caches validated dictionaries.</summary>
 public sealed partial class GitHubTranslationPackStore(HttpClient client, string dataDirectory,
-    IReadOnlyDictionary<string, string> englishMessages) : ITranslationPackStore
+    IReadOnlyDictionary<string, string> englishMessages, string? builtSourceRevision = null) : ITranslationPackStore
 {
     private const string CommitApi = "https://api.github.com/repos/Nexusov/MovieSift/git/ref/heads/main";
     private const string RawRoot = "https://raw.githubusercontent.com/Nexusov/MovieSift/";
@@ -59,27 +59,8 @@ public sealed partial class GitHubTranslationPackStore(HttpClient client, string
             Directory.CreateDirectory(cacheDirectory);
             PathSafety.RejectReparsePoints(cacheDirectory);
             using var exclusion = PortableRecordFileLock.Acquire(Path.Combine(cacheDirectory, "download.lock"));
-            var revisionBytes = await GetAsync(new(CommitApi), MaximumReferenceBytes, null, timeout.Token);
-            using var revisionJson = JsonDocument.Parse(revisionBytes, new() { MaxDepth = 16 });
-            var target = revisionJson.RootElement.GetProperty("object");
-            var revision = target.GetProperty("sha").GetString();
-
-            if (target.GetProperty("type").GetString() != "commit" || revision is null || !CommitPattern().IsMatch(revision))
-            {
-                throw TranslationPackJson.Invalid("GitHub did not identify an immutable source revision.");
-            }
-
-            var root = RawRoot + revision + "/translations/";
-            var catalog = await GetAsync(new(root + "catalog.json"), TranslationPackJson.MaximumCatalogBytes, null, timeout.Token);
-            var expected = TranslationPackJson.ReadCatalog(catalog, locale);
-            var bytes = await GetAsync(new(root + locale + ".json"), TranslationPackJson.MaximumPackBytes, progress, timeout.Token);
-
-            if (bytes.LongLength != expected.Bytes || Convert.ToHexStringLower(SHA256.HashData(bytes)) != expected.Hash)
-            {
-                throw TranslationPackJson.Invalid("The translation bytes do not match their snapshot manifest.");
-            }
-
-            var pack = TranslationPackJson.Read(bytes, locale, englishMessages);
+            var packs = await ReadCompatibleSnapshotAsync([locale], progress, timeout.Token);
+            var pack = packs[0];
             await CacheAsync(pack, timeout.Token);
             return pack;
         }
@@ -90,6 +71,140 @@ public sealed partial class GitHubTranslationPackStore(HttpClient client, string
         catch (Exception exception) when (IsExpectedFailure(exception))
         {
             throw MapFailure(exception);
+        }
+    }
+
+    /// <summary>Refreshes only existing cache entries once per application build using one immutable remote snapshot.</summary>
+    public async Task<IReadOnlyList<TranslationPack>> SynchronizeCachedAsync(CancellationToken cancellationToken = default)
+    {
+        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        timeout.CancelAfter(DownloadTimeout);
+
+        try
+        {
+            ValidateExistingAncestors(cacheDirectory);
+
+            if (!ExistsWithoutRedirection(cacheDirectory))
+            {
+                return [];
+            }
+
+            using var exclusion = PortableRecordFileLock.Acquire(Path.Combine(cacheDirectory, "download.lock"));
+            var identity = typeof(GitHubTranslationPackStore).Assembly.GetCustomAttributes(false)
+                .OfType<System.Reflection.AssemblyInformationalVersionAttribute>().Single().InformationalVersion;
+            var receipt = Path.Combine(cacheDirectory, "synchronization.json");
+
+            if (ExistsWithoutRedirection(receipt))
+            {
+                await using var existing = FileSourceAccess.OpenRegularReadStream(receipt);
+                using var document = JsonDocument.Parse(await ReadBoundedAsync(existing, MaximumReferenceBytes, null, null, timeout.Token),
+                    new() { MaxDepth = 16 });
+
+                if (document.RootElement.EnumerateObject().Count() != 2 || document.RootElement.GetProperty("version").GetInt32() != 1)
+                {
+                    throw TranslationPackJson.Invalid("Invalid synchronization receipt.");
+                }
+
+                if (document.RootElement.GetProperty("version").GetInt32() == 1 &&
+                    document.RootElement.GetProperty("build").GetString() == identity)
+                {
+                    return [];
+                }
+            }
+
+            var locales = TranslationCatalog.Languages.Where(language => language.Code != "en" &&
+                ExistsWithoutRedirection(Path.Combine(cacheDirectory, language.Code + ".json"))).Select(language => language.Code).ToArray();
+
+            if (locales.Length == 0)
+            {
+                return [];
+            }
+
+            var packs = await ReadCompatibleSnapshotAsync(locales, null, timeout.Token);
+
+            foreach (var pack in packs)
+            {
+                await CacheAsync(pack, timeout.Token);
+            }
+
+            var record = JsonSerializer.SerializeToElement(new { version = 1, build = identity });
+            await BoundedJson.WriteAsync(new JsonWriteRequest<JsonElement>(receipt, record, timeout.Token));
+            return packs;
+        }
+        catch (OperationCanceledException exception) when (!cancellationToken.IsCancellationRequested)
+        {
+            throw new TranslationPackException(TranslationErrorCode.Unavailable, "The cache synchronization timed out.", exception);
+        }
+        catch (Exception exception) when (IsExpectedFailure(exception))
+        {
+            throw MapFailure(exception);
+        }
+    }
+
+    /// <summary>Uses the exact built official source only when current main has a different validated resource contract.</summary>
+    private async Task<IReadOnlyList<TranslationPack>> ReadCompatibleSnapshotAsync(IReadOnlyList<string> locales,
+        IProgress<TranslationDownloadProgress>? progress, CancellationToken cancellationToken)
+    {
+        var snapshot = await ResolveSnapshotAsync(cancellationToken);
+        var informational = typeof(GitHubTranslationPackStore).Assembly.GetCustomAttributes(false)
+            .OfType<System.Reflection.AssemblyInformationalVersionAttribute>().Single().InformationalVersion;
+        var fallback = builtSourceRevision ?? informational.Split('+').Last();
+        var fallbackRoot = CommitPattern().IsMatch(fallback) ? RawRoot + fallback + "/lang/" : null;
+
+        try
+        {
+            return await ReadSnapshotAsync(snapshot, locales, progress, cancellationToken);
+        }
+        catch (TranslationPackException exception) when (exception.Code == TranslationErrorCode.ResourceContractMismatch &&
+            fallbackRoot is not null && fallbackRoot != snapshot)
+        {
+            // Only a validated contract mismatch or the fixed official catalog's absence permits fallback.
+            // Pack absence, hash, schema and other transport failures remain errors.
+            return await ReadSnapshotAsync(fallbackRoot, locales, progress, cancellationToken);
+        }
+    }
+
+    /// <summary>Validates every pack against one immutable catalog before any cached file is replaced.</summary>
+    private async Task<IReadOnlyList<TranslationPack>> ReadSnapshotAsync(string snapshot, IReadOnlyList<string> locales,
+        IProgress<TranslationDownloadProgress>? progress, CancellationToken cancellationToken)
+    {
+        var catalog = await GetAsync(new(snapshot + "catalog.json"), TranslationPackJson.MaximumCatalogBytes, null, cancellationToken,
+            allowMissingSnapshotCatalog: true);
+        var packs = new List<TranslationPack>();
+
+        foreach (var locale in locales)
+        {
+            var expected = TranslationPackJson.ReadCatalog(catalog, locale);
+            var bytes = await GetAsync(new(snapshot + locale + ".json"), TranslationPackJson.MaximumPackBytes, progress, cancellationToken);
+            ValidateDigest(bytes, expected);
+            packs.Add(TranslationPackJson.Read(bytes, locale, englishMessages));
+        }
+
+        return packs;
+    }
+
+    /// <summary>Resolves all files in a request from the same immutable official repository commit.</summary>
+    private async Task<string> ResolveSnapshotAsync(CancellationToken cancellationToken)
+    {
+        var bytes = await GetAsync(new(CommitApi), MaximumReferenceBytes, null, cancellationToken);
+        using var document = JsonDocument.Parse(bytes, new() { MaxDepth = 16 });
+        var target = document.RootElement.GetProperty("object");
+        var revision = target.GetProperty("sha").GetString();
+
+        if (target.GetProperty("type").GetString() != "commit" || revision is null || !CommitPattern().IsMatch(revision))
+        {
+            throw TranslationPackJson.Invalid("GitHub did not identify an immutable source revision.");
+        }
+
+        return RawRoot + revision + "/lang/";
+    }
+
+    /// <summary>Checks actual complete bytes before any existing cached dictionary can be replaced.</summary>
+    private static void ValidateDigest(byte[] bytes, (string Hash, long Bytes) expected)
+    {
+        if (bytes.LongLength != expected.Bytes || Convert.ToHexStringLower(SHA256.HashData(bytes)) != expected.Hash)
+        {
+            throw TranslationPackJson.Invalid("The translation bytes do not match their snapshot manifest.");
         }
     }
 
@@ -117,7 +232,7 @@ public sealed partial class GitHubTranslationPackStore(HttpClient client, string
 
     /// <summary>Uses fixed HTTPS endpoints, machine responses and bounded asynchronous draining without executable resources.</summary>
     private async Task<byte[]> GetAsync(Uri address, int maximumBytes, IProgress<TranslationDownloadProgress>? progress,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken, bool allowMissingSnapshotCatalog = false)
     {
         using var request = new HttpRequestMessage(HttpMethod.Get, address);
         request.Headers.UserAgent.ParseAdd("MovieSift-Translations/1.0");
@@ -127,6 +242,15 @@ public sealed partial class GitHubTranslationPackStore(HttpClient client, string
         if (response.RequestMessage?.RequestUri != address || (int)response.StatusCode is >= 300 and < 400)
         {
             throw TranslationPackJson.Invalid("Redirected translation downloads are not accepted.");
+        }
+
+        var missingOfficialCatalog = allowMissingSnapshotCatalog && response.StatusCode == System.Net.HttpStatusCode.NotFound &&
+            address.Host == "raw.githubusercontent.com" && CatalogPathPattern().IsMatch(address.AbsolutePath);
+
+        if (missingOfficialCatalog)
+        {
+            throw new TranslationPackException(TranslationErrorCode.ResourceContractMismatch,
+                "This official source snapshot predates the language catalog location.");
         }
 
         response.EnsureSuccessStatusCode();
@@ -231,6 +355,9 @@ public sealed partial class GitHubTranslationPackStore(HttpClient client, string
         JsonException or FormatException or InvalidOperationException or KeyNotFoundException => new(TranslationErrorCode.InvalidPack, exception.Message, exception),
         _ => new(TranslationErrorCode.Unavailable, exception.Message, exception)
     };
+
+    [GeneratedRegex(@"^/Nexusov/MovieSift/[0-9a-f]{40}/lang/catalog\.json$", RegexOptions.CultureInvariant)]
+    private static partial Regex CatalogPathPattern();
 
     [GeneratedRegex("^[0-9a-f]{40}$", RegexOptions.CultureInvariant)]
     private static partial Regex CommitPattern();

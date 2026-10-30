@@ -1,44 +1,41 @@
 # MovieSift
 
-Remove unwanted audio and subtitle tracks from videos without re-encoding.
+Keep the tracks you need
 
-Choose tracks for a single movie or a whole series in one workspace. Available for Windows and Linux.
+Remove unwanted audio and subtitle tracks from MKV and supported MP4 files without re-encoding
 
-**[Download latest release](https://github.com/Nexusov/MovieSift/releases/latest)**
+**[Download for Windows or Linux](https://github.com/Nexusov/MovieSift/releases/latest)**
 
-<img src="docs/images/moviesift-dark.png" alt="MovieSift in dark mode, with files and shared track selection" width="800">
+<img src="docs/images/moviesift-dark.png" alt="Current MovieSift dark workspace with one movie, English demonstration metadata, audio/subtitle tabs and portable output choices — offscreen render" width="1000">
 
 ## Get started
 
-These controls describe **1.2.0**. Earlier release archives remain unchanged. Upgrade from 1.0/1.1 by extracting 1.2 into a separate directory; their updater cannot install the new package layout.
+1. Extract the portable archive and run `MovieSift.exe` on Windows or `./MovieSift` on Linux
+2. Add a movie, several files or a series folder
+3. Switch between **Audio** and **Subtitles**, then **Remove** unwanted tracks; muted cards offer **Restore**
+4. Choose how to save the result, review the changes and start processing
 
-1. Download and extract the archive for your platform.
-2. Run `MovieSift.exe` on Windows or `./MovieSift` on Linux.
-3. Add files or a folder, then use **Exclude** (×) for unwanted tracks. Muted cards stay in place and offer **Restore**.
-4. Review the changes and start processing.
+**Create trimmed copies** preserves the originals. **Replace original files** is a separate, explicit choice and still requires verification and Review
 
-The runtime and media tools are included. Linux requires the [listed system libraries](docs/SUPPORTED_FORMATS.md#platform-and-native-requirements).
-
-The root contains one application launcher; DLLs, bundled tools and documentation live under `app`, while portable settings stay in `data`. Keep the complete folder together. **Updates** is always available in the header, independently of Appearance, with a newer-version indicator alongside it. Startup checks are on by default; downloading/installing still requires an explicit action.
+The .NET runtime and media tools are included. Keep the complete extracted folder together: the launcher is at the root, internal files are in `app`, and portable preferences are in `data`
 
 ## Features
 
-- Select tracks across multiple files, with individual adjustments.
-- Exclude all subtitle tracks in one action.
-- Save language rules as reusable presets.
-- Choose from 12 interface languages, with explicit on-demand translation downloads and offline reuse.
-- Use light or dark themes and custom colors independently of language.
+- Independent choices for one movie or a sequential mixed MKV/MP4 queue
+- Optional recursive folders with preserved season/subfolder output paths
+- Language, literal-title and forced-subtitle rules with explicit Preview and Apply
+- Named portable rule presets and explicit restoration of unfinished lists
+- Light/dark themes, custom colors and 15 interface languages; English is included, other translations download on demand
+- Update checks at startup and a dedicated **Updates** button for manual checks
 
-## Formats
-
-Supports MKV and a defined MP4 subset: H.264 video, AAC audio and mov_text subtitles. See [format compatibility](docs/SUPPORTED_FORMATS.md) for details.
+MKV and MP4 have explicit preservation limits. MP4 support covers the documented H.264/AAC/mov_text subset; neither format is converted into the other. See [supported formats and platforms](docs/SUPPORTED_FORMATS.md), including Linux system-library requirements
 
 ## Documentation
 
-- [User guide](docs/USAGE.md)
-- [Build, run and contribute](CONTRIBUTING.md)
+- [Usage, portable settings and upgrades](docs/USAGE.md)
+- [Build and contribute](CONTRIBUTING.md)
 - [Architecture](docs/ARCHITECTURE.md)
 
 ## License
 
-[MIT](LICENSE). Bundled components retain their own [licenses and notices](THIRD_PARTY_NOTICES.md).
+[MIT](LICENSE) · [Third-party licenses and notices](THIRD_PARTY_NOTICES.md)

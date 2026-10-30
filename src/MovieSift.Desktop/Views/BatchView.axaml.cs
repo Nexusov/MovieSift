@@ -17,6 +17,7 @@ public sealed partial class BatchView : UserControl
     private const double NarrowWorkspaceWidth = 850;
     private const double NarrowFileListHeight = 140;
     private const double NarrowExpandedShelfFraction = 0.75;
+    private const double NarrowMinimumTrackHeight = 48;
     private const double FileSidebarWidth = 330;
     private BatchViewModel? observedWorkspace;
     private bool? narrowLayout;
@@ -55,6 +56,13 @@ public sealed partial class BatchView : UserControl
     /// <summary>Moves focus to inert review text so queued Space/Enter cannot activate Run.</summary>
     private void OnWorkspaceChanged(object? sender, PropertyChangedEventArgs eventArguments)
     {
+        var rulesClosed = eventArguments.PropertyName == nameof(BatchViewModel.IsRulesOpen) && observedWorkspace?.IsRulesOpen == false;
+
+        if (rulesClosed && RulesPanel.IsKeyboardFocusWithin)
+        {
+            TopLevel.GetTopLevel(this)?.FocusManager?.Focus(null);
+        }
+
         var reviewTransition = eventArguments.PropertyName is nameof(BatchViewModel.IsReviewOpen) or nameof(BatchViewModel.IsReviewPending);
 
         if (reviewTransition && observedWorkspace?.IsReviewOpen == true)
@@ -68,15 +76,7 @@ public sealed partial class BatchView : UserControl
             });
         }
 
-        if (eventArguments.PropertyName == nameof(BatchViewModel.IsDetailsOpen) && observedWorkspace?.IsDetailsOpen == true)
-        {
-            if (narrowLayout == true)
-            {
-                FileSidebar.IsExpanded = false;
-            }
-
-            Dispatcher.UIThread.Post(() => SelectedFileDetails.BringIntoView());
-        }
+        // Details expand in place: neither scroll the editor nor collapse a different section automatically.
     }
 
     /// <summary>Rearranges the same controls into a collapsible file shelf at the supported small width.</summary>
@@ -90,6 +90,7 @@ public sealed partial class BatchView : UserControl
         }
 
         narrowLayout = narrow;
+        NewQueueLabel.IsVisible = !narrow;
         WorkspaceColumns.ColumnDefinitions = new(narrow ? "*" : $"{FileSidebarWidth},*");
         UpdateShelfRows();
         Grid.SetColumn(WorkspaceScrollViewer, narrow ? 0 : 1);
@@ -121,8 +122,12 @@ public sealed partial class BatchView : UserControl
         }
 
         WorkspaceColumns.RowDefinitions = new("Auto,*");
-        FileSidebar.MaxHeight = FileSidebar.IsExpanded
-            ? WorkspaceColumns.Bounds.Height * NarrowExpandedShelfFraction : double.PositiveInfinity;
+        // Wrapped footer text can leave too little space for even one track action under a fractional cap alone.
+        var availableHeight = WorkspaceColumns.Bounds.Height;
+        var expandedShelfHeight = Math.Min(availableHeight * NarrowExpandedShelfFraction,
+            Math.Max(0, availableHeight - NarrowMinimumTrackHeight));
+        // Closing content remains visible during its fade and must keep the same finite layout budget.
+        FileSidebar.MaxHeight = expandedShelfHeight;
     }
 
     /// <summary>Opens deliberately activated row details while inclusion and filename controls retain their own actions.</summary>
@@ -191,7 +196,15 @@ public sealed partial class BatchView : UserControl
     }
 
     /// <summary>Reveals the existing reset confirmation outside its contextual flyout.</summary>
-    private void OnNewQueue(object? sender, RoutedEventArgs eventArguments) => WorkspaceOptions.Flyout?.Hide();
+    private void OnNewQueue(object? sender, RoutedEventArgs eventArguments)
+    {
+        if (observedWorkspace?.NewBatchCommand.CanExecute(null) == true)
+        {
+            observedWorkspace.NewBatchCommand.Execute(null);
+        }
+
+        WorkspaceOptions.Flyout?.Hide();
+    }
 
     /// <summary>Accepts local file transfers only; folders retain their explicit discovery options.</summary>
     private void OnDragOver(object? sender, DragEventArgs eventArguments)

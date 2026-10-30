@@ -19,6 +19,7 @@ public sealed class LanguageChoiceViewModel : ObservableObject
 
     public string Code { get; }
     public string NativeName { get; }
+    public bool IsInstalled => owner.IsInstalled(Code);
     public bool IsCurrent => owner.Localization.Language == Code;
     public string StateText => owner.Localization[IsCurrent ? "LanguageCurrent" : Code == "en" ? "LanguageIncluded" : owner.IsInstalled(Code) ? "LanguageDownloaded" : "LanguageDownload"];
     public IAsyncRelayCommand SelectCommand { get; }

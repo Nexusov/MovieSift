@@ -25,7 +25,7 @@ jobs:
         with:
           path: ${{ runner.temp }}/mkv-source-candidate
           key: windows-mkv-source-${{ hashFiles('build/*mkv*', 'build/ffmpeg-runtime-dependencies.py') }}
-      - name: Build the pinned CLI pair and collect its complete materials
+      - name: Build the pinned CLI workers and collect their complete materials
         run: ./build/provision-windows-mkv.ps1 -Destination '${{ runner.temp }}/mkv-source-candidate' -CacheDirectory '${{ runner.temp }}/mkv-source-downloads'
       - name: Execute the actual workers on Windows
         run: |
@@ -33,6 +33,29 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'The candidate mkvmerge could not execute on Windows.' }
           & '${{ runner.temp }}/mkv-source-candidate/mkvextract.exe' --version
           if ($LASTEXITCODE -ne 0) { throw 'The candidate mkvextract could not execute on Windows.' }
+          & '${{ runner.temp }}/mkv-source-candidate/mkvpropedit.exe' --version
+          if ($LASTEXITCODE -ne 0) { throw 'The candidate mkvpropedit could not execute on Windows.' }
+      - name: Exercise native header editing on an owned original fixture
+        run: |
+          $tools = '${{ runner.temp }}/mkv-source-candidate'
+          $fixtures = '${{ runner.temp }}/mkv-source-fixtures'
+          python ./build/generate-fixtures.py --tool-directory $tools --destination $fixtures
+          if ($LASTEXITCODE -ne 0) { throw 'Original worker fixture generation failed.' }
+          $original = Join-Path $fixtures 'dts-derived-properties-overlap.mkv'
+          $before = (Get-FileHash -LiteralPath $original -Algorithm SHA256).Hash
+          $ownedCopy = Join-Path $fixtures 'owned header projection.mkv'
+          Copy-Item -LiteralPath $original -Destination $ownedCopy
+          $inspection = (& "$tools/mkvmerge.exe" -J $ownedCopy) | ConvertFrom-Json
+          if ($LASTEXITCODE -ne 0) { throw 'Original DTS identification failed.' }
+          $dts = @($inspection.tracks | Where-Object { $_.properties.codec_id -eq 'A_DTS' })
+          if ($dts.Count -ne 1 -or $dts[0].properties.PSObject.Properties.Name -contains 'default_duration') { throw 'Expected exactly one original DTS track without DefaultDuration.' }
+          & "$tools/mkvpropedit.exe" $ownedCopy --edit ("track:=" + $dts[0].properties.uid) --set 'default-duration=10666667'
+          if ($LASTEXITCODE -ne 0) { throw 'Native owned-copy header editing failed.' }
+          $edited = (& "$tools/mkvmerge.exe" -J $ownedCopy) | ConvertFrom-Json
+          if ($LASTEXITCODE -ne 0) { throw 'Edited DTS identification failed.' }
+          $editedDts = @($edited.tracks | Where-Object { $_.properties.codec_id -eq 'A_DTS' })
+          if ($editedDts.Count -ne 1 -or $editedDts[0].properties.default_duration -ne 10666667) { throw 'The native editor did not set the requested duration.' }
+          if ((Get-FileHash -LiteralPath $original -Algorithm SHA256).Hash -ne $before) { throw 'The native edit changed the original fixture.' }
       # These are review-only worker/material artifacts, never a public release
       # or MovieSift binary publication. They expire and cannot replace final
       # covered-source delivery alongside an eventual release.

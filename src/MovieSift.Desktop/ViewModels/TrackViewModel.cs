@@ -37,6 +37,7 @@ public sealed class TrackViewModel : ObservableObject
     public string ChannelsText => Track.Channels?.ToString(CultureInfo.InvariantCulture) ?? Localization["Unknown"];
     public string KeepAccessibleName => $"{Localization["Keep"]}: {KindText} {IdentifierText}, {TitleText}";
     public string FlagsText => TrackPresentation.DescribeFlags(Track, Localization);
+    public string SizeText => TrackSizePresentation.Describe(Track, Localization);
 
     public bool Keep
     {

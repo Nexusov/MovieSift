@@ -3,6 +3,7 @@
         xmlns:appearance="using:MovieSift.Desktop.Appearance"
         xmlns:viewModels="using:MovieSift.Desktop.ViewModels"
         xmlns:views="using:MovieSift.Desktop.Views"
+        xmlns:converters="using:Avalonia.Data.Converters"
         x:Class="MovieSift.Desktop.Views.MainWindow"
         x:DataType="viewModels:MainViewModel"
         Title="MovieSift" Icon="avares://MovieSift/Assets/moviesift.ico" Width="1040" Height="800" MinWidth="640" MinHeight="480">
@@ -18,9 +19,8 @@
       <Button x:Name="AvailableUpdateButton" Grid.Column="1" Command="{Binding UpdateActionCommand}" IsVisible="{Binding ShowUpdateAction}" VerticalAlignment="Center" Margin="0,0,8,0"
                 AutomationProperties.Name="{Binding UpdateActionText}">
           <StackPanel Orientation="Horizontal" Spacing="8">
-            <Border Width="18" Height="18" Background="{DynamicResource MovieSiftTextBrush}">
-              <Border.OpacityMask><ImageBrush Source="avares://MovieSift/Assets/update.png" Stretch="Uniform" /></Border.OpacityMask>
-            </Border>
+            <Path Width="19" Height="19" Stretch="Uniform" Stroke="{DynamicResource MovieSiftTextBrush}" StrokeThickness="1.6"
+                  StrokeLineCap="Round" StrokeJoin="Round" Data="M20,7 A8,8 0 0 0 5,6 L3,9 M3,3 V9 H9 M4,17 A8,8 0 0 0 19,18 L21,15 M15,15 H21 V21" />
             <TextBlock Text="{Binding UpdateActionText}" TextTrimming="CharacterEllipsis" />
           </StackPanel>
         </Button>
@@ -89,49 +89,61 @@
       <views:QueueRecoveryView DataContext="{Binding Batch.Recovery}" />
     </Border>
     <Grid>
-      <Border IsEnabled="{Binding !IsPreferencesOpen}" IsHitTestVisible="{Binding !IsPreferencesOpen}">
+      <Border IsHitTestVisible="{Binding !#PreferencesBackdrop.IsVisible}">
         <views:BatchView x:Name="Workspace" DataContext="{Binding Batch}" />
       </Border>
-      <Border x:Name="AppearancePanel" Classes="panel" appearance:SoftMotion.Enter="True" IsVisible="{Binding IsAppearanceOpen}" KeyboardNavigation.TabNavigation="Cycle" HorizontalAlignment="Right" Width="460" MaxWidth="600" Margin="0,0,0,6" BoxShadow="{StaticResource MovieSiftPanelShadow}">
+      <Border x:Name="PreferencesBackdrop" Background="Transparent" PointerPressed="OnPreferencesBackdropPressed">
+        <Border.IsVisible>
+          <MultiBinding Converter="{x:Static converters:BoolConverters.Or}">
+            <Binding Path="IsVisible" ElementName="AppearancePanel" />
+            <Binding Path="IsVisible" ElementName="LanguagePanel" />
+            <Binding Path="IsVisible" ElementName="UpdatesPanel" />
+          </MultiBinding>
+        </Border.IsVisible>
+      </Border>
+      <Border x:Name="AppearancePanel" Classes="panel" appearance:SoftMotion.Visible="{Binding IsAppearanceOpen}" IsHitTestVisible="{Binding IsAppearanceOpen}" KeyboardNavigation.TabNavigation="Cycle" HorizontalAlignment="Right" Width="460" MaxWidth="600" Margin="0,0,0,6" BoxShadow="{StaticResource MovieSiftPanelShadow}">
         <DockPanel>
           <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,10">
             <TextBlock Text="{Binding Localization[WorkspaceSettings]}" Classes="heading" VerticalAlignment="Center" />
-            <Button x:Name="CloseAppearanceButton" Grid.Column="1" Content="{Binding Localization[WorkspaceClose]}" Command="{Binding ToggleAppearanceCommand}" />
+            <Button x:Name="CloseAppearanceButton" Grid.Column="1" Classes="iconClose" Command="{Binding ToggleAppearanceCommand}"
+                    AutomationProperties.Name="{Binding Localization[WorkspaceClose]}" ToolTip.Tip="{Binding Localization[WorkspaceClose]}">
+              <Path Classes="closeGlyph" />
+            </Button>
           </Grid>
           <Border DockPanel.Dock="Top" Classes="secondary" IsVisible="{Binding HasPendingMediaDecision}" Margin="0,0,0,10">
             <TextBlock Text="{Binding Localization[AppearancePendingDecision]}" Foreground="{DynamicResource MovieSiftWarningBrush}" TextWrapping="Wrap" />
           </Border>
-          <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-            <StackPanel Spacing="14">
-              <Border IsEnabled="{Binding CanEditPreferences}">
-                <views:AppearanceView DataContext="{Binding Appearance}" />
-              </Border>
-            </StackPanel>
-          </ScrollViewer>
+          <Border IsEnabled="{Binding CanEditPreferences}">
+            <views:AppearanceView x:Name="AppearanceEditor" DataContext="{Binding Appearance}" />
+          </Border>
         </DockPanel>
       </Border>
-      <Border x:Name="UpdatesPanel" Classes="panel" appearance:SoftMotion.Enter="True" IsVisible="{Binding IsUpdatesOpen}"
+      <Border x:Name="UpdatesPanel" Classes="panel" appearance:SoftMotion.Visible="{Binding IsUpdatesOpen}" IsHitTestVisible="{Binding IsUpdatesOpen}"
               KeyboardNavigation.TabNavigation="Cycle" HorizontalAlignment="Right" Width="400" MaxHeight="{Binding #Workspace.Bounds.Height}"
               Margin="0,0,0,6" BoxShadow="{StaticResource MovieSiftPanelShadow}">
         <DockPanel>
           <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
             <TextBlock Text="{Binding Localization[UpdatesHeading]}" Classes="heading" VerticalAlignment="Center" />
-            <Button x:Name="CloseUpdatesButton" Grid.Column="1" Content="×" Command="{Binding ToggleUpdatesCommand}"
-                    AutomationProperties.Name="{Binding Localization[WorkspaceClose]}" />
+            <Button x:Name="CloseUpdatesButton" Grid.Column="1" Classes="iconClose" Command="{Binding ToggleUpdatesCommand}"
+                    AutomationProperties.Name="{Binding Localization[WorkspaceClose]}" ToolTip.Tip="{Binding Localization[WorkspaceClose]}">
+              <Path Classes="closeGlyph" />
+            </Button>
           </Grid>
           <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
             <views:UpdatesView DataContext="{Binding Updates}" />
           </ScrollViewer>
         </DockPanel>
       </Border>
-      <Border x:Name="LanguagePanel" Classes="panel" appearance:SoftMotion.Enter="True" IsVisible="{Binding IsLanguageOpen}"
+      <Border x:Name="LanguagePanel" Classes="panel" appearance:SoftMotion.Visible="{Binding IsLanguageOpen}" IsHitTestVisible="{Binding IsLanguageOpen}"
               KeyboardNavigation.TabNavigation="Cycle" HorizontalAlignment="Right" VerticalAlignment="Top" Width="380" MaxWidth="600" MaxHeight="{Binding #Workspace.Bounds.Height}"
               Margin="0,0,0,6" BoxShadow="{StaticResource MovieSiftPanelShadow}">
         <DockPanel>
           <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
             <TextBlock Text="{Binding Localization[LanguageTitle]}" Classes="heading" VerticalAlignment="Center" />
-            <Button x:Name="CloseLanguageButton" Grid.Column="1" Content="×" Command="{Binding ToggleLanguageCommand}"
-                    AutomationProperties.Name="{Binding Localization[LanguageClose]}" />
+            <Button x:Name="CloseLanguageButton" Grid.Column="1" Classes="iconClose" Command="{Binding ToggleLanguageCommand}"
+                    AutomationProperties.Name="{Binding Localization[LanguageClose]}" ToolTip.Tip="{Binding Localization[LanguageClose]}">
+              <Path Classes="closeGlyph" />
+            </Button>
           </Grid>
           <views:LanguagesView DataContext="{Binding Languages}" />
         </DockPanel>

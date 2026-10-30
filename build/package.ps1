@@ -6,6 +6,7 @@ param(
     [string] $OutputDirectory,
     [string] $FixturePath,
     [string] $Mp4FixturePath,
+    [string] $DtsFixturePath,
     [string] $ToolCacheDirectory = (Join-Path $PSScriptRoot '../artifacts/downloads'),
     [string] $Dotnet = 'dotnet',
     [string] $WindowsMkvBuildDirectory = $env:MOVIESIFT_WINDOWS_MKV_BUILD_DIRECTORY,
@@ -192,7 +193,7 @@ try {
         }
     }
 
-    & (Join-Path $PSScriptRoot 'verify-package.ps1') -PackageDirectory $packageRoot -FixturePath $FixturePath -Mp4FixturePath $Mp4FixturePath
+    & (Join-Path $PSScriptRoot 'verify-package.ps1') -PackageDirectory $packageRoot -FixturePath $FixturePath -Mp4FixturePath $Mp4FixturePath -DtsFixturePath $DtsFixturePath
 
     $generatedDataDirectory = [IO.Path]::GetFullPath((Join-Path $packageRoot 'data'))
     $stagingPrefix = [IO.Path]::GetFullPath($stagingRoot) + [IO.Path]::DirectorySeparatorChar

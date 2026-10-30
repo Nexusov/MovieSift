@@ -27,14 +27,7 @@ internal static partial class TranslationPackJson
 
         var messages = Fields(fields["messages"], null);
 
-        if (english.Count > MaximumKeys || messages.Count != english.Count || messages.Keys.Any(key => !english.ContainsKey(key)))
-        {
-            throw Invalid("The translation does not match this application's resource keys.");
-        }
-
-        var translated = ImmutableDictionary.CreateBuilder<string, string>(StringComparer.Ordinal);
-
-        foreach (var (key, element) in messages)
+        foreach (var element in messages.Values)
         {
             var value = element.GetString();
 
@@ -44,6 +37,24 @@ internal static partial class TranslationPackJson
             }
 
             _ = CompositeFormat.Parse(value);
+        }
+
+        if (english.Count > MaximumKeys || messages.Count > MaximumKeys)
+        {
+            throw Invalid("The translation exceeds its resource limit.");
+        }
+
+        if (messages.Count != english.Count || messages.Keys.Any(key => !english.ContainsKey(key)))
+        {
+            throw new TranslationPackException(TranslationErrorCode.ResourceContractMismatch,
+                "The translation does not match this application's resource keys.");
+        }
+
+        var translated = ImmutableDictionary.CreateBuilder<string, string>(StringComparer.Ordinal);
+
+        foreach (var (key, element) in messages)
+        {
+            var value = element.GetString()!;
 
             if (Signature(value) != Signature(english[key]))
             {
@@ -91,7 +102,7 @@ internal static partial class TranslationPackJson
             }
         }
 
-        return selected ?? throw new TranslationPackException(TranslationErrorCode.Unavailable, "This translation is not available in the published catalog.");
+        return selected ?? throw new TranslationPackException(TranslationErrorCode.ResourceContractMismatch, "This supported locale is absent from the snapshot catalog.");
     }
 
     /// <summary>Bounds nesting and disables permissive JSON syntax.</summary>

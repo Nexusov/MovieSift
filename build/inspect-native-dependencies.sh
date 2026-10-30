@@ -36,10 +36,10 @@ while IFS= read -r -d '' candidate; do
         missing_dependency=1
     fi
 done < <(
-    # ldd resolves transitive dependencies of the CLI pair. Unused retained AppImage
+    # ldd resolves transitive dependencies of all CLI workers. Unused retained AppImage
     # GUI libraries are provenance material, not additional application requirements.
     find "$package_directory" -path "$payload_directory/tools/app-root" -prune -o -type f -print0
-    printf '%s\0' "$payload_directory/tools/app-root/usr/bin/mkvmerge" "$payload_directory/tools/app-root/usr/bin/mkvextract"
+    printf '%s\0' "$payload_directory/tools/app-root/usr/bin/mkvmerge" "$payload_directory/tools/app-root/usr/bin/mkvextract" "$payload_directory/tools/app-root/usr/bin/mkvpropedit"
 )
 
 mv "$temporary_report" "$report_path"

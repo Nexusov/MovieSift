@@ -46,7 +46,16 @@ internal static class AppBootstrap
         var sourceAccess = new FileSourceAccess();
         var backend = new ContainerMediaBackend(
             new MkvBackend(new(sourceAccess, MkvToolPaths.FromApplicationDirectory(),
-                Diagnostic: detail => logger.Warning("{MediaCleanupDiagnostic}", detail))),
+                Diagnostic: detail =>
+                {
+                    if (detail.StartsWith("Inspection timing:", StringComparison.Ordinal))
+                    {
+                        logger.Information("{MediaInspectionDiagnostic}", detail);
+                        return;
+                    }
+
+                    logger.Warning("{MediaCleanupDiagnostic}", detail);
+                })),
             new FfmpegBackend(new(sourceAccess, FfmpegToolPaths.FromApplicationDirectory())));
         var outputs = new OwnedOutputStore(dataDirectory);
         var settings = new PortableSettingsStore(dataDirectory);
@@ -57,7 +66,8 @@ internal static class AppBootstrap
         var batchViewModel = new BatchViewModel(new(batch,
             new BatchCoordinator(batch, new InspectionService(backend, sourceAccess), jobs, sourceAccess),
             new FileBatchInputDiscovery(sourceAccess, outputs, [dataDirectory]), dialogs, localization, dataWritable, logger,
-            new RulePresetService(new PortableRulePresetStore(dataDirectory)), new PortableQueueListStore(dataDirectory)));
+            new RulePresetService(new PortableRulePresetStore(dataDirectory)), new PortableQueueListStore(dataDirectory),
+            new PortableOutputPreferencesStore(dataDirectory)));
         var appearance = new AppearanceViewModel(new(new PortableAppearanceStore(dataDirectory), localization,
             new AppearanceApplier(Avalonia.Application.Current!)));
         var version = typeof(App).Assembly.GetName().Version!;

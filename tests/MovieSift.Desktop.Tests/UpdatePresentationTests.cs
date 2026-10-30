@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
@@ -6,12 +7,14 @@ using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using MovieSift.Application;
+using MovieSift.Application.Appearance;
 using MovieSift.Application.Batches;
 using MovieSift.Application.Inspection;
 using MovieSift.Application.Jobs;
 using MovieSift.Application.Ports;
 using MovieSift.Application.Updates;
 using MovieSift.Core.Media;
+using MovieSift.Desktop.Appearance;
 using MovieSift.Desktop.Localization;
 using MovieSift.Desktop.Updates;
 using MovieSift.Desktop.ViewModels;
@@ -24,6 +27,55 @@ namespace MovieSift.Desktop.Tests;
 /// <summary>Exercises explicit update consent and shell ownership without network calls or real installation.</summary>
 public sealed class UpdatePresentationTests
 {
+    private const int ReadmeWindowWidth = 1200;
+    private const int ReadmeWindowHeight = 1000;
+
+    /// <summary>Checks the permanent header against real workspace bounds and optionally exports the current README illustration.</summary>
+    [AvaloniaFact]
+    public async Task CurrentHeaderAndWorkspaceRemainReachableTogether()
+    {
+        var assemblyVersion = typeof(MovieSift.Desktop.App).Assembly.GetName().Version!;
+        var fixture = new UpdateFixture(new(assemblyVersion.Major, assemblyVersion.Minor, assemblyVersion.Build));
+        fixture.Preferences.Load = () => Task.FromResult(false);
+        await fixture.Main.InitializeAsync();
+        fixture.Main.Appearance!.ThemeIndex = (int)AppearanceTheme.Dark;
+        fixture.Main.Appearance.MotionIndex = (int)AppearanceMotion.Reduced;
+        await fixture.Batch.AddFilesCommand.ExecuteAsync(null);
+        var item = Assert.Single(fixture.Batch.Items);
+        item.Tracks.Single(track => track.Track.Kind == TrackKind.Audio && !track.Track.IsDefault).Keep = false;
+        var window = new MainWindow { DataContext = fixture.Main, Width = ReadmeWindowWidth, Height = ReadmeWindowHeight };
+        window.Show();
+
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            window.UpdateLayout();
+
+            foreach (var name in new[] { "AvailableUpdateButton", "LanguageButton", "AppearanceButton" })
+            {
+                var button = window.FindControl<Button>(name)!;
+                Assert.True(button.IsEffectivelyVisible);
+                var point = button.TranslatePoint(default, window)!.Value;
+                Assert.True(point.X >= 0 && point.X + button.Bounds.Width <= window.ClientSize.Width);
+            }
+
+            Assert.False(fixture.Batch.HasReview);
+            Assert.Empty(fixture.Backend.RemuxRequests);
+            Assert.Equal("en", fixture.Localization.Language);
+
+            foreach (var text in window.GetVisualDescendants().OfType<TextBlock>().Where(control => control.IsEffectivelyVisible))
+            {
+                Assert.DoesNotMatch(@"\p{IsCyrillic}", text.Text ?? string.Empty);
+            }
+
+            SoftWorkspaceRenderTests.Save(window, "readme-current-dark", 1);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
     /// <summary>A slow startup request runs once while ordinary media commands remain available.</summary>
     [AvaloniaFact]
     public async Task StartupChecksOnceWithoutReservingTheMediaWorkspace()
@@ -703,8 +755,13 @@ public sealed class UpdatePresentationTests
         public MainViewModel Main { get; }
 
         /// <summary>Reuses media test ports without constructing a second shell competing for availability.</summary>
-        public UpdateFixture()
+        public UpdateFixture(AppVersion? currentVersion = null)
         {
+            if (currentVersion is not null)
+            {
+                PrepareReadmeMetadata();
+            }
+
             var source = new BatchUiSourceAccess(Backend);
             var session = new BatchSession();
             var coordinator = new BatchCoordinator(session, new InspectionService(Backend, source), new JobCoordinator(Backend, source, Outputs), source);
@@ -712,8 +769,27 @@ public sealed class UpdatePresentationTests
             var discovery = new BatchUiDiscovery(Backend.Inspections.Values.Select(inspection => inspection.Source).ToImmutableArray());
             Batch = new(new(session, coordinator, discovery, new BatchUiDialogs(Backend.Inspections.Keys.ToArray()), Localization, true,
                 logger, new(new BatchUiPresetStore()), new BatchUiQueueListStore()));
-            Updates = new(Service, Preferences, Localization, new(1, 0, 0), logger);
-            Main = new(new(Settings, Outputs, Localization, true, logger, Batch, Updates: Updates));
+            Updates = new(Service, Preferences, Localization, currentVersion ?? new(1, 0, 0), logger);
+            var appearance = currentVersion is null ? null : new AppearanceViewModel(new(new WorkspaceAppearanceStore(), Localization,
+                new AppearanceApplier(Avalonia.Application.Current)));
+            Main = new(new(Settings, Outputs, Localization, true, logger, Batch, appearance, Updates));
+        }
+
+        /// <summary>Renders synthetic metadata with useful examples instead of private paths or internal codec placeholders.</summary>
+        private void PrepareReadmeMetadata()
+        {
+            var inspection = Backend.Inspections.Values.First();
+            Backend.Inspections.Clear();
+            var root = OperatingSystem.IsWindows() ? Path.GetPathRoot(Environment.SystemDirectory)! : Path.GetPathRoot(Path.GetTempPath())!;
+            var path = Path.Combine(root, "Movies", "Eternal.Sunshine.of.the.Spotless.Mind.2004.1080p.mkv");
+            var tracks = inspection.Tracks.Select(track => track with
+            {
+                Codec = track.Kind switch { TrackKind.Video => "H.264 / AVC", TrackKind.Audio => "AAC", _ => "SubRip / SRT" },
+                Title = track.Kind switch { TrackKind.Video => "Original video", TrackKind.Audio => track.IsDefault ? "Original English soundtrack" : "Russian dub — alternate soundtrack", _ => "English captions" },
+                Language = track.Kind == TrackKind.Audio ? track.IsDefault ? "eng" : "rus" : "eng",
+                LanguageIetf = track.Kind == TrackKind.Audio ? track.IsDefault ? "en" : "ru" : "en"
+            }).ToImmutableArray();
+            Backend.Inspections.Add(path, inspection with { Source = inspection.Source with { FullPath = path }, Tracks = tracks });
         }
 
         /// <summary>Produces a real immutable review through ordinary selection commands before updater gating.</summary>

@@ -39,6 +39,7 @@ public sealed class SubtitleSelectionActionTests
         await fixture.Batch.ReviewCommand.ExecuteAsync(null);
         var before = fixture.Batch.Items.ToDictionary(item => item.Id, item => item.Snapshot);
         var revision = fixture.Batch.Snapshot.Revision;
+        fixture.Batch.AggregateTracks.SelectedTrackTab = 1;
         var view = new AggregateTracksView { DataContext = fixture.Batch.AggregateTracks };
         var window = new Window { Content = view };
         window.Show();
