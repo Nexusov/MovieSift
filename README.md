@@ -6,7 +6,7 @@ Remove unwanted audio and subtitle tracks from MKV and supported MP4 files witho
 
 **[Download for Windows or Linux](https://github.com/Nexusov/MovieSift/releases/latest)**
 
-<img src="docs/images/moviesift-dark.png" alt="Current MovieSift dark workspace with two files, separate audio/subtitle tabs and portable output choices — offscreen render" width="1000">
+<img src="docs/images/moviesift-dark.png" alt="Current MovieSift dark workspace with one movie, English demonstration metadata, audio/subtitle tabs and portable output choices — offscreen render" width="1000">
 
 ## Get started
 

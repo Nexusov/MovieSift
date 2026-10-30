@@ -27,6 +27,9 @@ namespace MovieSift.Desktop.Tests;
 /// <summary>Exercises explicit update consent and shell ownership without network calls or real installation.</summary>
 public sealed class UpdatePresentationTests
 {
+    private const int ReadmeWindowWidth = 1200;
+    private const int ReadmeWindowHeight = 1000;
+
     /// <summary>Checks the permanent header against real workspace bounds and optionally exports the current README illustration.</summary>
     [AvaloniaFact]
     public async Task CurrentHeaderAndWorkspaceRemainReachableTogether()
@@ -38,8 +41,9 @@ public sealed class UpdatePresentationTests
         fixture.Main.Appearance!.ThemeIndex = (int)AppearanceTheme.Dark;
         fixture.Main.Appearance.MotionIndex = (int)AppearanceMotion.Reduced;
         await fixture.Batch.AddFilesCommand.ExecuteAsync(null);
-        fixture.Batch.AggregateTracks.AudioGroups.First().ToggleKeepCommand.Execute(null);
-        var window = new MainWindow { DataContext = fixture.Main, Width = 1200, Height = 850 };
+        var item = Assert.Single(fixture.Batch.Items);
+        item.Tracks.Single(track => track.Track.Kind == TrackKind.Audio && !track.Track.IsDefault).Keep = false;
+        var window = new MainWindow { DataContext = fixture.Main, Width = ReadmeWindowWidth, Height = ReadmeWindowHeight };
         window.Show();
 
         try
@@ -57,6 +61,13 @@ public sealed class UpdatePresentationTests
 
             Assert.False(fixture.Batch.HasReview);
             Assert.Empty(fixture.Backend.RemuxRequests);
+            Assert.Equal("en", fixture.Localization.Language);
+
+            foreach (var text in window.GetVisualDescendants().OfType<TextBlock>().Where(control => control.IsEffectivelyVisible))
+            {
+                Assert.DoesNotMatch(@"\p{IsCyrillic}", text.Text ?? string.Empty);
+            }
+
             SoftWorkspaceRenderTests.Save(window, "readme-current-dark", 1);
         }
         finally
@@ -767,22 +778,18 @@ public sealed class UpdatePresentationTests
         /// <summary>Renders synthetic metadata with useful examples instead of private paths or internal codec placeholders.</summary>
         private void PrepareReadmeMetadata()
         {
-            var originals = Backend.Inspections.Values.ToArray();
+            var inspection = Backend.Inspections.Values.First();
             Backend.Inspections.Clear();
-
-            for (var index = 0; index < originals.Length; index++)
+            var root = OperatingSystem.IsWindows() ? Path.GetPathRoot(Environment.SystemDirectory)! : Path.GetPathRoot(Path.GetTempPath())!;
+            var path = Path.Combine(root, "Movies", "Eternal.Sunshine.of.the.Spotless.Mind.2004.1080p.mkv");
+            var tracks = inspection.Tracks.Select(track => track with
             {
-                var inspection = originals[index];
-                var path = Path.Combine(Path.GetPathRoot(Path.GetTempPath())!, "Videos", "Sample series", "Season 1", $"Episode {index + 1:00}.mkv");
-                var tracks = inspection.Tracks.Select(track => track with
-                {
-                    Codec = track.Kind switch { TrackKind.Video => "H.264 / AVC", TrackKind.Audio => "AAC", _ => "SubRip / SRT" },
-                    Title = track.Kind switch { TrackKind.Video => "Original video", TrackKind.Audio => track.IsDefault ? "English soundtrack" : "Russian dub", _ => "Captions" },
-                    Language = track.Kind == TrackKind.Audio ? track.IsDefault ? "eng" : "rus" : track.Language,
-                    LanguageIetf = track.Kind == TrackKind.Audio ? track.IsDefault ? "en" : "ru" : track.LanguageIetf
-                }).ToImmutableArray();
-                Backend.Inspections.Add(path, inspection with { Source = inspection.Source with { FullPath = path }, Tracks = tracks });
-            }
+                Codec = track.Kind switch { TrackKind.Video => "H.264 / AVC", TrackKind.Audio => "AAC", _ => "SubRip / SRT" },
+                Title = track.Kind switch { TrackKind.Video => "Original video", TrackKind.Audio => track.IsDefault ? "Original English soundtrack" : "Russian dub — alternate soundtrack", _ => "English captions" },
+                Language = track.Kind == TrackKind.Audio ? track.IsDefault ? "eng" : "rus" : "eng",
+                LanguageIetf = track.Kind == TrackKind.Audio ? track.IsDefault ? "en" : "ru" : "en"
+            }).ToImmutableArray();
+            Backend.Inspections.Add(path, inspection with { Source = inspection.Source with { FullPath = path }, Tracks = tracks });
         }
 
         /// <summary>Produces a real immutable review through ordinary selection commands before updater gating.</summary>
