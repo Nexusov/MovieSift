@@ -51,6 +51,7 @@
   <data name="NoChange" xml:space="preserve"><value>No track changes. Processing is not needed</value></data>
   <data name="Checking" xml:space="preserve"><value>Checking source and destination…</value></data>
   <data name="Remuxing" xml:space="preserve"><value>Copying retained streams…</value></data>
+  <data name="PreparingInput" xml:space="preserve"><value>Preparing a temporary input copy…</value></data>
   <data name="Verifying" xml:space="preserve"><value>Verifying the candidate…</value></data>
   <data name="Publishing" xml:space="preserve"><value>Saving the verified result…</value></data>
   <data name="Published" xml:space="preserve"><value>New file created: {0}</value></data>
@@ -483,4 +484,5 @@
   <data name="TrackSizeUnavailable" xml:space="preserve"><value>Size unavailable</value></data>
   <data name="BatchNewHelp" xml:space="preserve"><value>Start an empty list. Files already created stay on disk</value></data>
   <data name="TrackSizeHelp" xml:space="preserve"><value>Container-reported or bitrate-based sizes may be approximate. Exact sizes require reading every payload</value></data>
+  <data name="InterruptedInputProjectionPath" xml:space="preserve"><value>Temporary input copy: {0}</value></data>
 </root>

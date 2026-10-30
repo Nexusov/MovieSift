@@ -482,6 +482,8 @@
     "TrackSizeEstimated": "推定データ量: ≈ {0}",
     "TrackSizeUnavailable": "サイズ不明",
     "BatchNewHelp": "空のリストを開始します。作成済みファイルはディスクに残ります",
-    "TrackSizeHelp": "メタデータやビットレートに基づくサイズは概算です。正確なサイズにはすべてのデータの読み取りが必要です"
+    "TrackSizeHelp": "メタデータやビットレートに基づくサイズは概算です。正確なサイズにはすべてのデータの読み取りが必要です",
+    "PreparingInput": "入力ファイルの一時コピーを準備しています…",
+    "InterruptedInputProjectionPath": "入力ファイルの一時コピー: {0}"
   }
 }

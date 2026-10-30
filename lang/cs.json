@@ -482,6 +482,8 @@
     "TrackSizeEstimated": "Odhadovaná velikost dat: ≈ {0}",
     "TrackSizeUnavailable": "Velikost není dostupná",
     "BatchNewHelp": "Začít s prázdným seznamem. Již vytvořené soubory zůstanou na disku",
-    "TrackSizeHelp": "Velikosti uváděné kontejnerem nebo odvozené z datového toku mohou být přibližné. Přesná velikost vyžaduje načtení všech dat stopy"
+    "TrackSizeHelp": "Velikosti uváděné kontejnerem nebo odvozené z datového toku mohou být přibližné. Přesná velikost vyžaduje načtení všech dat stopy",
+    "PreparingInput": "Příprava dočasné kopie vstupního souboru…",
+    "InterruptedInputProjectionPath": "Dočasná kopie zdrojového souboru: {0}"
   }
 }

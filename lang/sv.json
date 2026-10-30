@@ -482,6 +482,8 @@
     "TrackSizeEstimated": "Uppskattad nyttolast: ≈ {0}",
     "TrackSizeUnavailable": "Storlek saknas",
     "BatchNewHelp": "Starta en tom lista. Redan skapade filer ligger kvar på disken",
-    "TrackSizeHelp": "Storlekar som rapporteras av behållaren eller beräknas från bithastigheten kan vara ungefärliga. Exakta storlekar kräver att all nyttolast läses"
+    "TrackSizeHelp": "Storlekar som rapporteras av behållaren eller beräknas från bithastigheten kan vara ungefärliga. Exakta storlekar kräver att all nyttolast läses",
+    "PreparingInput": "Förbereder en tillfällig kopia av källfilen…",
+    "InterruptedInputProjectionPath": "Tillfällig kopia av källfilen: {0}"
   }
 }

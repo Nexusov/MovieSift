@@ -51,6 +51,7 @@
   <data name="NoChange" xml:space="preserve"><value>Изменений дорожек нет. Обработка не требуется</value></data>
   <data name="Checking" xml:space="preserve"><value>Проверка исходного файла и пути результата…</value></data>
   <data name="Remuxing" xml:space="preserve"><value>Копирование выбранных потоков…</value></data>
+  <data name="PreparingInput" xml:space="preserve"><value>Подготовка временной копии исходного файла…</value></data>
   <data name="Verifying" xml:space="preserve"><value>Проверка временного результата…</value></data>
   <data name="Publishing" xml:space="preserve"><value>Сохранение проверенного результата…</value></data>
   <data name="Published" xml:space="preserve"><value>Создан новый файл: {0}</value></data>
@@ -483,4 +484,5 @@
   <data name="TrackSizeUnavailable" xml:space="preserve"><value>Размер неизвестен</value></data>
   <data name="BatchNewHelp" xml:space="preserve"><value>Начать пустой список. Уже созданные файлы останутся на диске</value></data>
   <data name="TrackSizeHelp" xml:space="preserve"><value>Объём из метаданных или расчёт по битрейту может быть неточным. Точный размер требует чтения всех данных дорожки</value></data>
+  <data name="InterruptedInputProjectionPath" xml:space="preserve"><value>Временная копия исходного файла: {0}</value></data>
 </root>

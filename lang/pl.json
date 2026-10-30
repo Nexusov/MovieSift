@@ -482,6 +482,8 @@
     "TrackSizeEstimated": "Szacowany rozmiar danych: ≈ {0}",
     "TrackSizeUnavailable": "Rozmiar nieznany",
     "BatchNewHelp": "Rozpocznij pustą listę. Utworzone pliki pozostaną na dysku",
-    "TrackSizeHelp": "Rozmiary z metadanych lub wyliczone z przepływności mogą być przybliżone. Dokładny rozmiar wymaga odczytu wszystkich danych"
+    "TrackSizeHelp": "Rozmiary z metadanych lub wyliczone z przepływności mogą być przybliżone. Dokładny rozmiar wymaga odczytu wszystkich danych",
+    "PreparingInput": "Przygotowywanie tymczasowej kopii pliku źródłowego…",
+    "InterruptedInputProjectionPath": "Tymczasowa kopia pliku źródłowego: {0}"
   }
 }

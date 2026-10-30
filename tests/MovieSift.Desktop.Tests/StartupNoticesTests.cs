@@ -1,5 +1,6 @@
 using Avalonia.Headless.XUnit;
 using MovieSift.Application.Ports;
+using MovieSift.Core.Media;
 using MovieSift.Desktop.Views;
 using Xunit;
 
@@ -8,6 +9,31 @@ namespace MovieSift.Desktop.Tests;
 /// <summary>Shows unresolved ownership records independently of portable language-setting failures.</summary>
 public sealed class StartupNoticesTests
 {
+    /// <summary>Shows the unresolved app-local input copy without offering deletion or starting another media operation.</summary>
+    [AvaloniaTheory]
+    [InlineData("en", "Temporary input copy:")]
+    [InlineData("ru", "Временная копия исходного файла:")]
+    public async Task InterruptedProjectionShowsItsActualPathForManualReview(string language, string expectedLabel)
+    {
+        const string projectionPath = "app-local-data/ownership/fixture.input.mkv";
+        var fixture = new ViewModelFixture();
+        var projection = new OwnedInputProjection(new(projectionPath, "owned-copy", 0, 1),
+            new SourceRevision("original.mkv", "original-identity", 100, 1));
+        var output = new OwnedOutput(Guid.NewGuid(), "fixture-owned", "candidate.mkv", ViewModelFixture.OutputPath,
+            "fixture-token", InputProjection: projection);
+        fixture.Outputs.Interrupted = [new(output, "Reserved", false)];
+        await fixture.ViewModel.InitializeAsync();
+        await fixture.ViewModel.ChangeLanguageCommand.ExecuteAsync(language);
+        Assert.True(fixture.ViewModel.HasInterrupted);
+        Assert.Contains(expectedLabel, fixture.ViewModel.InterruptedDetails);
+        Assert.Contains(projectionPath, fixture.ViewModel.InterruptedDetails);
+        Assert.Contains(output.CandidatePath, fixture.ViewModel.InterruptedDetails);
+        Assert.Contains(output.DestinationPath, fixture.ViewModel.InterruptedDetails);
+        Assert.False(fixture.ViewModel.CleanInterruptedCommand.CanExecute(null));
+        Assert.Equal(0, fixture.Outputs.CleanupCount);
+        Assert.Equal(0, fixture.Backend.RemuxCount);
+    }
+
     /// <summary>Explains invalid records in the selected language without offering automatic deletion.</summary>
     [AvaloniaTheory]
     [InlineData("en", "needs manual review")]

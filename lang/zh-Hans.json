@@ -482,6 +482,8 @@
     "TrackSizeEstimated": "估计数据量：≈ {0}",
     "TrackSizeUnavailable": "大小未知",
     "BatchNewHelp": "开始一个空列表。已创建的文件仍保留在磁盘上",
-    "TrackSizeHelp": "根据元数据或比特率计算的大小可能为近似值。准确大小需要读取所有数据"
+    "TrackSizeHelp": "根据元数据或比特率计算的大小可能为近似值。准确大小需要读取所有数据",
+    "PreparingInput": "正在准备源文件的临时副本…",
+    "InterruptedInputProjectionPath": "源文件的临时副本：{0}"
   }
 }

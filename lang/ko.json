@@ -482,6 +482,8 @@
     "TrackSizeEstimated": "예상 데이터 크기: ≈ {0}",
     "TrackSizeUnavailable": "크기 알 수 없음",
     "BatchNewHelp": "빈 목록을 시작합니다. 이미 만든 파일은 디스크에 남습니다",
-    "TrackSizeHelp": "메타데이터 또는 비트 전송률 기반 크기는 근사값일 수 있습니다. 정확한 크기는 모든 데이터를 읽어야 합니다"
+    "TrackSizeHelp": "메타데이터 또는 비트 전송률 기반 크기는 근사값일 수 있습니다. 정확한 크기는 모든 데이터를 읽어야 합니다",
+    "PreparingInput": "입력 파일의 임시 복사본 준비 중…",
+    "InterruptedInputProjectionPath": "원본 파일의 임시 복사본: {0}"
   }
 }

@@ -482,6 +482,8 @@
     "TrackSizeEstimated": "Estimeret datamængde: ≈ {0}",
     "TrackSizeUnavailable": "Størrelse ikke tilgængelig",
     "BatchNewHelp": "Start en tom liste. Allerede oprettede filer forbliver på disken",
-    "TrackSizeHelp": "Størrelser angivet af containeren eller beregnet ud fra bitrate kan være omtrentlige. Præcise størrelser kræver læsning af alle nyttedata"
+    "TrackSizeHelp": "Størrelser angivet af containeren eller beregnet ud fra bitrate kan være omtrentlige. Præcise størrelser kræver læsning af alle nyttedata",
+    "PreparingInput": "Forbereder en midlertidig kopi af kildefilen…",
+    "InterruptedInputProjectionPath": "Midlertidig kopi af kildefilen: {0}"
   }
 }

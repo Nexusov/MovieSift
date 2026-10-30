@@ -482,6 +482,8 @@
     "TrackSizeEstimated": "Dados estimados: ≈ {0}",
     "TrackSizeUnavailable": "Tamanho desconhecido",
     "BatchNewHelp": "Iniciar uma lista vazia. Os arquivos já criados permanecem no disco",
-    "TrackSizeHelp": "Os tamanhos dos metadados ou calculados pela taxa de bits podem ser aproximados. O tamanho exato exige a leitura de todos os dados"
+    "TrackSizeHelp": "Os tamanhos dos metadados ou calculados pela taxa de bits podem ser aproximados. O tamanho exato exige a leitura de todos os dados",
+    "PreparingInput": "Preparando uma cópia temporária do arquivo de origem…",
+    "InterruptedInputProjectionPath": "Cópia temporária do arquivo de origem: {0}"
   }
 }

@@ -482,6 +482,8 @@
     "TrackSizeEstimated": "Tahmini veri boyutu: ≈ {0}",
     "TrackSizeUnavailable": "Boyut bilinmiyor",
     "BatchNewHelp": "Boş bir liste başlatın. Oluşturulan dosyalar diskte kalır",
-    "TrackSizeHelp": "Meta verilerden veya bit hızından alınan boyutlar yaklaşık olabilir. Kesin boyut tüm verilerin okunmasını gerektirir"
+    "TrackSizeHelp": "Meta verilerden veya bit hızından alınan boyutlar yaklaşık olabilir. Kesin boyut tüm verilerin okunmasını gerektirir",
+    "PreparingInput": "Kaynak dosyanın geçici kopyası hazırlanıyor…",
+    "InterruptedInputProjectionPath": "Kaynak dosyanın geçici kopyası: {0}"
   }
 }

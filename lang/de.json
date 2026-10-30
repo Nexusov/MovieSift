@@ -482,6 +482,8 @@
     "TrackSizeEstimated": "Geschätzte Nutzdaten: ≈ {0}",
     "TrackSizeUnavailable": "Größe unbekannt",
     "BatchNewHelp": "Eine leere Liste beginnen. Bereits erstellte Dateien bleiben auf dem Datenträger",
-    "TrackSizeHelp": "Metadaten- oder bitratebasierte Größen können ungenau sein. Genaue Größen erfordern das Lesen aller Nutzdaten"
+    "TrackSizeHelp": "Metadaten- oder bitratebasierte Größen können ungenau sein. Genaue Größen erfordern das Lesen aller Nutzdaten",
+    "PreparingInput": "Temporäre Kopie der Quelldatei wird vorbereitet…",
+    "InterruptedInputProjectionPath": "Temporäre Eingabekopie: {0}"
   }
 }
